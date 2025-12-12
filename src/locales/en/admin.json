@@ -1,0 +1,12 @@
+{
+  "title": "Admin",
+  "customers": "Customers",
+  "features": "Features",
+  "navigation": "Navigation",
+  "dashboard": "Dashboard Layout",
+  "theme": "Theme",
+  "audit": "Audit Log",
+  "create_customer": "Create Customer",
+  "name": "Name",
+  "slug": "Slug"
+}

@@ -1,0 +1,519 @@
+﻿We’ll follow the phases from IMPLEMENTATION_MASTER_GUIDE.md and the overall config plan. This is your final, stable roadmap.
+
+Phase 0 – Foundation & Types (Week 1–2)
+
+Goal: Get all core types, validation, and default config in place, before touching UI or dynamic stuff.
+
+Key files (all under src/ now, not OLD/src/):
+
+types/config.types.ts
+
+types/feature.types.ts
+
+types/widget.types.ts
+
+types/permission.types.ts
+
+validation/configSchemas.ts
+
+config/defaultConfig.ts
+
+Checklist:
+
+ Create all 4 type files with the exact interfaces from the guide:
+
+Customer, CustomerConfig, FeatureConfig, NavigationConfig, DashboardConfig, ThemeConfig, etc.
+
+ Add PERMISSIONS enum + PermissionCode in permission.types.ts.
+
+ Implement Zod schemas in validation/configSchemas.ts (CustomerConfig, FeatureConfig, NavigationTab, DashboardWidget, ThemeConfig, etc.).
+
+ Create config/defaultConfig.ts with:
+
+DEFAULT_THEME
+
+DEFAULT_FEATURES
+
+DEFAULT_NAVIGATION_TABS
+
+DEFAULT_DASHBOARD_WIDGETS
+
+DEFAULT_PERMISSIONS
+
+DEFAULT_CONFIG and SAFE_MODE_CONFIG
+
+ Run TypeScript and fix any type errors.
+
+When Phase 0 is done: you can fully represent a customer’s config in TS + validate it.
+
+Phase 1 – Database Schema & Migrations (Week 2–3)
+
+Goal: Build all DB tables and RLS needed for config-driven behavior.
+
+Use the SQL migrations listed in IMPLEMENTATION_MASTER_GUIDE and CONFIG_PLAN:
+
+Tables:
+
+customers
+
+customer_features
+
+navigation_tabs
+
+navigation_screens
+
+dashboard_widgets
+
+dashboard_layouts
+
+customer_themes
+
+roles
+
+permissions
+
+role_permissions
+
+user_permissions
+
+config_audit_log
+
+permission_audit_log
+
+config_change_events
+
+user_profiles updated with customer_id
+
+Checklist:
+
+ Create migration files for all tables above.
+
+ Add helper functions:
+
+get_customer_id_from_slug
+
+get_enabled_features
+
+get_dashboard_layout
+
+get_navigation_config
+
+get_customer_theme
+
+get_user_permissions
+
+check_user_permission
+
+emergency_disable_feature
+
+ Enable RLS on config tables and add policies (customers, customer_features, navigation_tabs, dashboard_layouts, customer_themes, user_permissions, config_change_events).
+
+ Seed:
+
+default widgets
+
+default roles
+
+default permissions
+
+default customer (for your dev environment)
+
+ Verify with basic SQL tests:
+
+A student only sees their own customer’s config.
+
+Admin can see/manage all.
+
+When Phase 1 is done: DB can serve full config for one or many customers safely.
+
+Phase 2 – Core Config Services & Store (Week 3–4)
+
+Goal: One place in the app to fetch & cache config from Supabase, including safe fallback.
+
+Key files:
+
+stores/configStore.ts
+
+services/config/featureService.ts
+
+services/config/navigationService.ts
+
+services/config/dashboardService.ts
+
+services/config/permissionService.ts
+
+services/config/themeService.ts
+
+services/config/customerConfigService.ts
+
+services/config/index.ts
+
+Checklist:
+
+ Implement useConfigStore (Zustand) with:
+
+config, isLoading, isInitialized, error
+
+setConfig, setLoading, setError, setCustomer, resetToDefault, resetToSafeMode, clearConfig
+
+ Implement FeatureService using:
+
+get_enabled_features RPC
+
+fallback to DEFAULT_FEATURES on error
+
+ Implement NavigationService using:
+
+get_navigation_config RPC
+
+fallback to DEFAULT_NAVIGATION_TABS
+
+ Implement DashboardService using:
+
+get_dashboard_layout RPC
+
+fallback to DEFAULT_DASHBOARD_WIDGETS
+
+ Implement PermissionService with get_user_permissions + check_user_permission.
+
+ Implement ThemeService with get_customer_theme + contrast validation helper.
+
+ Implement CustomerConfigService:
+
+Fetch customer info
+
+Parallel fetch: features, navigation, dashboard, permissions, theme
+
+Validate with Zod (validateCustomerConfig)
+
+Fallback using DEFAULT_CONFIG on failure
+
+When Phase 2 is done: You can call one service and get full CustomerConfig (from DB or default).
+
+Phase 3 – Config Hooks & Realtime Engine (Week 4–5)
+
+Goal: Simple React hooks that screens can call to use config, without touching Supabase directly.
+
+Key files:
+
+hooks/config/useFeatures.ts
+
+hooks/config/usePermissions.ts
+
+hooks/config/useNavigation.ts
+
+hooks/config/useDashboardLayout.ts
+
+hooks/config/useCustomerTheme.ts
+
+hooks/config/useCustomerConfig.ts
+
+hooks/config/index.ts
+
+Checklist:
+
+ useFeatures, useFeatureEnabled, useFeatureFlags built on configStore.
+
+ usePermissions, useHasPermission, useHasPermissions, useCanAccessFeature.
+
+ useNavigationConfig, useEnabledTabs, useTabScreens, useTabEnabled.
+
+ useDashboardLayout, useEnabledWidgets, useWidgetConfig.
+
+ useCustomerTheme, useTheme, useThemeColor, useThemeStyles.
+
+ useCustomerConfig:
+
+Calls CustomerConfigService
+
+Stores config in Zustand
+
+Sets up Supabase realtime subscription on config_change_events to invalidate queries.
+
+When Phase 3 is done: All screens can use hooks like useEnabledTabs, useWidgetEnabled, useHasPermission without knowing DB details.
+
+Phase 4 – Feature Registry (Week 5–6)
+
+Goal: One central mapping: which features exist, what they do, and their metadata.
+
+Key files:
+
+config/featureRegistry.ts
+
+config/featureRegistry.types.ts (or reuse feature.types.ts)
+
+Checklist:
+
+ Define all feature IDs used in FEATURE_TAXONOMY.md.
+
+ For each feature: include name, description, category, defaultEnabled, requiredPermissions, etc.
+
+ Add validation / contract tests to ensure:
+
+All referenced feature IDs in DB exist in registry.
+
+All feature IDs in registry have actual screens/components.
+
+When Phase 4 is done: Features are a closed, well-typed list; customers only toggle known ones.
+
+Phase 5 – Widget System & Dynamic Dashboard (Week 6–8)
+
+Goal: DynamicDashboard screen powered by widget layout from DB, not hardcoded cards.
+
+Key files:
+
+components/widgets/base/WidgetContainer.tsx
+
+components/widgets/base/WidgetErrorBoundary.tsx
+
+components/widgets/base/WidgetSkeleton.tsx
+
+components/widgets/dashboard/*.tsx (HeroCardWidget, TodayScheduleWidget, etc.)
+
+config/widgetRegistry.ts
+
+screens/student/DynamicDashboard.tsx
+
+Checklist:
+
+ Implement WidgetProps, WidgetMetadata, WidgetDataPolicy as per plan.
+
+ Build base components:
+
+WidgetContainer (padding, card)
+
+WidgetErrorBoundary (per-widget safety)
+
+WidgetSkeleton (type-based loading UI)
+
+ Implement at least these widgets first:
+
+HeroCardWidget
+
+TodayScheduleWidget
+
+QuickActionsWidget
+
+AssignmentsTestsWidget
+
+ Fill widgetRegistry with mapping from widgetType → widget class/component + metadata.
+
+ Implement DynamicDashboard:
+
+Uses useEnabledWidgets()
+
+For each widget config, looks up registry and renders inside WidgetContainer + WidgetErrorBoundary.
+
+When Phase 5 is done: Student dashboard is fully widget-based and ordered by DB config.
+
+Phase 6 – Dynamic Navigation (Week 8–9)
+
+Goal: Tab bar + nested stacks generated from navigation config in DB.
+
+Key files:
+
+components/navigation/DynamicStudentNavigator.tsx
+
+components/navigation/TabBuilder.tsx
+
+components/navigation/DynamicTabBar.tsx
+
+Checklist:
+
+ Use useEnabledTabs() to build bottom tabs instead of hardcoding 5 Tab.Screens.
+
+ Use useTabScreens(tabId) to define which stack screens belong under each tab.
+
+ Keep a feature flag use_dynamic_navigation so you can fall back to static navigator if something breaks.
+
+ Add tests verifying:
+
+Tabs order matches DB.
+
+Disabled tabs are hidden.
+
+Screens without permission are gated via FeatureGate / PermissionGate.
+
+When Phase 6 is done: Changing navigation in Supabase updates the app without redeploy.
+
+Phase 7 – Permission Engine & Gates (Week 9–10)
+
+Goal: Every sensitive action or feature is controlled by permission codes, not if role === 'x'.
+
+Key files:
+
+components/gates/FeatureGate.tsx
+
+components/gates/PermissionGate.tsx
+
+Permission logic already defined in hooks + services.
+
+Checklist:
+
+ Implement FeatureGate({ featureId, children }) using useCanAccessFeature.
+
+ Implement PermissionGate({ permissionCode, children }) using useHasPermission.
+
+ Wrap:
+
+AI Tutor buttons
+
+Live class actions
+
+Gamification buttons
+
+Any admin / teacher-only controls
+
+ Ensure fail-closed behavior:
+
+On permission fetch error → hide feature, except core features (dashboard/profile) which may be fail-open as designed.
+
+When Phase 7 is done: Turning a permission on/off in DB immediately changes visible actions.
+
+Phase 8 – Theme System (Week 10–11)
+
+Goal: Per-customer theme & branding, applied through Material 3.
+
+Key files:
+
+customer_themes table (already from Phase 1)
+
+ThemeService (Phase 2)
+
+useCustomerTheme / useThemeStyles (Phase 3)
+
+Integration inside AppProviders (PaperProvider theme override)
+
+Checklist:
+
+ Update AppProviders:
+
+Load theme from useCustomerTheme or useTheme and merge into Material 3 base (appTheme).
+
+ Replace hardcoded colors in your components with theme tokens from useThemeStyles().
+
+ Test with:
+
+Default customer
+
+Fake “dark-ish” customer
+
+Different primary colors.
+
+When Phase 8 is done: Each school/coaching can have its own branding without code changes.
+
+Phase 9 – Admin Dashboard (Weeks 11–15)
+
+Goal: Internal (or separate app) UI to manage customers, features, navigation, widgets, themes.
+
+As Config plan suggests, split into: Phase 7A + 7B internally, but in your head just treat as one big admin phase.
+
+Core screens:
+
+Customer Management
+
+Feature Toggles per customer
+
+Navigation Builder
+
+Dashboard Layout Builder
+
+Theme Customizer
+
+Permission Management (optional early)
+
+Audit Log Viewer
+
+Checklist (minimal version):
+
+ Basic Admin:
+
+List/create/edit customers.
+
+Toggle features per customer.
+
+ Navigation Admin:
+
+Reorder tabs (drag/drop or simple up/down).
+
+Toggle tabs on/off.
+
+ Dashboard Admin:
+
+Reorder widgets.
+
+Turn widgets on/off.
+
+Customize key props (like show/hide sections).
+
+ Theme Admin:
+
+Select primary/secondary colors.
+
+Upload logo.
+
+Validate contrast.
+
+ Safety:
+
+Use draft/publish workflow.
+
+Log all changes to config_audit_log & permission_audit_log.
+
+When Phase 9 is done: You can onboard/modify customers using UI only.
+
+Phase 10 – Testing, Migration & Launch (Weeks 15–18)
+
+Goal: Make sure the whole system is safe, fast, and ready for production.
+
+Use the testing strategy + milestones from CONFIG_PLAN.
+
+Checklist:
+
+ Unit tests:
+
+FeatureService, NavigationService, DashboardService, PermissionService, ThemeService.
+
+Widget components + error boundaries.
+
+ Integration tests:
+
+DynamicDashboard: respects DB layout + handles errors.
+
+DynamicStudentNavigator: builds tabs & stacks correctly.
+
+ Contract tests:
+
+Config from DB matches Zod schema.
+
+Widget & feature registries match code.
+
+ E2E tests (Detox):
+
+Login → Dashboard load.
+
+Feature toggle from Admin changes UI.
+
+Permission grant/revoke changes visible actions.
+
+ Load tests (k6):
+
+500 concurrent users hitting config + dashboard.
+
+Response time + DB connections within thresholds.
+
+ Migration scripts:
+
+Migrate old users to customers + user_profiles.customer_id.
+
+Backfill default navigation + dashboard configs.
+
+ Launch:
+
+Deploy to production.
+
+Monitor for 7 days (errors, performance, leaks).
+
+Keep ability to fall back to static navigation / static dashboard via feature flags if needed.
+
+When Phase 10 is done: Your config-driven, multi-tenant, dynamic app is production‑ready.

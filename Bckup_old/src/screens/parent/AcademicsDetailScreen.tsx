@@ -1,0 +1,372 @@
+/**
+ * AcademicsDetailScreen - PHASE 3A: Detailed Academic Performance
+ *
+ * Displays comprehensive academic performance with:
+ * - Subject-wise performance breakdown
+ * - Performance trends and grades
+ * - Overall academic summary
+ * - Subject cards with detailed stats
+ */
+
+import React, { useEffect, useMemo } from 'react';
+import { View, StyleSheet } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../../lib/supabase';
+import { BaseScreen } from '../../shared/components/BaseScreen';
+import { Col, Row, T, Card, CardContent, Button } from '../../ui';
+import { Colors, Spacing } from '../../theme/designSystem';
+import type { ParentStackParamList } from '../../types/navigation';
+import { trackScreenView, trackAction } from '../../utils/navigationAnalytics';
+import { safeNavigate } from '../../utils/navigationService';
+
+type Props = NativeStackScreenProps<ParentStackParamList, 'AcademicsDetail'>;
+
+interface SubjectGrade {
+  subject: string;
+  grade: number;
+  total_marks: number;
+  teacher_name?: string;
+  last_updated?: string;
+}
+
+const AcademicsDetailScreen: React.FC<Props> = ({ route }) => {
+  const { childId, childName } = route.params;
+
+  useEffect(() => {
+    trackScreenView('AcademicsDetail', { from: 'ChildDetail', childId });
+  }, [childId]);
+
+  // Fetch subject grades
+  const {
+    data: subjectGrades = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['academicsDetail', childId],
+    queryFn: async () => {
+      console.log('📚 [AcademicsDetail] Fetching subject grades for:', childId);
+      const { data, error } = await supabase
+        .from('student_grades')
+        .select('subject, grade, total_marks')
+        .eq('student_id', childId)
+        .order('subject');
+
+      if (error) {
+        console.error('❌ [AcademicsDetail] Error fetching grades:', error);
+        throw error;
+      }
+
+      console.log('✅ [AcademicsDetail] Loaded', data?.length || 0, 'subjects');
+      return data as SubjectGrade[];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+  // Group and aggregate grades by subject
+  const aggregatedSubjects = useMemo(() => {
+    if (!subjectGrades || subjectGrades.length === 0) return [];
+
+    const subjectMap = new Map<string, { totalGrade: number; totalMarks: number; count: number }>();
+
+    subjectGrades.forEach(sg => {
+      const existing = subjectMap.get(sg.subject) || { totalGrade: 0, totalMarks: 0, count: 0 };
+      subjectMap.set(sg.subject, {
+        totalGrade: existing.totalGrade + sg.grade,
+        totalMarks: existing.totalMarks + sg.total_marks,
+        count: existing.count + 1,
+      });
+    });
+
+    const aggregated: SubjectGrade[] = [];
+    subjectMap.forEach((value, subject) => {
+      aggregated.push({
+        subject,
+        grade: Math.round(value.totalGrade / value.count),
+        total_marks: Math.round(value.totalMarks / value.count),
+      });
+    });
+
+    console.log("📊 [AcademicsDetail] Aggregated", subjectGrades.length, "grades into", aggregated.length, "subjects");
+    return aggregated;
+  }, [subjectGrades]);
+
+
+  // Calculate overall performance
+  const overallStats = useMemo(() => {
+    if (!aggregatedSubjects || aggregatedSubjects.length === 0) {
+      return {
+        overallPercentage: 0,
+        totalSubjects: 0,
+        averageGrade: 0,
+        highestGrade: 0,
+        lowestGrade: 0,
+        passingSubjects: 0,
+      };
+    }
+
+    const percentages = aggregatedSubjects.map(sg => (sg.grade / sg.total_marks) * 100);
+    const overallPercentage = percentages.reduce((sum, p) => sum + p, 0) / percentages.length;
+    const passingSubjects = percentages.filter(p => p >= 60).length;
+
+    return {
+      overallPercentage: Math.round(overallPercentage),
+      totalSubjects: aggregatedSubjects.length,
+      averageGrade: Math.round(overallPercentage),
+      highestGrade: Math.max(...percentages),
+      lowestGrade: Math.min(...percentages),
+      passingSubjects,
+    };
+  }, [aggregatedSubjects]);
+
+  // Map subject full names to codes for gradebook queries
+  const getSubjectCode = (subjectName: string): string => {
+    const mapping: { [key: string]: string } = {
+      'English': 'ENG',
+      'Mathematics': 'MATH',
+      'Math': 'MATH',
+      'Computer Science': 'CS',
+      'Physics': 'PHY',
+      'Chemistry': 'CHEM',
+      'Biology': 'BIO',
+      'History': 'HIST',
+      'Geography': 'GEO',
+      'Science': 'SCI',
+      'Social Studies': 'SS',
+    };
+    return mapping[subjectName] || subjectName.toUpperCase().slice(0, 4);
+  };
+
+  // Get performance level and color
+  const getPerformanceLevel = (percentage: number) => {
+    if (percentage >= 90) return { label: 'Excellent', color: Colors.success };
+    if (percentage >= 80) return { label: 'Very Good', color: Colors.primary };
+    if (percentage >= 70) return { label: 'Good', color: Colors.accent };
+    if (percentage >= 60) return { label: 'Satisfactory', color: Colors.warning };
+    return { label: 'Needs Improvement', color: Colors.error };
+  };
+
+  const performanceLevel = getPerformanceLevel(overallStats.overallPercentage);
+
+  // Get grade letter
+  const getGradeLetter = (percentage: number) => {
+    if (percentage >= 90) return 'A+';
+    if (percentage >= 85) return 'A';
+    if (percentage >= 80) return 'B+';
+    if (percentage >= 75) return 'B';
+    if (percentage >= 70) return 'C+';
+    if (percentage >= 60) return 'C';
+    if (percentage >= 50) return 'D';
+    return 'F';
+  };
+
+  return (
+    <BaseScreen
+      scrollable={true}
+      loading={isLoading}
+      error={error ? 'Failed to load academic data' : null}
+      empty={!isLoading && aggregatedSubjects.length === 0}
+      emptyBody="No academic data available for this student"
+      onRetry={refetch}
+    >
+      <Col sx={{ p: 'md' }} gap="md">
+        {/* Header Section */}
+        <Card variant="elevated">
+          <CardContent>
+            <T variant="title" weight="bold" style={{ marginBottom: Spacing.xs }}>
+              🎓 Academic Performance
+            </T>
+            <T variant="body" color="textSecondary" style={{ marginBottom: Spacing.md }}>
+              Detailed academic performance for {childName || 'student'}
+            </T>
+
+            {/* Overall Stats */}
+            <View style={styles.statsGrid}>
+              <View style={styles.statBox}>
+                <T variant="display" weight="bold" color="primary" style={{ fontSize: 32 }}>
+                  {overallStats.overallPercentage}%
+                </T>
+                <T variant="caption" color="textSecondary">Overall Grade</T>
+                <T variant="caption" weight="semiBold" style={{ color: performanceLevel.color }}>
+                  {performanceLevel.label}
+                </T>
+              </View>
+
+              <View style={styles.statBox}>
+                <T variant="display" weight="bold" style={{ fontSize: 32 }}>
+                  {getGradeLetter(overallStats.overallPercentage)}
+                </T>
+                <T variant="caption" color="textSecondary">Letter Grade</T>
+              </View>
+
+              <View style={styles.statBox}>
+                <T variant="display" weight="bold" style={{ fontSize: 32 }}>
+                  {overallStats.totalSubjects}
+                </T>
+                <T variant="caption" color="textSecondary">Total Subjects</T>
+              </View>
+
+              <View style={styles.statBox}>
+                <T variant="display" weight="bold" color="success" style={{ fontSize: 32 }}>
+                  {overallStats.passingSubjects}
+                </T>
+                <T variant="caption" color="textSecondary">Passing Subjects</T>
+              </View>
+            </View>
+          </CardContent>
+        </Card>
+
+        {/* Subject Breakdown */}
+        <T variant="title" weight="semiBold" style={{ marginTop: Spacing.sm }}>
+          Subject-wise Performance
+        </T>
+
+        {aggregatedSubjects.map((subject, index) => {
+          const percentage = Math.round((subject.grade / subject.total_marks) * 100);
+          const level = getPerformanceLevel(percentage);
+          const gradeLetter = getGradeLetter(percentage);
+
+          return (
+            <Card
+              key={`${subject.subject}-${index}`}
+              variant="elevated"
+              onPress={() => {
+                trackAction('view_subject_detail', 'AcademicsDetail', {
+                  subject: subject.subject,
+                  childId,
+                });
+                safeNavigate('SubjectDetail', {
+                  studentId: childId,
+                  subject: subject.subject,  // Pass full name - gradebook.subject_code stores full names
+                });
+              }}
+            >
+              <CardContent>
+                <Row spaceBetween centerV style={{ marginBottom: Spacing.sm }}>
+                  <Col flex={1}>
+                    <T variant="body" weight="semiBold">{subject.subject}</T>
+                    <T variant="caption" color="textSecondary">
+                      {subject.grade} / {subject.total_marks} marks
+                    </T>
+                  </Col>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <T variant="title" weight="bold" style={{ fontSize: 24, color: level.color }}>
+                      {percentage}%
+                    </T>
+                    <T variant="caption" weight="semiBold">{gradeLetter}</T>
+                  </View>
+                </Row>
+
+                {/* Progress Bar */}
+                <View style={styles.progressBarContainer}>
+                  <View
+                    style={[
+                      styles.progressBar,
+                      {
+                        width: `${percentage}%`,
+                        backgroundColor: level.color,
+                      },
+                    ]}
+                  />
+                </View>
+
+                {/* Performance Label */}
+                <Row spaceBetween centerV style={{ marginTop: Spacing.xs }}>
+                  <T variant="caption" style={{ color: level.color }}>
+                    {level.label}
+                  </T>
+                  <T variant="caption" color="textSecondary">Tap for details</T>
+                </Row>
+              </CardContent>
+            </Card>
+          );
+        })}
+
+        {/* Performance Summary */}
+        {subjectGrades.length > 0 && (
+          <Card variant="elevated" style={{ marginTop: Spacing.sm }}>
+            <CardContent>
+              <T variant="body" weight="semiBold" style={{ marginBottom: Spacing.sm }}>
+                📊 Performance Summary
+              </T>
+              <Col gap="xs">
+                <Row spaceBetween>
+                  <T variant="body" color="textSecondary">Highest Grade:</T>
+                  <T variant="body" weight="semiBold" color="success">
+                    {Math.round(overallStats.highestGrade)}%
+                  </T>
+                </Row>
+                <Row spaceBetween>
+                  <T variant="body" color="textSecondary">Lowest Grade:</T>
+                  <T variant="body" weight="semiBold" color="error">
+                    {Math.round(overallStats.lowestGrade)}%
+                  </T>
+                </Row>
+                <Row spaceBetween>
+                  <T variant="body" color="textSecondary">Passing Rate:</T>
+                  <T variant="body" weight="semiBold">
+                    {overallStats.totalSubjects > 0
+                      ? Math.round((overallStats.passingSubjects / overallStats.totalSubjects) * 100)
+                      : 0}%
+                  </T>
+                </Row>
+              </Col>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Upcoming Exams Button */}
+        <Button
+          variant="primary"
+          onPress={() => {
+            trackAction('view_upcoming_exams', 'AcademicsDetail', { childId });
+            safeNavigate('UpcomingExams', { studentId: childId });
+          }}
+          style={{ marginTop: Spacing.md }}
+        >
+          📅 View Upcoming Exams
+        </Button>
+
+        {/* Academic Reports Button */}
+        <Button
+          variant="secondary"
+          onPress={() => {
+            trackAction('view_academic_reports', 'AcademicsDetail', { childId });
+            safeNavigate('AcademicReports', { studentId: childId });
+          }}
+          style={{ marginTop: Spacing.md }}
+        >
+          📄 View Academic Reports
+        </Button>
+      </Col>
+    </BaseScreen>
+  );
+};
+
+const styles = StyleSheet.create({
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: Spacing.md,
+    marginHorizontal: -Spacing.xs,
+  },
+  statBox: {
+    width: '50%',
+    padding: Spacing.xs,
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: Colors.surface,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginTop: Spacing.xs,
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+});
+
+export default AcademicsDetailScreen;

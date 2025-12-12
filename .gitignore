@@ -1,0 +1,20 @@
+# Node / React
+node_modules/
+.next/
+
+# Env
+.env
+.env.local
+
+# Android build outputs
+android/app/build/
+android/build/
+*.apk
+*.aab
+*.so
+
+# IDE
+.vscode/
+.kiro/
+.claude/
+.mcp.json

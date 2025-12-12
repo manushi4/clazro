@@ -1,0 +1,189 @@
+{
+  "title": "Progress",
+  "screenTitle": "My Progress",
+  "analytics": "Analytics",
+  "gamification": "Gamification",
+  
+  "tabs": {
+    "overview": "Overview",
+    "subjects": "Subjects",
+    "analytics": "Analytics",
+    "achievements": "Achievements"
+  },
+  
+  "stats": {
+    "title": "Your Stats",
+    "testsCompleted": "Tests Completed",
+    "averageScore": "Average Score",
+    "studyTime": "Study Time",
+    "streak": "Day Streak",
+    "xp": "Total XP",
+    "level": "Level",
+    "badges": "Badges Earned",
+    "assignments": "Assignments Done",
+    "improvement": "Improvement",
+    "rank": "Class Rank"
+  },
+  
+  "streak": {
+    "title": "Study Streak",
+    "current": "Current Streak",
+    "longest": "Longest Streak",
+    "days": "days",
+    "day": "day",
+    "weeklyGoal": "Weekly Goal",
+    "keepItUp": "Keep it up!",
+    "startStreak": "Start your streak today!",
+    "streakBroken": "Your streak was broken",
+    "achievements": "Streak Achievements"
+  },
+  
+  "subjects": {
+    "title": "Subject Progress",
+    "viewAll": "View All",
+    "chapters": "chapters",
+    "completed": "completed",
+    "mastery": "Mastery",
+    "lastActivity": "Last activity",
+    "noSubjects": "No subjects found",
+    "continue": "Continue Learning"
+  },
+  
+  "goals": {
+    "title": "Learning Goals",
+    "addGoal": "Add Goal",
+    "noGoals": "No goals set",
+    "setGoals": "Set your learning goals",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "dueIn": "Due in",
+    "overdue": "Overdue",
+    "priority": {
+      "high": "High Priority",
+      "medium": "Medium Priority",
+      "low": "Low Priority"
+    }
+  },
+  
+  "quests": {
+    "title": "Active Quests",
+    "viewAll": "View All Quests",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "completed": "Completed",
+    "active": "Active",
+    "locked": "Locked",
+    "xpReward": "XP Reward",
+    "progress": "Progress",
+    "noQuests": "No active quests",
+    "checkBack": "Check back later for new quests"
+  },
+  
+  "leaderboard": {
+    "title": "Leaderboard",
+    "viewAll": "View Full Leaderboard",
+    "yourRank": "Your Rank",
+    "topPerformers": "Top Performers",
+    "scope": {
+      "class": "Class",
+      "school": "School",
+      "global": "Global"
+    },
+    "percentile": "Top {{percent}}%",
+    "xp": "XP",
+    "you": "You"
+  },
+  
+  "weakAreas": {
+    "title": "Topics to Strengthen",
+    "subtitle": "Focus on these areas to improve",
+    "practice": "Practice",
+    "noWeakAreas": "Great job! No weak areas found",
+    "score": "Score",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    }
+  },
+  
+  "analyticsSnapshot": {
+    "title": "Overall Progress",
+    "subtitle": "See how you're doing across subjects",
+    "studyTime": "Study Time",
+    "assignmentsDone": "Assignments Done",
+    "testsAttempted": "Tests Attempted",
+    "vsLastWeek": "vs last week",
+    "subjectSnapshot": "Subject Snapshot",
+    "streakFocus": "Streak & Focus",
+    "avgFocusSession": "Avg Focus Session",
+    "guidedSessions": "Guided Sessions",
+    "recommendations": "Suggested Next Steps",
+    "selectSubjectTip": "Select a subject to see detailed stats",
+    "avgTestScore": "Average Test Score",
+    "doubtsResolved": "Doubts Resolved",
+    "completedTopics": "Completed Topics"
+  },
+  
+  "subjectAnalytics": {
+    "title": "Subject Analytics",
+    "averageScore": "Avg Score",
+    "testsCompleted": "Tests",
+    "studyTime": "Study Time",
+    "doubtsResolved": "Doubts",
+    "resolved": "Resolved",
+    "thisMonth": "This month",
+    "thisWeek": "This week",
+    "performanceTrend": "Performance Trend",
+    "chartComingSoon": "Performance chart coming soon",
+    "topicBreakdown": "Topic Breakdown",
+    "noTopics": "No topics available",
+    "recentTests": "Recent Tests",
+    "noTests": "No tests yet",
+    "practiceSection": "Practice & Improve",
+    "doubtsResolvedCount": "Doubts resolved: {{count}}",
+    "practiceSessionsCount": "Practice sessions: {{count}}",
+    "practiceWeakTopics": "Practice weak topics with {{aiName}}",
+    "allTopicsMastered": "All topics mastered!"
+  },
+  
+  "actions": {
+    "viewDetails": "View Details",
+    "viewAll": "View All",
+    "practice": "Practice",
+    "continue": "Continue",
+    "share": "Share Progress",
+    "export": "Export Report"
+  },
+  
+  "empty": {
+    "title": "No Progress Data",
+    "subtitle": "Start learning to see your progress here",
+    "startLearning": "Start Learning"
+  },
+  
+  "errors": {
+    "loadFailed": "Failed to load progress data",
+    "retry": "Tap to retry"
+  },
+  
+  "gamifiedHub": {
+    "title": "Gamified Learning Hub",
+    "dayStreak": "Day Streak",
+    "longestStreak": "Longest: {{days}} days",
+    "myBadges": "My Badges",
+    "of": "of",
+    "earned": "earned",
+    "noBadges": "No badges yet",
+    "weeklyLeaderboard": "Weekly Leaderboard",
+    "viewFullLeaderboard": "View Full Leaderboard",
+    "noLeaderboard": "Leaderboard not available",
+    "activeChallenges": "Active Challenges",
+    "noChallenges": "No active challenges",
+    "rewardsShop": "Rewards Shop",
+    "redeemPoints": "Redeem your XP for rewards",
+    "shop": "Shop",
+    "xpToNextLevel": "XP to Level {{level}}",
+    "level": "Level {{level}}"
+  }
+}

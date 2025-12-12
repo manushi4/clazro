@@ -1,0 +1,189 @@
+{
+  "title": "प्रगति",
+  "screenTitle": "मेरी प्रगति",
+  "analytics": "एनालिटिक्स",
+  "gamification": "गैमिफ़िकेशन",
+  
+  "tabs": {
+    "overview": "अवलोकन",
+    "subjects": "विषय",
+    "analytics": "एनालिटिक्स",
+    "achievements": "उपलब्धियां"
+  },
+  
+  "stats": {
+    "title": "आपके आंकड़े",
+    "testsCompleted": "टेस्ट पूर्ण",
+    "averageScore": "औसत स्कोर",
+    "studyTime": "पढ़ाई का समय",
+    "streak": "दिन की स्ट्रीक",
+    "xp": "कुल XP",
+    "level": "लेवल",
+    "badges": "बैज अर्जित",
+    "assignments": "असाइनमेंट पूर्ण",
+    "improvement": "सुधार",
+    "rank": "क्लास रैंक"
+  },
+  
+  "streak": {
+    "title": "स्टडी स्ट्रीक",
+    "current": "वर्तमान स्ट्रीक",
+    "longest": "सबसे लंबी स्ट्रीक",
+    "days": "दिन",
+    "day": "दिन",
+    "weeklyGoal": "साप्ताहिक लक्ष्य",
+    "keepItUp": "जारी रखें!",
+    "startStreak": "आज अपनी स्ट्रीक शुरू करें!",
+    "streakBroken": "आपकी स्ट्रीक टूट गई",
+    "achievements": "स्ट्रीक उपलब्धियां"
+  },
+  
+  "subjects": {
+    "title": "विषय प्रगति",
+    "viewAll": "सभी देखें",
+    "chapters": "अध्याय",
+    "completed": "पूर्ण",
+    "mastery": "महारत",
+    "lastActivity": "अंतिम गतिविधि",
+    "noSubjects": "कोई विषय नहीं मिला",
+    "continue": "पढ़ाई जारी रखें"
+  },
+  
+  "goals": {
+    "title": "सीखने के लक्ष्य",
+    "addGoal": "लक्ष्य जोड़ें",
+    "noGoals": "कोई लक्ष्य निर्धारित नहीं",
+    "setGoals": "अपने सीखने के लक्ष्य निर्धारित करें",
+    "completed": "पूर्ण",
+    "inProgress": "प्रगति में",
+    "dueIn": "में देय",
+    "overdue": "अतिदेय",
+    "priority": {
+      "high": "उच्च प्राथमिकता",
+      "medium": "मध्यम प्राथमिकता",
+      "low": "कम प्राथमिकता"
+    }
+  },
+  
+  "quests": {
+    "title": "सक्रिय क्वेस्ट",
+    "viewAll": "सभी क्वेस्ट देखें",
+    "daily": "दैनिक",
+    "weekly": "साप्ताहिक",
+    "completed": "पूर्ण",
+    "active": "सक्रिय",
+    "locked": "लॉक",
+    "xpReward": "XP पुरस्कार",
+    "progress": "प्रगति",
+    "noQuests": "कोई सक्रिय क्वेस्ट नहीं",
+    "checkBack": "नए क्वेस्ट के लिए बाद में देखें"
+  },
+  
+  "leaderboard": {
+    "title": "लीडरबोर्ड",
+    "viewAll": "पूरा लीडरबोर्ड देखें",
+    "yourRank": "आपकी रैंक",
+    "topPerformers": "शीर्ष प्रदर्शक",
+    "scope": {
+      "class": "क्लास",
+      "school": "स्कूल",
+      "global": "ग्लोबल"
+    },
+    "percentile": "शीर्ष {{percent}}%",
+    "xp": "XP",
+    "you": "आप"
+  },
+  
+  "weakAreas": {
+    "title": "मजबूत करने के विषय",
+    "subtitle": "सुधार के लिए इन क्षेत्रों पर ध्यान दें",
+    "practice": "अभ्यास",
+    "noWeakAreas": "बहुत बढ़िया! कोई कमजोर क्षेत्र नहीं मिला",
+    "score": "स्कोर",
+    "difficulty": {
+      "easy": "आसान",
+      "medium": "मध्यम",
+      "hard": "कठिन"
+    }
+  },
+  
+  "analyticsSnapshot": {
+    "title": "समग्र प्रगति",
+    "subtitle": "देखें कि आप सभी विषयों में कैसा प्रदर्शन कर रहे हैं",
+    "studyTime": "पढ़ाई का समय",
+    "assignmentsDone": "असाइनमेंट पूर्ण",
+    "testsAttempted": "टेस्ट प्रयास",
+    "vsLastWeek": "पिछले सप्ताह की तुलना में",
+    "subjectSnapshot": "विषय स्नैपशॉट",
+    "streakFocus": "स्ट्रीक और फोकस",
+    "avgFocusSession": "औसत फोकस सत्र",
+    "guidedSessions": "गाइडेड सत्र",
+    "recommendations": "सुझाए गए अगले कदम",
+    "selectSubjectTip": "विस्तृत आंकड़े देखने के लिए एक विषय चुनें",
+    "avgTestScore": "औसत टेस्ट स्कोर",
+    "doubtsResolved": "संदेह हल किए गए",
+    "completedTopics": "पूर्ण विषय"
+  },
+  
+  "subjectAnalytics": {
+    "title": "विषय एनालिटिक्स",
+    "averageScore": "औसत स्कोर",
+    "testsCompleted": "टेस्ट",
+    "studyTime": "पढ़ाई का समय",
+    "doubtsResolved": "संदेह",
+    "resolved": "हल किए गए",
+    "thisMonth": "इस महीने",
+    "thisWeek": "इस सप्ताह",
+    "performanceTrend": "प्रदर्शन रुझान",
+    "chartComingSoon": "प्रदर्शन चार्ट जल्द आ रहा है",
+    "topicBreakdown": "विषय विश्लेषण",
+    "noTopics": "कोई विषय उपलब्ध नहीं",
+    "recentTests": "हाल के टेस्ट",
+    "noTests": "अभी तक कोई टेस्ट नहीं",
+    "practiceSection": "अभ्यास और सुधार",
+    "doubtsResolvedCount": "संदेह हल किए गए: {{count}}",
+    "practiceSessionsCount": "अभ्यास सत्र: {{count}}",
+    "practiceWeakTopics": "{{aiName}} के साथ कमजोर विषयों का अभ्यास करें",
+    "allTopicsMastered": "सभी विषयों में महारत हासिल!"
+  },
+  
+  "actions": {
+    "viewDetails": "विवरण देखें",
+    "viewAll": "सभी देखें",
+    "practice": "अभ्यास",
+    "continue": "जारी रखें",
+    "share": "प्रगति साझा करें",
+    "export": "रिपोर्ट निर्यात करें"
+  },
+  
+  "empty": {
+    "title": "कोई प्रगति डेटा नहीं",
+    "subtitle": "अपनी प्रगति यहां देखने के लिए पढ़ाई शुरू करें",
+    "startLearning": "पढ़ाई शुरू करें"
+  },
+  
+  "errors": {
+    "loadFailed": "प्रगति डेटा लोड करने में विफल",
+    "retry": "पुनः प्रयास करने के लिए टैप करें"
+  },
+  
+  "gamifiedHub": {
+    "title": "गैमिफाइड लर्निंग हब",
+    "dayStreak": "दिन की स्ट्रीक",
+    "longestStreak": "सबसे लंबी: {{days}} दिन",
+    "myBadges": "मेरे बैज",
+    "of": "में से",
+    "earned": "अर्जित",
+    "noBadges": "अभी तक कोई बैज नहीं",
+    "weeklyLeaderboard": "साप्ताहिक लीडरबोर्ड",
+    "viewFullLeaderboard": "पूरा लीडरबोर्ड देखें",
+    "noLeaderboard": "लीडरबोर्ड उपलब्ध नहीं",
+    "activeChallenges": "सक्रिय चुनौतियां",
+    "noChallenges": "कोई सक्रिय चुनौती नहीं",
+    "rewardsShop": "पुरस्कार दुकान",
+    "redeemPoints": "पुरस्कारों के लिए अपने XP रिडीम करें",
+    "shop": "दुकान",
+    "xpToNextLevel": "लेवल {{level}} के लिए XP",
+    "level": "लेवल {{level}}"
+  }
+}

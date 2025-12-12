@@ -1,0 +1,590 @@
+﻿Below is your **full Phase-11 to Phase-20 task plan**, each phase corresponding to one of the 10 global “brick” systems we created.
+
+This goes into:
+
+```
+docs/PHASE_11_TO_20_TASK_PLAN.md
+```
+
+---
+
+# 📘 PHASE 11–20 TASK PLAN
+
+### (Error Handling → Accessibility)
+
+Complete Production Execution Plan With Tasks, Subtasks & Checklists
+
+---
+
+# **Phase 11 — Error Handling System Implementation**
+
+(Reference: `ERROR_HANDLING_SPEC.md`)
+
+## 🎯 Goal
+
+Implement global, stack, screen, and widget-level error boundaries + safe-mode + error utilities.
+
+---
+
+## ✅ Tasks
+
+### **11.1 Global Error Boundary**
+
+* Create `src/error/GlobalErrorBoundary.tsx`
+* Wrap entire app root (AppProviders + Navigation)
+* Add crash UI:
+
+  * Title, message, “Restart App”
+* Hook: fallback navigation to home
+* Log errors → Sentry + Analytics
+
+### **11.2 Stack-Level Error Boundaries**
+
+* Create `src/error/StackErrorBoundary.tsx`
+* Wrap each BottomTab stack:
+
+  * HomeStack
+  * StudyStack
+  * AskStack
+  * ProgressStack
+  * ProfileStack
+  * AdminStack
+
+### **11.3 Screen-Level Error Boundaries**
+
+* Create `src/error/ScreenErrorBoundary.tsx`
+* Wrap screens with complex UI:
+
+  * Dashboard
+  * Study Library
+  * Doubt Submission
+  * Progress
+  * Admin pages
+
+### **11.4 Widget-Level ErrorBoundary**
+
+* Create `WidgetErrorBoundary` & integrate into WidgetContainer
+
+### **11.5 Safe Mode Implementation**
+
+* Trigger if:
+
+  * DB config fetch fails
+  * Validation fails
+* Load `SAFE_MODE_CONFIG`
+* Show minimal tabs & widgets
+
+### **11.6 Error Utilities**
+
+* Create custom AppError class
+* Implement `useHandleError()`
+* Standardize user-facing messages
+
+---
+
+## ✔️ Checklist
+
+* [ ] Global error boundary wrapped around app
+* [ ] Stack boundaries implemented
+* [ ] Screen boundaries on critical screens
+* [ ] Widget boundaries integrated
+* [ ] Safe-mode logic implemented
+* [ ] Error logging → Sentry + Analytics
+* [ ] UI fallback patterns implemented
+* [ ] All errors use `AppError` classification
+
+---
+
+# **Phase 12 — Analytics & Telemetry System**
+
+(Reference: `ANALYTICS_TELEMETRY_SPEC.md`)
+
+## 🎯 Goal
+
+Create unified analytics system for screen views, widget events, navigation actions, feature usage, config errors.
+
+---
+
+## ✅ Tasks
+
+### **12.1 Analytics Provider Setup**
+
+* Create `AnalyticsService`
+* Add sinks:
+
+  * Sentry
+  * Optional Supabase logs table
+
+### **12.2 useAnalytics Hook**
+
+* `trackEvent()`
+* `trackScreenView()`
+* `trackWidgetEvent()`
+* `trackConfigEvent()`
+
+### **12.3 Screen Analytics**
+
+* Fire `screen_view` on screen mount
+* Track load start / end / error
+
+### **12.4 Navigation Analytics**
+
+* Tab changes → `tab_changed`
+* Screen navigation → `navigate_to_screen`
+* Errors → `navigation_error`
+
+### **12.5 Widget Analytics**
+
+* Render
+* CTA click
+* Error
+* Data load success/failure
+
+### **12.6 Feature Usage Events**
+
+* Doubt creation events
+* Test start/submit events
+* AI session start, message sent
+
+---
+
+## ✔️ Checklist
+
+* [ ] AnalyticsService implemented
+* [ ] useAnalytics hook wired
+* [ ] Screen events firing
+* [ ] Tab navigation tracked
+* [ ] Widget render + CTA events
+* [ ] Feature usage events created
+* [ ] Config events logged
+* [ ] Sensitive data excluded
+
+---
+
+# **Phase 13 — Crash Reporting & Monitoring (Sentry)**
+
+(Reference: `CRASH_REPORTING_SENTRY_SPEC.md`)
+
+## 🎯 Goal
+
+Implement Sentry crash reporting, performance monitoring, breadcrumbs, user context.
+
+---
+
+## ✅ Tasks
+
+### **13.1 Sentry Initialization**
+
+* Add DSN
+* Environment tags: dev, staging, production
+* Release version tagging
+
+### **13.2 Attach Context**
+
+* userId
+* customerId
+* role
+* device data
+* network status
+
+### **13.3 Capture Errors**
+
+* Global boundary errors
+* Backend errors
+* Widget/screen errors
+* Navigation errors
+* Config errors
+
+### **13.4 Breadcrumb Integration**
+
+* Screen views
+* Navigation events
+* Config loads
+* Widget interactions
+
+---
+
+## ✔️ Checklist
+
+* [ ] Sentry initialized
+* [ ] Context & tags added
+* [ ] All errors captured
+* [ ] Breadcrumbs enabled
+* [ ] Tested with intentionally thrown errors
+
+---
+
+# **Phase 14 — Navigation Failsafe System**
+
+(Reference: `NAVIGATION_FAILSAFE_SPEC.md`)
+
+## 🎯 Goal
+
+Ensure navigation is unbreakable even with invalid configs.
+
+---
+
+## ✅ Tasks
+
+### **14.1 Route Registry**
+
+* Create `routeRegistry.ts`
+* Map screenIds → components
+
+### **14.2 Navigation Resolver**
+
+* `resolveScreen()`
+* Placeholder fallback screen
+
+### **14.3 Navigation Error Boundary**
+
+* Wrap each stack navigator
+* Log errors
+
+### **14.4 Static Navigation Fallback**
+
+* `USE_DYNAMIC_NAV=false` env flag
+* Use hardcoded 5 tabs
+
+### **14.5 Permission/Feature-Based Tab Filtering**
+
+* Remove restricted tabs/screens
+
+---
+
+## ✔️ Checklist
+
+* [ ] Registry implemented
+* [ ] Resolver with fallback screen
+* [ ] Stack error boundaries added
+* [ ] Static fallback mode implemented
+* [ ] Permission-based filtering functioning
+* [ ] Offline blocking rules functional
+
+---
+
+# **Phase 15 — Widget Failsafe System**
+
+(Reference: `WIDGET_FAILSAFE_SPEC.md`)
+
+## 🎯 Goal
+
+Ensure dashboard widgets never crash screen or app.
+
+---
+
+## ✅ Tasks
+
+### **15.1 Widget Registry**
+
+* Central registry of all widgets
+
+### **15.2 WidgetContainer**
+
+* Loading state
+* Error fallback
+* Offline fallback
+* Layout consistency
+
+### **15.3 WidgetErrorBoundary**
+
+* Wrap every widget
+
+### **15.4 Invalid Config Handling**
+
+Skip widget if:
+
+* Missing widgetId
+* Invalid config
+* Permissions missing
+* Requires online
+
+### **15.5 Analytics + Sentry Logging**
+
+---
+
+## ✔️ Checklist
+
+* [ ] Widget registry complete
+* [ ] Widget container implemented
+* [ ] Error boundaries active
+* [ ] Config validation integrated
+* [ ] Skip behavior safe
+* [ ] Offline + online fallbacks
+
+---
+
+# **Phase 16 — Feature & Widget Versioning System**
+
+(Reference: `FEATURE_VERSIONING_SPEC.md`)
+
+## 🎯 Goal
+
+Add versioning and migration to prevent old configs from breaking.
+
+---
+
+## ✅ Tasks
+
+### **16.1 Add Version Fields**
+
+* Features
+* Widgets
+* Dashboard layout
+* Navigation config
+* CustomerConfig
+
+### **16.2 Version Checking Logic**
+
+* Mismatch detection
+* Semantic version parsing
+
+### **16.3 Migration Engine**
+
+* `migrateDashboardLayoutVx()`
+* `migrateFeatureVx()`
+
+### **16.4 Deprecation Flags**
+
+* Mark deprecated widgets/features
+* Add fallback equivalents
+
+---
+
+## ✔️ Checklist
+
+* [ ] Version fields added
+* [ ] Migration functions created
+* [ ] Version checks integrated
+* [ ] Deprecated items logged
+* [ ] Contract tests updated
+
+---
+
+# **Phase 17 — Data Sync & Freshness**
+
+(Reference: `DATA_SYNC_CONSISTENCY_SPEC.md`)
+
+## 🎯 Goal
+
+Implement consistent data sync rules across all features.
+
+---
+
+## ✅ Tasks
+
+### **17.1 React Query Global Settings**
+
+* Cache times
+* Stale times
+* Retry strategies
+* Offline guards
+
+### **17.2 Per-Feature Freshness Rules**
+
+* Study library → eventual
+* Dashboard → eventual
+* Tests/exams → strong
+* Notes → local-first
+
+### **17.3 Background Sync Engine**
+
+Trigger on:
+
+* App foreground
+* Network reconnect
+* Pull-to-refresh
+* Config updates
+
+### **17.4 Mutation Safeguards**
+
+* Prevent double-submits
+* Offline blocking rules
+
+---
+
+## ✔️ Checklist
+
+* [ ] Query defaults applied
+* [ ] Feature-level rules added
+* [ ] Background sync implemented
+* [ ] Mutation locking added
+
+---
+
+# **Phase 18 — Media & File Handling System**
+
+(Reference: `MEDIA_FILE_HANDLING_SPEC.md`)
+
+## 🎯 Goal
+
+Offline-ready download manager + secure file system handling.
+
+---
+
+## ✅ Tasks
+
+### **18.1 Supabase Storage Buckets**
+
+* PDFs
+* Videos
+* Thumbnails
+* User uploads
+* Branding assets
+
+### **18.2 Download Manager**
+
+* Download
+* Validate
+* Delete
+* Cache metadata
+* Offline open
+
+### **18.3 Signed URL Refresh**
+
+* Handle expiration
+* Automatic refresh
+
+### **18.4 Local FileSystem Integration**
+
+* Directory structure
+* Cleanup policies
+
+---
+
+## ✔️ Checklist
+
+* [ ] Buckets created
+* [ ] Download manager implemented
+* [ ] URL refresh implemented
+* [ ] Offline reading functional
+* [ ] Corrupted file detection added
+
+---
+
+# **Phase 19 — UI Component System**
+
+(Reference: `UI_COMPONENT_SYSTEM.md`)
+
+## 🎯 Goal
+
+Implement reusable UI components with design tokens + MD3.
+
+---
+
+## ✅ Tasks
+
+### **19.1 Design Tokens**
+
+* spacing
+* typography
+* color tokens
+* radius
+
+### **19.2 Base Components**
+
+* AppText
+* AppButton
+* AppCard
+* AppInput
+* AppChip
+* AppIcon
+* AppDivider
+
+### **19.3 Layout Components**
+
+* Row
+* Column
+* ScreenSection
+* AppScaffold
+
+### **19.4 Widget Shell Integration**
+
+---
+
+## ✔️ Checklist
+
+* [ ] All base components created
+* [ ] Tokens integrated
+* [ ] Layout components ready
+* [ ] Screens use AppScaffold
+* [ ] Widgets use WidgetContainer
+
+---
+
+# **Phase 20 — Accessibility**
+
+(Reference: `ACCESSIBILITY_GUIDELINES.md`)
+
+## 🎯 Goal
+
+Implement full accessibility compliance across UI.
+
+---
+
+## ✅ Tasks
+
+### **20.1 Font Scaling**
+
+* Ensure all text respects system font size
+* Replace raw `<Text>` with AppText
+
+### **20.2 Screen Reader Support**
+
+* accessibilityLabel
+* accessible containers
+* announce key interactions
+
+### **20.3 Touch Targets**
+
+* Minimum 44dp
+* Buttons & icons padded
+
+### **20.4 Color Contrast Checks**
+
+* Validate theme colors
+* Auto-contrast override where needed
+
+### **20.5 Layout Resilience**
+
+* All screens must remain usable:
+
+  * in RTL
+  * with large fonts
+  * with dark mode
+
+### **20.6 Offline/Low-Network Accessibility**
+
+* Offline messages readable
+* No blank states
+
+---
+
+## ✔️ Checklist
+
+* [ ] All components support font scaling
+* [ ] Accessibility labels added
+* [ ] UI passes contrast tests
+* [ ] Touch targets at least 44dp
+* [ ] Screen reader flows validated
+* [ ] Offline mode accessible
+* [ ] RTL-compatible components
+
+---
+
+# 🎉 FINAL SUMMARY
+
+### Phase 11–20 represent the **core safety, stability, UI, and inclusivity layer** of Mansuhi.
+
+Once these phases are complete, your app becomes:
+
+* Crash-safe
+* Config-safe
+* Permission-safe
+* Widget-safe
+* Navigation-safe
+* Offline-ready
+* Themed
+* Multi-lingual
+* Accessible
+* And production-ready at scale

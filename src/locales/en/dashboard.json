@@ -1,0 +1,349 @@
+{
+  "title": "Dashboard",
+  "widgets": {
+    "heroCard": {
+      "title": "Welcome",
+      "subtitle": "Ready to learn something new today?",
+      "greetings": {
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening",
+        "hello": "Hello"
+      },
+      "defaultNames": {
+        "student": "Student",
+        "parent": "Parent",
+        "teacher": "Teacher",
+        "admin": "Admin"
+      },
+      "subtitles": {
+        "student": "Ready to learn something new today?",
+        "parent": "Stay connected with your child's progress",
+        "teacher": "Ready to inspire your students today?",
+        "admin": "Manage your institution efficiently"
+      },
+      "labels": {
+        "streak": "Day Streak",
+        "today": "Today",
+        "score": "Score",
+        "xp": "XP",
+        "children": "Children",
+        "pendingFees": "Pending",
+        "messages": "Messages",
+        "classes": "Classes",
+        "students": "Students",
+        "pendingTasks": "To Review"
+      }
+    },
+    "todaySchedule": {
+      "title": "Today's Schedule",
+      "subtitle": "Upcoming classes",
+      "error": "Unable to load schedule",
+      "states": {
+        "empty": "No classes scheduled for today",
+        "error": "Unable to load schedule",
+        "offline": "Cached data"
+      },
+      "actions": {
+        "retry": "Try Again",
+        "viewAll": "View all ({{count}} items)"
+      },
+      "labels": {
+        "due": "Due",
+        "live": "Live"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Shortcuts to key flows",
+      "cta": "Start study",
+      "success": "Action triggered",
+      "states": {
+        "empty": "No quick actions available"
+      },
+      "study": "Study",
+      "ask": "Ask Doubt",
+      "test": "Take Test",
+      "live": "Live Class"
+    },
+    "assignmentsTests": {
+      "title": "Assignments & Tests",
+      "subtitle": "Upcoming tasks"
+    },
+    "assignments": {
+      "labels": {
+        "overdue": "Overdue",
+        "dueToday": "Due Today",
+        "upcoming": "Upcoming",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "noDue": "No due date"
+      },
+      "states": {
+        "empty": "No pending assignments"
+      },
+      "actions": {
+        "viewAll": "View all ({{count}})"
+      }
+    },
+    "doubtsInbox": {
+      "title": "Doubts Inbox",
+      "subtitle": "Recent doubts"
+    },
+    "progressSnapshot": {
+      "title": "Progress Snapshot",
+      "subtitle": "Mini analytics",
+      "labels": {
+        "overall": "Overall",
+        "chapters": "Chapters Completed",
+        "hours": "Hours Studied",
+        "tests": "Tests Passed",
+        "assignments": "Assignments Done",
+        "subjectProgress": "Subject Progress"
+      },
+      "states": {
+        "empty": "No progress data yet",
+        "loading": "Loading progress...",
+        "error": "Failed to load progress"
+      },
+      "actions": {
+        "viewAll": "View All Progress",
+        "retry": "Try Again"
+      }
+    },
+    "subjectProgress": {
+      "title": "Subject Progress",
+      "subtitle": "Detailed progress by subject",
+      "labels": {
+        "chapters": "chapters",
+        "ch": "ch",
+        "tests": "tests",
+        "hours": "hours",
+        "lastStudied": "Last studied",
+        "justNow": "Just now",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "states": {
+        "empty": "No subjects enrolled yet",
+        "loading": "Loading subjects...",
+        "error": "Failed to load subject progress"
+      },
+      "actions": {
+        "viewAll": "View all {{count}} subjects",
+        "retry": "Try Again"
+      }
+    },
+    "studyStreak": {
+      "title": "Study Streak",
+      "subtitle": "Your learning consistency",
+      "labels": {
+        "currentStreak": "Current Streak",
+        "longest": "Longest",
+        "totalDays": "Total Days",
+        "totalHours": "Total Hours",
+        "weeklyGoal": "this week",
+        "day": "day",
+        "days": "days",
+        "recentAchievements": "Recent Achievements",
+        "recentActivity": "Recent Activity",
+        "activities": "activities"
+      },
+      "states": {
+        "empty": "Start your study streak today!",
+        "loading": "Loading streak data...",
+        "error": "Failed to load study streak"
+      },
+      "actions": {
+        "viewAll": "View Full Progress",
+        "retry": "Try Again"
+      }
+    },
+    "statsGrid": {
+      "title": "Statistics",
+      "subtitle": "Your learning stats at a glance",
+      "labels": {
+        "totalXP": "Total XP",
+        "streak": "Day Streak",
+        "badges": "Badges",
+        "studyTime": "This Week",
+        "testsPassed": "Tests Passed",
+        "assignments": "Completed"
+      },
+      "states": {
+        "empty": "No stats available yet",
+        "loading": "Loading stats...",
+        "error": "Failed to load statistics"
+      },
+      "actions": {
+        "viewAll": "View All Stats",
+        "retry": "Try Again"
+      }
+    },
+    "recommendations": {
+      "title": "Recommendations",
+      "subtitle": "Suggestions",
+      "error": "Unable to load recommendations"
+    },
+    "classFeed": {
+      "title": "Class Feed",
+      "subtitle": "Announcements and updates",
+      "error": "Unable to load feed"
+    },
+    "peersGroups": {
+      "title": "Peers & Groups",
+      "subtitle": "Peer network highlights"
+    },
+    "activeQuests": {
+      "title": "Active Quests",
+      "subtitle": "Complete quests to earn XP",
+      "labels": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "special": "Special",
+        "completedToday": "Done Today",
+        "xpAvailable": "XP Available"
+      },
+      "states": {
+        "empty": "No active quests right now",
+        "loading": "Loading quests...",
+        "error": "Failed to load quests"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Try Again",
+        "gamifiedHub": "Gamified Learning Hub"
+      }
+    },
+    "peersLeaderboard": {
+      "title": "Leaderboard",
+      "subtitle": "See how you rank among peers",
+      "scopes": {
+        "class": "Class",
+        "school": "School",
+        "global": "Global"
+      },
+      "labels": {
+        "myRank": "My Rank",
+        "percentile": "Top {{value}}%",
+        "you": "(You)"
+      },
+      "states": {
+        "empty": "No leaderboard data available",
+        "loading": "Loading leaderboard...",
+        "error": "Failed to load leaderboard"
+      },
+      "actions": {
+        "viewAll": "View Full Leaderboard ({{count}} students)",
+        "retry": "Try Again"
+      }
+    },
+    "continueLearning": {
+      "title": "Continue Learning",
+      "subtitle": "Pick up where you left off",
+      "types": {
+        "resource": "Resource",
+        "aiSession": "AI Session",
+        "assignment": "Assignment",
+        "testReview": "Test Review",
+        "doubt": "Doubt",
+        "lesson": "Lesson",
+        "video": "Video"
+      },
+      "states": {
+        "empty": "No recent learning activity",
+        "loading": "Loading...",
+        "error": "Failed to load recent items"
+      },
+      "actions": {
+        "viewAll": "View All",
+        "retry": "Try Again",
+        "clearHistory": "Clear History"
+      }
+    },
+    "learningGoals": {
+      "title": "Learning Goals",
+      "subtitle": "Track your progress",
+      "types": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "streak": "Streak",
+        "subject": "Subject",
+        "custom": "Custom"
+      },
+      "labels": {
+        "active": "Active",
+        "completed": "Completed",
+        "dueToday": "Due today",
+        "dueTomorrow": "Due tomorrow",
+        "daysLeft": "{{count}} days left"
+      },
+      "states": {
+        "empty": "No goals set yet",
+        "loading": "Loading goals...",
+        "error": "Failed to load goals"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Try Again",
+        "addGoal": "Add Goal"
+      }
+    },
+    "weakAreas": {
+      "title": "Topics to Strengthen",
+      "subtitle": "{{count}} topics need attention",
+      "labels": {
+        "mastery": "mastery",
+        "showing": "Showing {{count}} of {{total}}"
+      },
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "actions": {
+        "practice": "Practice",
+        "watchVideo": "Watch Video",
+        "review": "Review",
+        "askDoubt": "Ask Doubt",
+        "viewAll": "View All"
+      },
+      "states": {
+        "empty": "Great job!",
+        "emptySubtitle": "No weak areas found. Keep practicing!",
+        "loading": "Loading topics...",
+        "error": "Failed to load weak areas"
+      }
+    },
+    "analyticsSnapshot": {
+      "title": "Analytics Snapshot",
+      "subtitle": "Weekly overview of your progress",
+      "sections": {
+        "thisWeek": "This week",
+        "subjects": "By subject",
+        "suggestions": "Suggestions"
+      },
+      "labels": {
+        "studyTime": "Study time",
+        "assignments": "Assignments",
+        "tests": "Tests",
+        "avgScore": "Avg Score",
+        "topics": "Topics",
+        "doubts": "Doubts",
+        "streak": "day streak",
+        "avgFocus": "avg focus"
+      },
+      "states": {
+        "empty": "No analytics data yet",
+        "loading": "Loading analytics...",
+        "error": "Couldn't load analytics"
+      },
+      "actions": {
+        "viewAll": "View Full Analytics",
+        "viewDetails": "View Details",
+        "retry": "Retry"
+      }
+    }
+  }
+}

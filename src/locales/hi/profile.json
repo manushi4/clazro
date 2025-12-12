@@ -1,0 +1,201 @@
+{
+  "title": "प्रोफ़ाइल",
+  "widgets": {
+    "profileCard": {
+      "title": "प्रोफ़ाइल",
+      "subtitle": "आपकी प्रोफ़ाइल जानकारी",
+      "states": {
+        "loading": "प्रोफ़ाइल लोड हो रहा है...",
+        "error": "प्रोफ़ाइल लोड नहीं हो सका",
+        "empty": "कोई प्रोफ़ाइल नहीं मिला"
+      },
+      "actions": {
+        "edit": "प्रोफ़ाइल संपादित करें",
+        "viewAll": "पूरी प्रोफ़ाइल देखें"
+      },
+      "stats": {
+        "xp": "XP",
+        "streak": "स्ट्रीक",
+        "badges": "बैज"
+      }
+    },
+    "profileStats": {
+      "title": "आंकड़े",
+      "subtitle": "आपके सीखने के आंकड़े",
+      "states": {
+        "loading": "आंकड़े लोड हो रहे हैं...",
+        "error": "आंकड़े लोड नहीं हो सके",
+        "empty": "कोई आंकड़े उपलब्ध नहीं"
+      },
+      "labels": {
+        "totalXP": "कुल XP",
+        "weeklyXP": "इस सप्ताह",
+        "streak": "स्ट्रीक",
+        "days": "दिन",
+        "badges": "बैज",
+        "studyTime": "अध्ययन समय",
+        "passRate": "पास दर",
+        "lessons": "पाठ",
+        "assignments": "असाइनमेंट",
+        "tests": "टेस्ट",
+        "doubts": "सवाल",
+        "notes": "नोट्स",
+        "avgScore": "औसत स्कोर",
+        "bestScore": "सर्वश्रेष्ठ स्कोर",
+        "rank": "रैंक"
+      },
+      "sections": {
+        "gamification": "उपलब्धियां",
+        "learning": "सीखने की प्रगति",
+        "assessments": "मूल्यांकन",
+        "engagement": "सहभागिता"
+      }
+    },
+    "quickLinks": {
+      "title": "त्वरित लिंक",
+      "subtitle": "शॉर्टकट",
+      "links": {
+        "editProfile": "प्रोफ़ाइल संपादित करें",
+        "settings": "सेटिंग्स",
+        "help": "सहायता और समर्थन",
+        "logout": "लॉग आउट"
+      }
+    },
+    "achievements": {
+      "title": "उपलब्धियां",
+      "subtitle": "आपके बैज और पुरस्कार",
+      "states": {
+        "loading": "उपलब्धियां लोड हो रही हैं...",
+        "error": "उपलब्धियां लोड नहीं हो सकीं",
+        "empty": "अभी तक कोई उपलब्धि नहीं"
+      },
+      "labels": {
+        "unlocked": "अनलॉक",
+        "points": "अंक",
+        "progress": "प्रगति",
+        "locked": "लॉक",
+        "claimed": "दावा किया"
+      },
+      "categories": {
+        "all": "सभी",
+        "learning": "सीखना",
+        "streak": "स्ट्रीक",
+        "social": "सामाजिक",
+        "assessment": "टेस्ट",
+        "milestone": "मील का पत्थर",
+        "special": "विशेष"
+      },
+      "rarity": {
+        "common": "सामान्य",
+        "uncommon": "असामान्य",
+        "rare": "दुर्लभ",
+        "epic": "महाकाव्य",
+        "legendary": "पौराणिक"
+      },
+      "actions": {
+        "viewAll": "सभी उपलब्धियां देखें",
+        "claim": "पुरस्कार प्राप्त करें"
+      }
+    },
+    "activity": {
+      "title": "हाल की गतिविधि",
+      "subtitle": "आपकी सीखने की यात्रा",
+      "states": {
+        "loading": "गतिविधि लोड हो रही है...",
+        "error": "गतिविधि लोड नहीं हो सकी",
+        "empty": "अभी तक कोई गतिविधि नहीं"
+      },
+      "labels": {
+        "today": "आज",
+        "yesterday": "कल",
+        "activities": "गतिविधियां",
+        "xpEarned": "XP अर्जित",
+        "studyTime": "अध्ययन समय",
+        "todayProgress": "आज की प्रगति"
+      },
+      "types": {
+        "lesson_completed": "पाठ पूरा किया",
+        "test_taken": "टेस्ट दिया",
+        "assignment_submitted": "असाइनमेंट जमा किया",
+        "doubt_asked": "सवाल पूछा",
+        "doubt_resolved": "सवाल हल हुआ",
+        "badge_earned": "बैज अर्जित किया",
+        "streak_milestone": "स्ट्रीक मील का पत्थर",
+        "video_watched": "वीडियो देखा",
+        "note_created": "नोट बनाया"
+      },
+      "actions": {
+        "viewAll": "सभी गतिविधि देखें"
+      }
+    }
+  },
+  "labels": {
+    "class": "कक्षा",
+    "section": "सेक्शन",
+    "school": "स्कूल",
+    "rollNumber": "रोल नं.",
+    "email": "ईमेल",
+    "phone": "फ़ोन"
+  },
+  "editProfile": {
+    "title": "प्रोफ़ाइल संपादित करें",
+    "tapToChange": "फ़ोटो बदलने के लिए टैप करें",
+    "save": "परिवर्तन सहेजें",
+    "fields": {
+      "name": "पूरा नाम",
+      "phone": "फ़ोन नंबर",
+      "class": "कक्षा",
+      "section": "सेक्शन"
+    },
+    "placeholders": {
+      "name": "अपना नाम दर्ज करें",
+      "phone": "फ़ोन नंबर दर्ज करें",
+      "class": "कक्षा दर्ज करें",
+      "section": "सेक्शन दर्ज करें"
+    },
+    "errors": {
+      "nameRequired": "नाम आवश्यक है",
+      "invalidPhone": "वैध 10 अंकों का फ़ोन दर्ज करें"
+    },
+    "success": {
+      "title": "सफलता",
+      "message": "प्रोफ़ाइल सफलतापूर्वक अपडेट हुई"
+    },
+    "error": {
+      "title": "त्रुटि",
+      "message": "प्रोफ़ाइल अपडेट करने में विफल"
+    }
+  },
+  "help": {
+    "title": "हम कैसे मदद कर सकते हैं?",
+    "subtitle": "नीचे एक सहायता विकल्प चुनें",
+    "contactUs": "संपर्क करें",
+    "faqTitle": "अक्सर पूछे जाने वाले प्रश्न",
+    "version": "संस्करण",
+    "options": {
+      "helpCenter": "सहायता केंद्र",
+      "helpCenterDesc": "FAQs और गाइड ब्राउज़ करें",
+      "email": "ईमेल सहायता",
+      "emailDesc": "ईमेल के माध्यम से सहायता प्राप्त करें",
+      "whatsapp": "व्हाट्सएप",
+      "whatsappDesc": "व्हाट्सएप पर हमसे चैट करें",
+      "phone": "कॉल करें",
+      "phoneDesc": "हमारी सहायता टीम से बात करें"
+    },
+    "faq": {
+      "resetPassword": "मैं अपना पासवर्ड कैसे रीसेट करूं?",
+      "resetPasswordAnswer": "सेटिंग्स > पासवर्ड बदलें पर जाएं, या सहायता के लिए संपर्क करें।",
+      "offlineAccess": "क्या मैं ऐप ऑफ़लाइन उपयोग कर सकता हूं?",
+      "offlineAccessAnswer": "हां! डाउनलोड की गई सामग्री ऑफ़लाइन उपलब्ध है। जब आप वापस ऑनलाइन होते हैं तो आपकी प्रगति सिंक होती है।",
+      "changeLanguage": "मैं भाषा कैसे बदलूं?",
+      "changeLanguageAnswer": "सेटिंग्स > भाषा पर जाएं और अपनी पसंदीदा भाषा चुनें।"
+    },
+    "error": {
+      "title": "त्रुटि",
+      "cannotOpen": "यह लिंक नहीं खोल सकते",
+      "failed": "कुछ गलत हो गया",
+      "noWhatsapp": "व्हाट्सएप सहायता उपलब्ध नहीं है",
+      "noPhone": "फ़ोन सहायता उपलब्ध नहीं है"
+    }
+  }
+}

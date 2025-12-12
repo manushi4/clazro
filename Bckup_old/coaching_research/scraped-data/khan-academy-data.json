@@ -1,0 +1,169 @@
+{
+  "company": "Khan Academy",
+  "platform_type": "Personalized Learning Platform / Educational Content Library",
+  "target_audience": ["Teachers", "Students", "Parents", "School Districts"],
+  "positioning": "Free world-class education for anyone, anywhere",
+  
+  "core_offerings": [
+    "Video lessons",
+    "Personalized learning dashboards", 
+    "Practical exercises",
+    "Khan Academy Kids (ages 2-8)",
+    "Khan Academy Districts"
+  ],
+  
+  "ai_integration": {
+    "khanmigo": {
+      "description": "AI-powered teaching assistant & tutor",
+      "teacher_features": [
+        "Standards-aligned lesson planning",
+        "On-demand student work summaries",
+        "Quick progress assessment",
+        "Differentiation tools",
+        "Lesson plan generation",
+        "Quiz question creation",
+        "Student grouping assistance",
+        "Hooks and exit tickets",
+        "Rubric creation"
+      ],
+      "student_features": [
+        "Guided learning (doesn't give direct answers)",
+        "Limitless patience tutoring",
+        "Scaffolded problem solving"
+      ],
+      "pricing": "$4/month or $44/year for parents and learners, Free for teachers"
+    }
+  },
+  
+  "2025_teacher_updates": {
+    "writing_coach": "Khan Academy Writing Coach powered by Khanmigo with scaffolded feedback",
+    "question_generator": "Create custom Blooket quizzes with no limits",
+    "assignment_preview": "See student experience before assigning",
+    "platform_integration": "Easily export quizzes, exit tickets, and lesson plans"
+  },
+  
+  "teacher_tools": {
+    "dashboard_features": [
+      "Student progress tracking",
+      "Class management",
+      "Assignment creation and distribution",
+      "Standards alignment",
+      "Content library access"
+    ],
+    "limitations": [
+      "No teacher dashboard access on mobile app",
+      "Mobile app lacks teacher tools functionality",
+      "Requires desktop browser for full teacher features"
+    ]
+  },
+  
+  "student_features": {
+    "personalized_learning": [
+      "Adaptive learning paths",
+      "Skill mastery tracking",
+      "Progress visualization",
+      "Self-paced learning",
+      "Extra proficiency attempts after wrong answers"
+    ],
+    "content_access": [
+      "Thousands of video lessons",
+      "Interactive exercises",
+      "Real-time feedback",
+      "Hint systems"
+    ]
+  },
+  
+  "parent_integration": {
+    "parent_dashboard": [
+      "Real-time progress tracking",
+      "Learning minutes visibility",
+      "Skills practiced monitoring", 
+      "Skills mastered tracking",
+      "Lesson assignment capabilities",
+      "Completion status checking"
+    ],
+    "account_management": [
+      "Create and manage child accounts (under 13)",
+      "Support for up to 10 children under 18",
+      "Monthly/annual subscription options"
+    ]
+  },
+  
+  "mobile_capabilities": {
+    "khan_academy_app": {
+      "platforms": ["iOS", "Android"],
+      "student_features": "Full access to learning content",
+      "limitations": [
+        "No teacher dashboard access",
+        "No community discussions",
+        "No computer programming content",
+        "No test prep access",
+        "No parent tools",
+        "No district tools"
+      ],
+      "redirect_note": "Advanced features require browser access at khanacademy.org"
+    }
+  },
+  
+  "content_updates_2025": {
+    "new_courses": [
+      "Reading courses (4th and 5th grade)",
+      "Python programming course with auto-graded challenges",
+      "Real-world project modules"
+    ],
+    "curriculum_alignment": "Better aligned with IM curriculum for grades 3-5",
+    "features": [
+      "Engaging texts with vocabulary instruction",
+      "Reading strategy videos",
+      "Conceptual understanding with visuals and hints"
+    ]
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": false,
+    "cross_platform": ["Web (primary)", "iOS", "Android"],
+    "automation_features": [
+      "AI-powered tutoring",
+      "Automatic progress tracking",
+      "Personalized learning paths",
+      "Auto-graded assessments"
+    ],
+    "integration_ready": true
+  },
+  
+  "pricing_model": {
+    "core_platform": "Free for all users",
+    "khanmigo_teachers": "Free",
+    "khanmigo_parents_students": "$4/month or $44/year",
+    "promotional": "FREEPARENT coupon for first month free",
+    "family_coverage": "Up to 10 learners per subscription"
+  },
+  
+  "unique_selling_points": [
+    "Completely free core platform",
+    "World-class educational content",
+    "AI tutor that guides rather than gives answers",
+    "Comprehensive parent dashboard",
+    "Standards-aligned content",
+    "Self-paced personalized learning"
+  ],
+  
+  "communication_workflows": {
+    "teacher_student": "Assignment feedback and progress tracking",
+    "parent_child": "Progress monitoring and assignment management", 
+    "ai_tutoring": "Guided problem-solving assistance",
+    "self_directed": "Individual learning path progression"
+  },
+  
+  "limitations": [
+    "Limited mobile teacher functionality",
+    "No native communication tools between users",
+    "Requires separate tools for classroom discussion",
+    "Desktop dependency for advanced features"
+  ],
+  
+  "value_proposition": "Free, personalized education with AI-powered tutoring and comprehensive progress tracking",
+  "data_collection_date": "2025-08-29",
+  "source_urls": ["Web search results - Khan Academy 2025 updates"]
+}

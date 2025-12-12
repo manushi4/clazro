@@ -1,0 +1,201 @@
+{
+  "title": "Profile",
+  "widgets": {
+    "profileCard": {
+      "title": "Profile",
+      "subtitle": "Your profile information",
+      "states": {
+        "loading": "Loading profile...",
+        "error": "Could not load profile",
+        "empty": "No profile found"
+      },
+      "actions": {
+        "edit": "Edit Profile",
+        "viewAll": "View Full Profile"
+      },
+      "stats": {
+        "xp": "XP",
+        "streak": "Streak",
+        "badges": "Badges"
+      }
+    },
+    "profileStats": {
+      "title": "Statistics",
+      "subtitle": "Your learning stats",
+      "states": {
+        "loading": "Loading stats...",
+        "error": "Could not load statistics",
+        "empty": "No statistics available"
+      },
+      "labels": {
+        "totalXP": "Total XP",
+        "weeklyXP": "This Week",
+        "streak": "Streak",
+        "days": "days",
+        "badges": "Badges",
+        "studyTime": "Study Time",
+        "passRate": "Pass Rate",
+        "lessons": "Lessons",
+        "assignments": "Assignments",
+        "tests": "Tests",
+        "doubts": "Doubts",
+        "notes": "Notes",
+        "avgScore": "Avg Score",
+        "bestScore": "Best Score",
+        "rank": "Rank"
+      },
+      "sections": {
+        "gamification": "Achievements",
+        "learning": "Learning Progress",
+        "assessments": "Assessments",
+        "engagement": "Engagement"
+      }
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "subtitle": "Shortcuts",
+      "links": {
+        "editProfile": "Edit Profile",
+        "settings": "Settings",
+        "help": "Help & Support",
+        "logout": "Logout"
+      }
+    },
+    "achievements": {
+      "title": "Achievements",
+      "subtitle": "Your badges and rewards",
+      "states": {
+        "loading": "Loading achievements...",
+        "error": "Could not load achievements",
+        "empty": "No achievements yet"
+      },
+      "labels": {
+        "unlocked": "Unlocked",
+        "points": "Points",
+        "progress": "Progress",
+        "locked": "Locked",
+        "claimed": "Claimed"
+      },
+      "categories": {
+        "all": "All",
+        "learning": "Learning",
+        "streak": "Streaks",
+        "social": "Social",
+        "assessment": "Tests",
+        "milestone": "Milestones",
+        "special": "Special"
+      },
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "actions": {
+        "viewAll": "View All Achievements",
+        "claim": "Claim Reward"
+      }
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "subtitle": "Your learning journey",
+      "states": {
+        "loading": "Loading activity...",
+        "error": "Could not load activity",
+        "empty": "No activity yet"
+      },
+      "labels": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "activities": "Activities",
+        "xpEarned": "XP Earned",
+        "studyTime": "Study Time",
+        "todayProgress": "Today's Progress"
+      },
+      "types": {
+        "lesson_completed": "Lesson Completed",
+        "test_taken": "Test Taken",
+        "assignment_submitted": "Assignment Submitted",
+        "doubt_asked": "Doubt Asked",
+        "doubt_resolved": "Doubt Resolved",
+        "badge_earned": "Badge Earned",
+        "streak_milestone": "Streak Milestone",
+        "video_watched": "Video Watched",
+        "note_created": "Note Created"
+      },
+      "actions": {
+        "viewAll": "View All Activity"
+      }
+    }
+  },
+  "labels": {
+    "class": "Class",
+    "section": "Section",
+    "school": "School",
+    "rollNumber": "Roll No.",
+    "email": "Email",
+    "phone": "Phone"
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "tapToChange": "Tap to change photo",
+    "save": "Save Changes",
+    "fields": {
+      "name": "Full Name",
+      "phone": "Phone Number",
+      "class": "Class",
+      "section": "Section"
+    },
+    "placeholders": {
+      "name": "Enter your name",
+      "phone": "Enter phone number",
+      "class": "Enter class",
+      "section": "Enter section"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "invalidPhone": "Enter valid 10-digit phone"
+    },
+    "success": {
+      "title": "Success",
+      "message": "Profile updated successfully"
+    },
+    "error": {
+      "title": "Error",
+      "message": "Failed to update profile"
+    }
+  },
+  "help": {
+    "title": "How can we help?",
+    "subtitle": "Choose a support option below",
+    "contactUs": "Contact Us",
+    "faqTitle": "Frequently Asked Questions",
+    "version": "Version",
+    "options": {
+      "helpCenter": "Help Center",
+      "helpCenterDesc": "Browse FAQs and guides",
+      "email": "Email Support",
+      "emailDesc": "Get help via email",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Chat with us on WhatsApp",
+      "phone": "Call Us",
+      "phoneDesc": "Speak to our support team"
+    },
+    "faq": {
+      "resetPassword": "How do I reset my password?",
+      "resetPasswordAnswer": "Go to Settings > Change Password, or contact support for assistance.",
+      "offlineAccess": "Can I use the app offline?",
+      "offlineAccessAnswer": "Yes! Downloaded content is available offline. Your progress syncs when you're back online.",
+      "changeLanguage": "How do I change the language?",
+      "changeLanguageAnswer": "Go to Settings > Language and select your preferred language."
+    },
+    "error": {
+      "title": "Error",
+      "cannotOpen": "Cannot open this link",
+      "failed": "Something went wrong",
+      "noWhatsapp": "WhatsApp support not available",
+      "noPhone": "Phone support not available"
+    }
+  }
+}

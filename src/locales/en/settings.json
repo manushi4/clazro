@@ -1,0 +1,79 @@
+{
+  "title": "Settings",
+  "subtitle": "Manage your preferences",
+  
+  "sections": {
+    "account": "Account",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "about": "About"
+  },
+  
+  "profile": {
+    "title": "Profile",
+    "subtitle": "View and edit your profile"
+  },
+  
+  "changePassword": {
+    "title": "Change Password",
+    "subtitle": "Update your password",
+    "message": "To change your password:\n\n1. Contact support\n2. Email: {{email}}\n\n(Self-service coming soon)"
+  },
+  
+  "language": {
+    "title": "Language",
+    "screenTitle": "Select Language",
+    "description": "Choose your preferred language for the app",
+    "note": "The app will restart to apply the language change.",
+    "english": "English",
+    "hindi": "हिंदी"
+  },
+  
+  "pushNotifications": {
+    "title": "Push Notifications",
+    "subtitle": "Receive push notifications"
+  },
+  
+  "emailAlerts": {
+    "title": "Email Alerts",
+    "subtitle": "Receive email notifications"
+  },
+  
+  "darkMode": {
+    "title": "Dark Mode",
+    "subtitle": "Switch between light and dark theme"
+  },
+  
+  "theme": {
+    "title": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  
+  "help": {
+    "title": "Help & Support",
+    "subtitle": "Get help and contact support"
+  },
+  
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "Read our privacy policy"
+  },
+  
+  "terms": {
+    "title": "Terms of Service",
+    "subtitle": "Read our terms of service"
+  },
+  
+  "version": {
+    "title": "App Version"
+  },
+  
+  "logout": {
+    "button": "Logout",
+    "title": "Logout",
+    "message": "Are you sure you want to logout?",
+    "confirm": "Logout"
+  }
+}

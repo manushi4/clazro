@@ -1,0 +1,175 @@
+{
+  "company": "Google",
+  "platform_type": "Learning Management System (LMS) / Classroom Management Platform",
+  "target_audience": ["Teachers", "Students", "Parents/Guardians", "School Administrators"],
+  "positioning": "Central hub for creating, distributing, and grading assignments",
+  
+  "core_lms_features": [
+    "Central assignment hub",
+    "Differentiated instruction support",
+    "Personalized learning experiences",
+    "Google Workspace integration",
+    "Course management",
+    "Assignment distribution and grading"
+  ],
+  
+  "2025_new_features": {
+    "ai_integration": {
+      "gemini_capabilities": [
+        "Generate tailored vocabulary lists",
+        "Create scripts, visuals, and background audio for lessons",
+        "Integration with Google Vids",
+        "Pre-configured AI personalities (Gems)",
+        "Reading Coach adaptations"
+      ],
+      "lms_integration": "Gemini and NotebookLM integrate with Canvas and Schoology"
+    },
+    "enhanced_group_management": [
+      "Student Group Capabilities",
+      "Email Groups for specific group communication",
+      "Group-Based Grading",
+      "Dynamic Group Management",
+      "Group assignment creation"
+    ],
+    "assignment_features": [
+      "Assignment Scheduling across multiple classes",
+      "Practice Sets turning PDFs/Forms into interactive tasks",
+      "YouTube video embedding with questions",
+      "AI-suggested follow-up questions"
+    ]
+  },
+  
+  "teacher_tools": {
+    "class_management": [
+      "Class tools as remote control for Chromebooks",
+      "Share content to student screens",
+      "Remote screen viewing",
+      "Live translated captions",
+      "Real-time progress checking"
+    ],
+    "content_creation": [
+      "Course creation",
+      "Homework assignment",
+      "Exam building",
+      "Resource sharing",
+      "Supplemental reading materials"
+    ],
+    "assessment_tools": [
+      "Efficient grading with customizable rubrics",
+      "Real-time student feedback",
+      "Originality reports for academic integrity",
+      "Group-based grading systems"
+    ]
+  },
+  
+  "student_features": {
+    "learning_experience": [
+      "Assignment completion",
+      "Instructor communication",
+      "Collaboration tools",
+      "Interactive assignments with real-time feedback",
+      "Self-paced learning options"
+    ],
+    "accessibility": [
+      "Expanded Face Control",
+      "Reading Mode features",
+      "Support for motor and visual challenges",
+      "Accommodation for hearing, vision, physical disabilities"
+    ]
+  },
+  
+  "parent_integration": {
+    "communication_tools": [
+      "Weekly guardian email summaries",
+      "Shareable links to view classwork",
+      "Due date visibility",
+      "Announcement access",
+      "Built-in chat features"
+    ],
+    "monitoring_capabilities": [
+      "View assigned classwork via links",
+      "Assignment due dates tracking",
+      "Student progress visibility"
+    ]
+  },
+  
+  "mobile_capabilities": {
+    "strengths": [
+      "Simple, clean mobile interface",
+      "Well-optimized mobile app",
+      "Multiple device access",
+      "On-the-go management",
+      "Mobile grading activities"
+    ],
+    "limitations": [
+      "iPhone/iPad interface challenges",
+      "Document upload/viewing difficulties",
+      "Mobile app not as feature-rich as desktop"
+    ]
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": false,
+    "cross_platform": ["Web", "iOS", "Android"],
+    "automation_features": [
+      "AI-assisted lesson planning",
+      "Automated grading suggestions",
+      "Real-time feedback",
+      "Originality checking"
+    ],
+    "integration_ready": true,
+    "uptime": "99%"
+  },
+  
+  "integrations": {
+    "sis_integrations": [
+      "PowerSchool",
+      "Infinite Campus", 
+      "Skyward SMS",
+      "Skyward Qmlativ",
+      "Follett Aspen"
+    ],
+    "educational_apps": "800+ educational app integrations",
+    "lms_partners": ["Canvas", "Schoology"],
+    "google_ecosystem": "Deep Google Workspace integration",
+    "third_party_tools": ["Canva", "Clever", "Edpuzzle", "Formative"]
+  },
+  
+  "pricing_structure": {
+    "free_tier": "Google Classroom Fundamentals (free for personal Google accounts)",
+    "education_plus": "Paid tier with advanced features", 
+    "add_ons": "Additional capabilities available",
+    "starting_price": "$5 per student annually",
+    "nonprofit": "Free for Google Workspace for nonprofits"
+  },
+  
+  "unique_selling_points": [
+    "99% uptime reliability",
+    "Robust privacy and security",
+    "Global network support",
+    "Comprehensive administrator analytics",
+    "Deep Google ecosystem integration",
+    "AI-powered educational tools"
+  ],
+  
+  "communication_workflows": {
+    "teacher_student": "Real-time feedback and assignment management",
+    "teacher_parent": "Guardian summaries and shareable links",
+    "class_management": "Group communication and screen sharing",
+    "administrative": "SIS integration and analytics reporting"
+  },
+  
+  "limitations": [
+    "Not a stand-alone full-featured LMS",
+    "Mobile interface challenges on some devices",
+    "Limited standalone capabilities without Google Workspace"
+  ],
+  
+  "value_proposition": "Transform teaching and learning through flexible, intuitive, and powerful educational technology",
+  "data_collection_date": "2025-08-29",
+  "source_urls": [
+    "https://edu.google.com/intl/ALL_us/workspace-for-education/products/classroom/",
+    "Web search results"
+  ]
+}

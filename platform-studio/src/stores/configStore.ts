@@ -179,6 +179,20 @@ export const useConfigStore = create<ConfigState>()(
         },
         parent: {
           "parent-home": { screen_id: "parent-home", widgets: DEFAULT_PARENT_HOME_WIDGETS },
+          "children-overview": { screen_id: "children-overview", widgets: [
+            { widget_id: "hero.greeting", position: 1, size: "compact", enabled: true },
+            { widget_id: "parent.children-overview", position: 2, size: "expanded", enabled: true },
+            { widget_id: "parent.quick-actions", position: 3, size: "standard", enabled: true },
+          ] },
+          "child-detail": { screen_id: "child-detail", widgets: [
+            { widget_id: "parent.child-stats", position: 1, size: "standard", enabled: true },
+            { widget_id: "parent.attendance-summary", position: 2, size: "standard", enabled: true },
+            { widget_id: "parent.performance-chart", position: 3, size: "expanded", enabled: true },
+            { widget_id: "parent.subject-progress", position: 4, size: "standard", enabled: true },
+            { widget_id: "parent.assignments-pending", position: 5, size: "standard", enabled: true },
+            { widget_id: "parent.weak-areas", position: 6, size: "compact", enabled: true },
+            { widget_id: "parent.quick-actions", position: 7, size: "compact", enabled: true },
+          ] },
           "child-progress-screen": { screen_id: "child-progress-screen", widgets: [] },
           "schedule-screen": { screen_id: "schedule-screen", widgets: [] },
           "profile-home": { screen_id: "profile-home", widgets: [] },

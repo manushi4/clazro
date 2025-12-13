@@ -1820,3 +1820,650 @@ const styles = StyleSheet.create({
 1. Always use theme colors from useAppTheme
 2. Check SafeAreaView is wrapping content
 3. Verify flex: 1 on container
+
+
+---
+
+## Media Upload Patterns
+
+For screens that need file uploads (profile editing, fee receipts, document submission), use these patterns. Reference: `MEDIA_FILE_HANDLING_SPEC.md`
+
+### Using Media Upload Hook
+
+```typescript
+import { useMediaUpload, BUCKETS } from "../../hooks/useMediaUpload";
+
+const { upload, isUploading, progress, error } = useMediaUpload({
+  bucket: BUCKETS.USER_UPLOADS,
+  resourceType: 'document',
+  resourceId: recordId,
+});
+
+const handleFilePick = async () => {
+  const result = await launchImageLibrary({ mediaType: 'mixed' });
+  if (result.assets?.[0]) {
+    const uploadResult = await upload({
+      uri: result.assets[0].uri!,
+      name: result.assets[0].fileName || 'file',
+      type: result.assets[0].type,
+    });
+    
+    if (uploadResult.success) {
+      // Use uploadResult.path for the file reference
+      setFileUrl(uploadResult.path);
+    }
+  }
+};
+
+// Show upload progress in UI
+{isUploading && (
+  <View style={styles.uploadProgress}>
+    <ActivityIndicator size="small" color={colors.primary} />
+    <AppText style={{ color: colors.onSurfaceVariant }}>
+      {t("common:upload.progress", { progress: Math.round(progress * 100) })}
+    </AppText>
+  </View>
+)}
+```
+
+### Image Optimization Before Upload
+
+```typescript
+import { useImageOptimization, IMAGE_PRESETS } from "../../hooks/useImageOptimization";
+
+const { optimize, isOptimizing } = useImageOptimization();
+
+const handleImagePick = async () => {
+  const result = await launchImageLibrary({ mediaType: 'photo' });
+  if (result.assets?.[0]) {
+    // Optimize before upload (reduces file size)
+    const optimized = await optimize(result.assets[0].uri!, 'medium');
+    
+    if (optimized) {
+      await upload({
+        uri: optimized.uri,
+        name: optimized.name,
+        type: 'image/jpeg',
+      });
+    }
+  }
+};
+```
+
+### Image Presets
+
+| Preset | Dimensions | Quality | Use Case |
+|--------|------------|---------|----------|
+| `thumbnail` | 150x150 | 70% | List thumbnails |
+| `avatar` | 200x200 | 80% | Profile pictures |
+| `preview` | 400x400 | 75% | Preview images |
+| `medium` | 800x800 | 80% | General uploads (recommended) |
+| `large` | 1200x1200 | 85% | High-quality images |
+| `full` | 1920x1920 | 90% | Full resolution |
+
+### Storage Buckets
+
+| Bucket | Public | Max Size | Allowed Types | Use Case |
+|--------|--------|----------|---------------|----------|
+| `user-uploads` | No | 10MB | JPEG, PNG, PDF | General user uploads |
+| `avatars` | Yes | 2MB | JPEG, PNG | Profile pictures |
+| `school-branding` | Yes | 5MB | JPEG, PNG, SVG | School logos |
+| `fee-receipts` | No | 5MB | PDF, JPEG | Payment receipts |
+| `documents` | No | 20MB | PDF, DOC, DOCX | Document uploads |
+
+### Offline Upload Handling
+
+```typescript
+const handleUpload = async () => {
+  if (!isOnline) {
+    Alert.alert(
+      t("common:offline.title"),
+      t("common:offline.uploadDisabled", { 
+        defaultValue: "File uploads require internet connection." 
+      })
+    );
+    return;
+  }
+  
+  // Proceed with upload
+  await upload(file);
+};
+```
+
+---
+
+## Performance Budgets
+
+All screens must meet these performance targets. Reference: `WIDGET_FAILSAFE_SPEC.md`
+
+### Screen Performance Targets
+
+| Metric | Budget | Measurement |
+|--------|--------|-------------|
+| Initial render | <200ms | Time to first meaningful paint |
+| Data fetch | <500ms | Time to load primary data |
+| Navigation transition | <300ms | Screen-to-screen transition |
+| Pull-to-refresh | <1000ms | Time to complete refresh |
+| Interaction response | <100ms | Response to user tap |
+
+### Monitoring Performance
+
+```typescript
+// Monitor screen render performance
+const renderStart = useRef(performance.now());
+
+useEffect(() => {
+  const renderTime = performance.now() - renderStart.current;
+  
+  // Log slow renders (>200ms budget)
+  if (renderTime > 200) {
+    addBreadcrumb({
+      category: "performance",
+      message: "slow_screen_render",
+      level: "warning",
+      data: { screenId, renderTime: Math.round(renderTime) },
+    });
+  }
+  
+  // Track in analytics
+  trackEvent("screen_render_time", {
+    screenId,
+    renderTime: Math.round(renderTime),
+    isSlowRender: renderTime > 200,
+  });
+}, []);
+```
+
+### Data Fetch Performance
+
+```typescript
+// Track data loading time
+const fetchStart = useRef<number>();
+
+useEffect(() => {
+  if (isLoading && !fetchStart.current) {
+    fetchStart.current = performance.now();
+  }
+  
+  if (!isLoading && fetchStart.current) {
+    const fetchTime = performance.now() - fetchStart.current;
+    
+    if (fetchTime > 500) {
+      addBreadcrumb({
+        category: "performance",
+        message: "slow_data_fetch",
+        level: "warning",
+        data: { screenId, fetchTime: Math.round(fetchTime) },
+      });
+    }
+    
+    fetchStart.current = undefined;
+  }
+}, [isLoading]);
+```
+
+### Performance Optimization Tips
+
+```typescript
+// 1. Memoize expensive computations
+const filteredData = useMemo(() => 
+  data?.filter(item => item.enabled).sort((a, b) => a.order - b.order),
+  [data]
+);
+
+// 2. Memoize callbacks
+const handlePress = useCallback((id: string) => {
+  navigation.navigate("detail", { id });
+}, [navigation]);
+
+// 3. Use React.memo for list items
+const ListItem = React.memo(({ item, onPress }: ListItemProps) => (
+  <TouchableOpacity onPress={() => onPress(item.id)}>
+    <AppText>{item.title}</AppText>
+  </TouchableOpacity>
+));
+
+// 4. Virtualize long lists
+import { FlashList } from "@shopify/flash-list";
+
+<FlashList
+  data={items}
+  renderItem={({ item }) => <ListItem item={item} onPress={handlePress} />}
+  estimatedItemSize={80}
+/>
+
+// 5. Lazy load heavy components
+const HeavyChart = React.lazy(() => import("./HeavyChart"));
+
+{showChart && (
+  <Suspense fallback={<ActivityIndicator />}>
+    <HeavyChart data={chartData} />
+  </Suspense>
+)}
+```
+
+---
+
+## Real-Time Config Sync
+
+For screens that need to respond to Platform Studio configuration changes in real-time.
+
+### How Real-Time Sync Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    REAL-TIME SYNC FLOW                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Platform Studio ──save──> config_change_events table           │
+│                                    │                            │
+│                                    ▼                            │
+│  Mobile App ←──realtime subscription──┘                         │
+│       │                                                         │
+│       ▼                                                         │
+│  useConfigSubscription() → invalidateQueries() → re-render      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Config Subscription Hook
+
+The `useConfigSubscription` hook is already set up in `AppContent.tsx` and listens for:
+- `layout_updated` → Invalidates screen-layout queries
+- `theme_updated` → Invalidates theme queries
+- `branding_updated` → Invalidates branding queries
+- `feature_updated` → Invalidates feature queries
+
+### Screen-Level Config Subscription
+
+For screens that need custom real-time updates:
+
+```typescript
+import { useEffect } from "react";
+import { supabase } from "../../services/supabaseClient";
+import { useQueryClient } from "@tanstack/react-query";
+
+export function useScreenConfigSubscription(screenId: string, customerId: string) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`screen-config-${screenId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "screen_layouts",
+          filter: `screen_id=eq.${screenId}`,
+        },
+        (payload) => {
+          console.log(`[ConfigSync] Screen ${screenId} config changed`);
+          
+          // Invalidate screen layout query
+          queryClient.invalidateQueries({
+            queryKey: ["screen-layout", screenId],
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [screenId, customerId, queryClient]);
+}
+
+// Usage in screen
+const MyScreen: React.FC<Props> = ({ screenId }) => {
+  const customerId = useCustomerId();
+  
+  // Subscribe to real-time config changes
+  useScreenConfigSubscription(screenId, customerId);
+  
+  // ... rest of screen
+};
+```
+
+### When to Use Real-Time Sync
+
+| Scenario | Use Real-Time Sync? |
+|----------|---------------------|
+| Dashboard screens | ✅ Yes - widgets may be rearranged |
+| Settings screens | ❌ No - local state only |
+| Detail screens | ❌ No - static layout |
+| Form screens | ❌ No - user input focused |
+| Admin screens | ✅ Yes - config may change |
+
+---
+
+## Screen Visibility Rules
+
+Control screen access based on permissions, features, and conditions.
+
+### Visibility Rule Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `permission` | User must have permission | `"view_analytics"` |
+| `feature` | Feature must be enabled | `"premium.features"` |
+| `role` | User must have role | `"admin"` |
+| `online` | Requires internet | `true` |
+| `time` | Time-based access | `{"start": "08:00", "end": "18:00"}` |
+
+### Implementing Screen Visibility
+
+```typescript
+import { usePermissions } from "../../hooks/config/usePermissions";
+import { useFeatures } from "../../hooks/config/useFeatures";
+import { useNetworkStatus } from "../../offline/networkStore";
+
+type ScreenVisibilityRule = {
+  type: "permission" | "feature" | "role" | "online";
+  value: string | boolean;
+};
+
+function checkScreenVisibility(
+  rules: ScreenVisibilityRule[],
+  context: {
+    permissions: string[];
+    features: string[];
+    role: string;
+    isOnline: boolean;
+  }
+): boolean {
+  if (!rules || rules.length === 0) return true;
+
+  return rules.every((rule) => {
+    switch (rule.type) {
+      case "permission":
+        return context.permissions.includes(rule.value as string);
+      case "feature":
+        return context.features.includes(rule.value as string);
+      case "role":
+        return context.role === rule.value;
+      case "online":
+        return rule.value ? context.isOnline : true;
+      default:
+        return true;
+    }
+  });
+}
+
+// Usage in screen
+const MyScreen: React.FC<Props> = ({ screenId, role }) => {
+  const { permissions } = usePermissions(role);
+  const features = useFeatures();
+  const { isOnline } = useNetworkStatus();
+
+  const visibilityRules: ScreenVisibilityRule[] = [
+    { type: "permission", value: "view_reports" },
+    { type: "feature", value: "analytics" },
+  ];
+
+  const isVisible = checkScreenVisibility(visibilityRules, {
+    permissions,
+    features: features.filter(f => f.enabled).map(f => f.featureId),
+    role,
+    isOnline,
+  });
+
+  if (!isVisible) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.centerContent}>
+          <Icon name="lock" size={48} color={colors.onSurfaceVariant} />
+          <AppText style={{ color: colors.onSurfaceVariant }}>
+            {t("common:access.restricted", { defaultValue: "Access Restricted" })}
+          </AppText>
+          <AppButton
+            title={t("common:actions.goBack")}
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Render screen content
+  return (/* ... */);
+};
+```
+
+### Navigation Guard Pattern
+
+```typescript
+// In navigation setup - prevent navigation to restricted screens
+const navigationRef = useNavigationContainerRef();
+
+const checkScreenAccess = (screenId: string, role: string): boolean => {
+  const screenRules = SCREEN_VISIBILITY_RULES[screenId];
+  if (!screenRules) return true;
+  
+  return checkScreenVisibility(screenRules, {
+    permissions: userPermissions,
+    features: enabledFeatures,
+    role,
+    isOnline,
+  });
+};
+
+// Before navigating
+const navigateWithCheck = (screenId: string, params?: object) => {
+  if (!checkScreenAccess(screenId, currentRole)) {
+    Alert.alert(
+      t("common:access.title"),
+      t("common:access.noPermission")
+    );
+    return;
+  }
+  
+  navigation.navigate(screenId, params);
+};
+```
+
+### Screen Visibility Configuration
+
+```typescript
+// Define visibility rules per screen
+const SCREEN_VISIBILITY_RULES: Record<string, ScreenVisibilityRule[]> = {
+  "admin-dashboard": [
+    { type: "role", value: "admin" },
+  ],
+  "analytics-detail": [
+    { type: "permission", value: "view_analytics" },
+    { type: "feature", value: "analytics" },
+  ],
+  "live-class": [
+    { type: "online", value: true },
+    { type: "feature", value: "live_classes" },
+  ],
+  "premium-content": [
+    { type: "feature", value: "premium" },
+    { type: "permission", value: "access_premium" },
+  ],
+};
+```
+
+---
+
+## Layout Styles for Embedded Widgets
+
+When Fixed screens embed widgets or widget-like components, they can support multiple layout styles.
+
+### Supported Layout Styles
+
+| Style | Description | Best For |
+|-------|-------------|----------|
+| `list` | Vertical list (default) | Most content, detailed items |
+| `cards` | Horizontal scrollable cards | Featured items, quick browse |
+| `grid` | 2-column grid | Compact overview, many items |
+| `timeline` | Vertical timeline with line | Chronological items |
+
+### Implementing Layout Styles in Screens
+
+```typescript
+type LayoutStyle = "list" | "cards" | "grid" | "timeline";
+
+interface ScreenConfig {
+  layoutStyle: LayoutStyle;
+  maxItems: number;
+}
+
+const MyScreen: React.FC<Props> = ({ config }) => {
+  const { colors } = useAppTheme();
+  const layoutStyle = (config?.layoutStyle as LayoutStyle) || "list";
+
+  const renderContent = () => {
+    switch (layoutStyle) {
+      case "cards":
+        return (
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.cardsContainer}
+          >
+            {items.map((item) => (
+              <View key={item.id} style={[styles.cardItem, { backgroundColor: colors.surfaceVariant }]}>
+                {/* Card content */}
+              </View>
+            ))}
+          </ScrollView>
+        );
+
+      case "grid":
+        return (
+          <View style={styles.gridContainer}>
+            {items.map((item) => (
+              <View key={item.id} style={[styles.gridItem, { backgroundColor: colors.surfaceVariant }]}>
+                {/* Grid item content */}
+              </View>
+            ))}
+          </View>
+        );
+
+      case "timeline":
+        return (
+          <View style={styles.timelineContainer}>
+            <View style={[styles.timelineLine, { backgroundColor: colors.outline }]} />
+            {items.map((item) => (
+              <View key={item.id} style={styles.timelineItem}>
+                <View style={[styles.timelineDot, { borderColor: colors.primary }]} />
+                <View style={[styles.timelineContent, { backgroundColor: colors.surfaceVariant }]}>
+                  {/* Timeline item content */}
+                </View>
+              </View>
+            ))}
+          </View>
+        );
+
+      case "list":
+      default:
+        return (
+          <View style={styles.listContainer}>
+            {items.map((item) => (
+              <View key={item.id} style={[styles.listItem, { backgroundColor: colors.surfaceVariant }]}>
+                {/* List item content */}
+              </View>
+            ))}
+          </View>
+        );
+    }
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.content}>
+        {renderContent()}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  content: { padding: 16 },
+  
+  // List layout
+  listContainer: { gap: 8 },
+  listItem: { padding: 12, borderRadius: 10 },
+  
+  // Cards layout
+  cardsContainer: { gap: 12, paddingRight: 4 },
+  cardItem: { width: 140, padding: 14, borderRadius: 12, alignItems: "center" },
+  
+  // Grid layout
+  gridContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  gridItem: { width: "48%", padding: 10, borderRadius: 10 },
+  
+  // Timeline layout
+  timelineContainer: { position: "relative", paddingLeft: 16 },
+  timelineLine: { position: "absolute", left: 5, top: 8, bottom: 8, width: 2, borderRadius: 1 },
+  timelineItem: { flexDirection: "row", alignItems: "flex-start", marginBottom: 12 },
+  timelineDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, backgroundColor: "#fff", marginRight: 8, marginTop: 4, marginLeft: -8 },
+  timelineContent: { flex: 1, padding: 10, borderRadius: 8 },
+});
+```
+
+### Layout Style Selection UI
+
+For screens with configurable layouts:
+
+```typescript
+const LayoutStyleSelector: React.FC<{
+  value: LayoutStyle;
+  onChange: (style: LayoutStyle) => void;
+}> = ({ value, onChange }) => {
+  const { colors } = useAppTheme();
+  const { t } = useTranslation("common");
+
+  const options: { value: LayoutStyle; icon: string; label: string }[] = [
+    { value: "list", icon: "format-list-bulleted", label: t("layout.list") },
+    { value: "cards", icon: "view-carousel", label: t("layout.cards") },
+    { value: "grid", icon: "view-grid", label: t("layout.grid") },
+    { value: "timeline", icon: "timeline", label: t("layout.timeline") },
+  ];
+
+  return (
+    <View style={styles.layoutSelector}>
+      {options.map((option) => (
+        <TouchableOpacity
+          key={option.value}
+          style={[
+            styles.layoutOption,
+            { backgroundColor: value === option.value ? colors.primaryContainer : colors.surfaceVariant },
+          ]}
+          onPress={() => onChange(option.value)}
+        >
+          <Icon
+            name={option.icon}
+            size={20}
+            color={value === option.value ? colors.primary : colors.onSurfaceVariant}
+          />
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
+```
+
+---
+
+## Related Documentation
+
+- [WIDGET_DEVELOPMENT_GUIDE.md](./WIDGET_DEVELOPMENT_GUIDE.md) - Widget creation guide
+- [WIDGET_SYSTEM_SPEC.md](./WIDGET_SYSTEM_SPEC.md) - Widget system architecture
+- [WIDGET_FAILSAFE_SPEC.md](./WIDGET_FAILSAFE_SPEC.md) - Error handling & failsafes
+- [I18N_MULTILANGUAGE_SPEC.md](./I18N_MULTILANGUAGE_SPEC.md) - Translations & localization
+- [OFFLINE_SUPPORT_SPEC.md](./OFFLINE_SUPPORT_SPEC.md) - Offline capabilities
+- [ERROR_HANDLING_SPEC.md](./ERROR_HANDLING_SPEC.md) - Global error handling
+- [ANALYTICS_TELEMETRY_SPEC.md](./ANALYTICS_TELEMETRY_SPEC.md) - Analytics events
+- [DB_SCHEMA_REFERENCE.md](./DB_SCHEMA_REFERENCE.md) - Database schema
+- [PERMISSIONS_RBAC_SPEC.md](./PERMISSIONS_RBAC_SPEC.md) - Role-based access control
+- [MEDIA_FILE_HANDLING_SPEC.md](./MEDIA_FILE_HANDLING_SPEC.md) - Media upload handling
+- [PLATFORM_STUDIO_TECHNICAL_SPEC.md](./PLATFORM_STUDIO_TECHNICAL_SPEC.md) - Platform Studio
+
+---
+
+*Document created: December 2024*  
+*Last updated: December 2024*

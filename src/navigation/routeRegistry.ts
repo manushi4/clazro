@@ -29,6 +29,8 @@ const registry: Record<string, RouteDefinition> = {
   // Parent screens (widget-based)
   "child-progress-screen": { screenId: "child-progress-screen", component: DynamicScreen },
   "schedule-screen": { screenId: "schedule-screen", component: DynamicScreen },
+  "children-overview": { screenId: "children-overview", component: DynamicScreen },
+  "child-detail": { screenId: "child-detail", component: DynamicScreen },
   
   // Fixed screens (not widget-based)
   // Settings screen - multiple aliases for compatibility

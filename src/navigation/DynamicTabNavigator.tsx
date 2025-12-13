@@ -30,6 +30,9 @@ const COMMON_SCREENS = [
   { screenId: "notifications", component: DynamicScreen },
   { screenId: "help", component: DynamicScreen },
   { screenId: "about", component: DynamicScreen },
+  // Parent screens (accessible via widget navigation)
+  { screenId: "children-overview", component: DynamicScreen },
+  { screenId: "child-detail", component: DynamicScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons

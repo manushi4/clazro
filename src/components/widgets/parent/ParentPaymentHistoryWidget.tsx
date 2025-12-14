@@ -77,7 +77,7 @@ export const ParentPaymentHistoryWidget: React.FC<WidgetProps> = ({
 
   const handlePaymentPress = (payment: PaymentRecord) => {
     if (enableTap) {
-      onNavigate?.("payment-details", { paymentId: payment.id });
+      onNavigate?.("payment-detail", { paymentId: payment.id });
     }
   };
 

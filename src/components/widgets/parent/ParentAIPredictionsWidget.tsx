@@ -86,7 +86,7 @@ export const ParentAIPredictionsWidget: React.FC<WidgetProps> = ({
 
   const handlePredictionPress = (prediction: AIPrediction) => {
     if (enableTap) {
-      onNavigate?.("prediction-details", { predictionId: prediction.id });
+      onNavigate?.("prediction-detail", { predictionId: prediction.id });
     }
   };
 

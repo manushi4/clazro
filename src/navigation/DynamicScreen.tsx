@@ -81,12 +81,11 @@ export const DynamicScreen: React.FC<Props> = ({
         );
       }
     } else if (route) {
-      // Try direct navigation
-      try {
-        navigation.navigate(route, params);
-      } catch (e) {
-        Alert.alert("Coming Soon", `This feature is under development.`, [{ text: "OK" }]);
+      // Try direct navigation for screens registered in COMMON_SCREENS
+      if (__DEV__) {
+        console.log(`[DynamicScreen] Navigating to: ${route}`, params);
       }
+      navigation.navigate(route, params);
     }
   }, [navigation, trackWidgetEvent]);
 

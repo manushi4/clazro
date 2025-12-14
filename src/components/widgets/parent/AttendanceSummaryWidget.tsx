@@ -50,7 +50,7 @@ export const AttendanceSummaryWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "child_tap", childId: child.child_user_id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_child_tap`, level: "info" });
-    onNavigate?.("child-attendance", { childId: child.child_user_id });
+    onNavigate?.("child-detail", { childId: child.child_user_id });
   };
 
   // Handle view all tap

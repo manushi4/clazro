@@ -91,16 +91,16 @@ export const ParentPendingFeesWidget: React.FC<WidgetProps> = ({
 
   const handleFeePress = (fee: FeeRecord) => {
     if (enableTap) {
-      onNavigate?.("fee-details", { feeId: fee.id });
+      onNavigate?.("fee-detail", { feeId: fee.id });
     }
   };
 
   const handlePayPress = (fee: FeeRecord) => {
-    onNavigate?.("pay-fee", { feeId: fee.id });
+    onNavigate?.("fee-detail", { feeId: fee.id });
   };
 
   const handleViewAll = () => {
-    onNavigate?.("fees");
+    onNavigate?.("fees-overview");
   };
 
   // Get fee type icon

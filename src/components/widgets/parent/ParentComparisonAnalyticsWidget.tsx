@@ -79,7 +79,7 @@ export const ParentComparisonAnalyticsWidget: React.FC<WidgetProps> = ({
 
   const handleMetricPress = (metric: ComparisonMetric) => {
     if (enableTap) {
-      onNavigate?.("comparison-details", { metricId: metric.id, type: metric.comparison_type });
+      onNavigate?.("comparison-details", { childId: data?.child_id, metricId: metric.id, type: metric.comparison_type });
     }
   };
 

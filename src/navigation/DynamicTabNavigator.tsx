@@ -16,7 +16,12 @@ import { DynamicScreen } from "./DynamicScreen";
 import { BrandedHeader } from "../components/branding/BrandedHeader";
 import { SettingsScreen, LanguageSelectionScreen } from "../screens/settings";
 import { EditProfileScreen, HelpFeedbackScreen } from "../screens/profile";
-import { GlobalAnalyticsScreen, SubjectAnalyticsScreen } from "../screens/progress";
+import { GlobalAnalyticsScreen, SubjectAnalyticsScreen, SubjectProgressScreen, SubjectPerformanceScreen, SubjectDetailScreen, SubjectReportScreen } from "../screens/progress";
+import { NotificationDetailScreen } from "../screens/notifications";
+import { AnnouncementDetailScreen } from "../screens/announcements";
+import { FeeDetailScreen, FeePaymentScreen, PaymentDetailScreen } from "../screens/fees";
+import { ChildStatsScreen, ChildWeakAreaScreen, AssignmentDetailScreen, TeacherDetailScreen, AiInsightDetailScreen, PredictionDetailScreen, ComparisonDetailsScreen } from "../screens/parent";
+import { MessageDetailScreen, ComposeMessageScreen } from "../screens/messages";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -33,6 +38,44 @@ const COMMON_SCREENS = [
   // Parent screens (accessible via widget navigation)
   { screenId: "children-overview", component: DynamicScreen },
   { screenId: "child-detail", component: DynamicScreen },
+  { screenId: "attendance-overview", component: DynamicScreen },
+  { screenId: "child-attendance", component: DynamicScreen },
+  { screenId: "child-progress-detail", component: DynamicScreen },
+  { screenId: "performance-detail", component: DynamicScreen },
+  { screenId: "child-subjects", component: DynamicScreen },
+  { screenId: "child-report-card", component: DynamicScreen },
+  { screenId: "announcements", component: DynamicScreen },
+  { screenId: "fees-overview", component: DynamicScreen },
+  { screenId: "payment-history", component: DynamicScreen },
+  // Fixed screens (accessible via widget navigation)
+  { screenId: "notification-detail", component: NotificationDetailScreen },
+  { screenId: "announcement-detail", component: AnnouncementDetailScreen },
+  { screenId: "fee-detail", component: FeeDetailScreen },
+  { screenId: "fee-payment", component: FeePaymentScreen },
+  { screenId: "payment-detail", component: PaymentDetailScreen },
+  { screenId: "subject-progress", component: SubjectProgressScreen },
+  { screenId: "subject-performance", component: SubjectPerformanceScreen },
+  { screenId: "subject-detail", component: SubjectDetailScreen },
+  { screenId: "subject-report", component: SubjectReportScreen },
+  { screenId: "child-stats-detail", component: DynamicScreen },
+  { screenId: "child-stats", component: ChildStatsScreen },
+  { screenId: "child-weak-areas-detail", component: DynamicScreen },
+  { screenId: "child-weak-area", component: ChildWeakAreaScreen },
+  { screenId: "child-assignments", component: DynamicScreen },
+  { screenId: "assignment-detail", component: AssignmentDetailScreen },
+  { screenId: "messages", component: DynamicScreen },
+  { screenId: "message-detail", component: MessageDetailScreen },
+  { screenId: "compose-message", component: ComposeMessageScreen },
+  { screenId: "teacher-contacts", component: DynamicScreen },
+  { screenId: "teacher-detail", component: TeacherDetailScreen },
+  { screenId: "ai-insights", component: DynamicScreen },
+  { screenId: "ai-insight-detail", component: AiInsightDetailScreen },
+  { screenId: "ai-predictions", component: DynamicScreen },
+  { screenId: "prediction-detail", component: PredictionDetailScreen },
+  { screenId: "ai-recommendations", component: DynamicScreen },
+  { screenId: "ai-alerts", component: DynamicScreen },
+  { screenId: "comparison-analytics", component: DynamicScreen },
+  { screenId: "comparison-details", component: ComparisonDetailsScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons

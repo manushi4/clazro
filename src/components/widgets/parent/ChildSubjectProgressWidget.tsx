@@ -55,7 +55,7 @@ export const ChildSubjectProgressWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "subject_tap", subjectId: subject.subject_id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_subject_tap`, level: "info", data: { subjectId: subject.subject_id } });
-    onNavigate?.(`subject-detail/${subject.subject_id}`);
+    onNavigate?.("subject-progress", { subjectId: subject.subject_id });
   };
 
   const handleViewAll = () => {

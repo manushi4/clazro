@@ -63,7 +63,7 @@ export const ChildReportCardWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "subject_tap", subjectId: subject.subject_id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_subject_tap`, level: "info", data: { subjectId: subject.subject_id } });
-    onNavigate?.(`subject-report/${subject.subject_id}`);
+    onNavigate?.("subject-report", { subjectId: subject.subject_id, childId: report?.child_id });
   };
 
   const handleViewAll = () => {

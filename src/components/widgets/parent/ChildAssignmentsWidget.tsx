@@ -77,7 +77,7 @@ export const ChildAssignmentsWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "assignment_tap", assignmentId: assignment.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_assignment_tap`, level: "info", data: { assignmentId: assignment.id } });
-    onNavigate?.(`assignment-detail/${assignment.id}`);
+    onNavigate?.("assignment-detail", { assignmentId: assignment.id });
   };
 
   const handleViewAll = () => {

@@ -55,7 +55,7 @@ export const ParentTeacherContactsWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "teacher_tap", teacherId: teacher.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_teacher_tap`, level: "info", data: { teacherId: teacher.id } });
-    onNavigate?.(`teacher/${teacher.id}`);
+    onNavigate?.("teacher-detail", { teacherId: teacher.id });
   };
 
   const handleCall = (teacher: TeacherContact) => {
@@ -72,7 +72,7 @@ export const ParentTeacherContactsWidget: React.FC<WidgetProps> = ({
 
   const handleMessage = (teacher: TeacherContact) => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "message", teacherId: teacher.id });
-    onNavigate?.(`compose-message?teacherId=${teacher.id}`);
+    onNavigate?.("compose-message", { teacherId: teacher.id });
   };
 
   const handleViewAll = () => {

@@ -56,12 +56,19 @@ export const ChildWeakAreasWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "topic_tap", topicId: area.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_topic_tap`, level: "info", data: { topicId: area.id } });
-    onNavigate?.(`child-weak-area/${area.id}`, { childId });
+    if (__DEV__) {
+      console.log(`[ChildWeakAreasWidget] Navigating to child-weak-area with:`, { childId, topicId: area.id });
+    }
+    if (onNavigate) {
+      onNavigate("child-weak-area", { childId, topicId: area.id });
+    } else if (__DEV__) {
+      console.warn(`[ChildWeakAreasWidget] onNavigate is not defined!`);
+    }
   };
 
-  const handleViewAll = () => {
+  const handleViewAll = (childId: string) => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "view_all" });
-    onNavigate?.("child-weak-areas-detail");
+    onNavigate?.("child-weak-area", { childId });
   };
 
   if (isLoading) {
@@ -254,7 +261,7 @@ export const ChildWeakAreasWidget: React.FC<WidgetProps> = ({
 
       {/* View All Button */}
       {childData.total_weak_areas > maxTopics && (
-        <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAll}>
+        <TouchableOpacity style={styles.viewAllButton} onPress={() => handleViewAll(childData.child_user_id)}>
           <AppText style={[styles.viewAllText, { color: colors.primary }]}>
             {t("widgets.weakAreas.actions.viewAll", { count: childData.total_weak_areas })}
           </AppText>

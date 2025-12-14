@@ -88,7 +88,7 @@ export const ParentMessagesWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "message_tap", messageId: message.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_message_tap`, level: "info", data: { messageId: message.id } });
-    onNavigate?.(`message/${message.id}`);
+    onNavigate?.("message-detail", { messageId: message.id });
   };
 
   const handleViewAll = () => {

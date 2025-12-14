@@ -35,6 +35,9 @@ import { ChildPerformanceChartWidget } from "../components/widgets/parent/ChildP
 import { ChildAssignmentsWidget } from "../components/widgets/parent/ChildAssignmentsWidget";
 import { ChildSubjectProgressWidget } from "../components/widgets/parent/ChildSubjectProgressWidget";
 import { ChildReportCardWidget } from "../components/widgets/parent/ChildReportCardWidget";
+import { SubjectGradesWidget } from "../components/widgets/parent/SubjectGradesWidget";
+import { ReportCardSummaryWidget } from "../components/widgets/parent/ReportCardSummaryWidget";
+import { TeacherRemarksWidget } from "../components/widgets/parent/TeacherRemarksWidget";
 import { ParentMessagesWidget } from "../components/widgets/parent/ParentMessagesWidget";
 import { ParentAnnouncementsWidget } from "../components/widgets/parent/ParentAnnouncementsWidget";
 import { ParentTeacherContactsWidget } from "../components/widgets/parent/ParentTeacherContactsWidget";
@@ -939,6 +942,75 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
         compactMode: false,
         enableTap: true,
       },
+      requiredPermissions: [],
+    },
+  },
+  "parent.subject-grades": {
+    component: SubjectGradesWidget,
+    metadata: {
+      id: "parent.subject-grades",
+      titleKey: "parent:widgets.subjectGrades.title",
+      descriptionKey: "parent:widgets.subjectGrades.subtitle",
+      featureId: "parent.progress",
+      roles: ["parent"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["standard", "expanded"],
+      defaultSize: "expanded",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {},
+      requiredPermissions: [],
+    },
+  },
+  "parent.report-card-summary": {
+    component: ReportCardSummaryWidget,
+    metadata: {
+      id: "parent.report-card-summary",
+      titleKey: "parent:widgets.reportCardSummary.title",
+      descriptionKey: "parent:widgets.reportCardSummary.subtitle",
+      featureId: "parent.progress",
+      roles: ["parent"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["standard", "expanded"],
+      defaultSize: "expanded",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {},
+      requiredPermissions: [],
+    },
+  },
+  "parent.teacher-remarks": {
+    component: TeacherRemarksWidget,
+    metadata: {
+      id: "parent.teacher-remarks",
+      titleKey: "parent:widgets.teacherRemarks.title",
+      descriptionKey: "parent:widgets.teacherRemarks.subtitle",
+      featureId: "parent.progress",
+      roles: ["parent"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {},
       requiredPermissions: [],
     },
   },

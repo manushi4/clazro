@@ -35,6 +35,7 @@ export type ComparisonAnalyticsSummary = {
   below_average_count: number;
   improving_count: number;
   total_count: number;
+  child_id: string | null;
 };
 
 export function useComparisonAnalyticsQuery() {
@@ -55,7 +56,7 @@ export function useComparisonAnalyticsQuery() {
 
       if (childrenError) throw childrenError;
       if (!childrenData || childrenData.length === 0) {
-        return { metrics: [], by_type: {} as Record<ComparisonType, ComparisonMetric[]>, above_average_count: 0, below_average_count: 0, improving_count: 0, total_count: 0 };
+        return { metrics: [], by_type: {} as Record<ComparisonType, ComparisonMetric[]>, above_average_count: 0, below_average_count: 0, improving_count: 0, total_count: 0, child_id: null };
       }
 
       const childIds = childrenData.map((c) => c.child_user_id);
@@ -114,6 +115,7 @@ export function useComparisonAnalyticsQuery() {
         below_average_count,
         improving_count,
         total_count: metrics.length,
+        child_id: childIds[0] || null,
       };
     },
     enabled: !!customerId && !!parentUserId,

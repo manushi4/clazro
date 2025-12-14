@@ -92,7 +92,7 @@ export const ParentAnnouncementsWidget: React.FC<WidgetProps> = ({
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "announcement_tap", announcementId: announcement.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_announcement_tap`, level: "info", data: { announcementId: announcement.id } });
-    onNavigate?.(`announcement/${announcement.id}`);
+    onNavigate?.("announcement-detail", { announcementId: announcement.id });
   };
 
   const handleViewAll = () => {

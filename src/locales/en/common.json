@@ -1,0 +1,52 @@
+{
+  "tabs": {
+    "home": "Home",
+    "study": "Study",
+    "ask": "Ask",
+    "progress": "Progress",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "actions": {
+    "submit": "Submit",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "enable": "Enable",
+    "disable": "Disable",
+    "save": "Save",
+    "create": "Create",
+    "up": "Up",
+    "down": "Down"
+  },
+  "status": {
+    "loading": "Loading configuration...",
+    "safe_mode": "Safe Mode",
+    "offline_title": "Offline",
+    "offline_action": "Go online to perform this action.",
+    "offline_widget": "{{widget}} requires internet.",
+    "ai_tutor_enabled": "AI Tutor enabled",
+    "ai_tutor_disabled": "AI Tutor disabled",
+    "ai_tutor_perm_missing": "AI Tutor permission missing"
+  },
+  "admin": {
+    "warning": "Uses service-role key if provided. Do not ship to prod with key embedded.",
+    "disabled": "Admin disabled: missing configuration."
+  },
+  "app": {
+    "title": "Config-Driven UI",
+    "subtitle": "Dynamic navigation & dashboard ({{role}}) for {{customer}}"
+  },
+  "screens": {
+    "home.dashboard": "Dashboard",
+    "home.schedule": "Schedule",
+    "study.library": "Library",
+    "study.library.alt": "Library",
+    "study.assignments": "Assignments",
+    "study.tests": "Tests",
+    "ask.doubts": "Doubts",
+    "ask.ai": "AI Tutor",
+    "progress.analytics": "Progress",
+    "profile.home": "Profile",
+    "admin.panel": "Admin"
+  }
+}

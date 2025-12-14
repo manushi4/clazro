@@ -1,0 +1,88 @@
+{
+  "company": "Remind",
+  "platform_type": "Education Communication Platform",
+  "parent_company": "ParentSquare family",
+  "target_audience": ["Teachers", "Administrators", "Families", "Students"],
+  "user_base": "20+ million students across US schools",
+  "market_penetration": "80% of US schools",
+  "teacher_users": "2+ million teachers",
+  
+  "product_offerings": {
+    "remind_chat": {
+      "pricing": "Free",
+      "features": [
+        "Classroom messaging",
+        "Language translation",
+        "Device-agnostic communication"
+      ]
+    },
+    "remind_hub": {
+      "target": "Organizations",
+      "features": [
+        "Organizational communication",
+        "Administrator oversight", 
+        "Easy implementation",
+        "Data insights"
+      ]
+    }
+  },
+  
+  "core_features": {
+    "messaging": {
+      "type": "Two-way messaging",
+      "translation": "Automatic translation into 90+ languages",
+      "delivery": "Phone-based messaging",
+      "privacy": "No personal phone numbers shared",
+      "notifications": "Real-time on any device"
+    },
+    "communication_tools": {
+      "individual_messaging": true,
+      "group_messaging": true,
+      "message_history": "Downloadable",
+      "communication_boundaries": true
+    },
+    "mobile_functionality": {
+      "platforms": ["iOS", "Android", "Browser"],
+      "notifications": "Cross-device",
+      "accessibility": "Multi-platform"
+    }
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "automation_features": ["automatic translation", "real-time notifications"],
+    "integration_ready": true,
+    "mobile_first": true,
+    "privacy_controls": true
+  },
+  
+  "unique_selling_points": [
+    "90+ language translation",
+    "Phone-based messaging without sharing numbers",
+    "80% market penetration in US schools",
+    "Privacy protection",
+    "Communication boundaries for educators"
+  ],
+  
+  "app_ratings": {
+    "apple_app_store": "4.8/5",
+    "reviewers": "1.1 million"
+  },
+  
+  "privacy_security": [
+    "Highest education data privacy standards",
+    "iKeep Safe Certified",
+    "Personal information protection"
+  ],
+  
+  "communication_workflows": {
+    "classroom_communication": "Direct messaging with translation",
+    "group_coordination": "Club and team messaging",
+    "family_engagement": "Parent-teacher communication",
+    "administrative_oversight": "Hub management tools"
+  },
+  
+  "value_proposition": "Positive relationships can change trajectories",
+  "data_collection_date": "2025-08-29",
+  "source_urls": ["https://www.remind.com/", "https://www.remind.com/features"]
+}

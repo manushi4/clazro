@@ -1,0 +1,40 @@
+{
+    "tabs":  {
+                 "home":  "होम",
+                 "study":  "स्टडी",
+                 "ask":  "पूछें",
+                 "progress":  "प्रगति",
+                 "profile":  "प्रोफ़ाइल",
+                 "admin":  "एडमिन"
+             },
+    "actions":  {
+                    "submit":  "सबमिट",
+                    "retry":  "दोबारा प्रयास",
+                    "cancel":  "रद्द करें",
+                    "enable":  "चालू करें",
+                    "disable":  "बंद करें",
+                    "save":  "सेव",
+                    "create":  "बनाएँ",
+                    "up":  "ऊपर",
+                    "down":  "नीचे"
+                },
+    "status":  {
+                   "loading":  "कॉन्फ़िगरेशन लोड हो रहा है...",
+                   "safe_mode":  "सेफ़ मोड",
+                   "offline":  "आप ऑफ़लाइन हैं",
+                   "offline_widget":  "{{widget}} requires internet.",
+                   "ai_tutor_enabled":  "एआई ट्यूटर चालू",
+                   "ai_tutor_disabled":  "एआई ट्यूटर बंद",
+                   "ai_tutor_perm_missing":  "एआई ट्यूटर अनुमति नहीं है",
+                   "offline_title":  "Offline",
+                   "offline_action":  "Go online to perform this action."
+               },
+    "admin":  {
+                  "warning":  "यदि सर्विस-रोल कुंजी सेट है तो उपयोग करता है। प्रोड में कभी शामिल न करें।",
+                  "disabled":  "एडमिन निष्क्रिय: कॉन्फ़िगरेशन गायब।"
+              },
+    "app":  {
+                "subtitle":  "Dynamic navigation \u0026 dashboard ({{role}}) for {{customer}}",
+                "title":  "Config-Driven UI"
+            }
+}

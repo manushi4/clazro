@@ -1,0 +1,248 @@
+# Prompt / System Policy / Template Governance (Versioning & Rollback)
+
+## 1. Purpose
+
+This guide defines how Clazro manages **prompts**, **system policies**, and **template libraries** safely at scale. It ensures AI behavior is:
+
+* **controlled** (no ad-hoc prompt edits in code)
+* **auditable** (who changed what, when, and why)
+* **reversible** (instant rollback)
+* **tenant-aware** (overrides without breaking global safety)
+* **audience-safe** (Kid/Teen rules cannot be weakened)
+
+This document is mandatory for all AI features and automations that use AI.
+
+---
+
+## 2. Definitions
+
+* **System Policy**: Top-level behavioral rules that always apply (safety, style, refusals).
+* **Prompt Template**: Feature/widget-specific prompt with variables.
+* **Profile Template**: Prompt variants per audience profile (kid/teen/adult/coaching).
+* **Tenant Override**: Tenant-specific modifications allowed within constraints.
+* **Version**: Immutable snapshot of policy + templates published together.
+* **Draft**: Editable state not used in production.
+
+---
+
+## 3. Non-Negotiable Principles
+
+1. **Policies and prompts are config-controlled** (Platform Studio), not hardcoded.
+2. **Versioned publishing**: production always uses a published version.
+3. **Rollback is instant** (config pointer change).
+4. **Child safety policies are immutable** for tenants (no weakening allowed).
+5. **Every template has tests and validation** before publish.
+6. **Separation of concerns**: routing chooses model; governance controls instructions.
+
+---
+
+## 4. Governance Model
+
+### 4.1 Ownership & Roles
+
+* **AI Admin (Platform-level)**: defines global system policy, approved template library.
+* **Tenant Admin**: can enable features and apply limited overrides.
+* **Coach/Teacher**: may propose content edits but cannot publish system policy.
+
+### 4.2 Approval Levels
+
+* **Low Risk** (copy edits, tone adjustments): 1 reviewer
+* **Medium Risk** (new prompt template, changed refusal rules): 2 reviewers
+* **High Risk** (kid templates, safety policy, tool instructions): security/safety approval required
+
+---
+
+## 5. Template Structure Standards
+
+Every prompt template must include:
+
+### 5.1 Metadata
+
+* templateId
+* featureId, widgetId
+* audienceProfiles supported
+* roles supported
+* capabilityClass
+* outputMode (TEXT/JSON/SCHEMA)
+* toolPolicy (disabled/allowed/required)
+
+### 5.2 Instruction Layers
+
+Prompts must be layered:
+
+1. **System Policy** (global, immutable)
+2. **Audience Policy** (kid/teen/adult/coaching)
+3. **Feature Policy** (use-case constraints)
+4. **Template Body** (content + variables)
+5. **Runtime Context** (redacted, minimal)
+
+No template may bypass system/audience layers.
+
+### 5.3 Variables & Safety
+
+* Variables must be typed and validated
+* No raw user-provided HTML/markdown inserted without sanitation
+* Context size limits enforced
+
+---
+
+## 6. Versioning Strategy
+
+### 6.1 Version Objects
+
+A published AI config version must bundle:
+
+* system policy version
+* audience policy versions
+* template versions
+* routing policy version reference
+* schema definitions (if used)
+
+### 6.2 Semantic Versioning (Recommended)
+
+* MAJOR: behavior changes, safety changes
+* MINOR: new templates/features
+* PATCH: bug fixes / minor wording improvements
+
+### 6.3 Pinning in Production
+
+* Production uses pinned version IDs, never “latest”.
+* Canary tenants may opt into a newer version.
+
+---
+
+## 7. Publishing Workflow (Draft → Validate → Publish)
+
+### 7.1 Draft
+
+* Editable in Platform Studio
+* Not used by runtime
+
+### 7.2 Validate
+
+Validation must include:
+
+* schema validation for templates
+* forbidden strings / leakage checks
+* kid-safety rules enforcement
+* tool usage rules enforcement
+* regression test suite
+
+### 7.3 Publish
+
+* Creates an immutable version
+* Moves tenant pointers to that version
+* Stores audit log entry
+
+---
+
+## 8. Rollback Rules
+
+### 8.1 Rollback Types
+
+* **Tenant rollback**: revert a tenant to a prior version
+* **Global rollback**: revert all tenants (emergency)
+
+### 8.2 Rollback Triggers
+
+* spike in refusals or unsafe flags
+* schema failures
+* user complaints
+* provider behavior drift
+
+### 8.3 Rollback Requirements
+
+* Rollback must be a single operation (pointer update)
+* Must be logged with reason
+* Must notify admins
+
+---
+
+## 9. Tenant Overrides
+
+### 9.1 Allowed Overrides
+
+* tone (formal/informal)
+* branding language
+* domain vocabulary
+* feature-specific custom instructions
+
+### 9.2 Disallowed Overrides
+
+* weakening kid safety
+* bypassing refusals
+* enabling tools for minors
+* altering system policy constraints
+
+### 9.3 Override Validation
+
+Tenant overrides must:
+
+* pass static linting
+* pass kid-safety constraints
+* pass regression suite
+
+---
+
+## 10. Prompt Testing & Regression
+
+Every template must have:
+
+* **golden test cases** (inputs → expected properties)
+* safety tests (disallowed topics)
+* output format tests (schema compliance)
+* prompt injection tests
+
+Publishing is blocked if tests fail.
+
+---
+
+## 11. Observability & Auditability
+
+For every AI execution, record:
+
+* promptVersionId
+* policyVersionId
+* templateId
+* tenantId
+* featureId
+* audienceProfile
+* model used
+* traceId
+
+Prompt content itself should be logged only in secure admin environments.
+
+---
+
+## 12. Security Controls
+
+* No secrets in prompts
+* Redaction before prompt assembly
+* Tool instructions never include credentials
+* Guard against prompt injection via strict tool allowlists
+
+---
+
+## 13. Minimum Implementation Checklist
+
+Phase 1 must include:
+
+1. Prompt templates stored in config tables
+2. Versioning and immutable publish
+3. Tenant pointer to active version
+4. Validation + basic regression tests
+5. Rollback endpoint / studio action
+6. Audit logs
+
+---
+
+## 14. Non-Negotiables Summary
+
+* No unversioned prompts in production
+* Kid safety cannot be overridden
+* Publish is gated by validation
+* Rollback is instant and logged
+
+---
+
+This governance system keeps AI behavior **stable, safe, configurable, and reversible** across tenants and audiences.

@@ -1,0 +1,202 @@
+# AI & Automation Architecture Overview
+
+## 1. Purpose
+
+This document defines how **AI**, **automation (n8n)**, **MCP/tool-calling**, and **external connectors** integrate into the existing Clazro platform without refactoring core app logic. It extends current principles: **config-driven UI**, **widget-based rendering**, **Platform Studio governance**, **RBAC**, and **failsafe-first execution**.
+
+---
+
+## 2. Architectural Principles
+
+* **Thin client**: Mobile app renders widgets and sends requests; no direct AI/provider logic.
+* **Single gateway**: All AI, automation, tools, and connectors flow through a governed backend gateway.
+* **Config over code**: Behavior is controlled by published config from Platform Studio.
+* **Least privilege**: Minimal data, minimal scopes, explicit consent.
+* **Fail-safe by default**: No AI or automation failure may break navigation or screens.
+
+---
+
+## 3. High-Level Architecture
+
+Mobile App (Widgets)
+→ AI & Automation Gateway (Policy + Routing)
+→ Providers / n8n / MCP Tools
+
+Platform Studio controls configuration for every step.
+
+---
+
+## 4. Core Components
+
+### 4.1 Mobile App (React Native)
+
+* AI widgets (chat, insights, summaries, copilots)
+* Automation-trigger UI (buttons, events)
+* Deep links to external tools (Google Meet, Canva, etc.)
+* Offline & fallback UI states
+
+### 4.2 Platform Studio
+
+Controls:
+
+* Feature enablement per tenant / role / audience profile
+* Prompt templates & policies
+* Model routing rules
+* Tool & connector permissions
+* Automation workflow references
+* Publish, validate, rollback
+
+### 4.3 AI & Automation Gateway (Backend)
+
+Responsibilities:
+
+* RBAC & consent enforcement
+* Audience profile & safety rules
+* Context assembly & redaction
+* Model selection & fallback
+* Tool-calling governance (MCP)
+* Automation invocation (n8n)
+* Observability, audit logs, cost tracking
+
+### 4.4 n8n (Automation Orchestrator)
+
+* Event & schedule-based workflows
+* Multi-step logic, retries, approvals
+* Calls AI only via Gateway
+* Never acts as system of record
+
+### 4.5 MCP / Tool Layer
+
+* Standardized interface for AI tool usage
+* Tools: calendar, email, docs, storage, etc.
+* Allowlisted, scoped, auditable
+
+---
+
+## 5. Control Plane vs Data Plane
+
+### Control Plane
+
+* Studio-published config (versioned)
+* Remote → cached → default → safe-mode
+
+### Data Plane
+
+* Runtime AI and automation execution
+* Governed entirely by Gateway
+
+---
+
+## 6. Key Runtime Flows
+
+### 6.1 AI Widget Request
+
+1. App → Gateway: AI request with context references
+2. Gateway validates RBAC, policy, audience rules
+3. Gateway routes to model, optionally calls tools
+4. Gateway → App: response + metadata
+
+### 6.2 Automation Trigger
+
+1. App/Backend emits event
+2. Gateway validates event against config
+3. Gateway triggers n8n workflow
+4. n8n executes steps and returns outcome
+
+### 6.3 Meeting Lifecycle (Google Meet)
+
+1. App requests meeting creation
+2. Gateway creates Calendar event + Meet link
+3. App opens Meet via deep link
+4. User returns to app for post-meeting flow
+
+---
+
+## 7. Multi-Model & Tool Governance
+
+* Provider selection by feature, audience, cost, region
+* Automatic fallback on failure
+* Tool calls restricted by allowlists and scopes
+
+---
+
+## 8. Security, Safety & Compliance
+
+* RBAC & consent on every call
+* Child safety enforcement
+* Prompt injection & tool abuse prevention
+* Full audit trail
+* Tenant & global kill switches
+
+---
+
+## 9. Observability & Cost Control
+
+* Trace IDs per execution
+* Token, latency, cost tracking
+* Budgets per tenant & feature
+* Alerts and throttling
+
+---
+
+## 10. Offline & Degraded Mode
+
+* Cached responses where allowed
+* Read-only or non-AI fallback UI
+* Queued or skipped automations with logs
+
+---
+
+## 11. API Contracts (High-Level)
+
+### AI Execution API
+
+POST /ai/execute
+
+* tenantId
+* userId
+* role
+* audienceProfile
+* featureId
+* widgetId
+* input
+* contextRefs
+
+### Automation Trigger API
+
+POST /automation/trigger
+
+* tenantId
+* eventName
+* payloadRef
+
+### Tool Execution API
+
+POST /tools/execute
+
+* toolId
+* action
+* parameters
+
+### Meeting API
+
+POST /integrations/meetings/create
+
+* participants
+* startTime
+* duration
+
+---
+
+## 12. Phase 1 Deliverables
+
+* AI & Automation Gateway
+* Multi-model routing + fallback
+* n8n integration
+* Google Calendar/Meet connector
+* 1–2 AI widgets
+* Basic observability & audit logs
+
+---
+
+This document is intentionally **additive** and aligns with existing Clazro architecture and documentation standards.

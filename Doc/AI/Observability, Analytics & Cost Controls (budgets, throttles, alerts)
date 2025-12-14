@@ -1,0 +1,247 @@
+# Observability, Analytics & Cost Controls (Budgets, Throttles, Alerts)
+
+## 1. Purpose
+
+This guide defines how Clazro measures, controls, and governs AI and automation usage through:
+
+* structured observability (logs/metrics/traces)
+* analytics and dashboards
+* cost and token budgets
+* throttling and rate limits
+* alerts and anomaly detection
+
+The goal is to maintain **reliability, safety, and predictable cost** across tenants, roles, and audience profiles.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Every AI/automation execution is traceable** (traceId end-to-end)
+2. **Costs are enforced, not just reported**
+3. **Budgets are tenant-scoped and feature-scoped**
+4. **Throttling must degrade gracefully**
+5. **Alerts must be actionable**
+6. **No logging of raw PII by default**
+
+---
+
+## 3. Observability Model
+
+### 3.1 Signals
+
+#### Logs (structured)
+
+* per-request events with fields
+
+#### Metrics
+
+* counters, gauges, histograms
+
+#### Traces
+
+* end-to-end execution across services
+
+---
+
+## 4. Required Identifiers (Standard Fields)
+
+Every AI/automation event must include:
+
+* traceId
+* tenantId
+* userId (or anonymized hash)
+* role
+* audienceProfile
+* featureId
+* widgetId (if UI-driven)
+* workflowId + stepId (if automation)
+* providerId + modelId (for AI)
+
+---
+
+## 5. AI Metrics (Minimum)
+
+### 5.1 Usage & Performance
+
+* request count
+* latency p50/p90/p99
+* provider error rate
+* retries and fallback frequency
+
+### 5.2 Output Reliability
+
+* schema validation pass rate
+* refusal rate
+* safety flag rate
+
+### 5.3 Cost
+
+* tokens in/out
+* cost per request
+* cost per feature
+* cost per tenant/day
+
+---
+
+## 6. Automation Metrics (Minimum)
+
+* workflow run count
+* success vs failure rate
+* step duration
+* retry rate
+* approval queue time
+* idempotency dedupe rate
+
+---
+
+## 7. Budgeting Model
+
+### 7.1 Budget Levels
+
+Budgets can exist at:
+
+* tenant/day
+* feature/day
+* user/day
+* workflow/day
+
+### 7.2 Budget Policies
+
+Each budget has:
+
+* cap value (currency or tokens)
+* action on breach (degrade, deny, notify)
+* reset schedule
+
+### 7.3 Default Actions
+
+When near cap:
+
+* route to cheaper models
+* reduce max tokens
+* disable premium capability classes
+
+When exceeded:
+
+* block non-critical features
+* show “limit reached” UX
+* notify admins
+
+---
+
+## 8. Throttling & Rate Limiting
+
+### 8.1 Rate Limits
+
+* per tenant (req/min)
+* per user (req/min)
+* per feature (req/min)
+
+### 8.2 Throttle Behavior
+
+Throttle must:
+
+* return a clear error code
+* suggest retry after
+* degrade UI gracefully
+
+For minors:
+
+* do not encourage repeated retries
+
+---
+
+## 9. Alerts
+
+### 9.1 Cost Alerts
+
+* sudden spike in daily spend
+* budget nearing cap (80%, 90%, 100%)
+
+### 9.2 Reliability Alerts
+
+* provider timeout spike
+* schema failure spike
+* automation failure spike
+
+### 9.3 Safety Alerts
+
+* elevated crisis detections
+* elevated refusal or unsafe attempts
+
+---
+
+## 10. Dashboards
+
+Minimum dashboards:
+
+* Tenant cost dashboard
+* Feature cost dashboard
+* Provider reliability dashboard
+* Safety & refusal dashboard
+* Automation success dashboard
+
+---
+
+## 11. Logging & Privacy
+
+* log redacted parameters
+* never store raw child chat transcripts by default
+* store only:
+
+  * policy versions
+  * safety outcomes
+  * metrics
+
+---
+
+## 12. Audit Trail Requirements
+
+For all AI/tool calls:
+
+* who invoked
+* what feature
+* what provider/tool
+* what outcome
+* what cost
+
+Audits must be immutable and tenant-scoped.
+
+---
+
+## 13. Anomaly Detection
+
+Detect:
+
+* abnormal token usage patterns
+* repeated tool denials
+* sudden increase in refusals
+
+Action:
+
+* throttle
+* alert
+* auto-disable feature (optional)
+
+---
+
+## 14. Phase 1 Minimum Implementation
+
+1. traceId propagation across app → gateway → provider → tools
+2. structured logs for every request
+3. budget enforcement per tenant/day
+4. rate limits per tenant/user
+5. basic alerts for cost + provider errors
+
+---
+
+## 15. Non-Negotiables Summary
+
+* costs are enforced via budgets
+* throttling degrades gracefully
+* dashboards exist per tenant and feature
+* logs protect privacy
+
+---
+
+This guide ensures Clazro’s AI and automation remain **observable, affordable, and reliable** at scale.

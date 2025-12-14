@@ -1,0 +1,277 @@
+# Kill Switch, Rollback & Incident Response Runbook
+
+## 1. Purpose
+
+This runbook defines how Clazro safely responds to incidents involving:
+
+* AI model/provider failures
+* unsafe outputs or safety policy breaches
+* tool/connector abuse (including MCP)
+* automation runaway workflows
+* cost spikes
+
+It standardizes:
+
+* kill switches (global/tenant/feature/tool)
+* rollback (config, prompts, routing)
+* containment and recovery
+* post-incident review
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Fast containment > perfect diagnosis**
+2. **Kill switches must be one-click and auditable**
+3. **Rollback must restore last-known-good within minutes**
+4. **Never disable safety controls to restore service**
+5. **All incidents produce traceable artifacts**
+
+---
+
+## 3. Kill Switch Inventory
+
+Kill switches must exist at these levels:
+
+### 3.1 Global AI Kill Switch
+
+* disables all AI execution
+* app shows “AI unavailable” fallback UX
+
+### 3.2 Tenant AI Kill Switch
+
+* disables AI for a single tenant
+
+### 3.3 Feature Kill Switch
+
+* disables a specific featureId (e.g., coach_copilot)
+
+### 3.4 Provider/Model Kill Switch
+
+* disables a provider or model across routing
+* forces fallback provider
+
+### 3.5 Tool/Connector Kill Switch
+
+* disables specific toolId or connector
+* blocks tool execution immediately
+
+### 3.6 Automation Kill Switch
+
+* disables workflows globally or per tenant
+* pauses triggers and new runs
+
+All kill switch activations must be logged.
+
+---
+
+## 4. Rollback Types
+
+### 4.1 Prompt/Policy Rollback
+
+* revert to prior prompt version
+* revert system policy version
+
+### 4.2 Routing Rollback
+
+* revert routing policy version
+* revert fallback order
+
+### 4.3 Workflow Rollback
+
+* revert workflow definition version
+
+### 4.4 Tenant Config Rollback
+
+* revert tenant’s active AI config version pointer
+
+Rollbacks must be atomic pointer changes.
+
+---
+
+## 5. Incident Categories & Immediate Actions
+
+### 5.1 Unsafe Content Incident
+
+Examples:
+
+* disallowed content appears in output
+* kid profile receives unsafe response
+
+Immediate actions:
+
+1. Enable Feature or Global AI kill switch
+2. Roll back prompt/policy version
+3. Block affected templates
+4. Review safety logs and traceIds
+5. Notify tenant admins if required
+
+---
+
+### 5.2 Provider Outage / Degradation
+
+Examples:
+
+* high timeout/error rate
+
+Immediate actions:
+
+1. Disable affected provider/model in routing
+2. Force fallback provider
+3. Monitor latency/cost changes
+4. If systemic, enable AI kill switch
+
+---
+
+### 5.3 Tool/Connector Abuse
+
+Examples:
+
+* spam emails
+* mass calendar invites
+
+Immediate actions:
+
+1. Tool kill switch for connector
+2. Revoke tokens / disconnect OAuth
+3. Pause automation workflows that call tool
+4. Investigate tool audit logs
+
+---
+
+### 5.4 Automation Runaway
+
+Examples:
+
+* workflow loops
+* repeated triggers
+
+Immediate actions:
+
+1. Automation kill switch
+2. Pause offending workflowId
+3. Dedup keys validation
+4. Inspect workflow definition
+
+---
+
+### 5.5 Cost Spike
+
+Examples:
+
+* tenant exceeds budget quickly
+
+Immediate actions:
+
+1. Enforce throttles and budget caps
+2. Route to cheaper models
+3. Disable premium capability classes
+4. Notify tenant admins
+
+---
+
+## 6. Response Playbook (Step-by-Step)
+
+### Step 1: Detect
+
+Sources:
+
+* alerts (cost, failures, safety)
+* user/tenant reports
+* dashboard anomalies
+
+### Step 2: Contain
+
+* activate the smallest effective kill switch
+* if uncertain, escalate to larger kill switch
+
+### Step 3: Stabilize
+
+* rollback to last-known-good config
+* disable degraded provider
+* disable offending tool/workflow
+
+### Step 4: Investigate
+
+* use traceIds to track:
+
+  * model/provider decisions
+  * prompt versions
+  * tool calls
+  * workflow steps
+
+### Step 5: Recover
+
+* re-enable incrementally:
+
+  * canary tenant
+  * limited features
+  * monitor metrics
+
+### Step 6: Postmortem
+
+* root cause
+* preventive actions
+* update guides, tests, and controls
+
+---
+
+## 7. Required Operational Tooling
+
+* kill switch UI in Platform Studio
+* config version history and rollback UI
+* audit log search by traceId
+* dashboards for cost/reliability/safety
+* approval queue visibility
+
+---
+
+## 8. Communication Protocol
+
+### 8.1 Internal
+
+* incident channel created
+* assign incident commander
+
+### 8.2 Tenant Communication
+
+* notify tenant admins if:
+
+  * safety event affects minors
+  * connector compromise
+  * sustained outage
+
+Messages must be factual and include timeframe.
+
+---
+
+## 9. Validation & Drills
+
+* quarterly kill switch drills
+* rollback drills
+* simulated tool abuse scenario
+* simulated unsafe output scenario
+
+---
+
+## 10. Phase 1 Minimum Implementation
+
+1. global + tenant AI kill switches
+2. feature kill switch
+3. provider/model disable
+4. tool kill switch
+5. rollback pointers
+6. audit logs searchable by traceId
+
+---
+
+## 11. Non-Negotiables Summary
+
+* kill switches must be immediate
+* rollback is pointer-based
+* incidents are traceable
+* re-enable gradually
+
+---
+
+This runbook ensures Clazro can respond quickly and safely to AI, automation, and connector incidents.

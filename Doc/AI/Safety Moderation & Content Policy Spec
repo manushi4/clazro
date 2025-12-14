@@ -1,0 +1,246 @@
+# Safety Moderation & Content Policy Spec (Input/Output Moderation + Crisis Flow)
+
+## 1. Purpose
+
+This spec defines Clazro’s **safety moderation pipeline** and **content policy** for AI interactions, tool calls, and automations. It covers:
+
+* input moderation (user prompts)
+* output moderation (AI responses)
+* refusal behavior
+* escalation and crisis handling
+* logging and audit requirements
+
+This spec is mandatory for all AI features across all tenants.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Safety overrides helpfulness**
+2. **Kids are always stricter than adults**
+3. **Moderate both input and output**
+4. **Refuse unsafe requests clearly and calmly**
+5. **Escalate when risk is high**
+6. **No crisis handling by AI alone**
+7. **Policies are versioned and auditable**
+
+---
+
+## 3. Policy Scope
+
+Applies to:
+
+* AI chat widgets
+* summarization features
+* insights/recommendations
+* tool calls (MCP/connectors)
+* automation workflows that produce user-facing messages
+
+---
+
+## 4. Policy Taxonomy (Content Categories)
+
+### 4.1 Always Disallowed
+
+* self-harm instructions or encouragement
+* violence or harm instructions
+* sexual content involving minors
+* illegal wrongdoing instructions
+* hate, harassment, or targeted abuse
+* sharing personal data about minors
+
+### 4.2 Restricted / Age-Sensitive
+
+* sexual content (adult only, never minors)
+* substance use
+* mental health topics (supportive, non-medical)
+* relationship advice (teen/adult; safe framing)
+* political persuasion (avoid for kids)
+
+### 4.3 Allowed
+
+* education, learning support
+* coaching guidance (non-medical)
+* study planning
+* general wellbeing encouragement
+
+---
+
+## 5. Moderation Pipeline
+
+### 5.1 Pre-Processing
+
+* sanitize user input (strip HTML/script)
+* detect language
+* apply rate limits
+* apply audience profile rules
+
+### 5.2 Input Moderation
+
+Classify user input into:
+
+* SAFE
+* BORDERLINE
+* UNSAFE
+* CRISIS
+
+For minors, borderline often becomes unsafe.
+
+### 5.3 Output Generation
+
+* apply system + audience + feature policies
+* generate response
+
+### 5.4 Output Moderation
+
+Classify AI response:
+
+* SAFE
+* BORDERLINE
+* UNSAFE
+
+If unsafe:
+
+* block response
+* replace with refusal/safe completion
+
+---
+
+## 6. Refusal and Safe Completion
+
+### 6.1 Refusal Requirements
+
+Refusals must:
+
+* be calm and respectful
+* not provide enabling details
+* offer safe alternatives
+* encourage talking to trusted adults (for minors)
+
+### 6.2 Safe Completion
+
+When possible:
+
+* respond with general safe guidance
+* provide educational redirection
+
+---
+
+## 7. Crisis Flow
+
+### 7.1 Crisis Triggers
+
+* self-harm ideation
+* threats of violence
+* abuse disclosures
+* acute distress indicators
+
+### 7.2 Crisis Response Rules
+
+* do not give clinical advice
+* provide supportive language
+* encourage reaching out to trusted adult
+* offer emergency resources (region-aware if supported)
+
+### 7.3 Escalation
+
+If crisis detected:
+
+* create a safety event
+* notify parent/guardian or coach per policy
+* send user-safe message
+
+No automatic sharing to third parties unless legally mandated by tenant policy.
+
+---
+
+## 8. Tool & Automation Safety
+
+### 8.1 Tool Calls
+
+* tool calls are blocked if request is unsafe
+* tool outputs are sanitized before used by AI
+* disallow tools that could amplify harm
+
+### 8.2 Automation
+
+* outbound messages must be moderated
+* workflows must respect age and consent
+
+---
+
+## 9. Safety Event Model
+
+Create an immutable safety event record:
+
+* safetyEventId
+* tenantId
+* userId
+* role
+* audienceProfile
+* featureId
+* severity: LOW/MED/HIGH/CRISIS
+* category
+* actionTaken: REFUSED/ESCALATED/ALLOWED
+* traceId
+
+Content stored should be minimized and redacted.
+
+---
+
+## 10. Logging & Audit
+
+Log:
+
+* moderation decisions
+* policy version
+* refusal reason
+* escalation actions
+* tool blocks
+
+Do not store raw sensitive content beyond retention policy.
+
+---
+
+## 11. Enforcement Points
+
+Enforced at:
+
+* Platform Studio (policy config validation)
+* AI Gateway (runtime moderation + refusal)
+* Tool Gateway (blocks unsafe tool calls)
+* Automation runner (moderate outgoing content)
+
+---
+
+## 12. Testing Requirements
+
+* unsafe prompt penetration tests
+* output leakage tests
+* crisis simulation tests
+* kid profile strictness tests
+* tool misuse tests
+
+---
+
+## 13. Phase 1 Minimum Implementation
+
+1. input moderation classifier
+2. output moderation check
+3. refusal templates per audience profile
+4. crisis escalation event + notifications
+5. audit logs with traceId
+
+---
+
+## 14. Non-Negotiables Summary
+
+* moderate input and output
+* block unsafe content
+* crisis triggers escalate
+* kids have stricter rules
+* all decisions auditable
+
+---
+
+This spec ensures Clazro provides AI assistance responsibly while maintaining safety, trust, and compliance.

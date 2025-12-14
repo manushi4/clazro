@@ -1,0 +1,128 @@
+{
+  "company": "Seesaw",
+  "platform_type": "Elementary Learning Experience Platform / Student Portfolio Platform",
+  "target_audience": ["PreK-6 Teachers", "Students", "Parents/Families", "School Administrators"],
+  "positioning": "All-in-one platform for PreK–6",
+  
+  "core_components": [
+    "LMS (Learning Management System)",
+    "Digital portfolios",
+    "Multimodal learning",
+    "Assessments and insights",
+    "Admin tools",
+    "Family engagement features",
+    "Optional supplemental curriculum packages"
+  ],
+  
+  "key_features": {
+    "for_teachers": {
+      "content_creation": [
+        "Create learning tasks incorporating videos, photos, text, images, files, drawings",
+        "Class blog creation",
+        "Activity library access",
+        "Assessment via digital portfolios"
+      ],
+      "assessment_tools": [
+        "Digital portfolio assessment",
+        "AI-powered guided reading with scaffolds",
+        "Voice and screen recording for thinking visibility",
+        "Free Response Assessment Type with auto/manual grading",
+        "Aggregated response data reporting"
+      ],
+      "ai_automation": [
+        "AI-powered guided reading assessment",
+        "Reading accuracy and WPM analysis",
+        "Automated reading challenge identification"
+      ],
+      "teacher_impact": "97% of teachers say Seesaw helps capture evidence of student learning over time"
+    },
+    
+    "for_students": {
+      "portfolio_capabilities": [
+        "Digital work compilation",
+        "Photo capture of physical work",
+        "Progress showcase and reflection",
+        "Growth ownership tools"
+      ],
+      "learning_features": [
+        "Portfolios follow students throughout school journey",
+        "Flexible activity templates",
+        "Highlights folder for exemplary work",
+        "Student reflection attachments"
+      ],
+      "engagement_tools": [
+        "Focus Mode for developmental alignment",
+        "Distraction minimization",
+        "Appropriate response format guidance"
+      ]
+    },
+    
+    "for_families": {
+      "engagement_features": [
+        "Portfolio access and viewing",
+        "Teacher feedback visibility",
+        "Class announcements",
+        "Individual messaging with teachers"
+      ],
+      "accessibility": [
+        "Family login portal (web and mobile)",
+        "iOS and Android apps available",
+        "Translation tool for notes/captions/comments",
+        "Automatic notifications for student uploads"
+      ]
+    }
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": true,
+    "cross_platform": ["Web", "iOS", "Android"],
+    "automation_features": [
+      "AI-powered reading assessment",
+      "Automatic parent notifications",
+      "Auto-grading capabilities"
+    ],
+    "integration_ready": true
+  },
+  
+  "integrations": [
+    "ClassLink",
+    "Google Classroom", 
+    "Canvas",
+    "Clever"
+  ],
+  
+  "pricing_model": {
+    "free_tier": "Basic features available for individual teachers",
+    "premium": "School/district-wide adoption, priced per student",
+    "notes": "Individual teacher memberships discontinued, focus on district-wide adoption",
+    "trial": "Free trial available"
+  },
+  
+  "unique_selling_points": [
+    "All-in-one elementary platform",
+    "Longitudinal student portfolio tracking",
+    "AI-powered reading assessment",
+    "Multimodal content creation",
+    "Strong family engagement tools",
+    "Translation capabilities"
+  ],
+  
+  "communication_workflows": {
+    "teacher_student": "Portfolio feedback and assessment",
+    "teacher_family": "Individual messaging and announcements",
+    "student_showcase": "Portfolio sharing and reflection",
+    "family_engagement": "Work viewing and progress tracking"
+  },
+  
+  "recent_updates_2025": [
+    "Updated Data Processing Agreement (Sept 1, 2025)",
+    "Free Response Assessment Type",
+    "Focus Mode for developmental alignment",
+    "Enhanced AI assessment capabilities"
+  ],
+  
+  "value_proposition": "Swiss army knife connecting families, engaging students, and giving teachers creative ways to instruct and assess",
+  "data_collection_date": "2025-08-29",
+  "source_urls": ["https://seesaw.com/", "Web search results"]
+}

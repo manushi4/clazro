@@ -1,0 +1,71 @@
+{
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "done": "पूर्ण",
+    "back": "वापस",
+    "next": "आगे",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता",
+    "confirm": "पुष्टि करें"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "subtitle": "अपनी ऐप वरीयताएं प्रबंधित करें",
+    "account": "खाता",
+    "notifications": "सूचनाएं",
+    "appearance": "दिखावट",
+    "about": "के बारे में",
+    "profile": "प्रोफ़ाइल",
+    "profileSubtitle": "अपनी प्रोफ़ाइल देखें और संपादित करें",
+    "changePassword": "पासवर्ड बदलें",
+    "changePasswordSubtitle": "अपना पासवर्ड अपडेट करें",
+    "language": "भाषा",
+    "languageSubtitle": "अपनी पसंदीदा भाषा चुनें",
+    "pushNotifications": "पुश सूचनाएं",
+    "pushNotificationsSubtitle": "पुश सूचनाएं प्राप्त करें",
+    "emailAlerts": "ईमेल अलर्ट",
+    "emailAlertsSubtitle": "ईमेल सूचनाएं प्राप्त करें",
+    "darkMode": "डार्क मोड",
+    "darkModeSubtitle": "डार्क थीम का उपयोग करें",
+    "helpSupport": "सहायता और समर्थन",
+    "helpSupportSubtitle": "सहायता प्राप्त करें और समर्थन से संपर्क करें",
+    "privacyPolicy": "गोपनीयता नीति",
+    "privacyPolicySubtitle": "हमारी गोपनीयता नीति पढ़ें",
+    "termsOfService": "सेवा की शर्तें",
+    "termsOfServiceSubtitle": "हमारी सेवा की शर्तें पढ़ें",
+    "appVersion": "ऐप संस्करण",
+    "logout": "लॉगआउट",
+    "logoutConfirm": "क्या आप वाकई लॉगआउट करना चाहते हैं?"
+  },
+  "language": {
+    "title": "भाषा चुनें",
+    "subtitle": "अपनी पसंदीदा भाषा चुनें",
+    "english": "English",
+    "hindi": "हिंदी (Hindi)",
+    "changeLanguageConfirm": "भाषा सफलतापूर्वक बदल गई"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "welcome": "वापसी पर स्वागत है",
+    "children": "बच्चे",
+    "tasks": "कार्य",
+    "messages": "संदेश",
+    "dueAmount": "देय राशि",
+    "childrenProgress": "बच्चों की प्रगति",
+    "actionItems": "कार्य आइटम",
+    "recentCommunications": "हाल की संचार",
+    "allCaughtUp": "सब पूरा हो गया!",
+    "allCaughtUpMessage": "कोई लंबित कार्य या अपठित संदेश नहीं। बढ़िया काम!"
+  },
+  "navigation": {
+    "home": "होम",
+    "students": "छात्र",
+    "messages": "संदेश",
+    "fees": "शुल्क",
+    "events": "कार्यक्रम"
+  }
+}

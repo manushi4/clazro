@@ -1,0 +1,276 @@
+# Model Routing, Selection & Fallback Rules
+
+## 1. Purpose
+
+This guide defines **how AI models are selected, routed, and safely failed over at runtime**. It ensures that every AI request uses the **right model for the job**, respects **audience safety**, stays within **cost and latency budgets**, and **never breaks the user experience** when providers degrade or fail.
+
+This guide operationalizes the **Multi‑Model Provider Strategy** and is enforced by the **AI & Automation Gateway**.
+
+---
+
+## 2. Core Principles (Non‑Negotiable)
+
+1. **Routing is config‑driven, not hardcoded**
+2. **Audience profile overrides feature needs**
+3. **Fallback must never relax safety or consent**
+4. **Cheapest valid model first**
+5. **Pinned versions in production**
+6. **Failure is expected and designed for**
+
+---
+
+## 3. Routing Inputs (What the Gateway Evaluates)
+
+Every AI request is routed using the following inputs:
+
+### 3.1 Identity & Context
+
+* tenantId
+* role (student / parent / coach / admin)
+* audienceProfile (kid / teen / adult / coaching)
+* featureId
+* widgetId
+
+### 3.2 Capability Requirements
+
+* capabilityClass (chat, summarization, reasoning, extraction, etc.)
+* outputMode (free text / strict JSON / schema)
+* toolsRequired (none / optional / required)
+
+### 3.3 Constraints
+
+* tenant budget limits
+* feature‑level cost caps
+* latency SLA
+* regional/compliance rules
+
+### 3.4 Runtime Signals
+
+* provider health (timeouts, error rates)
+* model availability
+* recent fallback history
+
+---
+
+## 4. Capability‑First Routing Model
+
+Routing always begins by resolving the **capability class**.
+
+### Standard Capability Classes
+
+* SAFE_GUIDED_CHAT
+* GENERAL_CHAT
+* DEEP_REASONING
+* SUMMARIZATION
+* STRUCTURED_EXTRACTION
+* CLASSIFICATION
+* MULTIMODAL_VISION
+* EMBEDDINGS
+* IMAGE_GENERATION
+
+Each capability class has:
+
+* approved providers/models
+* default parameters
+* fallback chain
+* max cost and latency thresholds
+
+---
+
+## 5. Audience‑Aware Overrides
+
+### 5.1 Kid Profile
+
+* Allowed capability classes only
+* Strict prompt templates
+* Lower max tokens
+* No tool calls
+* Conservative refusal behavior
+
+### 5.2 Teen Profile
+
+* Structured outputs preferred
+* Tool calls require confirmation
+* Higher refusal sensitivity than adults
+
+### 5.3 Adult Profile
+
+* Full capability access (subject to tenant config)
+* Cost‑aware routing
+
+### 5.4 Coaching Profile
+
+* Deep reasoning allowed
+* Tool‑assisted workflows allowed
+* Human‑in‑the‑loop enforced for sensitive actions
+
+Audience overrides are applied **before provider selection**.
+
+---
+
+## 6. Provider & Model Selection Logic
+
+### 6.1 Selection Order
+
+1. Filter models approved for capability class
+2. Apply audience profile restrictions
+3. Apply tenant allowlist & budget
+4. Rank by:
+
+   * cost efficiency
+   * latency SLA fit
+   * reliability score
+   * output format reliability
+5. Select **primary model**
+
+### 6.2 Model Parameters
+
+Each selected model includes:
+
+* temperature
+* max tokens
+* output schema enforcement
+* tool enablement flags
+
+---
+
+## 7. Fallback Strategy
+
+### 7.1 Failure Types
+
+* timeout
+* rate limit
+* provider outage
+* schema/JSON validation failure
+* tool execution failure
+* safety policy violation
+
+### 7.2 Fallback Levels
+
+**Level 1 – Retry**
+
+* Short retry with jitter
+* Same model, same provider
+
+**Level 2 – Model Fallback**
+
+* Different model, same provider
+* Same capability class
+
+**Level 3 – Provider Fallback**
+
+* Alternate provider
+* Equivalent capability class
+
+**Level 4 – Degraded AI Mode**
+
+* Simpler model
+* Reduced output depth
+
+**Level 5 – Non‑AI Fallback**
+
+* Cached response
+* Static guidance
+* Graceful “AI unavailable” UI
+
+---
+
+## 8. Hard Safety Rules for Fallback
+
+Fallback must **never**:
+
+* expand tool access
+* change audience profile
+* bypass parental controls
+* relax refusal rules
+* exceed cost limits
+
+If no safe fallback exists, the request must fail gracefully.
+
+---
+
+## 9. Provider Health Scoring
+
+The Gateway maintains rolling health scores:
+
+* error rate
+* latency percentile
+* schema success rate
+* safety flag rate
+
+Providers below thresholds are automatically deprioritized.
+
+---
+
+## 10. Budget‑Aware Routing
+
+### Budget enforcement levels:
+
+* per request
+* per user/day
+* per feature/day
+* per tenant/day
+
+When budgets are near limit:
+
+* route to cheaper models
+* reduce max tokens
+* disable non‑critical AI features
+
+---
+
+## 11. Version Pinning & Drift Control
+
+* Production uses pinned model versions
+* “Latest” allowed only in dev/testing
+* Drift monitored via:
+
+  * golden prompt tests
+  * schema pass rates
+  * safety metrics
+
+Rollback is instant via config change.
+
+---
+
+## 12. Observability & Audit
+
+Every routing decision logs:
+
+* selected provider/model
+* fallback path taken (if any)
+* cost & latency
+* refusal or safety flags
+* traceId
+
+Logs are tenant‑scoped and auditable.
+
+---
+
+## 13. Example Routing Rule (Conceptual)
+
+If:
+
+* capabilityClass = SUMMARIZATION
+* audienceProfile = Kid
+
+Then:
+
+* use kid‑approved summarization model
+* maxTokens = low
+* tools = disabled
+* fallback = alternate kid‑safe summarizer
+
+---
+
+## 14. Non‑Negotiables Summary
+
+* Routing is deterministic and explainable
+* Safety rules never change during fallback
+* Cheapest valid model first
+* Failures degrade gracefully, never crash UX
+* All decisions are logged and reversible
+
+---
+
+This guide ensures AI execution is **predictable, safe, cost‑controlled, and resilient** at scale.

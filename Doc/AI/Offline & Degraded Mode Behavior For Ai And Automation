@@ -1,0 +1,266 @@
+# Offline & Degraded Mode Behavior for AI & Automation
+
+## 1. Purpose
+
+This guide defines how AI features and automations behave when:
+
+* the device is offline
+* AI providers are unavailable
+* Tool/Connector services fail (Google/Zoom/etc.)
+* Platform config is missing/invalid
+* budgets or rate limits are exceeded
+
+The goal is to ensure the app remains **usable**, **safe**, and **predictable** under failure, while aligning with the platform’s existing fallback philosophy.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **No AI failure may break navigation or screens**
+2. **Degrade gracefully with clear UX states**
+3. **Never relax safety rules to “make it work”**
+4. **Offline actions are queued only when safe**
+5. **Automation must be idempotent under retries**
+6. **Always prefer deterministic fallback over hallucinations**
+
+---
+
+## 3. Failure Modes
+
+### 3.1 Device Offline
+
+* no network access
+* slow/flaky connectivity
+
+### 3.2 AI Provider Unavailable
+
+* timeouts
+* rate limits
+* provider outage
+
+### 3.3 Tool/Connector Failure
+
+* OAuth expired
+* connector downtime
+* API limits
+
+### 3.4 Policy / Config Failure
+
+* missing config
+* invalid schema
+* unsafe prompt version
+
+### 3.5 Budget Failure
+
+* tenant daily cap exceeded
+* feature cap exceeded
+
+---
+
+## 4. Degraded Mode Levels
+
+### Level 0: Normal
+
+* full AI + tools + automations
+
+### Level 1: Reduced AI (Provider Degraded)
+
+* fallback model/provider
+* reduced context
+* shorter responses
+* disable non-critical tools
+
+### Level 2: AI Read-Only / No Tools
+
+* AI available but tools disabled
+* only safe classes (summaries, explanations)
+
+### Level 3: No AI (Non-AI UX)
+
+* show static guidance and manual flows
+* show cached summaries if allowed
+
+### Level 4: Safe Mode
+
+* minimal UI
+* AI features hidden or disabled
+* emergency messaging only
+
+---
+
+## 5. AI Widget UX Requirements
+
+Each AI widget must support:
+
+* Loading state
+* Streaming state (if used)
+* Error state with retry
+* Degraded state messaging
+* Offline state messaging
+
+### 5.1 Offline UI Rules
+
+* show “Offline: AI unavailable” message
+* provide alternative actions:
+
+  * view saved notes
+  * view cached summaries
+  * manual checklist
+
+### 5.2 Retry Rules
+
+* retry button
+* exponential backoff at backend
+* prevent infinite retries
+
+---
+
+## 6. Caching Policy
+
+### 6.1 What may be cached
+
+* summaries (if permitted)
+* learning recommendations (time-limited)
+* last-known safe responses
+
+### 6.2 What must not be cached (especially for kids)
+
+* raw chat transcripts (unless explicitly allowed)
+* sensitive or crisis content
+
+### 6.3 Cache TTL Defaults
+
+* summaries: 7–30 days (tenant configurable)
+* insights: 1–7 days
+* tool results: minimal or none
+
+---
+
+## 7. Automation Behavior Under Failure
+
+### 7.1 Trigger Handling
+
+* offline triggers may queue (client-side events)
+* backend triggers must not depend on client online state
+
+### 7.2 Queueing Rules
+
+Queue only:
+
+* safe, deterministic events
+* non-sensitive tasks
+
+Never queue:
+
+* destructive actions
+* high-risk communications
+
+### 7.3 Resume Rules
+
+When connectivity resumes:
+
+* replay queued events with idempotency keys
+* dedupe repeats
+* enforce current policies (not old ones)
+
+---
+
+## 8. Tool/Connector Degradation
+
+If a connector fails:
+
+* fallback to manual flow
+* prompt user to reconnect OAuth
+* log connector error and notify admins if recurring
+
+Examples:
+
+* Calendar OAuth expired → show “Reconnect Calendar” CTA
+* Meet link creation failed → create meeting without Meet and show manual join instructions
+
+---
+
+## 9. Config Failover Ladder (AI-specific)
+
+1. Remote published AI config
+2. Cached AI config
+3. DEFAULT_AI_CONFIG (embedded)
+4. SAFE_MODE_AI_CONFIG (embedded minimal)
+
+If config validation fails at any level:
+
+* do not apply
+* move down the ladder
+* log a config error event
+
+---
+
+## 10. Budget & Rate Limit Degraded Behavior
+
+When budgets are hit:
+
+* disable expensive capability classes
+* route to cheaper models
+* reduce max tokens
+* show friendly message: “AI limit reached for today”
+
+For kids:
+
+* do not encourage repeated retries
+* notify parent/coach where appropriate
+
+---
+
+## 11. Observability Requirements
+
+Log for every degraded event:
+
+* traceId
+* tenantId
+* featureId
+* profileId
+* reason code:
+
+  * OFFLINE
+  * PROVIDER_TIMEOUT
+  * RATE_LIMIT
+  * CONNECTOR_AUTH
+  * CONFIG_INVALID
+  * BUDGET_EXCEEDED
+* fallback level chosen
+
+---
+
+## 12. Testing Requirements
+
+* offline simulation tests (airplane mode)
+* provider outage tests
+* schema invalid config tests
+* connector OAuth expiry tests
+* budget exceeded tests
+* retry and dedupe tests
+
+---
+
+## 13. Phase 1 Minimum Implementation
+
+1. Widget-level offline + error UI states
+2. Provider fallback (Model Routing spec)
+3. Connector failure CTAs
+4. Config ladder for AI settings
+5. Budget exceed messaging
+6. Degraded event logging
+
+---
+
+## 14. Non-Negotiables Summary
+
+* never crash UI because AI failed
+* degrade in predictable levels
+* queue only safe automations
+* enforce current policies on replay
+* log all degraded behaviors
+
+---
+
+This guide ensures Clazro remains reliable and trustworthy even when AI, connectivity, or connectors fail.

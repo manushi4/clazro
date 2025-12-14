@@ -1,0 +1,324 @@
+{
+    "widgets":  {
+                    "heroCard":  {
+                                     "title":  "स्वागत",
+                                     "subtitle":  "आज कुछ नया सीखने के लिए तैयार हैं?",
+                                     "labels": {
+                                         "streak": "दिन की लकीर",
+                                         "today": "आज",
+                                         "score": "स्कोर",
+                                         "xp": "XP"
+                                     }
+                                 },
+                    "todaySchedule":  {
+                                          "title":  "आज की कक्षाएँ",
+                                          "subtitle":  "आगामी कक्षाएँ",
+                                          "error":  "शेड्यूल लोड करने में असमर्थ",
+                                          "states": {
+                                              "empty": "आज कोई कक्षा निर्धारित नहीं है",
+                                              "error": "शेड्यूल लोड करने में असमर्थ",
+                                              "offline": "कैश्ड डेटा"
+                                          },
+                                          "actions": {
+                                              "retry": "पुनः प्रयास करें",
+                                              "viewAll": "सभी देखें ({{count}} आइटम)"
+                                          },
+                                          "labels": {
+                                              "due": "देय",
+                                              "live": "लाइव"
+                                          }
+                                      },
+                    "quickActions":  {
+                                         "title":  "क्विक एक्शन्स",
+                                         "subtitle":  "मुख्य शॉर्टकट्स",
+                                         "cta":  "अध्ययन शुरू करें",
+                                         "success":  "एक्शन ट्रिगर हुआ",
+                                         "states": {
+                                             "empty": "कोई क्विक एक्शन उपलब्ध नहीं"
+                                         },
+                                         "study": "अध्ययन",
+                                         "ask": "प्रश्न पूछें",
+                                         "test": "टेस्ट दें",
+                                         "live": "लाइव क्लास"
+                                     },
+                    "assignmentsTests":  {
+                                             "title":  "असाइनमेंट्स और टेस्ट",
+                                             "subtitle":  "आगामी कार्य"
+                                         },
+                    "assignments": {
+                                       "labels": {
+                                           "overdue": "अतिदेय",
+                                           "dueToday": "आज देय",
+                                           "upcoming": "आगामी",
+                                           "today": "आज",
+                                           "tomorrow": "कल",
+                                           "noDue": "कोई नियत तारीख नहीं"
+                                       },
+                                       "states": {
+                                           "empty": "कोई लंबित असाइनमेंट नहीं"
+                                       },
+                                       "actions": {
+                                           "viewAll": "सभी देखें ({{count}})"
+                                       }
+                                   },
+                    "doubtsInbox":  {
+                                        "title":  "डाउट्स इनबॉक्स",
+                                        "subtitle":  "ताज़ा डाउट्स"
+                                    },
+                    "progressSnapshot":  {
+                                             "title":  "प्रगति स्नैपशॉट",
+                                             "subtitle":  "सरल एनालिटिक्स",
+                                             "labels": {
+                                                 "overall": "समग्र",
+                                                 "chapters": "पूर्ण अध्याय",
+                                                 "hours": "अध्ययन घंटे",
+                                                 "tests": "उत्तीर्ण परीक्षाएं",
+                                                 "assignments": "पूर्ण असाइनमेंट",
+                                                 "subjectProgress": "विषय प्रगति"
+                                             },
+                                             "states": {
+                                                 "empty": "अभी तक कोई प्रगति डेटा नहीं",
+                                                 "loading": "प्रगति लोड हो रही है...",
+                                                 "error": "प्रगति लोड करने में विफल"
+                                             },
+                                             "actions": {
+                                                 "viewAll": "सभी प्रगति देखें",
+                                                 "retry": "पुनः प्रयास करें"
+                                             }
+                                         },
+                    "subjectProgress": {
+                                            "title": "विषय प्रगति",
+                                            "subtitle": "विषय के अनुसार विस्तृत प्रगति",
+                                            "labels": {
+                                                "chapters": "अध्याय",
+                                                "ch": "अ",
+                                                "tests": "परीक्षाएं",
+                                                "hours": "घंटे",
+                                                "lastStudied": "अंतिम अध्ययन",
+                                                "justNow": "अभी",
+                                                "hoursAgo": "{{count}} घंटे पहले",
+                                                "daysAgo": "{{count}} दिन पहले"
+                                            },
+                                            "states": {
+                                                "empty": "अभी तक कोई विषय नामांकित नहीं",
+                                                "loading": "विषय लोड हो रहे हैं...",
+                                                "error": "विषय प्रगति लोड करने में विफल"
+                                            },
+                                            "actions": {
+                                                "viewAll": "सभी {{count}} विषय देखें",
+                                                "retry": "पुनः प्रयास करें"
+                                            }
+                                        },
+                    "studyStreak": {
+                                        "title": "अध्ययन लकीर",
+                                        "subtitle": "आपकी सीखने की निरंतरता",
+                                        "labels": {
+                                            "currentStreak": "वर्तमान लकीर",
+                                            "longest": "सबसे लंबी",
+                                            "totalDays": "कुल दिन",
+                                            "totalHours": "कुल घंटे",
+                                            "weeklyGoal": "इस सप्ताह",
+                                            "day": "दिन",
+                                            "days": "दिन",
+                                            "recentAchievements": "हाल की उपलब्धियां",
+                                            "recentActivity": "हाल की गतिविधि",
+                                            "activities": "गतिविधियां"
+                                        },
+                                        "states": {
+                                            "empty": "आज अपनी अध्ययन लकीर शुरू करें!",
+                                            "loading": "लकीर डेटा लोड हो रहा है...",
+                                            "error": "अध्ययन लकीर लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "पूर्ण प्रगति देखें",
+                                            "retry": "पुनः प्रयास करें"
+                                        }
+                                    },
+                    "statsGrid": {
+                                        "title": "आंकड़े",
+                                        "subtitle": "आपके सीखने के आंकड़े",
+                                        "labels": {
+                                            "totalXP": "कुल XP",
+                                            "streak": "दिन की लकीर",
+                                            "badges": "बैज",
+                                            "studyTime": "इस सप्ताह",
+                                            "testsPassed": "उत्तीर्ण परीक्षाएं",
+                                            "assignments": "पूर्ण"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई आंकड़े नहीं",
+                                            "loading": "आंकड़े लोड हो रहे हैं...",
+                                            "error": "आंकड़े लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी आंकड़े देखें",
+                                            "retry": "पुनः प्रयास करें"
+                                        }
+                                    },
+                    "recommendations":  {
+                                            "title":  "सिफ़ारिशें",
+                                            "subtitle":  "सुझाव",
+                                            "error":  "Unable to load recommendations"
+                                        },
+                    "classFeed":  {
+                                      "title":  "क्लास फीड",
+                                      "subtitle":  "घोषणाएँ",
+                                      "error":  "Unable to load feed"
+                                  },
+                    "peersGroups":  {
+                                        "title":  "साथी व समूह",
+                                        "subtitle":  "पीयर नेटवर्क"
+                                    },
+                    "activeQuests": {
+                                        "title": "सक्रिय क्वेस्ट",
+                                        "subtitle": "XP कमाने के लिए क्वेस्ट पूरे करें",
+                                        "labels": {
+                                            "daily": "दैनिक",
+                                            "weekly": "साप्ताहिक",
+                                            "special": "विशेष",
+                                            "completedToday": "आज पूर्ण",
+                                            "xpAvailable": "उपलब्ध XP"
+                                        },
+                                        "states": {
+                                            "empty": "अभी कोई सक्रिय क्वेस्ट नहीं",
+                                            "loading": "क्वेस्ट लोड हो रहे हैं...",
+                                            "error": "क्वेस्ट लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "gamifiedHub": "गैमिफाइड लर्निंग हब"
+                                        }
+                                    },
+                    "peersLeaderboard": {
+                                        "title": "लीडरबोर्ड",
+                                        "subtitle": "देखें कि आप साथियों में कहाँ खड़े हैं",
+                                        "scopes": {
+                                            "class": "कक्षा",
+                                            "school": "स्कूल",
+                                            "global": "वैश्विक"
+                                        },
+                                        "labels": {
+                                            "myRank": "मेरी रैंक",
+                                            "percentile": "टॉप {{value}}%",
+                                            "you": "(आप)"
+                                        },
+                                        "states": {
+                                            "empty": "कोई लीडरबोर्ड डेटा उपलब्ध नहीं",
+                                            "loading": "लीडरबोर्ड लोड हो रहा है...",
+                                            "error": "लीडरबोर्ड लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "पूरा लीडरबोर्ड देखें ({{count}} छात्र)",
+                                            "retry": "पुनः प्रयास करें"
+                                        }
+                                    },
+                    "continueLearning": {
+                                        "title": "सीखना जारी रखें",
+                                        "subtitle": "जहाँ छोड़ा था वहाँ से शुरू करें",
+                                        "types": {
+                                            "resource": "संसाधन",
+                                            "aiSession": "AI सत्र",
+                                            "assignment": "असाइनमेंट",
+                                            "testReview": "टेस्ट समीक्षा",
+                                            "doubt": "संदेह",
+                                            "lesson": "पाठ",
+                                            "video": "वीडियो"
+                                        },
+                                        "states": {
+                                            "empty": "कोई हाल की सीखने की गतिविधि नहीं",
+                                            "loading": "लोड हो रहा है...",
+                                            "error": "हाल के आइटम लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें",
+                                            "retry": "पुनः प्रयास करें",
+                                            "clearHistory": "इतिहास साफ़ करें"
+                                        }
+                                    },
+                                    "learningGoals": {
+                                        "title": "सीखने के लक्ष्य",
+                                        "subtitle": "अपनी प्रगति ट्रैक करें",
+                                        "types": {
+                                            "daily": "दैनिक",
+                                            "weekly": "साप्ताहिक",
+                                            "monthly": "मासिक",
+                                            "streak": "स्ट्रीक",
+                                            "subject": "विषय",
+                                            "custom": "कस्टम"
+                                        },
+                                        "labels": {
+                                            "active": "सक्रिय",
+                                            "completed": "पूर्ण",
+                                            "dueToday": "आज देय",
+                                            "dueTomorrow": "कल देय",
+                                            "daysLeft": "{{count}} दिन शेष"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई लक्ष्य निर्धारित नहीं",
+                                            "loading": "लक्ष्य लोड हो रहे हैं...",
+                                            "error": "लक्ष्य लोड करने में विफल"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "addGoal": "लक्ष्य जोड़ें"
+                                        }
+                                    },
+                                    "weakAreas": {
+                                        "title": "मजबूत करने के विषय",
+                                        "subtitle": "{{count}} विषयों पर ध्यान देने की जरूरत",
+                                        "labels": {
+                                            "mastery": "महारत",
+                                            "showing": "{{total}} में से {{count}} दिखा रहे हैं"
+                                        },
+                                        "difficulty": {
+                                            "easy": "आसान",
+                                            "medium": "मध्यम",
+                                            "hard": "कठिन"
+                                        },
+                                        "actions": {
+                                            "practice": "अभ्यास करें",
+                                            "watchVideo": "वीडियो देखें",
+                                            "review": "समीक्षा करें",
+                                            "askDoubt": "संदेह पूछें",
+                                            "viewAll": "सभी देखें"
+                                        },
+                                        "states": {
+                                            "empty": "बहुत बढ़िया!",
+                                            "emptySubtitle": "कोई कमजोर क्षेत्र नहीं मिला। अभ्यास जारी रखें!",
+                                            "loading": "विषय लोड हो रहे हैं...",
+                                            "error": "कमजोर क्षेत्र लोड करने में विफल"
+                                        }
+                                    },
+                                    "analyticsSnapshot": {
+                                        "title": "एनालिटिक्स स्नैपशॉट",
+                                        "subtitle": "आपकी प्रगति का साप्ताहिक अवलोकन",
+                                        "sections": {
+                                            "thisWeek": "इस सप्ताह",
+                                            "subjects": "विषय के अनुसार",
+                                            "suggestions": "सुझाव"
+                                        },
+                                        "labels": {
+                                            "studyTime": "अध्ययन समय",
+                                            "assignments": "असाइनमेंट",
+                                            "tests": "परीक्षाएं",
+                                            "avgScore": "औसत स्कोर",
+                                            "topics": "विषय",
+                                            "doubts": "संदेह",
+                                            "streak": "दिन की लकीर",
+                                            "avgFocus": "औसत फोकस"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई एनालिटिक्स डेटा नहीं",
+                                            "loading": "एनालिटिक्स लोड हो रहा है...",
+                                            "error": "एनालिटिक्स लोड नहीं हो सका"
+                                        },
+                                        "actions": {
+                                            "viewAll": "पूर्ण एनालिटिक्स देखें",
+                                            "viewDetails": "विवरण देखें",
+                                            "retry": "पुनः प्रयास करें"
+                                        }
+                                    }
+                }
+}

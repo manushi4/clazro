@@ -1,0 +1,8 @@
+declare module '@env' {
+  export const SUPABASE_URL: string;
+  export const SUPABASE_ANON_KEY: string;
+  export const APP_NAME: string;
+  export const API_TIMEOUT: string;
+  export const RAZORPAY_KEY_ID: string;
+  export const RAZORPAY_KEY_SECRET: string;
+}

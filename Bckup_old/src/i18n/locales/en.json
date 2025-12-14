@@ -1,0 +1,71 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "done": "Done",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your app preferences",
+    "account": "Account",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "about": "About",
+    "profile": "Profile",
+    "profileSubtitle": "View and edit your profile",
+    "changePassword": "Change Password",
+    "changePasswordSubtitle": "Update your password",
+    "language": "Language",
+    "languageSubtitle": "Select your preferred language",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsSubtitle": "Receive push notifications",
+    "emailAlerts": "Email Alerts",
+    "emailAlertsSubtitle": "Receive email notifications",
+    "darkMode": "Dark Mode",
+    "darkModeSubtitle": "Use dark theme",
+    "helpSupport": "Help & Support",
+    "helpSupportSubtitle": "Get help and contact support",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicySubtitle": "Read our privacy policy",
+    "termsOfService": "Terms of Service",
+    "termsOfServiceSubtitle": "Read our terms of service",
+    "appVersion": "App Version",
+    "logout": "Logout",
+    "logoutConfirm": "Are you sure you want to logout?"
+  },
+  "language": {
+    "title": "Select Language",
+    "subtitle": "Choose your preferred language",
+    "english": "English",
+    "hindi": "हिंदी (Hindi)",
+    "changeLanguageConfirm": "Language changed successfully"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "children": "Children",
+    "tasks": "Tasks",
+    "messages": "Messages",
+    "dueAmount": "Due Amount",
+    "childrenProgress": "Children Progress",
+    "actionItems": "Action Items",
+    "recentCommunications": "Recent Communications",
+    "allCaughtUp": "All Caught Up!",
+    "allCaughtUpMessage": "No pending tasks or unread messages. Great job!"
+  },
+  "navigation": {
+    "home": "Home",
+    "students": "Students",
+    "messages": "Messages",
+    "fees": "Fees",
+    "events": "Events"
+  }
+}

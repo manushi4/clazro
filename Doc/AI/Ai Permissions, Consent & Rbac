@@ -1,0 +1,238 @@
+# AI Permissions, Consent & RBAC
+
+## 1. Purpose
+
+This guide defines **who can access AI**, **what AI can do on their behalf**, and **what data and tools AI may use**, enforced through **Role-Based Access Control (RBAC)** and **explicit consent**.
+
+It ensures AI features are:
+
+* permissioned (no implicit access)
+* auditable (who allowed what, when)
+* safe for minors
+* tenant-controlled
+
+This guide applies to **all AI features, automations, MCP/tool calls, and external connectors**.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **No permission → no AI**
+2. **Consent is explicit, revocable, and versioned**
+3. **Roles define authority; profiles define safety**
+4. **Children never grant consent alone**
+5. **Tools and automations require separate permission**
+6. **Permissions are enforced centrally (Gateway)**
+
+---
+
+## 3. Roles vs Audience Profiles
+
+* **Roles** define *authority* (what actions are allowed)
+* **Audience profiles** define *safety constraints* (how AI behaves)
+
+| Concept | Examples                      | Purpose           |
+| ------- | ----------------------------- | ----------------- |
+| Role    | Student, Parent, Coach, Admin | Permission scope  |
+| Profile | Kid, Teen, Adult, Coaching    | Safety & UX rules |
+
+Both must pass validation for any AI request.
+
+---
+
+## 4. RBAC Model for AI
+
+### 4.1 Core Roles
+
+#### Student
+
+* AI access: limited
+* Tool access: ❌
+* Automation: ❌ (read-only insights only)
+
+#### Parent
+
+* AI access: summaries, insights
+* Tool access: limited (calendar, notifications)
+* Automation: ✅ (approval-based)
+
+#### Coach / Teacher
+
+* AI access: full coaching tools
+* Tool access: ✅ (approved tools)
+* Automation: ✅ (multi-step workflows)
+
+#### Admin
+
+* AI access: analytics, configuration insights
+* Tool access: limited to ops tools
+* Automation: platform-level workflows
+
+---
+
+### 4.2 Permission Categories
+
+Permissions are granted per **feature**, not globally:
+
+* AI_CHAT_USE
+* AI_SUMMARIZE
+* AI_INSIGHTS
+* AI_COPILOT
+* AI_AUTOMATION_TRIGGER
+* AI_TOOL_USE
+* AI_CONFIG_MANAGE
+
+Each permission is evaluated at runtime.
+
+---
+
+## 5. Consent Model
+
+### 5.1 Consent Types
+
+* **AI Usage Consent** – allows AI to process data
+* **Data Processing Consent** – allows specific data categories
+* **Tool/Connector Consent** – allows external integrations
+* **Automation Consent** – allows background actions
+
+Each consent has:
+
+* scope
+* version
+* timestamp
+* grantedBy
+
+---
+
+### 5.2 Consent Rules by Audience
+
+#### Children (<13)
+
+* Consent must be granted by parent/guardian
+* Consent required per feature category
+* Consent is revocable at any time
+
+#### Teens (13–17)
+
+* Shared consent model
+* Parent visibility required
+
+#### Adults
+
+* Self-consent
+
+---
+
+## 6. Tool & Automation Permissions
+
+### 6.1 Tool Permissions
+
+Tool use requires **all** of:
+
+* AI feature permission
+* Tool-specific permission
+* Valid OAuth scope
+* Audience profile allowance
+
+Tools are allowlisted per role and profile.
+
+### 6.2 Automation Permissions
+
+Automations require:
+
+* explicit enablement
+* visibility into actions
+* approval for sensitive workflows
+
+No silent automation for minors.
+
+---
+
+## 7. Runtime Enforcement (Gateway)
+
+Before any AI execution, the Gateway must validate:
+
+1. Role permission
+2. Audience profile allowance
+3. Consent validity
+4. Tool/automation permission
+5. Tenant policy
+
+Failure at any step results in **POLICY_REFUSAL**.
+
+---
+
+## 8. Permission Resolution Order
+
+1. Global safety rules
+2. Audience profile rules
+3. Tenant restrictions
+4. Role permissions
+5. Feature-specific permissions
+6. Consent checks
+
+All must pass.
+
+---
+
+## 9. Platform Studio Controls
+
+Admins can:
+
+* enable/disable AI features per role
+* configure consent requirements
+* view consent history
+* revoke permissions
+* audit AI usage
+
+---
+
+## 10. Audit & Logging
+
+Every AI action must log:
+
+* userId
+* role
+* audienceProfile
+* featureId
+* permissions evaluated
+* consent version
+* outcome
+* traceId
+
+Logs are immutable and tenant-scoped.
+
+---
+
+## 11. Revocation & Expiry
+
+* Consent can be revoked instantly
+* Permission changes take effect immediately
+* Expired consent blocks AI execution
+
+No grace period for revoked consent.
+
+---
+
+## 12. Testing & Validation
+
+Required tests:
+
+* permission denial tests
+* consent expiry tests
+* cross-role access attempts
+* tool misuse attempts
+
+---
+
+## 13. Non-Negotiables Summary
+
+* AI is never implicitly allowed
+* Consent is mandatory and auditable
+* Children require adult consent
+* Tool and automation permissions are separate
+* Enforcement is centralized
+
+---
+
+This guide ensures AI remains **permissioned, trustworthy, and legally defensible** across the platform.

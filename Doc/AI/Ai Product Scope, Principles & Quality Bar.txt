@@ -1,0 +1,160 @@
+# AI Product Scope, Principles & Quality Bar
+
+## 1. Purpose
+
+This guide defines **what AI is allowed to do**, **what it must never do**, and the **quality bar** AI features must meet before being exposed to users. It ensures AI enhances the product without compromising **safety, trust, pedagogy, or platform stability**.
+
+This document is **product‑level governance**, not an implementation spec, and must be referenced by all AI, automation, MCP, and connector features.
+
+---
+
+## 2. In-Scope AI Capabilities
+
+AI in the platform is intended to **assist, not replace** human learning, coaching, or decision-making.
+
+### 2.1 Allowed Core Capabilities
+
+* Conversational assistance (chat, Q&A, explanations)
+* Content summarization (classes, meetings, notes, progress)
+* Guided learning support (hints, step-by-step help, practice feedback)
+* Coaching support (recommendations, reflections, next steps)
+* Insights & analytics (patterns, trends, progress indicators)
+* Automation support (reminders, follow-ups, workflow triggers)
+
+### 2.2 Role-Based Scope
+
+* **Students**: learning help, explanations, motivation, reflection
+* **Parents**: summaries, progress insights, alerts, guidance
+* **Coaches/Teachers**: planning help, student insights, content drafting
+* **Admins**: analytics, configuration insights, operational summaries
+
+All capabilities are gated by **RBAC + audience profile rules**.
+
+---
+
+## 3. Out-of-Scope / Disallowed Capabilities
+
+AI must **never**:
+
+* Make final academic, disciplinary, or medical decisions
+* Replace a coach/teacher in evaluation or judgment
+* Generate unsafe, age-inappropriate, or harmful content
+* Provide legal, medical, or mental health advice
+* Act autonomously without explicit user or workflow triggers
+* Modify core data directly without backend validation
+
+If a feature requires these behaviors, it must be redesigned or rejected.
+
+---
+
+## 4. Audience Profiles & Experience Rules
+
+AI behavior varies by **audience profile**:
+
+### 4.1 Young Children
+
+* Simple language
+* Encouraging, supportive tone
+* No open-ended or unsafe topics
+* High refusal sensitivity
+* Parent/coach visibility by default
+
+### 4.2 Teens
+
+* Guided autonomy
+* Clear boundaries
+* Explanatory reasoning
+* Safety filters still enforced
+
+### 4.3 Adults / Coaches
+
+* Higher depth and flexibility
+* Analytical and reflective tone
+* Tool-assisted workflows allowed
+
+Audience rules override feature logic and are enforced centrally.
+
+---
+
+## 5. Product Principles (Non-Negotiable)
+
+1. **AI is assistive, not authoritative**
+2. **Explainability over cleverness**
+3. **Safety over completeness**
+4. **Consistency over novelty**
+5. **Human override always available**
+6. **Config-driven behavior, not hardcoded logic**
+
+Any AI feature violating these principles must not ship.
+
+---
+
+## 6. Quality Bar (Required for Release)
+
+Every AI feature must meet the following:
+
+### 6.1 Functional Quality
+
+* Correctly scoped to its role and audience
+* Produces useful, relevant output ≥ 80% of the time (measured)
+* Handles unclear input gracefully
+
+### 6.2 Safety & Trust
+
+* No unsafe content under normal usage
+* Clear refusals when boundaries are hit
+* No hallucinated facts presented as truth
+
+### 6.3 UX Quality
+
+* Clear loading, error, and fallback states
+* Responses readable within expected time (< UX SLA)
+* Explicit messaging when AI may be uncertain
+
+### 6.4 Reliability
+
+* Provider failure does not break screens
+* Fallback behavior defined
+* Kill switch tested
+
+### 6.5 Governance
+
+* Prompt versioned and reviewable
+* Feature controllable via Platform Studio
+* Logged, auditable, and measurable
+
+---
+
+## 7. Success Metrics
+
+Each AI feature must define:
+
+* Primary success metric (learning outcome, time saved, clarity)
+* Safety metrics (refusals, flags)
+* Cost metrics (tokens per action)
+* User satisfaction signals
+
+Features without measurable outcomes should not ship.
+
+---
+
+## 8. Explicit Non-Goals
+
+AI is **not** intended to:
+
+* Be a general-purpose chatbot
+* Replace structured curriculum
+* Remove human accountability
+* Introduce hidden automation
+
+---
+
+## 9. Enforcement
+
+* Platform Studio enforces enable/disable per tenant and role
+* Gateway enforces scope, policies, and audience rules
+* Violations trigger rollback or kill switch
+
+---
+
+This guide is foundational and must be read before designing, implementing, or approving any AI or automation feature.

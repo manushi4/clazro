@@ -1,0 +1,211 @@
+ # Child Safety, Parental Controls & Age Gating
+
+## 1. Purpose
+
+This guide defines the **mandatory safety framework** for children and minors across AI, automation, widgets, tools, and external integrations. It ensures the platform is **age-appropriate, consent-driven, auditable, and compliant**, while preserving flexibility for teens and adults.
+
+This document is **non-optional** for any feature that can be accessed by users under 18.
+
+---
+
+## 2. Core Safety Principles (Non‑Negotiable)
+
+1. **Safety overrides functionality**
+2. **Age rules override role rules**
+3. **No silent autonomy for minors**
+4. **Parental visibility by default**
+5. **Human escalation over AI confidence**
+6. **Minimal data exposure**
+
+Any feature violating these principles must not ship.
+
+---
+
+## 3. Age Groups & Classification
+
+Age gating is determined at **account creation** and re‑evaluated on age transitions.
+
+| Group | Age Range | Risk Level | Autonomy |
+| ----- | --------- | ---------- | -------- |
+| Child | < 13      | Very High  | None     |
+| Teen  | 13–17     | Medium     | Limited  |
+| Adult | 18+       | Low        | Full     |
+
+Age classification is **authoritative** and cannot be overridden by AI or UI logic.
+
+---
+
+## 4. Child (<13) Safety Rules
+
+### 4.1 AI Interaction Rules
+
+* No free‑form, unbounded chat
+* Prompt templates must be **locked**
+* Short, guided, instructional responses only
+* No speculative or open‑ended answers
+
+### 4.2 Content Restrictions
+
+* No sensitive topics (violence, self‑harm, sexuality, substances, ideology)
+* No persuasive or opinionated content
+* No external links unless whitelisted
+
+### 4.3 Tool & Connector Restrictions
+
+* ❌ No direct tool usage (calendar, email, docs)
+* ❌ No MCP tool calls
+* ✅ Only indirect actions approved by parent/coach
+
+### 4.4 Automation Rules
+
+* No autonomous automations
+* All triggers must notify parent/coach
+* Automations run in **read‑only or advisory mode**
+
+### 4.5 Visibility & Logging
+
+* Parents/coaches can view:
+
+  * prompts
+  * responses
+  * safety flags
+* Logs are immutable
+
+---
+
+## 5. Teen (13–17) Safety Rules
+
+### 5.1 AI Interaction Rules
+
+* Structured chat allowed
+* Explicit refusals required
+* Safety‑filtered explanations
+
+### 5.2 Content Restrictions
+
+* Sensitive topics require neutral framing
+* Advice must be informational, not prescriptive
+
+### 5.3 Tool & Connector Rules
+
+* Limited tool usage with confirmation
+* No background tool execution
+
+### 5.4 Automation Rules
+
+* User‑initiated only
+* No silent background workflows
+
+### 5.5 Escalation
+
+* Repeated safety flags trigger adult review
+
+---
+
+## 6. Parental Controls
+
+### 6.1 Control Surface (Platform Studio + App)
+
+Parents can:
+
+* Enable/disable AI features
+* Restrict topics
+* Set usage time windows
+* Review history and summaries
+* Approve or reject automations
+
+### 6.2 Consent Model
+
+* Explicit opt‑in required for:
+
+  * AI usage
+  * data processing
+  * external tool exposure
+* Consent is versioned and auditable
+
+---
+
+## 7. Age Transitions
+
+When a user crosses an age boundary:
+
+* Features are re‑evaluated
+* Prompts and permissions migrate
+* Parents are notified
+* New consent may be required
+
+No automatic privilege escalation.
+
+---
+
+## 8. Enforcement Architecture
+
+Safety is enforced at **multiple layers**:
+
+1. **Platform Studio** – config validation
+2. **AI & Automation Gateway** – runtime enforcement
+3. **Prompt Templates** – profile‑locked
+4. **Tool Layer (MCP)** – allowlist + scope
+5. **UI Widgets** – constrained UX
+
+Failure at any layer triggers fallback.
+
+---
+
+## 9. Safety Signals & Escalation
+
+### 9.1 Signals
+
+* Repeated refusals
+* Topic boundary hits
+* Emotional distress indicators
+
+### 9.2 Escalation Path
+
+AI → Safe Response → Adult Notification → Human Review
+
+AI must **never** handle crisis alone.
+
+---
+
+## 10. Data Retention & Privacy
+
+* Child data retention minimized
+* No training on child conversations
+* Easy deletion upon request
+* Regional compliance respected
+
+---
+
+## 11. Testing & Validation
+
+Required tests:
+
+* Age‑based prompt validation
+* Forbidden topic penetration tests
+* Automation misuse scenarios
+* Parental visibility verification
+
+---
+
+## 12. Audit & Compliance
+
+Every child‑related AI interaction must record:
+
+* age group
+* feature invoked
+* policy version
+* outcome (answer/refusal/escalation)
+
+---
+
+## 13. Non‑Negotiables (Summary)
+
+* Children never get unrestricted AI
+* Parents always have visibility
+* Automations never act silently
+* Safety rules override product goals
+
+---
+
+This guide is foundational for trust, legality, and long‑term platform credibility.

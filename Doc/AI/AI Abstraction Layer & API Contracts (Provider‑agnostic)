@@ -1,0 +1,286 @@
+# AI Abstraction Layer & API Contracts (Provider‑agnostic)
+
+## 1. Purpose
+
+This guide defines the **provider-agnostic AI abstraction layer** and the **API contracts** used between:
+
+* Mobile App / Platform Studio
+* AI & Automation Gateway
+* Provider adapters (OpenAI/Claude/Gemini/AWS Bedrock/etc.)
+* Tool/MCP execution layer
+* Automation orchestrator (n8n)
+
+Goal: allow switching providers/models **without changing product features or UI**, while enforcing **RBAC, safety, budgets, observability, and fail-safes**.
+
+---
+
+## 2. Architecture Scope
+
+### 2.1 Where the abstraction lives
+
+* The abstraction layer lives in the **Gateway backend**.
+* The mobile app never calls providers directly.
+
+### 2.2 What the abstraction must guarantee
+
+* Consistent request/response shape for all providers
+* Standard error semantics
+* Tool-call normalization
+* Structured output validation (JSON/schema)
+* Traceability (traceId everywhere)
+
+---
+
+## 3. Core Concepts
+
+### 3.1 Capability Classes
+
+Routing uses a `capabilityClass` such as:
+
+* SAFE_GUIDED_CHAT
+* GENERAL_CHAT
+* DEEP_REASONING
+* SUMMARIZATION
+* STRUCTURED_EXTRACTION
+* CLASSIFICATION
+* MULTIMODAL_VISION
+* EMBEDDINGS
+* IMAGE_GENERATION
+
+### 3.2 Output Modes
+
+* `TEXT`
+* `JSON` (strict)
+* `SCHEMA` (validated against a named schema)
+
+### 3.3 Tool Policies
+
+* `TOOLS_DISABLED`
+* `TOOLS_ALLOWED` (allowlist)
+* `TOOLS_REQUIRED` (only if feature mandates)
+
+---
+
+## 4. Internal Provider‑Agnostic Interfaces
+
+### 4.1 ModelRequest (Internal)
+
+Used by the Gateway to invoke any provider adapter.
+
+Fields:
+
+* identity: tenantId, userId, role, audienceProfile
+* feature: featureId, widgetId
+* routing: capabilityClass, outputMode, modelHint(optional)
+* messages: system + user + assistant history (normalized)
+* contextBundle: already redacted and minimal
+* constraints: latencySLA, maxTokens, temperature
+* policies: safetyPolicyVersion, budgetPolicyVersion
+* tools: toolPolicy + allowlist
+* tracing: traceId
+
+### 4.2 ModelResponse (Internal)
+
+* outputText
+* outputJson (if JSON/SCHEMA)
+* refusal: boolean + refusalReason
+* safetyFlags
+* provider: providerId
+* model: modelId
+* usage: tokensIn, tokensOut, cost
+* latencyMs
+* toolCalls (normalized)
+* traceId
+
+### 4.3 ProviderAdapter (Interface)
+
+All providers implement:
+
+* `execute(ModelRequest) -> ModelResponse`
+* `health() -> ProviderHealth`
+
+---
+
+## 5. External API Contracts
+
+### 5.1 App → Gateway: AI Execute
+
+**POST** `/ai/execute`
+
+Request (conceptual JSON):
+
+* tenantId
+* userId
+* role
+* audienceProfile
+* featureId
+* widgetId
+* input: { text | messages }
+* contextRefs: ids/keys that the gateway can resolve (screen, student, session)
+* outputMode: TEXT | JSON | SCHEMA
+* schemaId (optional)
+* toolIntent (optional): none | allowed | required
+
+Response:
+
+* traceId
+* status: success | refused | error
+* outputText
+* outputJson (optional)
+* safetyFlags
+* provider/model used
+* fallbackPath (if any)
+* cost + latency
+
+---
+
+### 5.2 Studio → Gateway: Validate Config
+
+**POST** `/ai/config/validate`
+
+Request:
+
+* configVersion
+* routingRules
+* promptTemplates
+* audiencePolicies
+* budgets
+
+Response:
+
+* valid: boolean
+* errors[]
+* warnings[]
+
+---
+
+### 5.3 Gateway → n8n: Trigger Workflow
+
+**POST** `/automation/trigger`
+
+Request:
+
+* tenantId
+* eventName
+* payloadRef
+* workflowId
+* traceId
+
+Response:
+
+* accepted: boolean
+* jobId
+
+---
+
+### 5.4 Tool/MCP Execution API
+
+**POST** `/tools/execute`
+
+Request:
+
+* tenantId
+* userId
+* toolId
+* action
+* parameters
+* traceId
+
+Response:
+
+* status
+* result
+* toolTrace
+
+---
+
+## 6. Error Semantics (Standardized)
+
+Every endpoint must use consistent categories:
+
+* `POLICY_REFUSAL` (safety, consent, RBAC)
+* `VALIDATION_ERROR` (schema/JSON failed)
+* `PROVIDER_ERROR` (timeouts, 5xx)
+* `RATE_LIMIT` (provider or internal)
+* `TOOL_ERROR` (connector/tool failed)
+* `BUDGET_EXCEEDED`
+
+Errors must include:
+
+* traceId
+* safeMessage (user-facing)
+* debugCode (internal)
+
+---
+
+## 7. Structured Output Validation
+
+For `outputMode=SCHEMA`:
+
+* Gateway validates output against schema
+* On failure:
+
+  * attempt a single repair pass (optional)
+  * else fallback to alternate model/provider
+  * else return VALIDATION_ERROR
+
+No feature may rely on unvalidated structured data.
+
+---
+
+## 8. Tool Calling Normalization
+
+Providers may represent tool calls differently.
+The abstraction layer must normalize into:
+
+* toolId
+* action
+* arguments (JSON)
+* callId
+
+Tool execution must be:
+
+* allowlisted per feature/profile
+* auditable
+* idempotent where possible
+
+---
+
+## 9. Observability Requirements
+
+Every execution must emit:
+
+* traceId
+* tenantId
+* featureId
+* provider/model
+* latency, tokens, cost
+* safety flags
+* fallback steps
+
+This is mandatory for budgeting, debugging, and compliance.
+
+---
+
+## 10. Security & Privacy Requirements
+
+* No provider keys in client
+* All requests authenticated
+* Context minimal and redacted
+* Kids: stricter policies and logging
+* No training on user content (policy)
+
+---
+
+## 11. Minimal Phase‑1 Implementation Checklist
+
+1. Implement ProviderAdapter interface for 1–2 providers
+2. Implement `/ai/execute` with routing + fallback
+3. Implement structured output validation
+4. Implement normalized tool call format (even if tools disabled initially)
+5. Implement standardized errors + traceId
+6. Add observability events
+
+---
+
+This guide ensures Clazro can scale AI safely and flexibly with **multiple providers**, **tool use**, and **automation orchestration** while staying aligned with the platform’s config-driven architecture.

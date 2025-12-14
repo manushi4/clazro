@@ -1,0 +1,165 @@
+{
+  "company": "Duolingo",
+  "platform_type": "Language Learning Management Platform",
+  "platform_name": "Duolingo for Schools",
+  "target_audience": ["Language Teachers", "Students", "School Administrators"],
+  "positioning": "Comprehensive language learning management with gamified education",
+  
+  "core_capabilities": [
+    "Virtual classroom creation",
+    "Language-specific lesson assignment",
+    "Student progress tracking",
+    "Performance analytics",
+    "Multi-language support (35+ languages)"
+  ],
+  
+  "teacher_dashboard": {
+    "analytics_features": [
+      "Over 40 progress tracking metrics",
+      "Real-time student performance monitoring",
+      "Detailed individual student overviews",
+      "Class-wide performance statistics",
+      "Time spent on exercises tracking",
+      "Mistake pattern analysis"
+    ],
+    "management_tools": [
+      "Classroom creation and management",
+      "Lesson assignment by language",
+      "Homework assignment capabilities",
+      "Goal setting for students",
+      "Streak monitoring",
+      "Automated scoring system"
+    ]
+  },
+  
+  "2025_platform_updates": {
+    "design_improvements": [
+      "Mobile-first design",
+      "Simple and easy-to-use interface",
+      "Enhanced classroom management dashboard",
+      "Streamlined teacher workflow"
+    ],
+    "feature_enhancements": [
+      "More explicit learning objectives",
+      "Deeper student progress insights",
+      "Custom quiz creation matching learning goals",
+      "Tailored learning capabilities",
+      "Enhanced knowledge gap identification"
+    ]
+  },
+  
+  "student_tracking": {
+    "progress_monitoring": [
+      "Individual student performance tracking",
+      "Class-wide performance overview",
+      "Exercise completion time monitoring",
+      "Error pattern identification",
+      "Accuracy rate tracking",
+      "Knowledge gap analysis"
+    ],
+    "goal_setting": [
+      "Event-based goals",
+      "Lesson accomplishment targets",
+      "Knowledge check objectives",
+      "Accuracy rate goals",
+      "Mistake reduction targets"
+    ]
+  },
+  
+  "classroom_management": {
+    "virtual_classrooms": [
+      "Multi-language classroom support",
+      "Specific lesson assignment",
+      "Task distribution to students",
+      "Performance monitoring tools"
+    ],
+    "teacher_support": [
+      "Automated scoring to save time",
+      "Detailed progress reports",
+      "Personal feedback facilitation",
+      "Real-time updates"
+    ]
+  },
+  
+  "mobile_capabilities": {
+    "2025_improvements": [
+      "Mobile-first design approach",
+      "Cross-device accessibility",
+      "Anywhere access for teachers and students",
+      "Simplified mobile interface"
+    ]
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": true,
+    "cross_platform": ["Web", "Mobile"],
+    "automation_features": [
+      "Automated scoring",
+      "Real-time progress tracking",
+      "Automatic streak monitoring",
+      "Gamified learning progression"
+    ],
+    "integration_ready": false
+  },
+  
+  "language_support": {
+    "languages_available": "35+ languages",
+    "flexibility": "Multi-language classroom creation",
+    "scalability": "500,000+ registered teachers"
+  },
+  
+  "assessment_tools": {
+    "quiz_creation": [
+      "Custom quiz development",
+      "Learning goal alignment",
+      "Accurate evaluation tools",
+      "Progress-based assessments"
+    ],
+    "reporting": [
+      "Detailed student reports",
+      "Class performance analytics",
+      "Knowledge gap identification",
+      "Progress trend analysis"
+    ]
+  },
+  
+  "pricing_model": {
+    "cost": "Completely free",
+    "target_users": "Teachers and students",
+    "features_included": [
+      "Classroom creation and management",
+      "Lesson assignment",
+      "Student progress tracking",
+      "All dashboard features"
+    ]
+  },
+  
+  "unique_selling_points": [
+    "Completely free platform",
+    "35+ language support",
+    "40+ progress tracking metrics",
+    "Mobile-first 2025 redesign",
+    "Gamified language learning",
+    "Large teacher community (500,000+)"
+  ],
+  
+  "communication_workflows": {
+    "teacher_student": "Assignment distribution and progress feedback",
+    "progress_monitoring": "Real-time performance tracking",
+    "classroom_management": "Virtual classroom coordination",
+    "goal_setting": "Individual and class-wide objective setting"
+  },
+  
+  "limitations": [
+    "Language learning focus only",
+    "Limited integration capabilities",
+    "No multi-subject support",
+    "Primarily gamified approach"
+  ],
+  
+  "value_proposition": "Free, comprehensive language learning management with extensive analytics and mobile-first design",
+  "teacher_adoption": "500,000+ registered teachers",
+  "data_collection_date": "2025-08-29",
+  "source_urls": ["Web search results - Duolingo for Schools 2025 features"]
+}

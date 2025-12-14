@@ -1,0 +1,212 @@
+# Compliance, Retention & Audit Logging (Including Child Data Rules)
+
+## 1. Purpose
+
+This guide defines Clazro’s requirements for:
+
+* regulatory compliance principles
+* data retention and deletion
+* audit logging for AI, automations, tools, and connectors
+* special protections for minors and child data
+
+It ensures the platform remains **legally defensible, privacy-preserving, and operationally auditable**.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Data minimization by design**
+2. **Purpose limitation** (use data only for the feature purpose)
+3. **Child data gets the strictest rules**
+4. **Retention is explicit and enforced**
+5. **Audit logs are immutable and tenant-scoped**
+6. **Deletion and consent revocation take effect immediately**
+
+---
+
+## 3. Compliance Alignment (High-Level)
+
+This guide aligns with common privacy and child protection expectations such as:
+
+* child privacy protections (e.g., COPPA-style principles)
+* educational privacy expectations (FERPA-style principles)
+* general privacy requirements (GDPR-style principles)
+
+Clazro must implement these as **policy and engineering controls**, not just documentation.
+
+---
+
+## 4. Data Types & Sensitivity Levels
+
+### 4.1 Data Categories
+
+| Category       | Examples                              | Sensitivity |
+| -------------- | ------------------------------------- | ----------- |
+| Operational    | featureId, widgetId, timestamps       | Low         |
+| Educational    | lesson topics, progress stats         | Medium      |
+| Personal (PII) | name, email, phone                    | High        |
+| Sensitive      | mental health cues, abuse disclosures | Very High   |
+| Child Data     | any minor-linked content/PII          | Highest     |
+
+Child data includes any data connected to a minor account, even if not overtly personal.
+
+---
+
+## 5. Retention Policy Requirements
+
+### 5.1 Default Retention Windows (Recommended)
+
+* AI execution metadata (no raw text): 30–180 days
+* audit logs (immutable): 1–7 years (tenant configurable)
+* tool execution logs (redacted): 90–365 days
+* automation run logs: 90–365 days
+* safety events: per policy (often longer, strict access)
+
+### 5.2 Child Data Retention (Stricter)
+
+* no retention of raw AI transcripts by default
+* only store:
+
+  * moderation outcomes
+  * safety event metadata
+  * minimal audit evidence
+* shorter retention windows unless legally required
+
+### 5.3 Tenant Overrides
+
+Tenants may choose stricter retention but cannot weaken child rules.
+
+---
+
+## 6. Deletion & Right-to-Remove
+
+### 6.1 Deletion Requests
+
+Clazro must support deletion of:
+
+* user account data
+* AI histories (if stored)
+* connector data references
+
+### 6.2 Deletion Guarantees
+
+* deletion request triggers immediate access revoke
+* downstream systems must delete or anonymize
+* audit logs remain but must be minimized (no raw content)
+
+### 6.3 Consent Revocation
+
+* revocation blocks future processing immediately
+* queued automations referencing revoked data must be canceled
+
+---
+
+## 7. Audit Logging Requirements
+
+### 7.1 What Must Be Audited
+
+* AI executions
+* model routing decisions
+* prompt and policy versions used
+* tool calls (MCP/connectors)
+* automation runs and step outcomes
+* approvals and reviewer decisions
+* config publish/rollback
+* safety events and escalations
+
+### 7.2 Audit Log Properties
+
+Audit logs must be:
+
+* immutable (append-only)
+* tenant-scoped
+* searchable
+* access-controlled
+* redact sensitive fields
+
+---
+
+## 8. Audit Event Schema (Minimum Fields)
+
+Each event includes:
+
+* auditEventId
+* timestamp
+* tenantId
+* actorId (user/service)
+* actorRole
+* audienceProfile
+* eventType (AI_EXECUTE, TOOL_CALL, WORKFLOW_RUN, APPROVAL, CONFIG_PUBLISH)
+* featureId / workflowId
+* provider/model (if AI)
+* toolId/action (if tool)
+* result status (SUCCESS/FAIL/REFUSED)
+* traceId
+* redaction summary
+
+Do not store raw PII or full transcripts unless explicitly permitted.
+
+---
+
+## 9. Access Control for Audit Data
+
+* only tenant admins and platform admins can view audit logs
+* parents can view child activity summaries (limited)
+* coaches can view only student-linked events they are assigned to
+
+Sensitive events require elevated permissions.
+
+---
+
+## 10. Child-Specific Compliance Requirements
+
+For minors:
+
+* parent/guardian consent required for AI usage
+* parent visibility into AI use
+* restricted tool access
+* no marketing profiling
+* no behavioral advertising logic
+
+---
+
+## 11. Safety Event Handling
+
+Safety events are treated as:
+
+* highly restricted
+* minimal retention of raw content
+* strong access control
+
+---
+
+## 12. Data Residency & Regional Controls (If Applicable)
+
+If tenants require:
+
+* regional storage restrictions
+* region-limited provider routing
+
+Routing and storage must enforce it via tenant policy.
+
+---
+
+## 13. Phase 1 Minimum Implementation
+
+1. audit logging for AI + tools + workflows + approvals
+2. retention enforcement jobs
+3. deletion and consent revoke enforcement
+4. child transcript minimization
+
+---
+
+## 14. Non-Negotiables Summary
+
+* child data handled with highest protection
+* retention is enforced, not optional
+* audit logs are immutable and redacted
+* deletion and consent revocation act immediately
+
+---
+
+This guide ensures Clazro’s AI, tools, and automations remain **compliant, privacy-preserving, and auditable** across tenants and audiences.

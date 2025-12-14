@@ -1,0 +1,12 @@
+{
+  "title": "एडमिन",
+  "customers": "कस्टमर",
+  "features": "फ़ीचर्स",
+  "navigation": "नेविगेशन",
+  "dashboard": "डैशबोर्ड लेआउट",
+  "theme": "थीम",
+  "audit": "ऑडिट लॉग",
+  "create_customer": "कस्टमर बनाएँ",
+  "name": "नाम",
+  "slug": "स्लग"
+}

@@ -1,0 +1,206 @@
+# Context Assembly & Data Minimization Policy (PII & Redaction)
+
+## 1. Purpose
+
+This guide defines **what data is allowed to be sent to AI**, **how context is assembled**, and **how PII is minimized and redacted** before any AI, automation, tool, or connector execution.
+
+The goal is to ensure:
+
+* privacy-by-design
+* child safety and compliance
+* reduced data leakage risk
+* consistent, explainable AI behavior
+
+This policy applies to **all AI requests**, **automations (n8n)**, **MCP/tool calls**, and **external connectors**.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Minimum necessary data only**
+2. **Context references, not raw dumps**
+3. **Audience profile overrides data access**
+4. **PII is redacted by default**
+5. **No child data for training or reuse**
+6. **All context assembly happens server-side**
+
+---
+
+## 3. Data Classification
+
+### 3.1 Data Categories
+
+| Category       | Examples                         | AI Access           |
+| -------------- | -------------------------------- | ------------------- |
+| Public         | App labels, generic instructions | Allowed             |
+| Operational    | screen type, feature id          | Allowed             |
+| Educational    | lesson titles, topics            | Allowed (limited)   |
+| Personal (PII) | name, email, phone               | Restricted          |
+| Sensitive      | health, location, behavior       | Highly restricted   |
+| Child Data     | any minor-related info           | Strictly restricted |
+
+---
+
+## 4. Context Assembly Model
+
+### 4.1 Reference-Based Assembly (Required)
+
+The app sends **references**, not full data objects:
+
+* studentId
+* sessionId
+* screenId
+* widgetId
+
+The **AI & Automation Gateway** resolves references internally, applies policies, and assembles the final context.
+
+The client must never send raw PII payloads to AI.
+
+---
+
+### 4.2 Context Layers
+
+Context is assembled in layers (outer → inner):
+
+1. **System Layer** – global policy and safety rules
+2. **Audience Layer** – kid/teen/adult/coaching constraints
+3. **Feature Layer** – use-case specific instructions
+4. **Session Layer** – current screen/session metadata
+5. **Content Layer** – minimal educational data
+6. **User Input** – sanitized user prompt
+
+Each layer has strict size and content limits.
+
+---
+
+## 5. PII Handling Rules
+
+### 5.1 Default Behavior
+
+* PII is **excluded by default**
+* Names are replaced with roles ("the student")
+* Dates are generalized where possible
+
+### 5.2 Explicit Inclusion (Rare)
+
+PII may be included **only if**:
+
+* feature explicitly requires it
+* user consent exists
+* audience profile allows it
+* data is essential to the task
+
+Even then, data must be minimized.
+
+---
+
+## 6. Child Data Restrictions
+
+For **children (<13)**:
+
+* No names, contact info, or identifiers
+* No historical behavioral patterns
+* No free-form personal narratives
+* No data reuse across sessions
+
+Child context is ephemeral and session-scoped.
+
+---
+
+## 7. Redaction & Transformation Rules
+
+Before sending to AI:
+
+* names → roles
+* emails → [REDACTED_EMAIL]
+* phone → [REDACTED_PHONE]
+* locations → generalized region
+* IDs → opaque hashes
+
+Redaction is enforced centrally in the Gateway.
+
+---
+
+## 8. Tool & Connector Context Rules
+
+### 8.1 Tool Calls (MCP)
+
+* Tools receive only parameters required for the action
+* AI never receives tool credentials
+* Tool responses are sanitized before returning to AI
+
+### 8.2 External Connectors
+
+* OAuth scopes must be minimal
+* Only task-specific data shared
+* No bulk syncs for AI context
+
+---
+
+## 9. Automation Context (n8n)
+
+Automations receive:
+
+* event name
+* entity references
+* policy context
+
+They must not receive raw user PII unless explicitly approved.
+
+---
+
+## 10. Context Size & Limits
+
+* Hard limits per capability class
+* Automatic truncation with priority rules
+* Summarization used instead of raw logs
+
+Context overflow must degrade gracefully.
+
+---
+
+## 11. Audit & Traceability
+
+Every AI execution logs:
+
+* context categories included
+* redaction actions applied
+* policy version
+* audience profile
+* traceId
+
+No raw PII is stored in logs.
+
+---
+
+## 12. Compliance Alignment
+
+This policy supports:
+
+* COPPA (children)
+* GDPR (minimization, purpose limitation)
+* FERPA-style educational privacy principles
+
+---
+
+## 13. Validation & Testing
+
+Required tests:
+
+* PII leakage tests
+* child data exclusion tests
+* redaction accuracy tests
+* prompt injection attempts using PII
+
+---
+
+## 14. Non-Negotiables Summary
+
+* Raw PII never goes to AI by default
+* Children’s data is strictly limited
+* Context is assembled server-side
+* Redaction cannot be bypassed
+
+---
+
+This guide ensures AI remains **privacy-safe, compliant, and trustworthy** while still being useful.

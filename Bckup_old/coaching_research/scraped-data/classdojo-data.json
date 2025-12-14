@@ -1,0 +1,66 @@
+{
+  "company": "ClassDojo",
+  "platform_type": "Classroom Communication Platform",
+  "target_audience": ["Teachers", "Parents", "Students", "School Leaders"],
+  "user_base": "45+ million students and parents",
+  "pricing_model": "Free for teachers, forever",
+  
+  "core_features": {
+    "messaging": {
+      "description": "Instant communication between teachers, families, and staff",
+      "key_capability": "Automatic translation into 35+ languages",
+      "multi_role_support": true
+    },
+    "stories": {
+      "description": "Secure sharing of classroom photos, videos, and updates",
+      "privacy": "Private feed for parents",
+      "content_types": ["photos", "videos", "updates"]
+    },
+    "events": {
+      "description": "Calendar integration with automatic reminders",
+      "automation": true
+    },
+    "social_emotional_learning": {
+      "points_system": "Points and Big Ideas to support student growth",
+      "portfolios": "Student Portfolios to give kids 'a voice of their own'",
+      "focus": "Holistic student development"
+    },
+    "teacher_toolkit": {
+      "tools": ["attendance sheets", "timers", "classroom management tools"],
+      "target_user": "Teachers"
+    }
+  },
+  
+  "unique_selling_points": [
+    "Multilingual communication (35+ languages)",
+    "Secure, private sharing",
+    "Collaborative learning support", 
+    "Free core functionality",
+    "Mobile-friendly platform"
+  ],
+  
+  "emerging_features": {
+    "dojo_islands": {
+      "description": "Educational adventure platform",
+      "type": "Gamified learning"
+    }
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": true,
+    "automation_features": ["automatic translation", "automatic reminders"],
+    "privacy_controls": true,
+    "integration_ready": true
+  },
+  
+  "communication_workflows": {
+    "teacher_parent": "Direct messaging with translation",
+    "classroom_updates": "Stories and photo sharing",
+    "event_coordination": "Calendar integration",
+    "student_engagement": "Portfolio creation and points system"
+  },
+  
+  "data_collection_date": "2025-08-29",
+  "source_urls": ["https://www.classdojo.com/"]
+}

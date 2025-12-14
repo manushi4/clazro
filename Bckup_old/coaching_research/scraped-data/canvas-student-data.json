@@ -1,0 +1,138 @@
+{
+  "company": "Instructure",
+  "platform_type": "Learning Management System (LMS) Mobile App",
+  "app_name": "Canvas Student",
+  "target_audience": ["Students", "Parents (via Canvas Parent app)", "Educational Institutions"],
+  "positioning": "Mobile-first LMS access for comprehensive student learning management",
+  
+  "core_mobile_features": [
+    "View grades and course content",
+    "Submit assignments",
+    "Track coursework via to-do list and calendar",
+    "Send and receive messages",
+    "Post to discussions",
+    "Watch videos",
+    "Take quizzes",
+    "Receive push notifications for grades and updates"
+  ],
+  
+  "2025_updates": {
+    "ai_integration": [
+      "Gemini LTI AI assistant powered by Google",
+      "20+ AI-powered tools embedded directly in Canvas",
+      "Support for lesson planning and interactive content"
+    ],
+    "recent_enhancements": [
+      "Submission media comments viewable without downloading",
+      "Custom grade status display support",
+      "Canvas Offline feature for content access without internet",
+      "Redesigned Instructure and Canvas logos"
+    ]
+  },
+  
+  "mobile_capabilities": {
+    "platform_support": ["iOS", "Android"],
+    "ios_requirements": "iOS 17.0 and later",
+    "device_optimization": ["iPhone", "iPad"],
+    "languages": "29 languages supported",
+    "offline_access": "Pre-selected content available offline",
+    "responsive_design": "Full-featured responsive design"
+  },
+  
+  "student_features": {
+    "academic_management": [
+      "Course and group access",
+      "Assignment submission",
+      "Discussion participation",
+      "Grade viewing",
+      "Course material access"
+    ],
+    "organization_tools": [
+      "Course calendars",
+      "To-do item tracking",
+      "Modular course organization",
+      "Quick assignment location"
+    ],
+    "communication": [
+      "Inbox messages",
+      "Discussion posts",
+      "Teacher-student messaging"
+    ]
+  },
+  
+  "parent_integration": {
+    "canvas_parent_app": {
+      "features": [
+        "View assignment descriptions and due dates",
+        "Set assignment reminders",
+        "View assignment grades",
+        "View course grades",
+        "Set grade alerts",
+        "View course announcements"
+      ],
+      "communication": "Direct messaging with teachers",
+      "notifications": "Customizable grade and assignment alerts"
+    }
+  },
+  
+  "technical_capabilities": {
+    "multi_role_management": true,
+    "mobile_first": true,
+    "cross_platform": ["iOS", "Android", "Web"],
+    "automation_features": [
+      "Push notifications",
+      "Grade alerts",
+      "Assignment reminders",
+      "AI-powered content tools"
+    ],
+    "integration_ready": true,
+    "offline_support": true
+  },
+  
+  "notifications_system": {
+    "push_notifications": [
+      "New grades",
+      "Course updates",
+      "Assignment reminders",
+      "Discussion replies"
+    ],
+    "customization": "Customizable notification preferences",
+    "real_time": "Real-time academic tracking"
+  },
+  
+  "user_experience": {
+    "app_store_rating": "4.7/5 stars",
+    "total_ratings": "2.8 million ratings",
+    "user_feedback": [
+      "Better platform than Google Classroom",
+      "Everything united in one place",
+      "Very helpful for keeping organized",
+      "User-friendly parent interface"
+    ]
+  },
+  
+  "unique_selling_points": [
+    "Industry-leading mobile applications",
+    "Comprehensive offline access",
+    "AI-powered educational tools",
+    "Best-in-class data security",
+    "Dedicated parent app",
+    "29 language support"
+  ],
+  
+  "communication_workflows": {
+    "student_instructor": "Messages, discussions, assignment feedback",
+    "parent_teacher": "Direct messaging via Canvas Parent",
+    "student_peer": "Discussion boards and group communications",
+    "administrative": "Course announcements and updates"
+  },
+  
+  "recent_version": "8.0.1",
+  "platform_requirements": "Canvas account required",
+  "value_proposition": "Reach every learner, everywhere with mobile-first LMS access",
+  "data_collection_date": "2025-08-29",
+  "source_urls": [
+    "https://apps.apple.com/us/app/canvas-student/id480883488",
+    "Web search results"
+  ]
+}

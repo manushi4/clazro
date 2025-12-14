@@ -1,0 +1,236 @@
+# AI Use‑Case Catalog & Feature Matrix (Role / Tenant / Profile)
+
+## 1. Purpose
+
+This guide defines **what AI use‑cases exist**, **who can use them**, **under what conditions**, and **how they are governed** across tenants, roles, and audience profiles. It prevents unstructured AI feature growth and ensures every AI capability is **intentional, measurable, safe, and configurable**.
+
+This document acts as the **single source of truth** for deciding:
+
+* which AI features may be built
+* where they appear in the app
+* who can access them
+* how they are validated and controlled
+
+---
+
+## 2. Core Dimensions
+
+Every AI feature is evaluated across four dimensions:
+
+1. **Use‑Case Category** – what problem AI solves
+2. **Role** – student / parent / coach / admin
+3. **Audience Profile** – kid / teen / adult / coaching
+4. **Tenant Configuration** – enabled, restricted, or disabled
+
+No AI feature may bypass this matrix.
+
+---
+
+## 3. AI Use‑Case Categories
+
+### 3.1 Learning Assistance
+
+* Explain concepts
+* Answer questions
+* Provide guided hints
+* Practice feedback
+
+### 3.2 Progress & Insight Generation
+
+* Session summaries
+* Learning progress insights
+* Pattern detection
+* Risk/attention signals
+
+### 3.3 Coaching & Planning Support
+
+* Lesson/session planning
+* Student recommendations
+* Drafting feedback or notes
+
+### 3.4 Communication Support
+
+* Message drafting
+* Parent/coach summaries
+* Follow‑up suggestions
+
+### 3.5 Automation Triggers
+
+* Reminders
+* Notifications
+* Workflow initiation
+
+### 3.6 Administrative Intelligence
+
+* Usage insights
+* Operational summaries
+* Configuration recommendations
+
+---
+
+## 4. Feature Catalog (Representative)
+
+### 4.1 AI Chat Assistant
+
+**Description**: Conversational support tied to learning or coaching context.
+
+| Dimension      | Rules                                   |
+| -------------- | --------------------------------------- |
+| Roles          | Student, Parent, Coach                  |
+| Profiles       | Kid (restricted), Teen, Adult, Coaching |
+| Tenant Control | Enable / Disable / Profile‑limited      |
+| Automation     | ❌                                       |
+| Tool Use       | Profile‑dependent                       |
+
+Notes:
+
+* Kids use guided chat only
+* Coaches get analytical depth
+
+---
+
+### 4.2 Session / Class Summary
+
+**Description**: Summarizes lessons, meetings, or study sessions.
+
+| Dimension      | Rules                  |
+| -------------- | ---------------------- |
+| Roles          | Student, Parent, Coach |
+| Profiles       | All                    |
+| Tenant Control | Enable per role        |
+| Automation     | ✅ (post‑event)         |
+| Tool Use       | ❌                      |
+
+---
+
+### 4.3 Learning Insights & Recommendations
+
+**Description**: Identifies patterns and suggests next steps.
+
+| Dimension      | Rules                    |
+| -------------- | ------------------------ |
+| Roles          | Parent, Coach            |
+| Profiles       | Teen, Adult, Coaching    |
+| Tenant Control | Enable + review required |
+| Automation     | ⚠️ (approval‑based)      |
+| Tool Use       | ❌                        |
+
+---
+
+### 4.4 Coach Copilot
+
+**Description**: AI assistant for coaches to plan, reflect, and prepare.
+
+| Dimension      | Rules               |
+| -------------- | ------------------- |
+| Roles          | Coach               |
+| Profiles       | Coaching            |
+| Tenant Control | Explicit enable     |
+| Automation     | ✅                   |
+| Tool Use       | ✅ (calendar, notes) |
+
+---
+
+### 4.5 Parent Digest & Alerts
+
+**Description**: Periodic summaries and alerts for parents.
+
+| Dimension      | Rules         |
+| -------------- | ------------- |
+| Roles          | Parent        |
+| Profiles       | Adult         |
+| Tenant Control | Opt‑in        |
+| Automation     | ✅ (scheduled) |
+| Tool Use       | ❌             |
+
+---
+
+### 4.6 Meeting Scheduling & Follow‑ups
+
+**Description**: Create meetings, reminders, and summaries.
+
+| Dimension      | Rules                |
+| -------------- | -------------------- |
+| Roles          | Parent, Coach        |
+| Profiles       | Adult, Coaching      |
+| Tenant Control | Enable per connector |
+| Automation     | ✅                    |
+| Tool Use       | ✅ (Calendar/Meet)    |
+
+---
+
+## 5. Feature Matrix (High‑Level)
+
+| Feature     | Kid | Teen | Adult | Coaching |
+| ----------- | --- | ---- | ----- | -------- |
+| AI Chat     | ❌   | ⚠️   | ✅     | ✅        |
+| Summaries   | ✅   | ✅    | ✅     | ✅        |
+| Insights    | ❌   | ❌    | ⚠️    | ✅        |
+| Copilot     | ❌   | ❌    | ❌     | ✅        |
+| Automations | ❌   | ⚠️   | ✅     | ✅        |
+
+Legend: ❌ Not allowed | ⚠️ Restricted | ✅ Allowed
+
+---
+
+## 6. Tenant‑Level Controls
+
+Each tenant can:
+
+* enable/disable features globally
+* restrict features by role or profile
+* set usage limits and budgets
+* require approvals for sensitive features
+
+Tenant rules override defaults but cannot violate safety guides.
+
+---
+
+## 7. Feature Lifecycle
+
+Every AI feature must follow:
+
+1. Proposal (use‑case + value)
+2. Matrix validation (role/profile/tenant)
+3. Safety & quality review
+4. Studio configuration
+5. Limited rollout
+6. Measurement & iteration
+
+---
+
+## 8. Measurement & KPIs
+
+Each feature must define:
+
+* primary value metric
+* safety/refusal rates
+* automation success rate (if applicable)
+* cost per use
+
+Features without metrics may not advance.
+
+---
+
+## 9. Enforcement
+
+Enforced by:
+
+* Platform Studio (configuration & validation)
+* AI & Automation Gateway (runtime checks)
+* Widget registry (feature availability)
+
+Violations trigger fallback or disablement.
+
+---
+
+## 10. Non‑Negotiables
+
+* No feature ships without a defined use‑case
+* No feature bypasses the matrix
+* No tenant can override child safety
+* No automation without visibility
+
+---
+
+This guide ensures AI remains **purposeful, controlled, and scalable** across the platform.

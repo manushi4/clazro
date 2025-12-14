@@ -184,6 +184,32 @@
                                             "subtitle":  "सुझाव",
                                             "error":  "Unable to load recommendations"
                                         },
+                    "aiTutor": {
+                        "title": "AI ट्यूटर",
+                        "subtitle": "प्रश्न पूछें और मदद पाएं",
+                        "welcomeMessage": "नमस्ते! मैं आपका AI ट्यूटर हूं। अपनी पढ़ाई के बारे में कुछ भी पूछें!",
+                        "placeholder": "कुछ भी पूछें...",
+                        "setupRequired": "API key जोड़ने के लिए ⚙️ टैप करें",
+                        "thinking": "सोच रहा हूं...",
+                        "errorGeneric": "क्षमा करें, मैं इसे प्रोसेस नहीं कर सका। कृपया पुनः प्रयास करें।",
+                        "errorBlocked": "मैं इसका जवाब नहीं दे सकता। चलिए कुछ और बात करते हैं!",
+                        "errorApiKey": "API key में समस्या। कृपया सेटिंग्स जांचें।",
+                        "settings": {
+                            "title": "AI सेटिंग्स",
+                            "apiKeyLabel": "Gemini API Key",
+                            "apiKeyPlaceholder": "अपना Gemini API key दर्ज करें",
+                            "hint": "Google AI Studio (aistudio.google.com) से अपना API key प्राप्त करें",
+                            "keyConfigured": "API key कॉन्फ़िगर है",
+                            "save": "सेव करें",
+                            "clear": "API Key हटाएं",
+                            "success": "सफल",
+                            "error": "त्रुटि",
+                            "keySaved": "API key सेव हो गया!",
+                            "invalidKey": "अमान्य API key",
+                            "validationFailed": "key सत्यापित नहीं हो सका",
+                            "enterKey": "कृपया API key दर्ज करें"
+                        }
+                    },
                     "classFeed":  {
                                       "title":  "क्लास फीड",
                                       "subtitle":  "घोषणाएँ",

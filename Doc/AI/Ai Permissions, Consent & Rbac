@@ -236,3 +236,151 @@ Required tests:
 ---
 
 This guide ensures AI remains **permissioned, trustworthy, and legally defensible** across the platform.
+
+
+---
+
+## 14. Database Schema for AI Permissions
+
+### 14.1 New AI Permission Codes
+
+Add to existing `permissions` table:
+
+```sql
+INSERT INTO permissions (permission_code, name, description, category) VALUES
+  ('ai.chat.use', 'Use AI Chat', 'Access AI chat features', 'ai'),
+  ('ai.summary.use', 'Use AI Summaries', 'Generate AI summaries', 'ai'),
+  ('ai.copilot.use', 'Use AI Copilot', 'Access AI copilot features', 'ai'),
+  ('ai.tools.use', 'Use AI Tools', 'Allow AI to use external tools', 'ai'),
+  ('ai.automation.trigger', 'Trigger Automations', 'Trigger automated workflows', 'ai'),
+  ('ai.config.view', 'View AI Config', 'View AI configuration', 'ai'),
+  ('ai.config.manage', 'Manage AI Config', 'Modify AI configuration', 'ai'),
+  ('ai.budget.view', 'View AI Budget', 'View AI usage and budgets', 'ai'),
+  ('ai.audit.view', 'View AI Audit', 'View AI audit logs', 'ai'),
+  ('ai.killswitch.manage', 'Manage Kill Switches', 'Activate/deactivate AI kill switches', 'ai');
+```
+
+### 14.2 Default Role Permissions
+
+Add to existing `role_permissions` table:
+
+```sql
+-- Student: Limited AI access
+INSERT INTO role_permissions (role, permission_code) VALUES
+  ('student', 'ai.chat.use'),
+  ('student', 'ai.summary.use');
+
+-- Teacher: Full AI access
+INSERT INTO role_permissions (role, permission_code) VALUES
+  ('teacher', 'ai.chat.use'),
+  ('teacher', 'ai.summary.use'),
+  ('teacher', 'ai.copilot.use'),
+  ('teacher', 'ai.tools.use');
+
+-- Parent: Summary access only
+INSERT INTO role_permissions (role, permission_code) VALUES
+  ('parent', 'ai.summary.use');
+
+-- Admin: Full config access
+INSERT INTO role_permissions (role, permission_code) VALUES
+  ('admin', 'ai.config.view'),
+  ('admin', 'ai.config.manage'),
+  ('admin', 'ai.budget.view'),
+  ('admin', 'ai.audit.view'),
+  ('admin', 'ai.killswitch.manage');
+```
+
+---
+
+## 15. Integration with Existing Permission System
+
+### 15.1 Extend usePermissions Hook
+
+The existing `src/hooks/usePermissions.ts` already supports checking permissions. AI permissions work the same way:
+
+```typescript
+// Usage in components
+import { useHasPermission } from '../hooks/usePermissions';
+
+function AITutorWidget() {
+  const canUseAI = useHasPermission('ai.chat.use');
+  
+  if (!canUseAI) {
+    return <NoAccessMessage feature="AI Tutor" />;
+  }
+  
+  return <AITutorChat />;
+}
+```
+
+### 15.2 PermissionGate Component
+
+Use existing `src/components/auth/PermissionGate.tsx`:
+
+```tsx
+<PermissionGate permission="ai.chat.use" fallback={<UpgradePrompt />}>
+  <AITutorWidget />
+</PermissionGate>
+```
+
+---
+
+## 16. Consent Storage Schema
+
+```sql
+-- AI Consent Records
+CREATE TABLE ai_consents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES customers(id),
+  user_id TEXT NOT NULL,
+  consent_type TEXT NOT NULL, -- 'ai_usage', 'data_processing', 'tool_access', 'automation'
+  scope TEXT NOT NULL, -- 'all', specific feature_id
+  version TEXT NOT NULL, -- consent policy version
+  granted_by TEXT NOT NULL, -- user_id of granter (parent for minors)
+  granted_at TIMESTAMPTZ DEFAULT now(),
+  revoked_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  metadata JSONB DEFAULT '{}',
+  UNIQUE(customer_id, user_id, consent_type, scope)
+);
+
+-- RPC to check consent
+CREATE OR REPLACE FUNCTION check_ai_consent(
+  p_user_id TEXT,
+  p_customer_id UUID,
+  p_consent_type TEXT,
+  p_scope TEXT DEFAULT 'all'
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM ai_consents
+    WHERE customer_id = p_customer_id
+      AND user_id = p_user_id
+      AND consent_type = p_consent_type
+      AND (scope = 'all' OR scope = p_scope)
+      AND revoked_at IS NULL
+      AND (expires_at IS NULL OR expires_at > now())
+  );
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 17. Existing Code References
+
+| File | Purpose | AI Extension |
+|------|---------|--------------|
+| `src/hooks/usePermissions.ts` | Permission checking | Add AI permission codes |
+| `src/components/auth/PermissionGate.tsx` | UI permission gate | Works with AI permissions |
+| `src/services/config/permissionService.ts` | Permission service | Add consent checking |
+| `src/hooks/queries/useUserPermissionsQuery.ts` | Fetch permissions | Include AI permissions |
+
+---
+
+## 18. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/PERMISSIONS_RBAC_SPEC.md` - Existing RBAC system
+- `src/hooks/usePermissions.ts` - Permission hook implementation

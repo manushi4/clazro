@@ -62,6 +62,7 @@ const WIDGET_ICONS: Record<string, string> = {
   "peers.leaderboard": "trophy",
   "continue.learning": "book-clock",
   "ai.recommendations": "robot",
+  "ai.tutor-chat": "robot-happy",
   "feed.class": "bulletin-board",
   "peers.groups": "account-group",
   "profile.card": "account-circle",

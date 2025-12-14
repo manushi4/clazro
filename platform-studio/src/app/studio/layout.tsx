@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Circle,
   Bell,
+  Bot,
 } from "lucide-react";
 
 const sidebarItems = [
@@ -26,6 +27,7 @@ const sidebarItems = [
   { href: "/studio/screens", label: "Screens", icon: Layers },
   { href: "/studio/theme", label: "Theme", icon: Palette },
   { href: "/studio/branding", label: "Branding", icon: FileText },
+  { href: "/studio/ai", label: "AI Config", icon: Bot },
   { href: "/studio/notifications", label: "Notifications", icon: Bell },
   { href: "/studio/versions", label: "Versions", icon: History },
   { href: "/studio/debug", label: "Debug", icon: Bug },

@@ -421,3 +421,148 @@ Pinned versions + eval-driven rollouts prevent drift
 Costs are capped by tenant/feature/user
 
 Tool use is normalized and governed centrally
+
+
+---
+
+## 19. Database Schema for Multi-Model Routing
+
+### 19.1 AI Providers Table
+
+```sql
+CREATE TABLE ai_providers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  api_base_url TEXT,
+  is_enabled BOOLEAN DEFAULT true,
+  supported_capabilities TEXT[] DEFAULT '{}',
+  default_model TEXT,
+  config JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+INSERT INTO ai_providers (provider_id, display_name, supported_capabilities, default_model) VALUES
+  ('openai', 'OpenAI', ARRAY['chat', 'summarization', 'extraction', 'embeddings'], 'gpt-4o-mini'),
+  ('anthropic', 'Anthropic Claude', ARRAY['chat', 'reasoning', 'summarization'], 'claude-3-sonnet'),
+  ('google', 'Google Gemini', ARRAY['chat', 'multimodal', 'summarization'], 'gemini-1.5-flash'),
+  ('bedrock', 'AWS Bedrock', ARRAY['chat', 'summarization'], 'anthropic.claude-3-sonnet');
+```
+
+### 19.2 AI Models Table
+
+```sql
+CREATE TABLE ai_models (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id TEXT REFERENCES ai_providers(provider_id),
+  model_id TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  capability_class TEXT NOT NULL,
+  tier TEXT DEFAULT 'standard',
+  cost_per_1k_input DECIMAL(10,6),
+  cost_per_1k_output DECIMAL(10,6),
+  max_tokens INTEGER DEFAULT 4096,
+  supports_json_mode BOOLEAN DEFAULT false,
+  supports_tools BOOLEAN DEFAULT false,
+  is_enabled BOOLEAN DEFAULT true,
+  UNIQUE(provider_id, model_id)
+);
+
+INSERT INTO ai_models (provider_id, model_id, display_name, capability_class, tier, cost_per_1k_input, cost_per_1k_output) VALUES
+  ('openai', 'gpt-4o-mini', 'GPT-4o Mini', 'GENERAL_CHAT', 'cheap', 0.00015, 0.0006),
+  ('openai', 'gpt-4o', 'GPT-4o', 'DEEP_REASONING', 'premium', 0.005, 0.015),
+  ('anthropic', 'claude-3-haiku', 'Claude 3 Haiku', 'SUMMARIZATION', 'cheap', 0.00025, 0.00125),
+  ('anthropic', 'claude-3-sonnet', 'Claude 3 Sonnet', 'GENERAL_CHAT', 'standard', 0.003, 0.015);
+```
+
+### 19.3 AI Routing Rules Table
+
+```sql
+CREATE TABLE ai_routing_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES customers(id),
+  rule_name TEXT NOT NULL,
+  priority INTEGER DEFAULT 100,
+  use_case_ids TEXT[] DEFAULT '{}',
+  audience_profiles TEXT[] DEFAULT '{}',
+  roles TEXT[] DEFAULT '{}',
+  primary_provider TEXT NOT NULL,
+  primary_model TEXT NOT NULL,
+  fallback_providers JSONB DEFAULT '[]',
+  max_tokens INTEGER,
+  temperature DECIMAL(3,2),
+  is_enabled BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+---
+
+## 20. Routing Function
+
+```sql
+CREATE OR REPLACE FUNCTION get_ai_routing(
+  p_customer_id UUID,
+  p_use_case_id TEXT,
+  p_audience_profile TEXT,
+  p_role TEXT
+)
+RETURNS JSONB AS $$
+DECLARE
+  rule RECORD;
+BEGIN
+  SELECT * INTO rule FROM ai_routing_rules
+  WHERE customer_id = p_customer_id
+    AND is_enabled = true
+    AND (use_case_ids = '{}' OR p_use_case_id = ANY(use_case_ids))
+    AND (audience_profiles = '{}' OR p_audience_profile = ANY(audience_profiles))
+    AND (roles = '{}' OR p_role = ANY(roles))
+  ORDER BY priority ASC
+  LIMIT 1;
+  
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'provider', 'openai',
+      'model', 'gpt-4o-mini',
+      'fallbacks', '[]'::JSONB
+    );
+  END IF;
+  
+  RETURN jsonb_build_object(
+    'provider', rule.primary_provider,
+    'model', rule.primary_model,
+    'fallbacks', rule.fallback_providers,
+    'maxTokens', rule.max_tokens,
+    'temperature', rule.temperature
+  );
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 21. Environment Variables
+
+```bash
+# Provider API Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_AI_API_KEY=...
+AWS_BEDROCK_ACCESS_KEY=...
+AWS_BEDROCK_SECRET_KEY=...
+AWS_BEDROCK_REGION=us-east-1
+
+# Default Configuration
+AI_DEFAULT_PROVIDER=openai
+AI_DEFAULT_MODEL=gpt-4o-mini
+AI_REQUEST_TIMEOUT_MS=30000
+AI_MAX_RETRIES=2
+```
+
+---
+
+## 22. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/AI/AI Abstraction Layer & API Contracts` - API specs
+- `Doc/AI/Model Routing, Selection & Fallback Rules` - Detailed routing

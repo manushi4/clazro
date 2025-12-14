@@ -209,3 +209,91 @@ Every child‑related AI interaction must record:
 ---
 
 This guide is foundational for trust, legality, and long‑term platform credibility.
+
+
+---
+
+## 14. Database Schema for Child Safety
+
+### 14.1 Audience Profiles Table
+
+```sql
+CREATE TABLE ai_audience_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES customers(id),
+  profile_id TEXT NOT NULL, -- 'kid', 'teen', 'adult', 'coaching'
+  display_name TEXT NOT NULL,
+  min_age INTEGER,
+  max_age INTEGER,
+  -- Behavior Rules
+  tone TEXT DEFAULT 'friendly',
+  max_response_length INTEGER DEFAULT 500,
+  allowed_topics TEXT[] DEFAULT '{}',
+  forbidden_topics TEXT[] DEFAULT '{}',
+  -- Tool Policy
+  tools_allowed BOOLEAN DEFAULT false,
+  -- Safety
+  safety_level TEXT DEFAULT 'strict',
+  require_parent_visibility BOOLEAN DEFAULT false,
+  config JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(customer_id, profile_id)
+);
+```
+
+
+### 14.2 Default Profiles
+
+```sql
+INSERT INTO ai_audience_profiles (customer_id, profile_id, display_name, min_age, max_age, 
+  tone, max_response_length, forbidden_topics, tools_allowed, safety_level, require_parent_visibility)
+VALUES
+  (NULL, 'kid', 'Child', 0, 12, 'friendly', 200, 
+   ARRAY['violence', 'self-harm', 'sexuality', 'substances', 'ideology'], 
+   false, 'strict', true),
+  (NULL, 'teen', 'Teen', 13, 17, 'friendly', 500, 
+   ARRAY['explicit-content', 'self-harm-methods'], 
+   false, 'standard', true),
+  (NULL, 'adult', 'Adult', 18, NULL, 'professional', 2000, 
+   ARRAY[], true, 'relaxed', false),
+  (NULL, 'coaching', 'Coaching', 18, NULL, 'professional', 4000, 
+   ARRAY[], true, 'relaxed', false);
+```
+
+
+---
+
+## 15. Age Detection Function
+
+```sql
+CREATE OR REPLACE FUNCTION get_audience_profile(p_user_id TEXT)
+RETURNS TEXT AS $$
+DECLARE
+  user_age INTEGER;
+  profile TEXT;
+BEGIN
+  -- Calculate age from user_profiles (assuming birth_date column)
+  SELECT EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))
+  INTO user_age
+  FROM user_profiles WHERE user_id = p_user_id;
+  
+  IF user_age IS NULL THEN
+    RETURN 'adult'; -- Default if no birth date
+  ELSIF user_age < 13 THEN
+    RETURN 'kid';
+  ELSIF user_age < 18 THEN
+    RETURN 'teen';
+  ELSE
+    RETURN 'adult';
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 16. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/AI/Ai Permissions, Consent & Rbac` - Consent model
+- `src/hooks/useDemoUser.ts` - User context hook

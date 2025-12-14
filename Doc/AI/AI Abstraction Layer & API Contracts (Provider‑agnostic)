@@ -284,3 +284,197 @@ This is mandatory for budgeting, debugging, and compliance.
 ---
 
 This guide ensures Clazro can scale AI safely and flexibly with **multiple providers**, **tool use**, and **automation orchestration** while staying aligned with the platform’s config-driven architecture.
+
+
+---
+
+## 12. Concrete API Specifications
+
+### 12.1 AI Execute Endpoint
+
+```
+POST /api/ai/execute
+Authorization: Bearer <token>
+Content-Type: application/json
+
+Request Body:
+{
+  "tenantId": "uuid",
+  "userId": "string",
+  "role": "student | teacher | parent | admin",
+  "audienceProfile": "kid | teen | adult | coaching",
+  "useCaseId": "ai_chat | ai_summary | ai_copilot",
+  "widgetId": "ai.tutor-chat",
+  "input": {
+    "text": "string",
+    "messages": [{ "role": "user", "content": "string" }]
+  },
+  "contextRefs": {
+    "subjectId": "uuid",
+    "chapterId": "uuid"
+  },
+  "outputMode": "TEXT | JSON | SCHEMA",
+  "schemaId": "string (optional)",
+  "toolIntent": "none | allowed | required"
+}
+
+Success Response (200):
+{
+  "traceId": "trace_abc123",
+  "status": "success",
+  "outputText": "string",
+  "outputJson": {},
+  "safetyFlags": [],
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "fallbackPath": [],
+  "usage": {
+    "tokensIn": 50,
+    "tokensOut": 200,
+    "costUsd": 0.0003,
+    "latencyMs": 1200
+  }
+}
+
+Error Responses:
+- 403 POLICY_REFUSAL: Permission/consent/safety denied
+- 422 VALIDATION_ERROR: Schema validation failed
+- 429 RATE_LIMIT: Too many requests
+- 429 BUDGET_EXCEEDED: Cost limit reached
+- 502 PROVIDER_ERROR: Provider timeout/error
+- 500 TOOL_ERROR: Tool execution failed
+```
+
+### 12.2 Config Validation Endpoint
+
+```
+POST /api/ai/config/validate
+Authorization: Bearer <admin-token>
+
+Request Body:
+{
+  "customerId": "uuid",
+  "configVersion": "v1.2.3",
+  "routingRules": [...],
+  "promptTemplates": [...],
+  "audiencePolicies": [...],
+  "budgets": [...]
+}
+
+Response:
+{
+  "valid": true | false,
+  "errors": [
+    { "path": "routingRules[0].primaryModel", "message": "Model not found" }
+  ],
+  "warnings": [
+    { "path": "budgets.daily", "message": "No daily budget set" }
+  ]
+}
+```
+
+---
+
+## 13. TypeScript Type Definitions
+
+```typescript
+// src/types/ai.types.ts
+
+export type AIProviderId = 'openai' | 'anthropic' | 'google' | 'bedrock';
+export type CapabilityClass = 
+  | 'SAFE_GUIDED_CHAT' | 'GENERAL_CHAT' | 'DEEP_REASONING'
+  | 'SUMMARIZATION' | 'STRUCTURED_EXTRACTION' | 'CLASSIFICATION';
+export type OutputMode = 'TEXT' | 'JSON' | 'SCHEMA';
+export type AudienceProfile = 'kid' | 'teen' | 'adult' | 'coaching';
+
+export type AIExecuteRequest = {
+  tenantId: string;
+  userId: string;
+  role: string;
+  audienceProfile: AudienceProfile;
+  useCaseId: string;
+  widgetId?: string;
+  input: { text?: string; messages?: AIMessage[] };
+  contextRefs?: Record<string, string>;
+  outputMode?: OutputMode;
+  schemaId?: string;
+  toolIntent?: 'none' | 'allowed' | 'required';
+};
+
+export type AIExecuteResponse = {
+  traceId: string;
+  status: 'success' | 'refused' | 'error';
+  outputText?: string;
+  outputJson?: Record<string, unknown>;
+  safetyFlags: string[];
+  provider?: string;
+  model?: string;
+  fallbackPath?: string[];
+  usage?: { tokensIn: number; tokensOut: number; costUsd: number; latencyMs: number };
+  error?: { code: string; message: string };
+};
+```
+
+---
+
+## 14. Integration with Existing Codebase
+
+### 14.1 Extend Existing Services
+
+```typescript
+// src/services/ai/aiService.ts - follows pattern from configService.ts
+
+import { getSupabaseClient } from '../../lib/supabaseClient';
+import type { AIExecuteRequest, AIExecuteResponse } from '../../types/ai.types';
+
+export async function executeAI(request: AIExecuteRequest): Promise<AIExecuteResponse> {
+  const supabase = getSupabaseClient();
+  
+  // Call AI Gateway (Edge Function or external service)
+  const { data, error } = await supabase.functions.invoke('ai-execute', {
+    body: request
+  });
+  
+  if (error) throw error;
+  return data as AIExecuteResponse;
+}
+
+export async function fetchAIConfig(customerId: string) {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.rpc('get_ai_config', { p_customer_id: customerId });
+  if (error) throw error;
+  return data;
+}
+```
+
+### 14.2 Create AI Permission Hook
+
+```typescript
+// src/hooks/useAIPermission.ts - follows pattern from usePermissions.ts
+
+import { usePermissions } from './usePermissions';
+import { useDemoUser } from './useDemoUser';
+
+export function useAIPermission(useCaseId: string) {
+  const { hasPermission } = usePermissions();
+  const { role, audienceProfile } = useDemoUser();
+  
+  // Map use case to permission
+  const permissionMap: Record<string, string> = {
+    'ai_chat': 'ai.chat.use',
+    'ai_summary': 'ai.summary.use',
+    'ai_copilot': 'ai.copilot.use',
+  };
+  
+  const requiredPermission = permissionMap[useCaseId] || 'ai.chat.use';
+  return hasPermission(requiredPermission);
+}
+```
+
+---
+
+## 15. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete SQL schemas and types
+- `Doc/API_CONTRACTS.md` - Existing API patterns to follow
+- `src/services/config/configService.ts` - Service pattern reference

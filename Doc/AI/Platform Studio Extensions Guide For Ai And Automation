@@ -244,3 +244,289 @@ Studio modules must be permissioned:
 ---
 
 This guide ensures Platform Studio can govern AI and automation safely and at scale across tenants.
+
+
+---
+
+## 13. Platform Studio UI Specifications
+
+### 13.1 New Sidebar Menu Items
+
+Add to `platform-studio/src/app/studio/layout.tsx`:
+
+```typescript
+const aiMenuItems = [
+  { label: 'AI Features', href: '/studio/ai/features', icon: 'Bot' },
+  { label: 'Routing Rules', href: '/studio/ai/routing', icon: 'GitBranch' },
+  { label: 'Prompts', href: '/studio/ai/prompts', icon: 'FileText' },
+  { label: 'Audience Profiles', href: '/studio/ai/profiles', icon: 'Users' },
+  { label: 'Budgets', href: '/studio/ai/budgets', icon: 'DollarSign' },
+  { label: 'Kill Switches', href: '/studio/ai/kill-switches', icon: 'Power' },
+  { label: 'Audit Logs', href: '/studio/ai/audit', icon: 'FileSearch' },
+];
+```
+
+### 13.2 AI Features Page Fields
+
+```typescript
+// platform-studio/src/app/studio/ai/features/page.tsx
+
+type AIFeatureForm = {
+  useCaseId: string;        // Required, unique per customer
+  displayName: string;      // Required
+  description: string;      // Optional
+  capabilityClass: CapabilityClass; // Required, dropdown
+  enabledRoles: string[];   // Multi-select: student, teacher, parent, admin
+  enabledProfiles: string[]; // Multi-select: kid, teen, adult, coaching
+  outputMode: OutputMode;   // Radio: TEXT, JSON, SCHEMA
+  toolsPolicy: ToolsPolicy; // Radio: DISABLED, ALLOWED, REQUIRED
+  allowedTools: string[];   // Multi-select (if tools allowed)
+  isEnabled: boolean;       // Toggle
+};
+
+// Validation Rules
+const validationRules = {
+  useCaseId: { required: true, pattern: /^[a-z_]+$/ },
+  displayName: { required: true, maxLength: 100 },
+  capabilityClass: { required: true },
+  enabledRoles: { required: true, minLength: 1 },
+  enabledProfiles: { required: true, minLength: 1 },
+  // Kid profile cannot have tools
+  toolsPolicy: (value, form) => {
+    if (form.enabledProfiles.includes('kid') && value !== 'TOOLS_DISABLED') {
+      return 'Kids cannot have tool access';
+    }
+    return true;
+  }
+};
+```
+
+### 13.3 Routing Rules Page Fields
+
+```typescript
+type RoutingRuleForm = {
+  ruleName: string;
+  priority: number;         // 1-1000, lower = higher priority
+  useCaseIds: string[];     // Multi-select, empty = all
+  audienceProfiles: string[]; // Multi-select, empty = all
+  roles: string[];          // Multi-select, empty = all
+  primaryProvider: string;  // Dropdown: openai, anthropic, google, bedrock
+  primaryModel: string;     // Dropdown based on provider
+  fallbackProviders: Array<{ provider: string; model: string }>;
+  maxTokens: number;        // Optional
+  temperature: number;      // 0.0 - 2.0
+  latencySlaMsMs: number;   // Optional
+  isEnabled: boolean;
+};
+```
+
+### 13.4 Prompts Editor Page
+
+```typescript
+type PromptForm = {
+  promptId: string;
+  displayName: string;
+  systemPrompt: string;     // Textarea with syntax highlighting
+  userTemplate: string;     // Textarea with {{variable}} support
+  variables: Array<{
+    name: string;
+    type: 'string' | 'number' | 'boolean' | 'array';
+    required: boolean;
+    defaultValue: string;
+  }>;
+  useCaseIds: string[];
+  audienceProfiles: string[];
+  forbiddenPatterns: string[]; // Regex patterns to block
+  status: 'draft' | 'active' | 'archived';
+};
+
+// Variable preview panel
+// Test execution button (sandbox mode)
+```
+
+### 13.5 Kill Switch Controls
+
+```typescript
+type KillSwitchPanel = {
+  globalSwitch: { isActive: boolean; reason: string };
+  tenantSwitch: { isActive: boolean; reason: string };
+  featureSwitches: Array<{
+    useCaseId: string;
+    isActive: boolean;
+    reason: string;
+    activatedAt: string;
+  }>;
+  providerSwitches: Array<{
+    providerId: string;
+    isActive: boolean;
+    reason: string;
+  }>;
+};
+
+// One-click activate/deactivate
+// Reason required on activation
+// Audit log display
+```
+
+---
+
+## 14. Database Tables for Platform Studio
+
+### 14.1 AI Config Service Extension
+
+Add to `platform-studio/src/services/configService.ts`:
+
+```typescript
+// AI Use Cases
+export async function fetchAIUseCases(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_use_cases')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('use_case_id');
+  if (error) throw error;
+  return data;
+}
+
+export async function saveAIUseCase(customerId: string, useCase: AIUseCaseForm) {
+  const { error } = await supabase
+    .from('ai_use_cases')
+    .upsert({
+      customer_id: customerId,
+      use_case_id: useCase.useCaseId,
+      display_name: useCase.displayName,
+      capability_class: useCase.capabilityClass,
+      enabled_roles: useCase.enabledRoles,
+      enabled_profiles: useCase.enabledProfiles,
+      output_mode: useCase.outputMode,
+      tools_policy: useCase.toolsPolicy,
+      allowed_tools: useCase.allowedTools,
+      is_enabled: useCase.isEnabled,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'customer_id,use_case_id' });
+  if (error) throw error;
+}
+
+// AI Routing Rules
+export async function fetchAIRoutingRules(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_routing_rules')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('priority');
+  if (error) throw error;
+  return data;
+}
+
+// AI Kill Switches
+export async function fetchAIKillSwitches(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_kill_switches')
+    .select('*')
+    .or(`switch_type.eq.global,reference_id.eq.${customerId}`);
+  if (error) throw error;
+  return data;
+}
+
+export async function activateKillSwitch(
+  switchType: string,
+  referenceId: string,
+  reason: string,
+  activatedBy: string
+) {
+  const { error } = await supabase
+    .from('ai_kill_switches')
+    .upsert({
+      switch_type: switchType,
+      reference_id: referenceId,
+      is_active: true,
+      reason,
+      activated_by: activatedBy,
+      activated_at: new Date().toISOString(),
+    }, { onConflict: 'switch_type,reference_id' });
+  if (error) throw error;
+}
+```
+
+---
+
+## 15. Validation Framework Implementation
+
+### 15.1 Config Validator
+
+```typescript
+// platform-studio/src/services/aiConfigValidator.ts
+
+export type ValidationResult = {
+  valid: boolean;
+  errors: Array<{ path: string; message: string }>;
+  warnings: Array<{ path: string; message: string }>;
+};
+
+export async function validateAIConfig(customerId: string): Promise<ValidationResult> {
+  const errors: ValidationResult['errors'] = [];
+  const warnings: ValidationResult['warnings'] = [];
+  
+  const [useCases, routingRules, prompts, budgets] = await Promise.all([
+    fetchAIUseCases(customerId),
+    fetchAIRoutingRules(customerId),
+    fetchAIPrompts(customerId),
+    fetchAIBudgets(customerId),
+  ]);
+  
+  // Validate: Kid profile cannot have tools
+  useCases.forEach((uc, i) => {
+    if (uc.enabled_profiles.includes('kid') && uc.tools_policy !== 'TOOLS_DISABLED') {
+      errors.push({
+        path: `useCases[${i}].toolsPolicy`,
+        message: `Use case "${uc.use_case_id}" allows tools for kid profile`
+      });
+    }
+  });
+  
+  // Validate: Routing rules reference valid providers
+  const validProviders = ['openai', 'anthropic', 'google', 'bedrock'];
+  routingRules.forEach((rule, i) => {
+    if (!validProviders.includes(rule.primary_provider)) {
+      errors.push({
+        path: `routingRules[${i}].primaryProvider`,
+        message: `Invalid provider: ${rule.primary_provider}`
+      });
+    }
+  });
+  
+  // Warning: No budget set
+  if (!budgets.some(b => b.budget_type === 'tenant')) {
+    warnings.push({
+      path: 'budgets',
+      message: 'No tenant budget configured'
+    });
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+```
+
+---
+
+## 16. Existing Code References
+
+| Existing File | Pattern to Follow |
+|--------------|-------------------|
+| `platform-studio/src/app/studio/theme/page.tsx` | Form layout pattern |
+| `platform-studio/src/app/studio/navigation/page.tsx` | List + edit pattern |
+| `platform-studio/src/services/configService.ts` | Service pattern |
+| `platform-studio/src/stores/configStore.ts` | State management |
+| `platform-studio/src/components/builder/WidgetPropertiesPanel.tsx` | Form fields |
+
+---
+
+## 17. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete SQL schemas
+- `Doc/PLATFORM_STUDIO_OVERVIEW.md` - Existing Studio architecture
+- `platform-studio/README.md` - Studio setup guide

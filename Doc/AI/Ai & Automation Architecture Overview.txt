@@ -200,3 +200,89 @@ POST /integrations/meetings/create
 ---
 
 This document is intentionally **additive** and aligns with existing Clazro architecture and documentation standards.
+
+
+---
+
+## 13. Integration with Existing System
+
+### 13.1 Existing Tables to Reference
+
+| Table | Integration Point |
+|-------|------------------|
+| `customers` | `customer_id` for tenant isolation |
+| `user_profiles` | User identity, role, age for audience profile |
+| `permissions` | Extend with AI permission codes |
+| `role_permissions` | Map AI permissions to roles |
+| `analytics_events` | Track AI usage events |
+
+### 13.2 Existing Code Patterns
+
+| Pattern | File | How AI Extends |
+|---------|------|----------------|
+| Config Service | `src/services/config/configService.ts` | Add `fetchAIConfig()` |
+| Permission Hook | `src/hooks/usePermissions.ts` | Add `useAIPermission()` |
+| Widget Registry | `src/config/widgetRegistry.ts` | AI widgets already registered |
+| Supabase Client | `src/lib/supabaseClient.ts` | Reuse for AI tables |
+
+### 13.3 New AI Tables Required
+
+```
+ai_providers          - Provider configuration (OpenAI, Claude, etc.)
+ai_models             - Model registry with capabilities
+ai_use_cases          - Feature enablement per customer
+ai_routing_rules      - Model selection rules
+ai_prompts            - Prompt templates
+ai_audience_profiles  - Kid/Teen/Adult/Coaching rules
+ai_budgets            - Cost controls
+ai_kill_switches      - Emergency disable flags
+ai_audit_logs         - Execution logging
+```
+
+See `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` for complete SQL schemas.
+
+---
+
+## 14. Environment Variables
+
+```bash
+# Provider Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Gateway Config
+AI_GATEWAY_URL=https://api.yourapp.com/ai
+AI_DEFAULT_PROVIDER=openai
+AI_DEFAULT_MODEL=gpt-4o-mini
+AI_REQUEST_TIMEOUT_MS=30000
+
+# Budget Defaults
+AI_DEFAULT_DAILY_BUDGET_USD=10.00
+AI_RATE_LIMIT_PER_MINUTE=60
+```
+
+---
+
+## 15. Quick Start Implementation Checklist
+
+```
+□ Step 1: Run AI table migrations (see AI_IMPLEMENTATION_APPENDIX.md)
+□ Step 2: Add AI permissions to permissions table
+□ Step 3: Create src/types/ai.types.ts
+□ Step 4: Create src/services/ai/aiConfigService.ts
+□ Step 5: Create src/hooks/useAIPermission.ts
+□ Step 6: Implement AI Gateway backend service
+□ Step 7: Add AI config pages to Platform Studio
+□ Step 8: Update AI widgets to use new service
+□ Step 9: Set up observability dashboards
+□ Step 10: Test with demo customer
+```
+
+---
+
+## 16. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - SQL schemas, TypeScript types, API specs
+- `Doc/DB_SCHEMA_REFERENCE.md` - Existing database schema
+- `Doc/ARCHITECTURE_OVERVIEW.md` - Platform architecture
+- `Doc/API_CONTRACTS.md` - Existing API patterns

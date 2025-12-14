@@ -11,6 +11,7 @@ export type WidgetCategory =
   | "progress"
   | "social"
   | "ai"
+  | "automation"
   | "profile"
   | "notifications"
   | "actions"

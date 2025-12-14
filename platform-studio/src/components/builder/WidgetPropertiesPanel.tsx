@@ -23,6 +23,30 @@ const LAYOUT_STYLE_WIDGETS = [
   "profile.stats",
   "profile.achievements",
   "profile.activity",
+  // Parent widgets
+  "parent.children-overview",
+  "parent.attendance-summary",
+  "parent.fee-alerts",
+  "parent.notifications-preview",
+  "parent.ai-insights-preview",
+  "parent.quick-actions",
+  "parent.child-progress",
+  "parent.child-stats",
+  "parent.weak-areas",
+  "parent.performance-chart",
+  "parent.assignments-pending",
+  "parent.subject-progress",
+  "parent.report-card-preview",
+  "parent.messages-inbox",
+  "parent.announcements",
+  "parent.teacher-contacts",
+  "parent.fee-summary",
+  "parent.pending-fees",
+  "parent.payment-history",
+  "parent.ai-predictions",
+  "parent.ai-recommendations",
+  "parent.ai-alerts",
+  "parent.comparison-analytics",
 ];
 
 // Widget-specific layout options
@@ -32,6 +56,30 @@ const WIDGET_LAYOUT_OPTIONS: Record<string, string[]> = {
   "profile.stats": ["grid", "list", "cards"],
   "profile.achievements": ["grid", "list", "cards"],
   "profile.activity": ["timeline", "list", "cards"],
+  // Parent widgets
+  "parent.children-overview": ["cards", "list", "grid"],
+  "parent.attendance-summary": ["cards", "list", "compact"],
+  "parent.fee-alerts": ["list", "cards", "compact"],
+  "parent.notifications-preview": ["list", "cards", "compact"],
+  "parent.ai-insights-preview": ["list", "cards", "compact"],
+  "parent.quick-actions": ["grid", "list"],
+  "parent.child-progress": ["list", "cards", "compact"],
+  "parent.child-stats": ["grid", "list", "cards"],
+  "parent.weak-areas": ["list", "cards", "compact"],
+  "parent.performance-chart": ["stacked", "tabs", "compact"],
+  "parent.assignments-pending": ["list", "cards", "compact"],
+  "parent.subject-progress": ["list", "cards", "compact"],
+  "parent.report-card-preview": ["list", "cards", "compact"],
+  "parent.messages-inbox": ["list", "cards", "compact"],
+  "parent.announcements": ["list", "cards", "compact"],
+  "parent.teacher-contacts": ["list", "cards", "compact"],
+  "parent.fee-summary": ["list", "cards", "compact"],
+  "parent.pending-fees": ["list", "cards", "compact"],
+  "parent.payment-history": ["list", "cards", "compact"],
+  "parent.ai-predictions": ["list", "cards", "compact"],
+  "parent.ai-recommendations": ["list", "cards", "compact"],
+  "parent.ai-alerts": ["list", "cards", "compact"],
+  "parent.comparison-analytics": ["list", "cards", "compact"],
   // Default for other widgets
   default: ["list", "cards", "grid", "timeline"],
 };
@@ -72,7 +120,7 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
         ],
       },
       {
-        title: "Stats Section",
+        title: "Student Stats",
         icon: "📊",
         fields: [
           { key: "showStats", label: "Show Quick Stats", type: "boolean", default: true },
@@ -81,6 +129,24 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
           { key: "showStudyTime", label: "Show Study Time", type: "boolean", default: true },
           { key: "showScore", label: "Show Score", type: "boolean", default: true },
           { key: "showXP", label: "Show XP Points", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Parent Stats",
+        icon: "👨‍👩‍👧",
+        fields: [
+          { key: "showChildrenCount", label: "Show Children Count", type: "boolean", default: true },
+          { key: "showPendingFees", label: "Show Pending Fees", type: "boolean", default: true },
+          { key: "showUnreadMessages", label: "Show Unread Messages", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Teacher Stats",
+        icon: "👨‍🏫",
+        fields: [
+          { key: "showClassCount", label: "Show Class Count", type: "boolean", default: true },
+          { key: "showStudentCount", label: "Show Student Count", type: "boolean", default: true },
+          { key: "showPendingTasks", label: "Show Pending Tasks", type: "boolean", default: true },
         ],
       },
     ],
@@ -683,6 +749,793 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
         icon: "🔄",
         fields: [
           { key: "sortBy", label: "Sort By", type: "select", options: ["score", "attempts", "recent"], default: "score" },
+        ],
+      },
+    ],
+  },
+  // ============ PARENT WIDGETS ============
+  "parent.children-overview": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["cards", "list", "grid"], default: "cards" },
+        ],
+      },
+      {
+        title: "Child Info",
+        icon: "👤",
+        fields: [
+          { key: "showAvatar", label: "Show Avatar", type: "boolean", default: true },
+          { key: "showClass", label: "Show Class/Section", type: "boolean", default: true },
+          { key: "showAttendanceToday", label: "Show Today's Attendance", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Quick Stats",
+        icon: "📊",
+        fields: [
+          { key: "showQuickStats", label: "Show Quick Stats", type: "boolean", default: true },
+          { key: "showAttendanceStat", label: "Show Attendance %", type: "boolean", default: true },
+          { key: "showAssignmentsStat", label: "Show Pending Assignments", type: "boolean", default: true },
+          { key: "showStreakStat", label: "Show Streak", type: "boolean", default: true },
+          { key: "showTestsStat", label: "Show Upcoming Tests", type: "boolean", default: false },
+          { key: "showXPStat", label: "Show XP", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All Button", type: "boolean", default: false },
+        ],
+      },
+    ],
+  },
+  "parent.attendance-summary": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["cards", "list", "compact"], default: "cards" },
+        ],
+      },
+      {
+        title: "Today's Status",
+        icon: "📅",
+        fields: [
+          { key: "showTodayStatus", label: "Show Today's Status Badge", type: "boolean", default: true },
+          { key: "showCheckInTime", label: "Show Check-in Time", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Weekly Summary",
+        icon: "📊",
+        fields: [
+          { key: "showWeekSummary", label: "Show This Week Stats", type: "boolean", default: true },
+          { key: "showRecentDays", label: "Show Recent Days Indicator", type: "boolean", default: false },
+          { key: "maxRecentDays", label: "Days to Show", type: "number", min: 3, max: 7, default: 5 },
+        ],
+      },
+      {
+        title: "Monthly Stats",
+        icon: "📈",
+        fields: [
+          { key: "showMonthStats", label: "Show This Month Stats", type: "boolean", default: true },
+          { key: "showPercentage", label: "Show Attendance Percentage", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All Button", type: "boolean", default: false },
+        ],
+      },
+    ],
+  },
+  "parent.fee-alerts": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 5 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "💰",
+        fields: [
+          { key: "showTotalSummary", label: "Show Total Summary Banner", type: "boolean", default: true },
+          { key: "showOverdueFirst", label: "Show Overdue First", type: "boolean", default: true },
+          { key: "showAmount", label: "Show Amount", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+          { key: "showFeeType", label: "Show Fee Type Icon", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showPayButton", label: "Show Pay Now Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.notifications-preview": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 5 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🔔",
+        fields: [
+          { key: "showUnreadBadge", label: "Show Unread Badge", type: "boolean", default: true },
+          { key: "showUnreadFirst", label: "Show Unread First", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Category Badge", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time Ago", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Indicator", type: "boolean", default: true },
+          { key: "showPreview", label: "Show Message Preview", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.ai-insights-preview": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 4 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🧠",
+        fields: [
+          { key: "showHighPriorityFirst", label: "Show High Priority First", type: "boolean", default: true },
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Insight Type Badge", type: "boolean", default: true },
+          { key: "showUnreadBadge", label: "Show Unread Indicator", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showActionButton", label: "Show Action Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.quick-actions": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "columns", label: "Number of Columns", type: "select", options: ["2", "3"], default: "2" },
+          { key: "style", label: "Button Style", type: "select", options: ["filled", "outlined", "minimal"], default: "filled" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "⚡",
+        fields: [
+          { key: "maxActions", label: "Max Actions to Show", type: "number", min: 2, max: 8, default: 6 },
+          { key: "showLabels", label: "Show Labels", type: "boolean", default: true },
+          { key: "iconSize", label: "Icon Size", type: "select", options: ["small", "medium", "large"], default: "medium" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "🎯",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.child-progress": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxSubjects", label: "Max Subjects to Show", type: "number", min: 2, max: 8, default: 4 },
+        ],
+      },
+      {
+        title: "Summary",
+        icon: "📊",
+        fields: [
+          { key: "showOverallProgress", label: "Show Overall Progress", type: "boolean", default: true },
+          { key: "showHoursStudied", label: "Show Hours Studied", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Subject Details",
+        icon: "📚",
+        fields: [
+          { key: "showProgressBar", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showTestStats", label: "Show Test Stats", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View Details", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.child-stats": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["grid", "list", "cards"], default: "grid" },
+          { key: "columns", label: "Columns (Grid)", type: "select", options: ["2", "3"], default: "2" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Stats to Show",
+        icon: "📊",
+        fields: [
+          { key: "showXP", label: "Show XP Points", type: "boolean", default: true },
+          { key: "showStreak", label: "Show Streak", type: "boolean", default: true },
+          { key: "showBadges", label: "Show Badges", type: "boolean", default: true },
+          { key: "showStudyTime", label: "Show Study Time", type: "boolean", default: true },
+          { key: "showTests", label: "Show Tests Passed", type: "boolean", default: true },
+          { key: "showAssignments", label: "Show Assignments", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "showTrends", label: "Show Trend Indicators", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.weak-areas": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxTopics", label: "Max Topics to Show", type: "number", min: 1, max: 10, default: 4 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Topic Details",
+        icon: "📊",
+        fields: [
+          { key: "showScore", label: "Show Mastery Score", type: "boolean", default: true },
+          { key: "showDifficulty", label: "Show Difficulty Badge", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject Name", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showPracticeButton", label: "Show Practice Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.performance-chart": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["stacked", "tabs", "compact"], default: "stacked" },
+          { key: "chartType", label: "Chart Type", type: "select", options: ["bar", "progress", "both"], default: "bar" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Score Summary",
+        icon: "🎯",
+        fields: [
+          { key: "showAverageScore", label: "Show Average Score", type: "boolean", default: true },
+          { key: "showBestScore", label: "Show Best Score", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Subject Scores",
+        icon: "📊",
+        fields: [
+          { key: "showSubjectScores", label: "Show Subject Scores", type: "boolean", default: true },
+          { key: "maxSubjects", label: "Max Subjects to Show", type: "number", min: 1, max: 10, default: 5 },
+        ],
+      },
+      {
+        title: "Weekly Progress",
+        icon: "📈",
+        fields: [
+          { key: "showWeeklyProgress", label: "Show Weekly XP Progress", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.assignments-pending": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Assignment Details",
+        icon: "📋",
+        fields: [
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+          { key: "showPoints", label: "Show Points/Marks", type: "boolean", default: true },
+          { key: "showType", label: "Show Assignment Type", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Alerts",
+        icon: "⚠️",
+        fields: [
+          { key: "showOverdueBadge", label: "Show Overdue Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.subject-progress": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxSubjects", label: "Max Subjects to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Summary",
+        icon: "📊",
+        fields: [
+          { key: "showOverallProgress", label: "Show Overall Progress", type: "boolean", default: true },
+          { key: "showStudyHours", label: "Show Study Hours", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Subject Details",
+        icon: "📚",
+        fields: [
+          { key: "showProgressBar", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showScore", label: "Show Score Percentage", type: "boolean", default: true },
+          { key: "showChapters", label: "Show Chapters Stats", type: "boolean", default: true },
+          { key: "showTests", label: "Show Test Stats", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.report-card-preview": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxSubjects", label: "Max Subjects to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Grade Summary",
+        icon: "🎓",
+        fields: [
+          { key: "showOverallGrade", label: "Show Overall Grade", type: "boolean", default: true },
+          { key: "showAverageScore", label: "Show Average Score", type: "boolean", default: true },
+          { key: "showBestScore", label: "Show Best Score", type: "boolean", default: true },
+          { key: "showPassRate", label: "Show Pass Rate", type: "boolean", default: true },
+          { key: "showTerm", label: "Show Term Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Subject Grades",
+        icon: "📚",
+        fields: [
+          { key: "showSubjectGrades", label: "Show Subject Grades", type: "boolean", default: true },
+          { key: "showGradePoints", label: "Show Grade Points", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.messages-inbox": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Messages to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "📧",
+        fields: [
+          { key: "showUnreadBadge", label: "Show Unread Badge", type: "boolean", default: true },
+          { key: "showUnreadFirst", label: "Show Unread First", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Category Badge", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showPreview", label: "Show Message Preview", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.announcements": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Announcements to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "📢",
+        fields: [
+          { key: "showPinnedFirst", label: "Show Pinned First", type: "boolean", default: true },
+          { key: "showPinnedBadge", label: "Show Pinned Badge", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Category Badge", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showPreview", label: "Show Content Preview", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.teacher-contacts": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Teachers to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "👨‍🏫",
+        fields: [
+          { key: "showClassTeacherFirst", label: "Show Class Teacher First", type: "boolean", default: true },
+          { key: "showAvailability", label: "Show Availability Status", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+          { key: "showOfficeHours", label: "Show Office Hours", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Contact Options",
+        icon: "📞",
+        fields: [
+          { key: "showContactButtons", label: "Show Contact Buttons", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.fee-summary": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Fees to Show", type: "number", min: 1, max: 10, default: 5 },
+        ],
+      },
+      {
+        title: "Summary",
+        icon: "💰",
+        fields: [
+          { key: "showTotalSummary", label: "Show Total Summary", type: "boolean", default: true },
+          { key: "showOverdueFirst", label: "Show Overdue First", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Fee Details",
+        icon: "📋",
+        fields: [
+          { key: "showFeeType", label: "Show Fee Type Icon", type: "boolean", default: true },
+          { key: "showAmount", label: "Show Amount", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+          { key: "showProgressBar", label: "Show Progress Bar (Partial)", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showPayButton", label: "Show Pay Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.pending-fees": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Fees to Show", type: "number", min: 1, max: 10, default: 4 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "💰",
+        fields: [
+          { key: "showOverdueCount", label: "Show Overdue Alert Banner", type: "boolean", default: true },
+          { key: "showFeeType", label: "Show Fee Type Icon", type: "boolean", default: true },
+          { key: "showAmount", label: "Show Amount", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showPayButton", label: "Show Pay Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.payment-history": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Payments to Show", type: "number", min: 1, max: 10, default: 5 },
+        ],
+      },
+      {
+        title: "Summary",
+        icon: "📊",
+        fields: [
+          { key: "showTotalSummary", label: "Show Total Summary Header", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Payment Details",
+        icon: "💳",
+        fields: [
+          { key: "showAmount", label: "Show Amount", type: "boolean", default: true },
+          { key: "showPaymentMethod", label: "Show Payment Method", type: "boolean", default: true },
+          { key: "showReceiptNumber", label: "Show Receipt Number", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.ai-predictions": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Predictions to Show", type: "number", min: 1, max: 10, default: 4 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🧠",
+        fields: [
+          { key: "showConfidence", label: "Show Confidence Score", type: "boolean", default: true },
+          { key: "showRecommendation", label: "Show Recommendation", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showUnreadFirst", label: "Show Unread First", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.ai-recommendations": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Recommendations to Show", type: "number", min: 1, max: 10, default: 4 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "💡",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showActionButton", label: "Show Action Button", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showRelevance", label: "Show Relevance Score", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.ai-alerts": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Alerts to Show", type: "number", min: 1, max: 10, default: 4 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🚨",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showActionRequired", label: "Show Action Required", type: "boolean", default: true },
+          { key: "showSeverity", label: "Show Severity Badge", type: "boolean", default: true },
+          { key: "showCriticalFirst", label: "Show Critical First", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "parent.comparison-analytics": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "maxItems", label: "Max Metrics to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "comparisonType", label: "Comparison Type", type: "select", options: ["class_average", "grade_level", "historical"], default: "class_average" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "showInsights", label: "Show Insights", type: "boolean", default: true },
+          { key: "showTrend", label: "Show Trend Indicator", type: "boolean", default: true },
+          { key: "showPercentile", label: "Show Percentile/Rank", type: "boolean", default: true },
+          { key: "showComparisonBar", label: "Show Comparison Bar", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
         ],
       },
     ],

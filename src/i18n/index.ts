@@ -8,6 +8,7 @@ import enDoubts from "../locales/en/doubts.json";
 import enProgress from "../locales/en/progress.json";
 import enProfile from "../locales/en/profile.json";
 import enSettings from "../locales/en/settings.json";
+import enParent from "../locales/en/parent.json";
 import hiCommon from "../locales/hi/common.json";
 import hiDashboard from "../locales/hi/dashboard.json";
 import hiAdmin from "../locales/hi/admin.json";
@@ -16,6 +17,7 @@ import hiDoubts from "../locales/hi/doubts.json";
 import hiProgress from "../locales/hi/progress.json";
 import hiProfile from "../locales/hi/profile.json";
 import hiSettings from "../locales/hi/settings.json";
+import hiParent from "../locales/hi/parent.json";
 import { loadPersistedLanguageWithSource } from "./persistLanguage";
 
 const resources = {
@@ -28,6 +30,7 @@ const resources = {
     progress: enProgress,
     profile: enProfile,
     settings: enSettings,
+    parent: enParent,
   },
   hi: {
     common: hiCommon,
@@ -38,6 +41,7 @@ const resources = {
     progress: hiProgress,
     profile: hiProfile,
     settings: hiSettings,
+    parent: hiParent,
   },
 };
 
@@ -48,7 +52,7 @@ i18n.use(initReactI18next).init({
   resources,
   lng: "en", // Default to English initially
   fallbackLng: "en",
-  ns: ["common", "dashboard", "admin", "study", "doubts", "progress", "profile", "settings"],
+  ns: ["common", "dashboard", "admin", "study", "doubts", "progress", "profile", "settings", "parent"],
   defaultNS: "common",
   interpolation: { escapeValue: false },
 });

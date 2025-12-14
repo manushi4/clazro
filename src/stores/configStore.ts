@@ -17,6 +17,7 @@ type ConfigActions = {
   setCustomer: (customerId: string | null) => void;
   resetToDefault: () => void;
   resetToSafeMode: () => void;
+  resetForRoleChange: () => void;
 };
 
 export const useConfigStore = create<ConfigState & ConfigActions>((set) => ({
@@ -54,5 +55,12 @@ export const useConfigStore = create<ConfigState & ConfigActions>((set) => ({
       isInitialized: true,
       isLoading: false,
       error: "Safe mode active",
+    }),
+
+  resetForRoleChange: () =>
+    set({
+      isInitialized: false,
+      isLoading: true,
+      error: null,
     }),
 }));

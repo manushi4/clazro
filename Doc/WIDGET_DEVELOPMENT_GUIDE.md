@@ -2124,6 +2124,367 @@ const styles = StyleSheet.create({
 
 ---
 
+## Common Issues & Solutions (Lessons Learned)
+
+This section documents real issues encountered during widget development and their solutions. Reference this when debugging widget problems.
+
+### Issue 1: Widget Shows Translation Keys Instead of Text
+
+**Symptom:** Widget displays `widget.children.title` instead of "My Children"
+
+**Cause:** The i18n namespace for the widget's translations is not registered.
+
+**Solution:**
+1. Create translation files in `src/locales/en/{namespace}.json` and `src/locales/hi/{namespace}.json`
+2. Register the namespace in `src/i18n/index.ts`:
+
+```typescript
+// Import the translation files
+import enParent from '../locales/en/parent.json';
+import hiParent from '../locales/hi/parent.json';
+
+// Add to resources
+const resources = {
+  en: {
+    // ... existing namespaces
+    parent: enParent,  // Add new namespace
+  },
+  hi: {
+    // ... existing namespaces
+    parent: hiParent,  // Add new namespace
+  },
+};
+
+// Add to ns array
+ns: ['common', 'dashboard', 'parent'],  // Include new namespace
+```
+
+3. Use the correct namespace in your widget:
+```typescript
+const { t } = useTranslation('parent');  // Use your namespace
+```
+
+---
+
+### Issue 2: Widget Not Showing for Non-Student Roles (Parent/Teacher)
+
+**Symptom:** Widget works for student role but shows wrong content or doesn't appear for parent/teacher roles.
+
+**Cause:** Multiple potential issues:
+1. `role` prop not passed to `DynamicScreen`
+2. Screen ID not registered in `routeRegistry.ts`
+3. Fallback layouts being used for non-student roles
+
+**Solution:**
+
+**Step 1:** Ensure `role` prop is passed in `DynamicTabNavigator.tsx`:
+```typescript
+<DynamicScreen
+  screenId={tab.rootScreenId}
+  role={role}  // CRITICAL: Pass the role
+  tabId={tab.id}
+/>
+```
+
+**Step 2:** Register screen IDs in `src/navigation/routeRegistry.ts`:
+```typescript
+const registry: Record<string, RouteDefinition> = {
+  // Add all role-specific home screens
+  "parent-home": { screenId: "parent-home", component: DynamicScreen },
+  "teacher-home": { screenId: "teacher-home", component: DynamicScreen },
+  "child-progress-screen": { screenId: "child-progress-screen", component: DynamicScreen },
+  "schedule-screen": { screenId: "schedule-screen", component: DynamicScreen },
+};
+```
+
+**Step 3:** Disable fallback layouts for non-student roles in `src/services/config/configService.ts`:
+```typescript
+export async function fetchScreenLayout(screenId: string, role: string) {
+  // ... fetch from DB
+  
+  // Only use fallback for student role
+  if (!data && role === 'student') {
+    return getFallbackLayout(screenId);
+  }
+  
+  // For non-student roles, return empty if not configured
+  return data || { widgets: [] };
+}
+```
+
+---
+
+### Issue 3: Widget Permissions Blocking Display
+
+**Symptom:** Widget doesn't appear even though it's configured in Platform Studio.
+
+**Cause:** Widget metadata has `requiredPermissions` that the demo user doesn't have.
+
+**Solution:** For widgets that should be visible to all users of a role, set `requiredPermissions` to empty array:
+
+```typescript
+// src/config/widgetRegistry.ts
+"parent.children-overview": {
+  component: ChildrenOverviewWidget,
+  metadata: {
+    id: "parent.children-overview",
+    roles: ["parent"],
+    requiredPermissions: [],  // Empty = no permission check
+    // ...
+  },
+},
+```
+
+---
+
+### Issue 4: AsyncStorage Persisted Data Causing Stale State
+
+**Symptom:** After changing demo role, old user ID is still being used. Widget shows "No data" even though data exists in DB.
+
+**Cause:** Zustand persist middleware caches state in AsyncStorage. Hot reload doesn't clear this cache.
+
+**Solution:**
+
+**Option 1:** Change storage key to force reset (quick fix):
+```typescript
+// src/stores/demoRoleStore.ts
+export const useDemoRoleStore = create<DemoRoleState>()(
+  persist(
+    (set) => ({ /* ... */ }),
+    {
+      name: 'demo-role-storage-v2',  // Increment version to force reset
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+```
+
+**Option 2:** Clear app data:
+- Android: Settings → Apps → Your App → Clear Data
+- iOS: Delete and reinstall app
+
+**Option 3:** Add debug logging to verify IDs:
+```typescript
+if (__DEV__) {
+  console.log('[useChildrenQuery] customerId:', customerId, 'parentUserId:', parentUserId);
+}
+```
+
+---
+
+### Issue 5: Analytics Errors with Demo User IDs
+
+**Symptom:** Console shows `[Analytics] Failed to flush events: invalid input syntax for type uuid`
+
+**Cause:** Demo user IDs like `"parent-demo-001"` are not valid UUIDs, causing FK constraint errors when writing to analytics tables.
+
+**Solution:** Disable analytics DB writes in dev mode:
+
+```typescript
+// src/hooks/useAnalytics.ts
+const flushEvents = async () => {
+  // Skip DB writes in dev mode to avoid FK errors with demo user IDs
+  if (__DEV__) {
+    if (eventQueue.length > 0) {
+      console.log('[Analytics] Dev mode - skipping DB write for', eventQueue.length, 'events');
+      eventQueue.length = 0;  // Clear queue
+    }
+    return;
+  }
+  
+  // Production code...
+};
+```
+
+---
+
+### Issue 6: Empty Screens Causing Navigation Crash
+
+**Symptom:** App crashes or shows blank screen when navigating to a tab with no configured screens.
+
+**Cause:** `TabStack` expects at least one screen but `enabledScreens` array is empty.
+
+**Solution:** Create default screen from tab's `rootScreenId` when no screens configured:
+
+```typescript
+// src/navigation/TabStack.tsx
+const TabStack: React.FC<TabStackProps> = ({ tab, role }) => {
+  const { enabledScreens } = useScreenConfig(tab.id, role);
+  
+  // If no screens configured, create default from tab's rootScreenId
+  const screens = enabledScreens.length > 0 
+    ? enabledScreens 
+    : [{ screenId: tab.rootScreenId, component: DynamicScreen }];
+  
+  return (
+    <Stack.Navigator>
+      {screens.map(screen => (
+        <Stack.Screen key={screen.screenId} name={screen.screenId} component={screen.component} />
+      ))}
+    </Stack.Navigator>
+  );
+};
+```
+
+---
+
+### Issue 7: Parent Home Showing Student Settings Content
+
+**Symptom:** Parent home tab shows student settings page content instead of parent-specific widgets.
+
+**Cause:** Fallback layout system returns student layouts for all roles when role-specific layout not found.
+
+**Solution:** Modify `configService.ts` to only use fallbacks for student role:
+
+```typescript
+// src/services/config/configService.ts
+export async function fetchScreenLayout(screenId: string, role: string): Promise<ScreenLayout | null> {
+  const { data, error } = await supabase
+    .from('screen_layouts')
+    .select('*')
+    .eq('screen_id', screenId)
+    .eq('role', role);
+    
+  if (error) throw error;
+  
+  // Only use fallback for student role
+  // For parent/teacher/admin, show empty if not configured in Platform Studio
+  if (!data || data.length === 0) {
+    if (role === 'student') {
+      return getFallbackLayout(screenId);
+    }
+    return { widgets: [] };  // Empty layout for non-student roles
+  }
+  
+  return transformToScreenLayout(data);
+}
+```
+
+---
+
+### Issue 8: Widget Query Not Finding Database Data
+
+**Symptom:** Widget shows empty state even though data exists in database.
+
+**Cause:** Query is using wrong user ID or customer ID.
+
+**Debug Steps:**
+1. Add debug logging to your query hook:
+```typescript
+if (__DEV__) {
+  console.log('[useChildrenQuery] customerId:', customerId, 'parentUserId:', parentUserId);
+  console.log('[useChildrenQuery] data:', data, 'error:', error);
+}
+```
+
+2. Verify the IDs match what's in the database:
+```sql
+-- Check parent_children table
+SELECT * FROM parent_children 
+WHERE customer_id = 'your-customer-id' 
+AND parent_user_id = 'your-parent-user-id';
+```
+
+3. Ensure demo user IDs in `demoRoleStore.ts` match database records:
+```typescript
+const DEMO_USER_IDS: Record<Role, string> = {
+  student: '96055c84-a9ee-496d-8360-6b7cea64b928',
+  parent: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',  // Must match DB
+  teacher: 'b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e',
+  admin: 'c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f',
+};
+```
+
+---
+
+### Issue 9: Role Switching Not Updating UI
+
+**Symptom:** After switching role in DevRoleSwitcher, UI still shows old role's content.
+
+**Cause:** Config store and query cache not being reset on role change.
+
+**Solution:** Add reset action to config store and call it on role change:
+
+```typescript
+// src/stores/configStore.ts
+export const useConfigStore = create<ConfigState>((set) => ({
+  // ... existing state
+  
+  resetForRoleChange: () => set({
+    tabs: [],
+    screens: {},
+    widgets: {},
+    isLoading: true,
+  }),
+}));
+
+// src/components/dev/DevRoleSwitcher.tsx
+const handleRoleChange = async (newRole: Role) => {
+  // 1. Reset config store
+  useConfigStore.getState().resetForRoleChange();
+  
+  // 2. Set new role (this updates userId too)
+  setRole(newRole);
+  
+  // 3. Invalidate all queries to refetch with new role
+  queryClient.invalidateQueries();
+};
+```
+
+---
+
+### Issue 10: DynamicTabNavigator Shows Loading Forever
+
+**Symptom:** Tab navigator shows loading spinner indefinitely after role switch.
+
+**Cause:** `tabs` array is empty during role transition, causing infinite loading state.
+
+**Solution:** Add proper loading state handling:
+
+```typescript
+// src/navigation/DynamicTabNavigator.tsx
+const DynamicTabNavigator: React.FC = () => {
+  const { tabs, isLoading } = useConfigStore();
+  
+  // Show loading while fetching config
+  if (isLoading) {
+    return <LoadingScreen message="Loading navigation..." />;
+  }
+  
+  // Show empty state if no tabs configured (shouldn't happen in production)
+  if (!tabs || tabs.length === 0) {
+    return <LoadingScreen message="Configuring tabs..." />;
+  }
+  
+  return (
+    <Tab.Navigator>
+      {tabs.map(tab => (
+        <Tab.Screen key={tab.id} name={tab.id} /* ... */ />
+      ))}
+    </Tab.Navigator>
+  );
+};
+```
+
+---
+
+### Quick Debugging Checklist
+
+When a widget isn't working, check these in order:
+
+1. **Widget ID consistency** - Same ID in registry, Platform Studio, and database?
+2. **i18n namespace** - Registered in `src/i18n/index.ts`?
+3. **Role prop** - Passed to `DynamicScreen`?
+4. **Screen ID** - Registered in `routeRegistry.ts`?
+5. **Permissions** - `requiredPermissions` blocking display?
+6. **User IDs** - Demo user IDs match database records?
+7. **Query enabled** - Query has `enabled: !!customerId && !!userId`?
+8. **Console logs** - Add `__DEV__` logging to trace data flow
+9. **Cache** - Try incrementing storage key version or clearing app data
+10. **Fallback layouts** - Non-student roles getting student fallbacks?
+
+---
+
 ## Widget Development Checklist
 
 Use this checklist to ensure your widget is production-ready:

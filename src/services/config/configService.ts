@@ -211,11 +211,13 @@ export async function fetchScreenLayout(
     visibilityRules: row.visibility_rules || [],
   }));
 
-  // Return database layouts if available, otherwise use fallback
-  if (layouts.length > 0) {
+  // Return database layouts if available
+  // For parent/teacher/admin roles, don't use fallback - show empty if not configured
+  if (layouts.length > 0 || role !== "student") {
     return layouts;
   }
 
+  // Only use fallback for student role (backward compatibility)
   return getFallbackLayout(screenId);
 }
 

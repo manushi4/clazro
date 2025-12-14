@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEnabledTabs, useTabScreens, useFeatures } from "../hooks/config";
@@ -16,7 +16,12 @@ import { DynamicScreen } from "./DynamicScreen";
 import { BrandedHeader } from "../components/branding/BrandedHeader";
 import { SettingsScreen, LanguageSelectionScreen } from "../screens/settings";
 import { EditProfileScreen, HelpFeedbackScreen } from "../screens/profile";
-import { GlobalAnalyticsScreen, SubjectAnalyticsScreen } from "../screens/progress";
+import { GlobalAnalyticsScreen, SubjectAnalyticsScreen, SubjectProgressScreen, SubjectPerformanceScreen, SubjectDetailScreen, SubjectReportScreen } from "../screens/progress";
+import { NotificationDetailScreen } from "../screens/notifications";
+import { AnnouncementDetailScreen } from "../screens/announcements";
+import { FeeDetailScreen, FeePaymentScreen, PaymentDetailScreen } from "../screens/fees";
+import { ChildStatsScreen, ChildWeakAreaScreen, AssignmentDetailScreen, TeacherDetailScreen, AiInsightDetailScreen, PredictionDetailScreen, ComparisonDetailsScreen } from "../screens/parent";
+import { MessageDetailScreen, ComposeMessageScreen } from "../screens/messages";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -30,6 +35,47 @@ const COMMON_SCREENS = [
   { screenId: "notifications", component: DynamicScreen },
   { screenId: "help", component: DynamicScreen },
   { screenId: "about", component: DynamicScreen },
+  // Parent screens (accessible via widget navigation)
+  { screenId: "children-overview", component: DynamicScreen },
+  { screenId: "child-detail", component: DynamicScreen },
+  { screenId: "attendance-overview", component: DynamicScreen },
+  { screenId: "child-attendance", component: DynamicScreen },
+  { screenId: "child-progress-detail", component: DynamicScreen },
+  { screenId: "performance-detail", component: DynamicScreen },
+  { screenId: "child-subjects", component: DynamicScreen },
+  { screenId: "child-report-card", component: DynamicScreen },
+  { screenId: "announcements", component: DynamicScreen },
+  { screenId: "fees-overview", component: DynamicScreen },
+  { screenId: "payment-history", component: DynamicScreen },
+  // Fixed screens (accessible via widget navigation)
+  { screenId: "notification-detail", component: NotificationDetailScreen },
+  { screenId: "announcement-detail", component: AnnouncementDetailScreen },
+  { screenId: "fee-detail", component: FeeDetailScreen },
+  { screenId: "fee-payment", component: FeePaymentScreen },
+  { screenId: "payment-detail", component: PaymentDetailScreen },
+  { screenId: "subject-progress", component: SubjectProgressScreen },
+  { screenId: "subject-performance", component: SubjectPerformanceScreen },
+  { screenId: "subject-detail", component: SubjectDetailScreen },
+  { screenId: "subject-report", component: SubjectReportScreen },
+  { screenId: "child-stats-detail", component: DynamicScreen },
+  { screenId: "child-stats", component: ChildStatsScreen },
+  { screenId: "child-weak-areas-detail", component: DynamicScreen },
+  { screenId: "child-weak-area", component: ChildWeakAreaScreen },
+  { screenId: "child-assignments", component: DynamicScreen },
+  { screenId: "assignment-detail", component: AssignmentDetailScreen },
+  { screenId: "messages", component: DynamicScreen },
+  { screenId: "message-detail", component: MessageDetailScreen },
+  { screenId: "compose-message", component: ComposeMessageScreen },
+  { screenId: "teacher-contacts", component: DynamicScreen },
+  { screenId: "teacher-detail", component: TeacherDetailScreen },
+  { screenId: "ai-insights", component: DynamicScreen },
+  { screenId: "ai-insight-detail", component: AiInsightDetailScreen },
+  { screenId: "ai-predictions", component: DynamicScreen },
+  { screenId: "prediction-detail", component: PredictionDetailScreen },
+  { screenId: "ai-recommendations", component: DynamicScreen },
+  { screenId: "ai-alerts", component: DynamicScreen },
+  { screenId: "comparison-analytics", component: DynamicScreen },
+  { screenId: "comparison-details", component: ComparisonDetailsScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons
@@ -175,22 +221,29 @@ const Stack = createNativeStackNavigator();
 
 const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
   const screens = useTabScreens(role, tabId);
+  const tabs = useEnabledTabs(role);
   const { has } = usePermissions(role);
   const features = useFeatures();
   const enabledFeatureIds = new Set(features.filter((f) => f.enabled).map((f) => f.featureId));
   const { trackNavigation } = useAnalytics();
 
-  const enabledScreens = useMemo(
-    () =>
-      screens.filter((s) => {
-        // Skip feature check for now - screens should always render
-        // TODO: Re-enable strict feature checking in production
-        // if (s.featureId && !enabledFeatureIds.has(s.featureId)) return false;
-        if (s.requiredPermissions && s.requiredPermissions.some((code) => !has(code))) return false;
-        return true;
-      }),
-    [screens, has]
-  );
+  // Get the root screen for this tab from tabs config
+  const currentTab = tabs.find((t) => t.tabId === tabId);
+  const rootScreenId = currentTab?.initialRoute;
+
+  const enabledScreens = useMemo(() => {
+    const filtered = screens.filter((s) => {
+      if (s.requiredPermissions && s.requiredPermissions.some((code) => !has(code))) return false;
+      return true;
+    });
+    
+    // If no screens from config, create a default screen using the tab's root screen
+    if (filtered.length === 0 && rootScreenId) {
+      return [{ screenId: rootScreenId, tabId, orderIndex: 0, enabled: true }];
+    }
+    
+    return filtered;
+  }, [screens, has, rootScreenId, tabId]);
 
   return (
     <StackErrorBoundaryWrapper scope={`stack:${tabId}`}>
@@ -211,6 +264,7 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
                   return (
                     <Component
                       screenId={screenIdToUse}
+                      role={role}
                       onFocused={() => trackNavigation(screen.screenId, { tabId })}
                     />
                   );
@@ -230,6 +284,7 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
               <ScreenErrorBoundaryWrapper screenId={screen.screenId}>
                 <screen.component
                   screenId={screen.screenId}
+                  role={role}
                   navigation={navigation}
                   onFocused={() => trackNavigation(screen.screenId, { tabId })}
                 />
@@ -273,6 +328,18 @@ export const DynamicTabNavigator: React.FC<DynamicTabNavigatorProps> = ({ role }
   ];
 
   const tabsToRender = useStaticNav ? staticTabs : enabledTabs;
+
+  // Show loading state while tabs are being fetched
+  if (tabsToRender.length === 0) {
+    return (
+      <View style={[styles.container, styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <BrandedHeader />
+        <View style={styles.loadingContent}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -327,5 +394,13 @@ export const DynamicTabNavigator: React.FC<DynamicTabNavigatorProps> = ({ role }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+  },
+  loadingContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

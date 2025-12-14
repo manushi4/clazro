@@ -3,11 +3,35 @@
                     "heroCard":  {
                                      "title":  "स्वागत",
                                      "subtitle":  "आज कुछ नया सीखने के लिए तैयार हैं?",
+                                     "greetings": {
+                                         "morning": "सुप्रभात",
+                                         "afternoon": "नमस्कार",
+                                         "evening": "शुभ संध्या",
+                                         "hello": "नमस्ते"
+                                     },
+                                     "defaultNames": {
+                                         "student": "छात्र",
+                                         "parent": "अभिभावक",
+                                         "teacher": "शिक्षक",
+                                         "admin": "व्यवस्थापक"
+                                     },
+                                     "subtitles": {
+                                         "student": "आज कुछ नया सीखने के लिए तैयार हैं?",
+                                         "parent": "अपने बच्चे की प्रगति से जुड़े रहें",
+                                         "teacher": "आज अपने छात्रों को प्रेरित करने के लिए तैयार हैं?",
+                                         "admin": "अपने संस्थान को कुशलता से प्रबंधित करें"
+                                     },
                                      "labels": {
                                          "streak": "दिन की लकीर",
                                          "today": "आज",
                                          "score": "स्कोर",
-                                         "xp": "XP"
+                                         "xp": "XP",
+                                         "children": "बच्चे",
+                                         "pendingFees": "बकाया",
+                                         "messages": "संदेश",
+                                         "classes": "कक्षाएं",
+                                         "students": "छात्र",
+                                         "pendingTasks": "समीक्षा करें"
                                      }
                                  },
                     "todaySchedule":  {

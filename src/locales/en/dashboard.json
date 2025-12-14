@@ -4,11 +4,35 @@
     "heroCard": {
       "title": "Welcome",
       "subtitle": "Ready to learn something new today?",
+      "greetings": {
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening",
+        "hello": "Hello"
+      },
+      "defaultNames": {
+        "student": "Student",
+        "parent": "Parent",
+        "teacher": "Teacher",
+        "admin": "Admin"
+      },
+      "subtitles": {
+        "student": "Ready to learn something new today?",
+        "parent": "Stay connected with your child's progress",
+        "teacher": "Ready to inspire your students today?",
+        "admin": "Manage your institution efficiently"
+      },
       "labels": {
         "streak": "Day Streak",
         "today": "Today",
         "score": "Score",
-        "xp": "XP"
+        "xp": "XP",
+        "children": "Children",
+        "pendingFees": "Pending",
+        "messages": "Messages",
+        "classes": "Classes",
+        "students": "Students",
+        "pendingTasks": "To Review"
       }
     },
     "todaySchedule": {

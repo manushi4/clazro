@@ -20,7 +20,9 @@ export function useCustomerConfig(customerSlug: string | null, role: Role = "stu
   const useStaticDashboard = process.env.USE_DYNAMIC_DASHBOARD === "false";
 
   useEffect(() => {
-    if (!customerSlug || isInitialized) return;
+    if (!customerSlug) return;
+    // Skip if already initialized (resetForRoleChange clears this flag)
+    if (isInitialized) return;
 
     (async () => {
       try {

@@ -54,10 +54,24 @@ const FLUSH_INTERVAL = 5000; // 5 seconds
 // Generate session ID (persists for app session)
 const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
+// Demo user IDs that should skip DB writes
+const DEMO_USER_IDS = new Set([
+  '96055c84-a9ee-496d-8360-6b7cea64b928', // student
+  'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d', // parent
+  'b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e', // teacher
+  'c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f', // admin
+]);
+
 /**
  * Flush events to Supabase
  */
 async function flushEvents() {
+  // Skip all DB writes in dev mode
+  if (__DEV__) {
+    eventQueue = [];
+    return;
+  }
+  
   if (eventQueue.length === 0) return;
   
   const eventsToSend = [...eventQueue];
@@ -71,8 +85,8 @@ async function flushEvents() {
     
     if (error) {
       console.error('[Analytics] Failed to flush events:', error);
-      // Re-queue failed events (up to a limit)
-      if (eventQueue.length < 100) {
+      // Don't re-queue in dev mode to avoid spam
+      if (!__DEV__ && eventQueue.length < 100) {
         eventQueue = [...eventsToSend, ...eventQueue];
       }
     } else if (__DEV__) {
@@ -87,6 +101,11 @@ async function flushEvents() {
  * Queue an event for batched sending
  */
 function queueEvent(event: AnalyticsEvent) {
+  // Skip all DB writes in dev mode to avoid FK constraint issues with demo users
+  if (__DEV__) {
+    return;
+  }
+
   eventQueue.push(event);
   
   // Flush immediately if batch size reached
@@ -268,13 +287,18 @@ export const useAnalytics = () => {
         console.log(`[Analytics] error:`, { errorType, errorMessage, ...properties });
       }
 
+      // Skip all DB writes in dev mode
+      if (__DEV__) {
+        return;
+      }
+
       // Errors are sent immediately, not batched
       const supabase = getSupabaseClient();
       supabase.from('analytics_events').insert([eventData]).then(({ error }) => {
         if (error) console.error('[Analytics] Failed to log error:', error);
       });
     },
-    [createEvent]
+    [createEvent, userId]
   );
 
   /**

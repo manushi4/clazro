@@ -12,35 +12,63 @@ import { addBreadcrumb } from "../../../error/errorReporting";
 const WIDGET_ID = "hero.greeting";
 
 // Get greeting based on time of day and style
-const getGreeting = (style: string, customGreeting?: string): string => {
+const getGreeting = (style: string, customGreeting?: string, t?: (key: string, options?: object) => string): string => {
   if (customGreeting) return customGreeting;
   
   const hour = new Date().getHours();
   
   if (style === "formal") {
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
+    if (hour < 12) return t?.("widgets.heroCard.greetings.morning", { defaultValue: "Good Morning" }) || "Good Morning";
+    if (hour < 17) return t?.("widgets.heroCard.greetings.afternoon", { defaultValue: "Good Afternoon" }) || "Good Afternoon";
+    return t?.("widgets.heroCard.greetings.evening", { defaultValue: "Good Evening" }) || "Good Evening";
   }
   
   if (style === "minimal") {
-    return "Hello";
+    return t?.("widgets.heroCard.greetings.hello", { defaultValue: "Hello" }) || "Hello";
   }
   
   if (style === "emoji") {
-    if (hour < 12) return "🌅 Good Morning";
-    if (hour < 17) return "☀️ Good Afternoon";
-    return "🌙 Good Evening";
+    if (hour < 12) return "🌅 " + (t?.("widgets.heroCard.greetings.morning", { defaultValue: "Good Morning" }) || "Good Morning");
+    if (hour < 17) return "☀️ " + (t?.("widgets.heroCard.greetings.afternoon", { defaultValue: "Good Afternoon" }) || "Good Afternoon");
+    return "🌙 " + (t?.("widgets.heroCard.greetings.evening", { defaultValue: "Good Evening" }) || "Good Evening");
   }
   
   // friendly (default)
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
-  return "Good Evening";
+  if (hour < 12) return t?.("widgets.heroCard.greetings.morning", { defaultValue: "Good Morning" }) || "Good Morning";
+  if (hour < 17) return t?.("widgets.heroCard.greetings.afternoon", { defaultValue: "Good Afternoon" }) || "Good Afternoon";
+  return t?.("widgets.heroCard.greetings.evening", { defaultValue: "Good Evening" }) || "Good Evening";
+};
+
+// Get role-specific default username
+const getRoleUserName = (role: string, t: (key: string, options?: object) => string): string => {
+  switch (role) {
+    case "parent":
+      return t("widgets.heroCard.defaultNames.parent", { defaultValue: "Parent" });
+    case "teacher":
+      return t("widgets.heroCard.defaultNames.teacher", { defaultValue: "Teacher" });
+    case "admin":
+      return t("widgets.heroCard.defaultNames.admin", { defaultValue: "Admin" });
+    default:
+      return t("widgets.heroCard.defaultNames.student", { defaultValue: "Student" });
+  }
+};
+
+// Get role-specific subtitle
+const getRoleSubtitle = (role: string, t: (key: string, options?: object) => string): string => {
+  switch (role) {
+    case "parent":
+      return t("widgets.heroCard.subtitles.parent", { defaultValue: "Stay connected with your child's progress" });
+    case "teacher":
+      return t("widgets.heroCard.subtitles.teacher", { defaultValue: "Ready to inspire your students today?" });
+    case "admin":
+      return t("widgets.heroCard.subtitles.admin", { defaultValue: "Manage your institution efficiently" });
+    default:
+      return t("widgets.heroCard.subtitles.student", { defaultValue: "Ready to learn something new today?" });
+  }
 };
 
 export const HeroCardWidget: React.FC<WidgetProps> = ({ 
-  role, 
+  role = "student", 
   branding, 
   userId, 
   config,
@@ -48,14 +76,16 @@ export const HeroCardWidget: React.FC<WidgetProps> = ({
   size = "standard",
 }) => {
   const { colors, borderRadius } = useAppTheme();
-  const { t } = useTranslation("dashboard");
+  // Use role-specific namespace with fallback to dashboard
+  const { t } = useTranslation(role === "parent" ? "parent" : role === "teacher" ? "teacher" : "dashboard");
+  const { t: tCommon } = useTranslation("dashboard"); // Fallback for common translations
   const renderStart = useRef(Date.now());
   const { isOnline } = useNetworkStatus();
   const { trackWidgetEvent } = useAnalytics();
 
   // Track widget render
   useEffect(() => {
-    trackWidgetEvent(WIDGET_ID, "render", { size, loadTime: Date.now() - renderStart.current });
+    trackWidgetEvent(WIDGET_ID, "render", { size, role, loadTime: Date.now() - renderStart.current });
   }, []);
 
   // Size-aware config
@@ -69,19 +99,39 @@ export const HeroCardWidget: React.FC<WidgetProps> = ({
   const customSubtitle = config?.customSubtitle as string;
   const showStats = config?.showStats !== false && size !== "compact";
   const statsLayout = (config?.statsLayout as string) || "horizontal";
-  const showStreak = config?.showStreak !== false;
-  const showStudyTime = config?.showStudyTime !== false;
-  const showScore = config?.showScore !== false;
-  const showXP = config?.showXP === true || size === "expanded";
+  
+  // Role-specific stat visibility
+  const isParent = role === "parent";
+  const isTeacher = role === "teacher";
+  
+  // Student stats (default)
+  const showStreak = !isParent && !isTeacher && config?.showStreak !== false;
+  const showStudyTime = !isParent && !isTeacher && config?.showStudyTime !== false;
+  const showScore = !isParent && !isTeacher && config?.showScore !== false;
+  const showXP = !isParent && !isTeacher && (config?.showXP === true || size === "expanded");
+  
+  // Parent stats
+  const showChildrenCount = isParent && config?.showChildrenCount !== false;
+  const showPendingFees = isParent && config?.showPendingFees !== false;
+  const showUnreadMessages = isParent && config?.showUnreadMessages !== false;
+  
+  // Teacher stats
+  const showClassCount = isTeacher && config?.showClassCount !== false;
+  const showStudentCount = isTeacher && config?.showStudentCount !== false;
+  const showPendingTasks = isTeacher && config?.showPendingTasks !== false;
 
-  const greeting = getGreeting(greetingStyle, customGreeting);
-  const userName = "Student"; // Would come from user profile
-  const subtitle = customSubtitle || t("widgets.heroCard.subtitle", { defaultValue: "Ready to learn something new today?" });
+  const greeting = getGreeting(greetingStyle, customGreeting, tCommon);
+  const userName = getRoleUserName(role, tCommon); // Role-aware default name
+  const subtitle = customSubtitle || getRoleSubtitle(role, tCommon);
 
   const avatarBorderRadius = avatarStyle === "circle" ? 28 : avatarStyle === "rounded" ? 12 : 4;
 
-  // Count visible stats
-  const visibleStats = [showStreak, showStudyTime, showScore, showXP].filter(Boolean).length;
+  // Count visible stats based on role
+  const visibleStats = isParent 
+    ? [showChildrenCount, showPendingFees, showUnreadMessages].filter(Boolean).length
+    : isTeacher
+    ? [showClassCount, showStudentCount, showPendingTasks].filter(Boolean).length
+    : [showStreak, showStudyTime, showScore, showXP].filter(Boolean).length;
 
   // Handle profile tap
   const handleProfilePress = () => {
@@ -142,69 +192,170 @@ export const HeroCardWidget: React.FC<WidgetProps> = ({
         )}
       </View>
 
-      {/* Quick stats */}
+      {/* Quick stats - Role specific */}
       {showStats && visibleStats > 0 && (
         <View style={[
           styles.statsRow, 
           { backgroundColor: colors.surfaceVariant },
           statsLayout === "grid" && styles.statsGrid
         ]}>
-          {showStreak && (
-            <TouchableOpacity 
-              style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
-              onPress={() => handleStatPress("streak")}
-            >
-              <Icon name="fire" size={18} color={colors.primary} />
-              <AppText style={[styles.statValue, { color: colors.onSurface }]}>7</AppText>
-              <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
-                {t("widgets.heroCard.labels.streak", { defaultValue: "Day Streak" })}
-              </AppText>
-            </TouchableOpacity>
+          {/* Parent Stats */}
+          {isParent && (
+            <>
+              {showChildrenCount && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("children")}
+                >
+                  <Icon name="account-child" size={18} color={colors.primary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>2</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.children", { defaultValue: "Children" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showChildrenCount && showPendingFees && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showPendingFees && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("fees")}
+                >
+                  <Icon name="currency-inr" size={18} color={colors.warning} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>₹0</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.pendingFees", { defaultValue: "Pending" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showPendingFees && showUnreadMessages && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showUnreadMessages && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("messages")}
+                >
+                  <Icon name="message-text" size={18} color={colors.tertiary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>3</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.messages", { defaultValue: "Messages" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+            </>
           )}
-          {showStreak && showStudyTime && statsLayout === "horizontal" && (
-            <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+
+          {/* Teacher Stats */}
+          {isTeacher && (
+            <>
+              {showClassCount && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("classes")}
+                >
+                  <Icon name="google-classroom" size={18} color={colors.primary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>5</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.classes", { defaultValue: "Classes" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showClassCount && showStudentCount && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showStudentCount && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("students")}
+                >
+                  <Icon name="account-group" size={18} color={colors.secondary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>120</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.students", { defaultValue: "Students" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showStudentCount && showPendingTasks && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showPendingTasks && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("tasks")}
+                >
+                  <Icon name="clipboard-check" size={18} color={colors.warning} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>8</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.pendingTasks", { defaultValue: "To Review" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+            </>
           )}
-          {showStudyTime && (
-            <TouchableOpacity 
-              style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
-              onPress={() => handleStatPress("study-time")}
-            >
-              <Icon name="clock-outline" size={18} color={colors.secondary} />
-              <AppText style={[styles.statValue, { color: colors.onSurface }]}>2.5h</AppText>
-              <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
-                {t("widgets.heroCard.labels.today", { defaultValue: "Today" })}
-              </AppText>
-            </TouchableOpacity>
-          )}
-          {showStudyTime && showScore && statsLayout === "horizontal" && (
-            <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
-          )}
-          {showScore && (
-            <TouchableOpacity 
-              style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
-              onPress={() => handleStatPress("score")}
-            >
-              <Icon name="trophy" size={18} color={colors.warning} />
-              <AppText style={[styles.statValue, { color: colors.onSurface }]}>85%</AppText>
-              <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
-                {t("widgets.heroCard.labels.score", { defaultValue: "Score" })}
-              </AppText>
-            </TouchableOpacity>
-          )}
-          {showScore && showXP && statsLayout === "horizontal" && (
-            <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
-          )}
-          {showXP && (
-            <TouchableOpacity 
-              style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
-              onPress={() => handleStatPress("xp")}
-            >
-              <Icon name="star" size={18} color={colors.tertiary} />
-              <AppText style={[styles.statValue, { color: colors.onSurface }]}>1,250</AppText>
-              <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
-                {t("widgets.heroCard.labels.xp", { defaultValue: "XP" })}
-              </AppText>
-            </TouchableOpacity>
+
+          {/* Student Stats (default) */}
+          {!isParent && !isTeacher && (
+            <>
+              {showStreak && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("streak")}
+                >
+                  <Icon name="fire" size={18} color={colors.primary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>7</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.streak", { defaultValue: "Day Streak" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showStreak && showStudyTime && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showStudyTime && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("study-time")}
+                >
+                  <Icon name="clock-outline" size={18} color={colors.secondary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>2.5h</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.today", { defaultValue: "Today" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showStudyTime && showScore && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showScore && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("score")}
+                >
+                  <Icon name="trophy" size={18} color={colors.warning} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>85%</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.score", { defaultValue: "Score" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+              {showScore && showXP && statsLayout === "horizontal" && (
+                <View style={[styles.statDivider, { backgroundColor: colors.outline }]} />
+              )}
+              {showXP && (
+                <TouchableOpacity 
+                  style={[styles.statItem, statsLayout === "grid" && styles.statItemGrid]}
+                  onPress={() => handleStatPress("xp")}
+                >
+                  <Icon name="star" size={18} color={colors.tertiary} />
+                  <AppText style={[styles.statValue, { color: colors.onSurface }]}>1,250</AppText>
+                  <AppText style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+                    {tCommon("widgets.heroCard.labels.xp", { defaultValue: "XP" })}
+                  </AppText>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
       )}

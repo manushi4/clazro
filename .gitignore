@@ -1,53 +1,20 @@
-# Dependencies
+# Node / React
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.next/
 
-# React Native
-.expo/
-.expo-shared/
-
-# Android
-android/app/build/
-android/build/
-android/.gradle/
-android/app/release/
-android/keystore.properties
-
-# iOS
-ios/build/
-ios/Pods/
-ios/*.xcworkspace/xcuserdata/
-ios/*.xcodeproj/xcuserdata/
-ios/*.xcodeproj/project.xcworkspace/xcuserdata/
-
-# Environment files
+# Env
 .env
 .env.local
-.env.production
+
+# Android build outputs
+android/app/build/
+android/build/
+*.apk
+*.aab
+*.so
 
 # IDE
 .vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# Build outputs
-dist/
-build/
-
-# Next.js
-platform-studio/.next/
-platform-studio/out/
+.kiro/
+.claude/
+.mcp.json

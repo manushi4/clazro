@@ -13,6 +13,7 @@ import { useLanguageChangeInvalidation } from "../hooks/useLanguageChangeInvalid
 import { AppText } from "../ui/components/AppText";
 import { useBranding } from "../context/BrandingContext";
 import { DEMO_CUSTOMER_ID } from "../lib/supabaseClient";
+import { DevRoleSwitcher } from "../components/dev/DevRoleSwitcher";
 
 /**
  * Main app content - rendered inside all providers.
@@ -67,6 +68,7 @@ export const AppContent: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={statusBarStyle} />
       <DynamicTabNavigator role={role} />
+      {__DEV__ && <DevRoleSwitcher />}
     </View>
   );
 };

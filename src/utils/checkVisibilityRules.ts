@@ -8,10 +8,11 @@ type VisibilityContext = {
 };
 
 export function checkVisibilityRules(
-  rules: VisibilityRule[] | undefined,
+  rules: VisibilityRule[] | undefined | null | Record<string, unknown>,
   context: VisibilityContext
 ): boolean {
-  if (!rules || rules.length === 0) return true;
+  // Handle null, undefined, empty object, or non-array inputs
+  if (!rules || !Array.isArray(rules) || rules.length === 0) return true;
 
   return rules.every((rule) => {
     switch (rule.type) {

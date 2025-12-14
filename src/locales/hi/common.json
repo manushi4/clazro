@@ -16,19 +16,526 @@
                     "save":  "सेव",
                     "create":  "बनाएँ",
                     "up":  "ऊपर",
-                    "down":  "नीचे"
+                    "down":  "नीचे",
+                    "delete":  "हटाएं",
+                    "goBack":  "वापस जाएं",
+                    "ok":  "ठीक है"
                 },
     "status":  {
-                   "loading":  "कॉन्फ़िगरेशन लोड हो रहा है...",
+                   "loading":  "लोड हो रहा है...",
                    "safe_mode":  "सेफ़ मोड",
                    "offline":  "आप ऑफ़लाइन हैं",
-                   "offline_widget":  "{{widget}} requires internet.",
+                   "offline_widget":  "{{widget}} के लिए इंटरनेट आवश्यक है।",
                    "ai_tutor_enabled":  "एआई ट्यूटर चालू",
                    "ai_tutor_disabled":  "एआई ट्यूटर बंद",
                    "ai_tutor_perm_missing":  "एआई ट्यूटर अनुमति नहीं है",
-                   "offline_title":  "Offline",
-                   "offline_action":  "Go online to perform this action."
+                   "offline_title":  "ऑफ़लाइन",
+                   "offline_action":  "यह कार्य करने के लिए ऑनलाइन जाएं।"
                },
+    "offline":  {
+                   "title":  "आप ऑफ़लाइन हैं",
+                   "refreshDisabled":  "ऑफ़लाइन होने पर रिफ्रेश नहीं कर सकते",
+                   "actionRequired":  "इस कार्य के लिए इंटरनेट कनेक्शन आवश्यक है"
+               },
+    "errors":  {
+                  "title":  "त्रुटि",
+                  "generic":  "कुछ गलत हो गया",
+                  "loadFailed":  "डेटा लोड करने में विफल",
+                  "openUrl":  "लिंक नहीं खोल सका"
+              },
+    "notifications":  {
+                         "title":  "सूचनाएं",
+                         "detail":  "सूचना",
+                         "notFound":  "सूचना नहीं मिली",
+                         "noContent":  "कोई अतिरिक्त सामग्री नहीं",
+                         "additionalInfo":  "अतिरिक्त जानकारी",
+                         "takeAction":  "कार्रवाई करें",
+                         "read":  "पढ़ा गया",
+                         "unread":  "अपठित",
+                         "general":  "सामान्य",
+                         "deleteTitle":  "सूचना हटाएं",
+                         "deleteMessage":  "क्या आप वाकई इस सूचना को हटाना चाहते हैं?"
+                     },
+    "announcements":  {
+                         "title":  "घोषणाएं",
+                         "detail":  "घोषणा",
+                         "notFound":  "घोषणा नहीं मिली",
+                         "general":  "सामान्य",
+                         "pinned":  "पिन किया गया",
+                         "for":  "के लिए:",
+                         "attachment":  "अटैचमेंट",
+                         "tapToOpen":  "खोलने के लिए टैप करें",
+                         "expiresOn":  "समाप्ति तिथि:"
+                     },
+    "fees":  {
+                "title":  "शुल्क",
+                "detail":  "शुल्क विवरण",
+                "notFound":  "शुल्क रिकॉर्ड नहीं मिला",
+                "totalAmount":  "कुल राशि",
+                "paidAmount":  "भुगतान राशि",
+                "remainingAmount":  "शेष राशि",
+                "dueDate":  "देय तिथि",
+                "paidDate":  "भुगतान तिथि",
+                "paymentMethod":  "भुगतान विधि",
+                "receiptNumber":  "रसीद नं.",
+                "details":  "विवरण",
+                "notes":  "नोट्स",
+                "payNow":  "अभी भुगतान करें",
+                "downloadReceipt":  "रसीद डाउनलोड करें",
+                "paymentTitle":  "शुल्क भुगतान",
+                "paymentMessage":  "भुगतान गेटवे जल्द आ रहा है",
+                "receiptTitle":  "रसीद डाउनलोड",
+                "receiptMessage":  "रसीद डाउनलोड जल्द आ रहा है",
+                "dueToday":  "आज देय",
+                "dueDays":  "{{days}} दिनों में देय",
+                "overdueDays":  "{{days}} दिन विलंबित",
+                "status":  {
+                              "pending":  "लंबित",
+                              "overdue":  "विलंबित",
+                              "partial":  "आंशिक भुगतान",
+                              "paid":  "भुगतान हो गया"
+                          },
+                "types":  {
+                             "tuition":  "ट्यूशन फीस",
+                             "exam":  "परीक्षा शुल्क",
+                             "transport":  "परिवहन शुल्क",
+                             "library":  "पुस्तकालय शुल्क",
+                             "lab":  "प्रयोगशाला शुल्क",
+                             "other":  "अन्य शुल्क"
+                         },
+                "methods":  {
+                               "upi":  "यूपीआई",
+                               "card":  "कार्ड",
+                               "netbanking":  "नेट बैंकिंग",
+                               "wallet":  "वॉलेट",
+                               "cash":  "नकद",
+                               "cheque":  "चेक",
+                               "other":  "अन्य"
+                           },
+                "payment":  {
+                               "title":  "शुल्क भुगतान",
+                               "summary":  "शुल्क सारांश",
+                               "amount":  "भुगतान राशि",
+                               "partial":  "आंशिक भुगतान",
+                               "maxAmount":  "अधिकतम: {{amount}}",
+                               "selectMethod":  "भुगतान विधि चुनें",
+                               "selectMethodMessage":  "जारी रखने के लिए भुगतान विधि चुनें",
+                               "invalidAmount":  "अमान्य राशि",
+                               "invalidAmountMessage":  "कृपया एक वैध भुगतान राशि दर्ज करें",
+                               "exceedsAmount":  "राशि देय से अधिक",
+                               "exceedsAmountMessage":  "भुगतान राशि शेष राशि से अधिक नहीं हो सकती",
+                               "processing":  "प्रोसेसिंग...",
+                               "payAmount":  "{{amount}} भुगतान करें",
+                               "success":  "भुगतान सफल",
+                               "successMessage":  "आपका भुगतान प्रोसेस हो गया है। रसीद: {{receipt}}",
+                               "failed":  "भुगतान विफल",
+                               "failedMessage":  "भुगतान प्रोसेस नहीं हो सका। कृपया पुनः प्रयास करें।",
+                               "alreadyPaid":  "इस शुल्क का भुगतान पहले ही हो चुका है",
+                               "secure":  "आपका भुगतान सुरक्षित और एन्क्रिप्टेड है",
+                               "detailTitle":  "भुगतान विवरण",
+                               "notFound":  "भुगतान रिकॉर्ड नहीं मिला",
+                               "notPaid":  "इस शुल्क का भुगतान अभी नहीं हुआ है",
+                               "successful":  "भुगतान सफल",
+                               "amountPaid":  "भुगतान की गई राशि",
+                               "transactionDetails":  "लेनदेन विवरण",
+                               "shareTitle":  "भुगतान रसीद",
+                               "shareMessage":  "भुगतान रसीद\n\nशुल्क: {{title}}\nराशि: {{amount}}\nरसीद नं: {{receipt}}\nतिथि: {{date}}"
+                           }
+             },
+    "subjectProgress":  {
+                          "title":  "विषय प्रगति",
+                          "notFound":  "विषय नहीं मिला",
+                          "overallProgress":  "समग्र प्रगति",
+                          "chapters":  "अध्याय",
+                          "studied":  "अध्ययन",
+                          "testsPassed":  "पास परीक्षाएं",
+                          "avgScore":  "औसत अंक",
+                          "chaptersTitle":  "अध्याय",
+                          "lessons":  "पाठ",
+                          "recentTests":  "हाल की परीक्षाएं",
+                          "weakTopics":  "सुधार के क्षेत्र",
+                          "practiceTitle":  "विषय अभ्यास",
+                          "practiceMessage":  "अभ्यास मोड जल्द आ रहा है!",
+                          "difficulty":  {
+                                            "easy":  "आसान",
+                                            "medium":  "मध्यम",
+                                            "hard":  "कठिन"
+                                         }
+                       },
+    "subjectDetail":  {
+                        "title":  "विषय विवरण",
+                        "notFound":  "विषय नहीं मिला",
+                        "overallProgress":  "समग्र प्रगति",
+                        "chapters":  "अध्याय",
+                        "avgScore":  "औसत अंक",
+                        "studied":  "अध्ययन",
+                        "pending":  "लंबित",
+                        "nextClass":  "अगली कक्षा",
+                        "teacher":  "शिक्षक",
+                        "viewProgress":  "प्रगति देखें",
+                        "viewPerformance":  "प्रदर्शन देखें",
+                        "lessons":  "पाठ",
+                        "chapterLocked":  "अध्याय लॉक है",
+                        "completePrerequisite":  "अनलॉक करने के लिए पिछले अध्याय पूरे करें",
+                        "resourceTitle":  "संसाधन",
+                        "resourceComingSoon":  "संसाधन व्यूअर जल्द आ रहा है",
+                        "noChapters":  "कोई अध्याय उपलब्ध नहीं",
+                        "noAssignments":  "अभी तक कोई असाइनमेंट नहीं",
+                        "noResources":  "कोई संसाधन उपलब्ध नहीं",
+                        "overdue":  "विलंबित",
+                        "dueToday":  "आज देय",
+                        "dueDays":  "{{days}} दिनों में देय",
+                        "tabs":  {
+                                   "overview":  "अवलोकन",
+                                   "chapters":  "अध्याय",
+                                   "assignments":  "असाइनमेंट",
+                                   "resources":  "संसाधन"
+                                 },
+                        "assignmentType":  {
+                                             "homework":  "होमवर्क",
+                                             "project":  "प्रोजेक्ट",
+                                             "quiz":  "प्रश्नोत्तरी",
+                                             "test":  "परीक्षा"
+                                           },
+                        "status":  {
+                                     "pending":  "लंबित",
+                                     "submitted":  "जमा किया गया",
+                                     "graded":  "ग्रेड दिया गया",
+                                     "overdue":  "विलंबित"
+                                   }
+                     },
+    "subjectReport": {
+      "title": "विषय रिपोर्ट",
+      "report": "रिपोर्ट",
+      "notFound": "रिपोर्ट नहीं मिली",
+      "overallGrade": "समग्र ग्रेड",
+      "percentage": "प्रतिशत",
+      "classRank": "कक्षा रैंक",
+      "testsTaken": "परीक्षाएं",
+      "termGrades": "सत्र-वार ग्रेड",
+      "credits": "क्रेडिट",
+      "attendance": "उपस्थिति",
+      "present": "उपस्थित",
+      "excused": "छूट",
+      "absent": "अनुपस्थित",
+      "totalClasses": "कुल कक्षाएं",
+      "avgTestScore": "औसत परीक्षा स्कोर",
+      "avgAssignment": "औसत असाइनमेंट",
+      "noTests": "अभी तक कोई परीक्षा नहीं",
+      "noAssignments": "अभी तक कोई असाइनमेंट नहीं",
+      "noRemarks": "अभी तक कोई शिक्षक टिप्पणी नहीं",
+      "classAvg": "कक्षा औसत",
+      "tabs": {
+        "overview": "अवलोकन",
+        "tests": "परीक्षाएं",
+        "assignments": "असाइनमेंट",
+        "remarks": "टिप्पणियां"
+      },
+      "assignmentType": {
+        "homework": "होमवर्क",
+        "project": "प्रोजेक्ट",
+        "lab": "प्रयोगशाला",
+        "presentation": "प्रस्तुति"
+      },
+      "status": {
+        "submitted": "जमा किया गया",
+        "graded": "ग्रेड दिया गया",
+        "late": "देर से",
+        "missing": "गायब"
+      },
+      "remarkType": {
+        "positive": "सकारात्मक",
+        "improvement": "सुधार",
+        "general": "सामान्य"
+      }
+    },
+    "childWeakArea": {
+      "title": "कमजोर क्षेत्र",
+      "notFound": "डेटा नहीं मिला",
+      "weakTopics": "कमजोर विषय",
+      "across": "में",
+      "subjects": "विषय",
+      "avgScore": "औसत",
+      "highPriority": "उच्च प्राथमिकता",
+      "improving": "सुधार हो रहा",
+      "declining": "गिरावट",
+      "todayProgress": "आज का अभ्यास",
+      "allTopics": "सभी कमजोर विषय",
+      "noWeakTopics": "कोई कमजोर विषय नहीं मिला!",
+      "noSubjects": "कमजोर क्षेत्रों वाले कोई विषय नहीं",
+      "noPractice": "कोई अभ्यास सुझाव नहीं",
+      "noRecommendations": "अभी तक कोई सुझाव नहीं",
+      "attempts": "प्रयास",
+      "mins": "मिनट",
+      "questions": "प्र",
+      "practiceTitle": "अभ्यास शुरू करें",
+      "practiceMessage": "अभ्यास मोड जल्द आ रहा है!",
+      "actionMessage": "सुविधा जल्द आ रही है!",
+      "tabs": {
+        "overview": "अवलोकन",
+        "subjects": "विषय",
+        "practice": "अभ्यास",
+        "recommendations": "सुझाव"
+      },
+      "difficulty": {
+        "easy": "आसान",
+        "medium": "मध्यम",
+        "hard": "कठिन"
+      },
+      "priority": {
+        "high": "उच्च",
+        "medium": "मध्यम",
+        "low": "निम्न"
+      },
+      "type": {
+        "quiz": "प्रश्नोत्तरी",
+        "video": "वीडियो",
+        "worksheet": "वर्कशीट",
+        "flashcards": "फ्लैशकार्ड"
+      }
+    },
+    "assignmentDetail": {
+      "title": "असाइनमेंट",
+      "notFound": "असाइनमेंट नहीं मिला",
+      "details": "विवरण",
+      "type": "प्रकार",
+      "dueDate": "देय तिथि",
+      "maxScore": "अधिकतम अंक",
+      "points": "अंक",
+      "instructions": "निर्देश",
+      "attachments": "अटैचमेंट",
+      "overdue": "विलंबित",
+      "dueToday": "आज देय",
+      "dueTomorrow": "कल देय",
+      "dueDays": "{{days}} दिनों में देय",
+      "status": {
+        "draft": "ड्राफ्ट",
+        "published": "प्रकाशित",
+        "closed": "बंद"
+      },
+      "types": {
+        "homework": "होमवर्क",
+        "project": "प्रोजेक्ट",
+        "practice": "अभ्यास",
+        "classwork": "क्लासवर्क"
+      }
+    },
+    "teacherDetail": {
+      "title": "शिक्षक",
+      "notFound": "शिक्षक नहीं मिला",
+      "classTeacher": "कक्षा शिक्षक",
+      "contact": "संपर्क",
+      "call": "कॉल",
+      "email": "ईमेल",
+      "message": "संदेश",
+      "details": "विवरण",
+      "emailLabel": "ईमेल",
+      "phoneLabel": "फोन",
+      "officeHours": "कार्यालय समय",
+      "callError": "कॉल नहीं कर सकते",
+      "emailError": "ईमेल नहीं भेज सकते",
+      "status": {
+        "available": "उपलब्ध",
+        "busy": "व्यस्त",
+        "unavailable": "अनुपलब्ध",
+        "on_leave": "छुट्टी पर"
+      }
+    },
+    "composeMessage": {
+      "title": "नया संदेश",
+      "replyTitle": "जवाब",
+      "subject": "विषय",
+      "subjectPlaceholder": "विषय दर्ज करें...",
+      "message": "संदेश",
+      "messagePlaceholder": "अपना संदेश लिखें...",
+      "priority": "प्राथमिकता",
+      "category": "श्रेणी",
+      "send": "संदेश भेजें",
+      "sending": "भेज रहा है...",
+      "successTitle": "संदेश भेजा गया",
+      "successMessage": "आपका संदेश सफलतापूर्वक भेज दिया गया है",
+      "sendError": "संदेश भेजने में विफल। कृपया पुनः प्रयास करें।",
+      "validationError": "कृपया विषय और संदेश भरें",
+      "offlineMessage": "ऑफ़लाइन होने पर संदेश नहीं भेज सकते",
+      "priorities": {
+        "low": "कम",
+        "normal": "सामान्य",
+        "high": "उच्च",
+        "urgent": "अत्यावश्यक"
+      },
+      "categories": {
+        "general": "सामान्य",
+        "academic": "शैक्षणिक",
+        "attendance": "उपस्थिति",
+        "fees": "शुल्क",
+        "behavior": "व्यवहार",
+        "event": "कार्यक्रम"
+      }
+    },
+    "messageDetail": {
+      "title": "संदेश",
+      "notFound": "संदेश नहीं मिला",
+      "viewAttachment": "अटैचमेंट देखें",
+      "replies": "जवाब",
+      "sender": {
+        "parent": "आप",
+        "teacher": "शिक्षक",
+        "school": "स्कूल"
+      },
+      "priority": {
+        "low": "कम",
+        "normal": "सामान्य",
+        "high": "उच्च",
+        "urgent": "अत्यावश्यक"
+      },
+      "category": {
+        "general": "सामान्य",
+        "academic": "शैक्षणिक",
+        "attendance": "उपस्थिति",
+        "fees": "शुल्क",
+        "behavior": "व्यवहार",
+        "event": "कार्यक्रम"
+      }
+    },
+    "aiInsightDetail": {
+      "title": "एआई अंतर्दृष्टि",
+      "notFound": "अंतर्दृष्टि नहीं मिली",
+      "details": "विवरण",
+      "validUntil": "तक वैध",
+      "dismiss": "खारिज करें",
+      "dismissTitle": "अंतर्दृष्टि खारिज करें",
+      "dismissMessage": "क्या आप वाकई इस अंतर्दृष्टि को खारिज करना चाहते हैं?",
+      "types": {
+        "performance": "प्रदर्शन",
+        "attendance": "उपस्थिति",
+        "behavior": "व्यवहार",
+        "recommendation": "सुझाव",
+        "alert": "अलर्ट",
+        "achievement": "उपलब्धि"
+      },
+      "categories": {
+        "academic": "शैक्षणिक",
+        "attendance": "उपस्थिति",
+        "social": "सामाजिक",
+        "health": "स्वास्थ्य",
+        "general": "सामान्य"
+      },
+      "priority": {
+        "high": "उच्च प्राथमिकता",
+        "normal": "सामान्य",
+        "low": "कम प्राथमिकता"
+      }
+    },
+    "predictionDetail": {
+      "title": "एआई भविष्यवाणी",
+      "notFound": "भविष्यवाणी नहीं मिली",
+      "confidenceScore": "विश्वास स्कोर",
+      "confidenceHigh": "उच्च विश्वास - यह भविष्यवाणी बहुत संभावित है",
+      "confidenceMedium": "मध्यम विश्वास - यह भविष्यवाणी संभावित है",
+      "confidenceLow": "कम विश्वास - इस भविष्यवाणी को अधिक डेटा की आवश्यकता है",
+      "details": "विवरण",
+      "predictedOutcome": "अनुमानित परिणाम",
+      "recommendation": "सुझाव",
+      "validUntil": "तक वैध",
+      "types": {
+        "grade": "ग्रेड भविष्यवाणी",
+        "attendance": "उपस्थिति",
+        "performance": "प्रदर्शन",
+        "behavior": "व्यवहार",
+        "improvement": "सुधार"
+      },
+      "categories": {
+        "academic": "शैक्षणिक",
+        "attendance": "उपस्थिति",
+        "social": "सामाजिक",
+        "health": "स्वास्थ्य",
+        "general": "सामान्य"
+      },
+      "priority": {
+        "low": "कम प्राथमिकता",
+        "normal": "सामान्य",
+        "high": "उच्च प्राथमिकता",
+        "critical": "गंभीर"
+      }
+    },
+    "childStats": {
+      "title": "बच्चे के आंकड़े",
+      "notFound": "आंकड़े नहीं मिले",
+      "classRank": "कक्षा रैंक",
+      "overall": "समग्र",
+      "students": "छात्र",
+      "attendance": "उपस्थिति",
+      "present": "उपस्थित",
+      "absent": "अनुपस्थित",
+      "late": "देर से",
+      "dayStreak": "दिन की स्ट्रीक",
+      "viewReportCard": "रिपोर्ट कार्ड",
+      "viewAttendance": "उपस्थिति",
+      "noSubjects": "कोई विषय डेटा नहीं",
+      "tests": "परीक्षाएं",
+      "assignments": "असाइनमेंट",
+      "noTests": "अभी तक कोई परीक्षा नहीं",
+      "classAvg": "कक्षा औसत",
+      "noActivity": "कोई हालिया गतिविधि नहीं",
+      "tabs": {
+        "overview": "अवलोकन",
+        "subjects": "विषय",
+        "tests": "परीक्षाएं",
+        "activity": "गतिविधि"
+      }
+    },
+    "subjectPerformance":  {
+                             "title":  "प्रदर्शन",
+                             "performance":  "प्रदर्शन",
+                             "notFound":  "प्रदर्शन डेटा नहीं मिला",
+                             "currentScore":  "वर्तमान स्कोर",
+                             "classRank":  "कक्षा रैंक",
+                             "percentile":  "प्रतिशतक",
+                             "classAvg":  "कक्षा औसत",
+                             "trendTitle":  "प्रदर्शन रुझान",
+                             "yourScore":  "आपका स्कोर",
+                             "classAverage":  "कक्षा औसत",
+                             "skillsTitle":  "कौशल विश्लेषण",
+                             "testHistory":  "परीक्षा इतिहास",
+                             "noTests":  "अभी तक कोई परीक्षा नहीं दी",
+                             "noInsights":  "अभी तक कोई अंतर्दृष्टि उपलब्ध नहीं",
+                             "highPriority":  "उच्च",
+                             "takeAction":  "कार्रवाई करें",
+                             "tabs":  {
+                                        "overview":  "अवलोकन",
+                                        "tests":  "परीक्षाएं",
+                                        "insights":  "एआई अंतर्दृष्टि"
+                                      },
+                             "insightType":  {
+                                               "strength":  "ताकत",
+                                               "weakness":  "सुधार की जरूरत",
+                                               "recommendation":  "सुझाव",
+                                               "prediction":  "भविष्यवाणी"
+                                             }
+                          },
+    "comparisonDetails": {
+      "title": "तुलना विश्लेषण",
+      "notFound": "तुलना डेटा नहीं मिला",
+      "overall": "कुल",
+      "rank": "रैंक",
+      "overallComparison": "समग्र तुलना",
+      "yourChild": "आपका बच्चा",
+      "classAverage": "कक्षा औसत",
+      "schoolAverage": "स्कूल औसत",
+      "percentile": "प्रतिशतक",
+      "percentileDesc": "{{percentile}}% छात्रों से बेहतर",
+      "score": "अंक",
+      "classAvg": "कक्षा औसत",
+      "vsClass": "कक्षा से",
+      "child": "बच्चा",
+      "class": "कक्षा",
+      "school": "स्कूल",
+      "tabs": {
+        "overview": "अवलोकन",
+        "subjects": "विषय",
+        "metrics": "मेट्रिक्स"
+      }
+    },
     "admin":  {
                   "warning":  "यदि सर्विस-रोल कुंजी सेट है तो उपयोग करता है। प्रोड में कभी शामिल न करें।",
                   "disabled":  "एडमिन निष्क्रिय: कॉन्फ़िगरेशन गायब।"

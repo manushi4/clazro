@@ -1,0 +1,634 @@
+{
+  "title": "Parent",
+  "widgets": {
+    "childrenOverview": {
+      "title": "My Children",
+      "subtitle": "Overview of your children",
+      "states": {
+        "empty": "No children linked to your account",
+        "loading": "Loading children...",
+        "error": "Failed to load children"
+      },
+      "attendance": {
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "holiday": "Holiday",
+        "unknown": "Unknown"
+      },
+      "stats": {
+        "attendance": "Attendance",
+        "pending": "Pending",
+        "tests": "Tests",
+        "streak": "Streak",
+        "xp": "XP"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "viewDetails": "View Details"
+      }
+    },
+    "childProgress": {
+      "title": "Child Progress",
+      "subtitle": "Academic performance",
+      "states": {
+        "empty": "No progress data available",
+        "loading": "Loading progress...",
+        "error": "Failed to load progress"
+      },
+      "overall": "Overall",
+      "subjects": "Subjects",
+      "studied": "Studied",
+      "chapters": "{{completed}}/{{total}} chapters",
+      "tests": "{{passed}}/{{total}} tests",
+      "actions": {
+        "viewAll": "View All Subjects ({{count}})",
+        "viewDetails": "View Details"
+      }
+    },
+    "attendanceSummary": {
+      "title": "Attendance Summary",
+      "subtitle": "Track your children's attendance",
+      "states": {
+        "empty": "No attendance data available",
+        "loading": "Loading attendance...",
+        "error": "Failed to load attendance"
+      },
+      "status": {
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "excused": "Excused",
+        "halfDay": "Half Day",
+        "notMarked": "Not Marked"
+      },
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "checkIn": "Check-in",
+      "daysAttended": "{{attended}} of {{total}} days attended",
+      "stats": {
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late"
+      },
+      "actions": {
+        "viewAll": "View Full Attendance",
+        "viewDetails": "View Details"
+      }
+    },
+    "feeAlerts": {
+      "title": "Fee Alerts",
+      "subtitle": "Pending payments and dues",
+      "states": {
+        "empty": "All fees paid! No pending dues.",
+        "loading": "Loading fees...",
+        "error": "Failed to load fees"
+      },
+      "labels": {
+        "pending": "Pending",
+        "overdue": "Overdue",
+        "partial": "Partial",
+        "paid": "Paid",
+        "payNow": "Pay Now",
+        "dueToday": "Due Today",
+        "dueTomorrow": "Due Tomorrow",
+        "dueInDays": "Due in {{days}} days",
+        "daysOverdue": "{{days}} days overdue",
+        "partialPaid": "Paid: {{amount}}"
+      },
+      "summary": {
+        "totalDue": "Total Due",
+        "overdue": "Overdue"
+      },
+      "actions": {
+        "viewAll": "View All Fees ({{count}})",
+        "payAll": "Pay All"
+      }
+    },
+    "notificationsPreview": {
+      "title": "Notifications",
+      "subtitle": "Recent updates and alerts",
+      "states": {
+        "empty": "All caught up! No new notifications.",
+        "loading": "Loading notifications...",
+        "error": "Failed to load notifications"
+      },
+      "unreadCount": "{{count}} unread notification(s)",
+      "priority": {
+        "high": "Urgent",
+        "normal": "Normal",
+        "low": "Low"
+      },
+      "time": {
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "markAllRead": "Mark All Read"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Common tasks at your fingertips",
+      "states": {
+        "empty": "No quick actions available",
+        "loading": "Loading actions...",
+        "error": "Failed to load actions"
+      },
+      "actions": {
+        "payFees": "Pay Fees",
+        "messageTeacher": "Message Teacher",
+        "viewReports": "Reports",
+        "viewAttendance": "Attendance",
+        "schedule": "Schedule",
+        "contactSchool": "Contact School"
+      }
+    },
+    "childStats": {
+      "title": "Child Stats",
+      "subtitle": "Learning statistics overview",
+      "states": {
+        "empty": "No statistics available",
+        "loading": "Loading stats...",
+        "error": "Failed to load stats"
+      },
+      "stats": {
+        "xp": "Total XP",
+        "streak": "Day Streak",
+        "badges": "Badges",
+        "studyTime": "Study Time",
+        "tests": "Tests Passed",
+        "assignments": "Completed"
+      },
+      "actions": {
+        "viewAll": "View All Stats"
+      }
+    },
+    "weakAreas": {
+      "title": "Weak Areas",
+      "subtitle": "Topics needing attention",
+      "states": {
+        "empty": "Great Progress!",
+        "emptySubtitle": "No weak areas found. Your child is doing well!",
+        "loading": "Analyzing progress...",
+        "error": "Failed to load weak areas"
+      },
+      "mastery": "mastery",
+      "criticalCount": "{{count}} topic(s) need urgent attention",
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "practice": "Practice"
+      }
+    },
+    "performanceChart": {
+      "title": "Performance Chart",
+      "subtitle": "Subject scores and weekly progress",
+      "states": {
+        "empty": "No performance data available",
+        "loading": "Loading performance...",
+        "error": "Failed to load performance data"
+      },
+      "averageScore": "Average",
+      "bestScore": "Best Score",
+      "subjectScores": "Subject Scores",
+      "weeklyProgress": "Weekly XP Progress",
+      "actions": {
+        "viewAll": "View Detailed Report"
+      }
+    },
+    "subjectProgress": {
+      "title": "Subject Progress",
+      "subtitle": "Academic progress by subject",
+      "states": {
+        "empty": "No subject data available",
+        "loading": "Loading progress...",
+        "error": "Failed to load progress"
+      },
+      "overall": "Overall",
+      "studied": "Studied",
+      "chapters": "{{completed}}/{{total}} chapters",
+      "tests": "{{passed}}/{{total}} tests",
+      "actions": {
+        "viewAll": "View All Subjects ({{count}})"
+      }
+    },
+    "assignmentsPending": {
+      "title": "Pending Assignments",
+      "subtitle": "Assignments due soon",
+      "states": {
+        "empty": "All Caught Up!",
+        "emptySubtitle": "No pending assignments for your child.",
+        "loading": "Loading assignments...",
+        "error": "Failed to load assignments"
+      },
+      "labels": {
+        "overdue": "Overdue",
+        "dueToday": "Due Today",
+        "dueTomorrow": "Due Tomorrow",
+        "dueInDays": "Due in {{days}} days",
+        "daysOverdue": "{{days}} days overdue"
+      },
+      "overdueCount": "{{count}} assignment(s) overdue",
+      "actions": {
+        "viewAll": "View All ({{count}})"
+      }
+    },
+    "messagesInbox": {
+      "title": "Messages",
+      "subtitle": "Communication with teachers and school",
+      "states": {
+        "empty": "No Messages",
+        "emptySubtitle": "Your inbox is empty. Messages from teachers and school will appear here.",
+        "loading": "Loading messages...",
+        "error": "Failed to load messages"
+      },
+      "unreadCount": "{{count}} unread message(s)",
+      "categories": {
+        "general": "General",
+        "academic": "Academic",
+        "attendance": "Attendance",
+        "fees": "Fees",
+        "behavior": "Behavior",
+        "event": "Event"
+      },
+      "priority": {
+        "urgent": "Urgent",
+        "high": "Important",
+        "normal": "Normal",
+        "low": "Low"
+      },
+      "time": {
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "compose": "New Message"
+      }
+    },
+    "reportCardPreview": {
+      "title": "Report Card",
+      "subtitle": "Academic grades and performance",
+      "states": {
+        "empty": "No report card data available",
+        "loading": "Loading report card...",
+        "error": "Failed to load report card"
+      },
+      "overallGrade": "Overall",
+      "average": "Average",
+      "best": "Best",
+      "passRate": "Pass Rate",
+      "gradePoints": "Grade Points",
+      "actions": {
+        "viewAll": "View Full Report Card"
+      }
+    },
+    "teacherContacts": {
+      "title": "Teacher Contacts",
+      "subtitle": "Contact your child's teachers",
+      "states": {
+        "empty": "No Teachers",
+        "emptySubtitle": "Teacher contacts will appear here once assigned.",
+        "loading": "Loading teachers...",
+        "error": "Failed to load teachers"
+      },
+      "classTeacher": "Class Teacher",
+      "availableCount": "{{count}} teacher(s) available",
+      "status": {
+        "available": "Available",
+        "busy": "Busy",
+        "away": "Away"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "call": "Call",
+        "email": "Email",
+        "message": "Message"
+      }
+    },
+    "announcements": {
+      "title": "Announcements",
+      "subtitle": "School announcements and updates",
+      "states": {
+        "empty": "No Announcements",
+        "emptySubtitle": "No announcements at this time. Check back later for updates.",
+        "loading": "Loading announcements...",
+        "error": "Failed to load announcements"
+      },
+      "pinned": "Pinned",
+      "pinnedCount": "{{count}} pinned announcement(s)",
+      "categories": {
+        "general": "General",
+        "academic": "Academic",
+        "event": "Event",
+        "holiday": "Holiday",
+        "exam": "Exam",
+        "sports": "Sports",
+        "cultural": "Cultural",
+        "urgent": "Urgent"
+      },
+      "priority": {
+        "urgent": "Urgent",
+        "high": "Important",
+        "normal": "Normal",
+        "low": "Low"
+      },
+      "time": {
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})"
+      }
+    },
+    "aiInsights": {
+      "title": "AI Insights",
+      "subtitle": "Smart recommendations for your child",
+      "states": {
+        "empty": "No insights available right now.",
+        "loading": "Analyzing data...",
+        "error": "Failed to load insights"
+      },
+      "header": {
+        "aiPowered": "AI-Powered Insights",
+        "unread": "{{count}} new"
+      },
+      "types": {
+        "performance": "Performance",
+        "attendance": "Attendance",
+        "behavior": "Behavior",
+        "recommendation": "Recommendation",
+        "alert": "Alert",
+        "achievement": "Achievement"
+      },
+      "priority": {
+        "high": "Urgent",
+        "normal": "Normal",
+        "low": "Low"
+      },
+      "time": {
+        "justNow": "Just now",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All Insights ({{count}})",
+        "dismiss": "Dismiss"
+      }
+    },
+    "feeSummary": {
+      "title": "Fee Summary",
+      "subtitle": "Complete fee overview and payment status",
+      "states": {
+        "empty": "All Fees Paid!",
+        "emptySubtitle": "No pending fees. All payments are up to date.",
+        "loading": "Loading fee summary...",
+        "error": "Failed to load fee summary"
+      },
+      "labels": {
+        "pending": "Pending",
+        "overdue": "Overdue",
+        "partial": "Partial",
+        "paid": "Paid",
+        "payNow": "Pay Now",
+        "dueToday": "Due Today",
+        "dueTomorrow": "Due Tomorrow",
+        "dueInDays": "Due in {{days}} days",
+        "daysOverdue": "{{days}} days overdue",
+        "partialPaid": "Paid: {{amount}}"
+      },
+      "summary": {
+        "totalDue": "Total Due",
+        "overdue": "Overdue",
+        "pending": "Pending",
+        "thisMonth": "This Month"
+      },
+      "feeTypes": {
+        "tuition": "Tuition",
+        "exam": "Exam",
+        "transport": "Transport",
+        "library": "Library",
+        "lab": "Lab",
+        "other": "Other"
+      },
+      "actions": {
+        "viewAll": "View All Fees ({{count}})",
+        "payAll": "Pay All",
+        "viewHistory": "Payment History"
+      }
+    },
+    "pendingFees": {
+      "title": "Pending Fees",
+      "subtitle": "Fees due soon requiring attention",
+      "states": {
+        "empty": "All Caught Up!",
+        "emptySubtitle": "No pending fees. All payments are up to date.",
+        "loading": "Loading pending fees...",
+        "error": "Failed to load pending fees"
+      },
+      "labels": {
+        "dueToday": "Due Today",
+        "dueTomorrow": "Due Tomorrow",
+        "dueInDays": "Due in {{days}} days",
+        "daysOverdue": "{{days}} days overdue",
+        "partial": "Partial",
+        "pay": "Pay"
+      },
+      "overdueAlert": "{{count}} fee(s) overdue - action required",
+      "actions": {
+        "viewAll": "View All ({{count}})"
+      }
+    },
+    "paymentHistory": {
+      "title": "Payment History",
+      "subtitle": "Record of completed payments",
+      "states": {
+        "empty": "No Payments Yet",
+        "emptySubtitle": "Your payment history will appear here once you make payments.",
+        "loading": "Loading payment history...",
+        "error": "Failed to load payment history"
+      },
+      "labels": {
+        "paid": "Paid",
+        "receipt": "Receipt"
+      },
+      "methods": {
+        "upi": "UPI",
+        "card": "Card",
+        "netbanking": "Net Banking",
+        "cash": "Cash",
+        "cheque": "Cheque",
+        "unknown": "Other"
+      },
+      "summary": {
+        "totalPaid": "Total Paid",
+        "payments": "Payments"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "downloadReceipt": "Download Receipt"
+      }
+    },
+    "aiPredictions": {
+      "title": "AI Predictions",
+      "subtitle": "AI-powered insights and forecasts for your child",
+      "states": {
+        "empty": "No Predictions",
+        "emptySubtitle": "AI predictions will appear here as we analyze your child's learning patterns.",
+        "loading": "Analyzing patterns...",
+        "error": "Failed to load predictions"
+      },
+      "header": {
+        "unread": "{{count}} new prediction(s)"
+      },
+      "types": {
+        "performance": "Performance",
+        "attendance": "Attendance",
+        "behavior": "Behavior",
+        "risk": "Risk Alert",
+        "achievement": "Achievement"
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "labels": {
+        "confidence": "Confidence"
+      },
+      "time": {
+        "justNow": "Just now",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "dismiss": "Dismiss"
+      }
+    },
+    "aiRecommendations": {
+      "title": "AI Recommendations",
+      "subtitle": "Personalized suggestions to help your child succeed",
+      "states": {
+        "empty": "No Recommendations",
+        "emptySubtitle": "AI recommendations will appear here based on your child's learning progress.",
+        "loading": "Finding recommendations...",
+        "error": "Failed to load recommendations"
+      },
+      "header": {
+        "active": "{{count}} active recommendation(s)"
+      },
+      "types": {
+        "study": "Study",
+        "practice": "Practice",
+        "resource": "Resource",
+        "activity": "Activity",
+        "schedule": "Schedule",
+        "goal": "Goal"
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "labels": {
+        "relevance": "Relevance",
+        "match": "match"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "dismiss": "Dismiss",
+        "complete": "Mark Complete"
+      }
+    },
+    "aiAlerts": {
+      "title": "AI Alerts",
+      "subtitle": "Early warning system for your child's progress",
+      "states": {
+        "empty": "All Clear!",
+        "emptySubtitle": "No alerts at this time. Your child is on track!",
+        "loading": "Checking alerts...",
+        "error": "Failed to load alerts"
+      },
+      "header": {
+        "critical": "{{count}} critical alert(s) require attention",
+        "unacknowledged": "{{count}} unacknowledged alert(s)"
+      },
+      "types": {
+        "academic": "Academic",
+        "attendance": "Attendance",
+        "behavior": "Behavior",
+        "deadline": "Deadline",
+        "performance": "Performance",
+        "engagement": "Engagement"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "time": {
+        "justNow": "Just now",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "acknowledge": "Acknowledge",
+        "resolve": "Mark Resolved"
+      }
+    },
+    "comparisonAnalytics": {
+      "title": "Comparison Analytics",
+      "subtitle": "See how your child compares to peers",
+      "states": {
+        "empty": "No Comparison Data",
+        "emptySubtitle": "Comparison analytics will appear here as more data becomes available.",
+        "loading": "Analyzing comparisons...",
+        "error": "Failed to load comparison data"
+      },
+      "summary": {
+        "aboveAvg": "Above Avg",
+        "belowAvg": "Below Avg",
+        "improving": "Improving"
+      },
+      "labels": {
+        "vs": "vs",
+        "avg": "avg",
+        "you": "Your Child",
+        "average": "Average",
+        "vsAverage": "vs {{value}}{{unit}} avg",
+        "percentile": "Top {{value}}%",
+        "topPercentile": "Top {{value}}%",
+        "rank": "Rank #{{rank}} of {{total}}"
+      },
+      "types": {
+        "class_average": "Class Average",
+        "grade_level": "Grade Level",
+        "school_wide": "School Wide",
+        "subject_wise": "Subject Wise",
+        "historical": "Historical"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "viewDetails": "View Details"
+      }
+    }
+  }
+}

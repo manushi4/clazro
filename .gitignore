@@ -47,3 +47,7 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Next.js
+platform-studio/.next/
+platform-studio/out/

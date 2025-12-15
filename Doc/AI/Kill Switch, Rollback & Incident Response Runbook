@@ -1,0 +1,518 @@
+# Kill Switch, Rollback & Incident Response Runbook
+
+## 1. Purpose
+
+This runbook defines how Clazro safely responds to incidents involving:
+
+* AI model/provider failures
+* unsafe outputs or safety policy breaches
+* tool/connector abuse (including MCP)
+* automation runaway workflows
+* cost spikes
+
+It standardizes:
+
+* kill switches (global/tenant/feature/tool)
+* rollback (config, prompts, routing)
+* containment and recovery
+* post-incident review
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Fast containment > perfect diagnosis**
+2. **Kill switches must be one-click and auditable**
+3. **Rollback must restore last-known-good within minutes**
+4. **Never disable safety controls to restore service**
+5. **All incidents produce traceable artifacts**
+
+---
+
+## 3. Kill Switch Inventory
+
+Kill switches must exist at these levels:
+
+### 3.1 Global AI Kill Switch
+
+* disables all AI execution
+* app shows “AI unavailable” fallback UX
+
+### 3.2 Tenant AI Kill Switch
+
+* disables AI for a single tenant
+
+### 3.3 Feature Kill Switch
+
+* disables a specific featureId (e.g., coach_copilot)
+
+### 3.4 Provider/Model Kill Switch
+
+* disables a provider or model across routing
+* forces fallback provider
+
+### 3.5 Tool/Connector Kill Switch
+
+* disables specific toolId or connector
+* blocks tool execution immediately
+
+### 3.6 Automation Kill Switch
+
+* disables workflows globally or per tenant
+* pauses triggers and new runs
+
+All kill switch activations must be logged.
+
+---
+
+## 4. Rollback Types
+
+### 4.1 Prompt/Policy Rollback
+
+* revert to prior prompt version
+* revert system policy version
+
+### 4.2 Routing Rollback
+
+* revert routing policy version
+* revert fallback order
+
+### 4.3 Workflow Rollback
+
+* revert workflow definition version
+
+### 4.4 Tenant Config Rollback
+
+* revert tenant’s active AI config version pointer
+
+Rollbacks must be atomic pointer changes.
+
+---
+
+## 5. Incident Categories & Immediate Actions
+
+### 5.1 Unsafe Content Incident
+
+Examples:
+
+* disallowed content appears in output
+* kid profile receives unsafe response
+
+Immediate actions:
+
+1. Enable Feature or Global AI kill switch
+2. Roll back prompt/policy version
+3. Block affected templates
+4. Review safety logs and traceIds
+5. Notify tenant admins if required
+
+---
+
+### 5.2 Provider Outage / Degradation
+
+Examples:
+
+* high timeout/error rate
+
+Immediate actions:
+
+1. Disable affected provider/model in routing
+2. Force fallback provider
+3. Monitor latency/cost changes
+4. If systemic, enable AI kill switch
+
+---
+
+### 5.3 Tool/Connector Abuse
+
+Examples:
+
+* spam emails
+* mass calendar invites
+
+Immediate actions:
+
+1. Tool kill switch for connector
+2. Revoke tokens / disconnect OAuth
+3. Pause automation workflows that call tool
+4. Investigate tool audit logs
+
+---
+
+### 5.4 Automation Runaway
+
+Examples:
+
+* workflow loops
+* repeated triggers
+
+Immediate actions:
+
+1. Automation kill switch
+2. Pause offending workflowId
+3. Dedup keys validation
+4. Inspect workflow definition
+
+---
+
+### 5.5 Cost Spike
+
+Examples:
+
+* tenant exceeds budget quickly
+
+Immediate actions:
+
+1. Enforce throttles and budget caps
+2. Route to cheaper models
+3. Disable premium capability classes
+4. Notify tenant admins
+
+---
+
+## 6. Response Playbook (Step-by-Step)
+
+### Step 1: Detect
+
+Sources:
+
+* alerts (cost, failures, safety)
+* user/tenant reports
+* dashboard anomalies
+
+### Step 2: Contain
+
+* activate the smallest effective kill switch
+* if uncertain, escalate to larger kill switch
+
+### Step 3: Stabilize
+
+* rollback to last-known-good config
+* disable degraded provider
+* disable offending tool/workflow
+
+### Step 4: Investigate
+
+* use traceIds to track:
+
+  * model/provider decisions
+  * prompt versions
+  * tool calls
+  * workflow steps
+
+### Step 5: Recover
+
+* re-enable incrementally:
+
+  * canary tenant
+  * limited features
+  * monitor metrics
+
+### Step 6: Postmortem
+
+* root cause
+* preventive actions
+* update guides, tests, and controls
+
+---
+
+## 7. Required Operational Tooling
+
+* kill switch UI in Platform Studio
+* config version history and rollback UI
+* audit log search by traceId
+* dashboards for cost/reliability/safety
+* approval queue visibility
+
+---
+
+## 8. Communication Protocol
+
+### 8.1 Internal
+
+* incident channel created
+* assign incident commander
+
+### 8.2 Tenant Communication
+
+* notify tenant admins if:
+
+  * safety event affects minors
+  * connector compromise
+  * sustained outage
+
+Messages must be factual and include timeframe.
+
+---
+
+## 9. Validation & Drills
+
+* quarterly kill switch drills
+* rollback drills
+* simulated tool abuse scenario
+* simulated unsafe output scenario
+
+---
+
+## 10. Phase 1 Minimum Implementation
+
+1. global + tenant AI kill switches
+2. feature kill switch
+3. provider/model disable
+4. tool kill switch
+5. rollback pointers
+6. audit logs searchable by traceId
+
+---
+
+## 11. Non-Negotiables Summary
+
+* kill switches must be immediate
+* rollback is pointer-based
+* incidents are traceable
+* re-enable gradually
+
+---
+
+This runbook ensures Clazro can respond quickly and safely to AI, automation, and connector incidents.
+
+
+---
+
+## 12. Database Schema for Kill Switches
+
+```sql
+CREATE TABLE ai_kill_switches (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  switch_type TEXT NOT NULL, -- 'global', 'tenant', 'feature', 'provider', 'tool'
+  reference_id TEXT, -- customer_id, use_case_id, provider_id, tool_id
+  is_active BOOLEAN DEFAULT false,
+  activated_by UUID,
+  activated_at TIMESTAMPTZ,
+  reason TEXT,
+  auto_reactivate_at TIMESTAMPTZ, -- optional auto-recovery
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(switch_type, reference_id)
+);
+
+-- Insert default switches (inactive)
+INSERT INTO ai_kill_switches (switch_type, reference_id, is_active) VALUES
+  ('global', NULL, false);
+```
+
+---
+
+## 13. RPC Functions for Kill Switches
+
+```sql
+-- Activate kill switch
+CREATE OR REPLACE FUNCTION activate_ai_kill_switch(
+  p_switch_type TEXT,
+  p_reference_id TEXT,
+  p_reason TEXT,
+  p_activated_by UUID,
+  p_auto_reactivate_hours INTEGER DEFAULT NULL
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+  auto_time TIMESTAMPTZ;
+BEGIN
+  IF p_auto_reactivate_hours IS NOT NULL THEN
+    auto_time := now() + (p_auto_reactivate_hours || ' hours')::INTERVAL;
+  END IF;
+  
+  INSERT INTO ai_kill_switches (
+    switch_type, reference_id, is_active, reason, activated_by, activated_at, auto_reactivate_at
+  ) VALUES (
+    p_switch_type, p_reference_id, true, p_reason, p_activated_by, now(), auto_time
+  )
+  ON CONFLICT (switch_type, reference_id) DO UPDATE SET
+    is_active = true,
+    reason = p_reason,
+    activated_by = p_activated_by,
+    activated_at = now(),
+    auto_reactivate_at = auto_time,
+    updated_at = now();
+  
+  -- Log the activation
+  INSERT INTO ai_audit_logs (
+    trace_id, customer_id, user_id, role, use_case_id, status, refusal_reason
+  ) VALUES (
+    'killswitch_' || gen_random_uuid()::TEXT,
+    CASE WHEN p_switch_type = 'tenant' THEN p_reference_id::UUID ELSE NULL END,
+    p_activated_by::TEXT,
+    'admin',
+    'kill_switch_activation',
+    'success',
+    p_reason
+  );
+  
+  RETURN true;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Deactivate kill switch
+CREATE OR REPLACE FUNCTION deactivate_ai_kill_switch(
+  p_switch_type TEXT,
+  p_reference_id TEXT,
+  p_deactivated_by UUID
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+  UPDATE ai_kill_switches
+  SET is_active = false,
+      updated_at = now()
+  WHERE switch_type = p_switch_type
+    AND (reference_id = p_reference_id OR (reference_id IS NULL AND p_reference_id IS NULL));
+  
+  RETURN true;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Check if AI is blocked
+CREATE OR REPLACE FUNCTION is_ai_blocked(
+  p_customer_id UUID,
+  p_use_case_id TEXT DEFAULT NULL,
+  p_provider_id TEXT DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+  result JSONB;
+BEGIN
+  -- Check global switch
+  IF EXISTS (SELECT 1 FROM ai_kill_switches WHERE switch_type = 'global' AND is_active = true) THEN
+    RETURN jsonb_build_object('blocked', true, 'reason', 'AI globally disabled', 'switchType', 'global');
+  END IF;
+  
+  -- Check tenant switch
+  IF EXISTS (SELECT 1 FROM ai_kill_switches WHERE switch_type = 'tenant' AND reference_id = p_customer_id::TEXT AND is_active = true) THEN
+    RETURN jsonb_build_object('blocked', true, 'reason', 'AI disabled for tenant', 'switchType', 'tenant');
+  END IF;
+  
+  -- Check feature switch
+  IF p_use_case_id IS NOT NULL AND EXISTS (
+    SELECT 1 FROM ai_kill_switches WHERE switch_type = 'feature' AND reference_id = p_use_case_id AND is_active = true
+  ) THEN
+    RETURN jsonb_build_object('blocked', true, 'reason', 'Feature disabled', 'switchType', 'feature');
+  END IF;
+  
+  -- Check provider switch
+  IF p_provider_id IS NOT NULL AND EXISTS (
+    SELECT 1 FROM ai_kill_switches WHERE switch_type = 'provider' AND reference_id = p_provider_id AND is_active = true
+  ) THEN
+    RETURN jsonb_build_object('blocked', true, 'reason', 'Provider disabled', 'switchType', 'provider');
+  END IF;
+  
+  RETURN jsonb_build_object('blocked', false);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 14. Platform Studio Kill Switch UI
+
+### 14.1 Kill Switch Panel Component
+
+```typescript
+// platform-studio/src/app/studio/ai/kill-switches/page.tsx
+
+type KillSwitchState = {
+  switchType: 'global' | 'tenant' | 'feature' | 'provider' | 'tool';
+  referenceId: string | null;
+  isActive: boolean;
+  reason: string;
+  activatedAt: string | null;
+  activatedBy: string | null;
+};
+
+// UI Requirements:
+// - Big red button for global switch
+// - Toggle for tenant switch
+// - List of feature switches with toggles
+// - List of provider switches with toggles
+// - Reason input required on activation
+// - Confirmation dialog before activation
+// - Audit log display below
+```
+
+### 14.2 Service Functions
+
+```typescript
+// platform-studio/src/services/killSwitchService.ts
+
+export async function activateKillSwitch(
+  switchType: string,
+  referenceId: string | null,
+  reason: string,
+  activatedBy: string
+) {
+  const { data, error } = await supabase.rpc('activate_ai_kill_switch', {
+    p_switch_type: switchType,
+    p_reference_id: referenceId,
+    p_reason: reason,
+    p_activated_by: activatedBy
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function deactivateKillSwitch(
+  switchType: string,
+  referenceId: string | null,
+  deactivatedBy: string
+) {
+  const { data, error } = await supabase.rpc('deactivate_ai_kill_switch', {
+    p_switch_type: switchType,
+    p_reference_id: referenceId,
+    p_deactivated_by: deactivatedBy
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function checkAIBlocked(
+  customerId: string,
+  useCaseId?: string,
+  providerId?: string
+) {
+  const { data, error } = await supabase.rpc('is_ai_blocked', {
+    p_customer_id: customerId,
+    p_use_case_id: useCaseId,
+    p_provider_id: providerId
+  });
+  if (error) throw error;
+  return data;
+}
+```
+
+---
+
+## 15. Mobile App Fallback UI
+
+When AI is blocked, show fallback UI:
+
+```typescript
+// src/components/ai/AIBlockedFallback.tsx
+
+export function AIBlockedFallback({ reason }: { reason: string }) {
+  return (
+    <View style={styles.container}>
+      <Icon name="cloud-off" size={48} color={theme.colors.textSecondary} />
+      <Text style={styles.title}>AI Temporarily Unavailable</Text>
+      <Text style={styles.message}>
+        {reason || 'This feature is currently unavailable. Please try again later.'}
+      </Text>
+    </View>
+  );
+}
+```
+
+---
+
+## 16. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/ERROR_HANDLING_SPEC.md` - Error handling patterns
+- `src/error/GlobalErrorBoundary.tsx` - Error boundary pattern

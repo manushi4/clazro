@@ -185,6 +185,32 @@
       "subtitle": "Suggestions",
       "error": "Unable to load recommendations"
     },
+    "aiTutor": {
+      "title": "AI Tutor",
+      "subtitle": "Ask questions and get help",
+      "welcomeMessage": "Hi! I'm your AI tutor. Ask me anything about your studies!",
+      "placeholder": "Ask me anything...",
+      "setupRequired": "Tap ⚙️ to add API key",
+      "thinking": "Thinking...",
+      "errorGeneric": "Sorry, I couldn't process that. Please try again.",
+      "errorBlocked": "I can't respond to that. Let's talk about something else!",
+      "errorApiKey": "API key issue. Please check your settings.",
+      "settings": {
+        "title": "AI Settings",
+        "apiKeyLabel": "Gemini API Key",
+        "apiKeyPlaceholder": "Enter your Gemini API key",
+        "hint": "Get your API key from Google AI Studio (aistudio.google.com)",
+        "keyConfigured": "API key configured",
+        "save": "Save",
+        "clear": "Clear API Key",
+        "success": "Success",
+        "error": "Error",
+        "keySaved": "API key saved!",
+        "invalidKey": "Invalid API key",
+        "validationFailed": "Could not validate key",
+        "enterKey": "Please enter an API key"
+      }
+    },
     "classFeed": {
       "title": "Class Feed",
       "subtitle": "Announcements and updates",
@@ -586,6 +612,10 @@
         "message": "Message",
         "viewProfile": "View Profile"
       }
+    },
+    "n8nTest": {
+      "title": "n8n Automation Test",
+      "subtitle": "Test webhook automation workflows"
     }
   }
 }

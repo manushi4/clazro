@@ -1,0 +1,482 @@
+# Observability, Analytics & Cost Controls (Budgets, Throttles, Alerts)
+
+## 1. Purpose
+
+This guide defines how Clazro measures, controls, and governs AI and automation usage through:
+
+* structured observability (logs/metrics/traces)
+* analytics and dashboards
+* cost and token budgets
+* throttling and rate limits
+* alerts and anomaly detection
+
+The goal is to maintain **reliability, safety, and predictable cost** across tenants, roles, and audience profiles.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Every AI/automation execution is traceable** (traceId end-to-end)
+2. **Costs are enforced, not just reported**
+3. **Budgets are tenant-scoped and feature-scoped**
+4. **Throttling must degrade gracefully**
+5. **Alerts must be actionable**
+6. **No logging of raw PII by default**
+
+---
+
+## 3. Observability Model
+
+### 3.1 Signals
+
+#### Logs (structured)
+
+* per-request events with fields
+
+#### Metrics
+
+* counters, gauges, histograms
+
+#### Traces
+
+* end-to-end execution across services
+
+---
+
+## 4. Required Identifiers (Standard Fields)
+
+Every AI/automation event must include:
+
+* traceId
+* tenantId
+* userId (or anonymized hash)
+* role
+* audienceProfile
+* featureId
+* widgetId (if UI-driven)
+* workflowId + stepId (if automation)
+* providerId + modelId (for AI)
+
+---
+
+## 5. AI Metrics (Minimum)
+
+### 5.1 Usage & Performance
+
+* request count
+* latency p50/p90/p99
+* provider error rate
+* retries and fallback frequency
+
+### 5.2 Output Reliability
+
+* schema validation pass rate
+* refusal rate
+* safety flag rate
+
+### 5.3 Cost
+
+* tokens in/out
+* cost per request
+* cost per feature
+* cost per tenant/day
+
+---
+
+## 6. Automation Metrics (Minimum)
+
+* workflow run count
+* success vs failure rate
+* step duration
+* retry rate
+* approval queue time
+* idempotency dedupe rate
+
+---
+
+## 7. Budgeting Model
+
+### 7.1 Budget Levels
+
+Budgets can exist at:
+
+* tenant/day
+* feature/day
+* user/day
+* workflow/day
+
+### 7.2 Budget Policies
+
+Each budget has:
+
+* cap value (currency or tokens)
+* action on breach (degrade, deny, notify)
+* reset schedule
+
+### 7.3 Default Actions
+
+When near cap:
+
+* route to cheaper models
+* reduce max tokens
+* disable premium capability classes
+
+When exceeded:
+
+* block non-critical features
+* show “limit reached” UX
+* notify admins
+
+---
+
+## 8. Throttling & Rate Limiting
+
+### 8.1 Rate Limits
+
+* per tenant (req/min)
+* per user (req/min)
+* per feature (req/min)
+
+### 8.2 Throttle Behavior
+
+Throttle must:
+
+* return a clear error code
+* suggest retry after
+* degrade UI gracefully
+
+For minors:
+
+* do not encourage repeated retries
+
+---
+
+## 9. Alerts
+
+### 9.1 Cost Alerts
+
+* sudden spike in daily spend
+* budget nearing cap (80%, 90%, 100%)
+
+### 9.2 Reliability Alerts
+
+* provider timeout spike
+* schema failure spike
+* automation failure spike
+
+### 9.3 Safety Alerts
+
+* elevated crisis detections
+* elevated refusal or unsafe attempts
+
+---
+
+## 10. Dashboards
+
+Minimum dashboards:
+
+* Tenant cost dashboard
+* Feature cost dashboard
+* Provider reliability dashboard
+* Safety & refusal dashboard
+* Automation success dashboard
+
+---
+
+## 11. Logging & Privacy
+
+* log redacted parameters
+* never store raw child chat transcripts by default
+* store only:
+
+  * policy versions
+  * safety outcomes
+  * metrics
+
+---
+
+## 12. Audit Trail Requirements
+
+For all AI/tool calls:
+
+* who invoked
+* what feature
+* what provider/tool
+* what outcome
+* what cost
+
+Audits must be immutable and tenant-scoped.
+
+---
+
+## 13. Anomaly Detection
+
+Detect:
+
+* abnormal token usage patterns
+* repeated tool denials
+* sudden increase in refusals
+
+Action:
+
+* throttle
+* alert
+* auto-disable feature (optional)
+
+---
+
+## 14. Phase 1 Minimum Implementation
+
+1. traceId propagation across app → gateway → provider → tools
+2. structured logs for every request
+3. budget enforcement per tenant/day
+4. rate limits per tenant/user
+5. basic alerts for cost + provider errors
+
+---
+
+## 15. Non-Negotiables Summary
+
+* costs are enforced via budgets
+* throttling degrades gracefully
+* dashboards exist per tenant and feature
+* logs protect privacy
+
+---
+
+This guide ensures Clazro’s AI and automation remain **observable, affordable, and reliable** at scale.
+
+
+---
+
+## 16. Database Schema for Observability
+
+### 16.1 AI Audit Logs Table
+
+```sql
+CREATE TABLE ai_audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trace_id TEXT NOT NULL,
+  customer_id UUID REFERENCES customers(id),
+  user_id TEXT NOT NULL,
+  role TEXT NOT NULL,
+  audience_profile TEXT,
+  -- Request
+  use_case_id TEXT NOT NULL,
+  widget_id TEXT,
+  input_hash TEXT, -- SHA256 hash for privacy
+  context_refs JSONB DEFAULT '{}',
+  -- Execution
+  provider_id TEXT,
+  model_id TEXT,
+  prompt_id TEXT,
+  prompt_version INTEGER,
+  -- Response
+  status TEXT NOT NULL, -- 'success', 'refused', 'error', 'fallback'
+  refusal_reason TEXT,
+  safety_flags TEXT[] DEFAULT '{}',
+  fallback_path TEXT[],
+  -- Metrics
+  tokens_in INTEGER,
+  tokens_out INTEGER,
+  cost_usd DECIMAL(10,6),
+  latency_ms INTEGER,
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes for common queries
+CREATE INDEX idx_ai_audit_trace ON ai_audit_logs(trace_id);
+CREATE INDEX idx_ai_audit_customer ON ai_audit_logs(customer_id, created_at);
+CREATE INDEX idx_ai_audit_user ON ai_audit_logs(user_id, created_at);
+CREATE INDEX idx_ai_audit_status ON ai_audit_logs(status, created_at);
+```
+
+### 16.2 AI Budgets Table
+
+```sql
+CREATE TABLE ai_budgets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES customers(id),
+  budget_type TEXT NOT NULL, -- 'tenant', 'feature', 'user'
+  reference_id TEXT, -- use_case_id or user_id
+  -- Limits
+  daily_limit_usd DECIMAL(10,2),
+  monthly_limit_usd DECIMAL(10,2),
+  daily_token_limit INTEGER,
+  monthly_token_limit INTEGER,
+  -- Current Usage
+  current_daily_spend DECIMAL(10,2) DEFAULT 0,
+  current_monthly_spend DECIMAL(10,2) DEFAULT 0,
+  current_daily_tokens INTEGER DEFAULT 0,
+  current_monthly_tokens INTEGER DEFAULT 0,
+  -- Actions
+  action_on_limit TEXT DEFAULT 'deny', -- 'deny', 'degrade', 'notify'
+  -- Reset tracking
+  last_daily_reset TIMESTAMPTZ DEFAULT now(),
+  last_monthly_reset TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(customer_id, budget_type, reference_id)
+);
+
+-- Function to reset daily budgets (run via cron)
+CREATE OR REPLACE FUNCTION reset_daily_ai_budgets()
+RETURNS void AS $$
+BEGIN
+  UPDATE ai_budgets
+  SET current_daily_spend = 0,
+      current_daily_tokens = 0,
+      last_daily_reset = now()
+  WHERE last_daily_reset < CURRENT_DATE;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 17. RPC Functions for Observability
+
+```sql
+-- Get AI usage stats for dashboard
+CREATE OR REPLACE FUNCTION get_ai_usage_stats(
+  p_customer_id UUID,
+  p_start_date TIMESTAMPTZ,
+  p_end_date TIMESTAMPTZ
+)
+RETURNS JSONB AS $$
+BEGIN
+  RETURN jsonb_build_object(
+    'totalRequests', (
+      SELECT COUNT(*) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'totalCost', (
+      SELECT COALESCE(SUM(cost_usd), 0) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'totalTokens', (
+      SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'avgLatency', (
+      SELECT COALESCE(AVG(latency_ms), 0) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'errorRate', (
+      SELECT COALESCE(
+        COUNT(*) FILTER (WHERE status = 'error')::DECIMAL / NULLIF(COUNT(*), 0),
+        0
+      ) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'refusalRate', (
+      SELECT COALESCE(
+        COUNT(*) FILTER (WHERE status = 'refused')::DECIMAL / NULLIF(COUNT(*), 0),
+        0
+      ) FROM ai_audit_logs
+      WHERE customer_id = p_customer_id
+        AND created_at BETWEEN p_start_date AND p_end_date
+    ),
+    'byUseCase', (
+      SELECT jsonb_agg(jsonb_build_object(
+        'useCaseId', use_case_id,
+        'count', cnt,
+        'cost', cost
+      ))
+      FROM (
+        SELECT use_case_id, COUNT(*) as cnt, SUM(cost_usd) as cost
+        FROM ai_audit_logs
+        WHERE customer_id = p_customer_id
+          AND created_at BETWEEN p_start_date AND p_end_date
+        GROUP BY use_case_id
+      ) sub
+    ),
+    'byProvider', (
+      SELECT jsonb_agg(jsonb_build_object(
+        'providerId', provider_id,
+        'count', cnt,
+        'avgLatency', avg_latency
+      ))
+      FROM (
+        SELECT provider_id, COUNT(*) as cnt, AVG(latency_ms) as avg_latency
+        FROM ai_audit_logs
+        WHERE customer_id = p_customer_id
+          AND created_at BETWEEN p_start_date AND p_end_date
+        GROUP BY provider_id
+      ) sub
+    )
+  );
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 18. Integration with Existing Analytics
+
+Extend existing `analytics_events` table for AI events:
+
+```sql
+-- AI-specific event types
+INSERT INTO analytics_events (
+  event_name, event_category, customer_id, user_id, role,
+  properties, timestamp
+) VALUES (
+  'ai_request', 'ai', :customer_id, :user_id, :role,
+  jsonb_build_object(
+    'traceId', :trace_id,
+    'useCaseId', :use_case_id,
+    'provider', :provider,
+    'status', :status,
+    'latencyMs', :latency_ms,
+    'costUsd', :cost_usd
+  ),
+  now()
+);
+```
+
+---
+
+## 19. Dashboard Queries for Platform Studio
+
+```typescript
+// platform-studio/src/services/aiAnalyticsService.ts
+
+export async function fetchAIUsageStats(customerId: string, days: number = 7) {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  
+  const { data, error } = await supabase.rpc('get_ai_usage_stats', {
+    p_customer_id: customerId,
+    p_start_date: startDate.toISOString(),
+    p_end_date: new Date().toISOString()
+  });
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchBudgetStatus(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_budgets')
+    .select('*')
+    .eq('customer_id', customerId);
+  
+  if (error) throw error;
+  return data;
+}
+```
+
+---
+
+## 20. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/ANALYTICS_TELEMETRY_SPEC.md` - Existing analytics system
+- `src/hooks/useAnalytics.ts` - Analytics hook pattern

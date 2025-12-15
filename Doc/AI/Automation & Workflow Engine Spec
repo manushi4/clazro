@@ -1,0 +1,263 @@
+# Automation & Workflow Engine Spec (Triggers / Actions / Idempotency)
+
+## 1. Purpose
+
+This guide defines the **automation and workflow engine** used by Clazro to run reliable, auditable, and safe background processes. It covers **triggers**, **actions**, **guards**, **idempotency**, **retries**, and **approvals**, and aligns with the AI Gateway, Tool/Connector Gateway, and Platform Studio governance.
+
+Automations must **never break the app UI**, **never bypass permissions**, and **never act silently for minors**.
+
+---
+
+## 2. Core Principles (Non‑Negotiable)
+
+1. **Event-driven and explicit** – no hidden background behavior.
+2. **Idempotent by default** – retries must not duplicate effects.
+3. **Policy-first** – RBAC, consent, and audience rules are enforced before execution.
+4. **Human-in-the-loop where required** – approvals for sensitive actions.
+5. **Observable and auditable** – every step logged with a traceId.
+6. **Fail-safe** – failures degrade gracefully and notify, not crash.
+
+---
+
+## 3. Architecture Overview
+
+### 3.1 Components
+
+* **Trigger Sources**: App events, backend events, schedules, conditions
+* **Workflow Runner**: Executes steps (e.g., n8n or internal runner)
+* **AI Gateway**: All AI calls routed here
+* **Tool/Connector Gateway**: All external actions routed here
+* **Audit & Metrics Store**: Immutable logs, metrics, alerts
+
+### 3.2 Control Plane vs Data Plane
+
+* **Control Plane**: Workflow definitions, guards, approvals (Platform Studio)
+* **Data Plane**: Runtime execution, retries, outcomes
+
+---
+
+## 4. Trigger Types
+
+### 4.1 Event Triggers
+
+Triggered by system events:
+
+* `student_completed_lesson`
+* `meeting_scheduled`
+* `goal_overdue`
+
+**Requirements**:
+
+* Events must include a unique `eventId`
+* Payloads should contain **references**, not raw PII
+
+### 4.2 Schedule Triggers
+
+* Cron-like schedules (daily/weekly/monthly)
+* Tenant and timezone aware
+
+Examples:
+
+* Daily parent digest
+* Weekly coach summary
+
+### 4.3 Condition Triggers
+
+Triggered when conditions are met:
+
+* inactivity > N days
+* score below threshold
+
+Conditions must be deterministic and testable.
+
+---
+
+## 5. Actions
+
+### 5.1 Action Categories
+
+1. **AI Actions**
+
+   * generate summary
+   * classify or extract data
+
+2. **Tool Actions**
+
+   * create calendar event
+   * send notification
+
+3. **Data Actions**
+
+   * update internal state via backend APIs
+
+4. **Control Actions**
+
+   * wait/delay
+   * branch (if/else)
+
+All actions must declare **side effects**.
+
+---
+
+## 6. Workflow Structure
+
+A workflow is defined as:
+
+* `workflowId`
+* `trigger`
+* `guards`
+* `steps[]`
+* `approvalRules`
+* `retryPolicy`
+* `idempotencyPolicy`
+
+### 6.1 Guards (Preconditions)
+
+Checked before execution:
+
+* RBAC permissions
+* consent validity
+* audience profile rules
+* tenant feature flags
+
+Failure at guard stage aborts execution.
+
+---
+
+## 7. Idempotency
+
+### 7.1 Idempotency Keys
+
+Every workflow execution must compute:
+
+```
+idempotencyKey = hash(workflowId + triggerId + entityId + timeWindow)
+```
+
+### 7.2 Deduplication Window
+
+* Configurable per workflow
+* Common defaults: 5 min / 1 hr / 24 hr
+
+### 7.3 Idempotent Actions
+
+* Tool calls must accept `idempotencyKey`
+* Data writes must be conditional or transactional
+
+---
+
+## 8. Retry & Failure Handling
+
+### 8.1 Retry Policy
+
+Defined per workflow or step:
+
+* maxAttempts
+* backoff strategy (exponential + jitter)
+* retryable error types
+
+### 8.2 Failure Classes
+
+* `POLICY_DENIED`
+* `VALIDATION_ERROR`
+* `AI_PROVIDER_ERROR`
+* `TOOL_ERROR`
+* `TIMEOUT`
+
+### 8.3 Failure Outcomes
+
+* retry
+* skip step
+* abort workflow
+* notify user/admin
+
+---
+
+## 9. Human-in-the-Loop Approvals
+
+### 9.1 When Required
+
+* actions affecting minors
+* messaging or external communication
+* destructive or irreversible actions
+
+### 9.2 Approval Models
+
+* synchronous (blocking)
+* asynchronous (queue + notify)
+
+Approvals must include preview (`dryRun`) output.
+
+---
+
+## 10. Security & Permissions
+
+* Workflow execution identity must be explicit
+* No workflow may elevate privileges
+* Tool actions require separate permissions
+* Secrets never stored in workflow definitions
+
+---
+
+## 11. Observability & Audit
+
+Every workflow run must log:
+
+* traceId
+* workflowId
+* trigger info
+* step outcomes
+* retries
+* approvals
+* final status
+
+Metrics:
+
+* success rate
+* retry rate
+* average duration
+* cost (AI + tools)
+
+---
+
+## 12. Platform Studio Requirements
+
+Studio must support:
+
+* visual workflow definition
+* guard and approval configuration
+* enable/disable per tenant
+* test run (sandbox)
+* versioning and rollback
+
+---
+
+## 13. Offline & Degraded Mode
+
+* Triggers may queue when offline
+* Executions resume when backend available
+* No partial side effects without logs
+
+---
+
+## 14. Phase 1 Minimum Implementation
+
+1. Event + schedule triggers
+2. AI + tool actions via gateways
+3. Idempotency keys + dedupe store
+4. Retry with backoff
+5. Audit logs + traceId
+
+---
+
+## 15. Non‑Negotiables Summary
+
+* Every workflow is idempotent
+* Guards run before actions
+* Approvals for sensitive actions
+* All executions are auditable
+* Failures degrade safely
+
+---
+
+This spec ensures automations are **predictable, safe, and scalable** across tenants and audiences.

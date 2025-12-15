@@ -65,6 +65,10 @@ import { ParentAIPredictionsWidget } from "../components/widgets/parent/ParentAI
 import { ParentAIRecommendationsWidget } from "../components/widgets/parent/ParentAIRecommendationsWidget";
 import { ParentAIAlertsWidget } from "../components/widgets/parent/ParentAIAlertsWidget";
 import { ParentComparisonAnalyticsWidget } from "../components/widgets/parent/ParentComparisonAnalyticsWidget";
+// AI widgets
+import { AITutorChatWidget } from "../components/widgets/ai/AITutorChatWidget";
+// Automation widgets
+import { N8nTestWidget } from "../components/widgets/automation/N8nTestWidget";
 import type { WidgetComponent, WidgetId, WidgetMetadata } from "../types/widget.types";
 
 type WidgetRegistryEntry = {
@@ -441,6 +445,34 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
       requiredPermissions: [],
     },
   },
+  "ai.tutor-chat": {
+    component: AITutorChatWidget,
+    metadata: {
+      id: "ai.tutor-chat",
+      titleKey: "dashboard:widgets.aiTutor.title",
+      descriptionKey: "dashboard:widgets.aiTutor.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["standard", "expanded"],
+      defaultSize: "expanded",
+      minHeight: "lg",
+      dataPolicy: {
+        maxQueries: 0,
+        staleTimeMs: 0,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: false,
+      },
+      defaultConfig: {
+        showSettings: true,
+        maxMessages: 50,
+        enableVoice: false,
+      },
+      requiredPermissions: ["ai.tutor.use"],
+    },
+  },
   "notes.summary": {
     component: NotesSummaryWidget,
     metadata: {
@@ -691,6 +723,35 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
         layoutStyle: "list",
         compactMode: false,
         enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  // ============ AUTOMATION WIDGETS ============
+  "automation.n8n-test": {
+    component: N8nTestWidget,
+    metadata: {
+      id: "automation.n8n-test",
+      titleKey: "dashboard:widgets.n8nTest.title",
+      descriptionKey: "dashboard:widgets.n8nTest.subtitle",
+      featureId: "automation",
+      roles: ["student", "teacher", "parent", "admin"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["standard", "expanded"],
+      defaultSize: "standard",
+      minHeight: "md",
+      dataPolicy: {
+        maxQueries: 0,
+        staleTimeMs: 0,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: false,
+      },
+      defaultConfig: {
+        webhookUrl: "",
+        showResponse: true,
+        enableCustomMessage: true,
       },
       requiredPermissions: [],
     },

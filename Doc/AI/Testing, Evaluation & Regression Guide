@@ -1,0 +1,279 @@
+# Testing, Evaluation & Regression Guide (Golden Sets, Prompt/Model Tests)
+
+## 1. Purpose
+
+This guide defines how Clazro tests and evaluates AI features and automations to ensure:
+
+* stable behavior across releases
+* safety compliance (especially for minors)
+* reliable structured outputs
+* controlled cost and latency
+
+It establishes a repeatable framework for:
+
+* **golden test sets**
+* prompt regression testing
+* model/provider regression testing
+* automation workflow testing
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **No prompt or model change ships without regression checks**
+2. **Safety tests are mandatory for all audiences; stricter for kids**
+3. **Structured outputs must be schema-validated**
+4. **Evaluations are versioned and auditable**
+5. **Tests must be deterministic where possible**
+6. **Budget/latency tests are part of release readiness**
+
+---
+
+## 3. Test Taxonomy
+
+### 3.1 Unit Tests
+
+* template assembly
+* redaction rules
+* schema validators
+* routing decision logic
+
+### 3.2 Integration Tests
+
+* AI Gateway → provider adapter
+* AI Gateway → tool gateway
+* automation runner → AI + tools
+
+### 3.3 End-to-End Tests
+
+* app widget request → backend → response
+* workflow trigger → execution → audit logs
+
+### 3.4 Safety & Abuse Tests
+
+* prompt injection attempts
+* unsafe content attempts
+* tool abuse simulations
+
+---
+
+## 4. Golden Sets
+
+### 4.1 What is a Golden Set?
+
+A curated dataset of test cases that represents real usage patterns.
+
+Each case includes:
+
+* featureId
+* audienceProfile
+* input
+* minimal context bundle
+* expected properties (not necessarily exact text)
+
+### 4.2 Golden Set Types
+
+* **Functional**: correctness/utility
+* **Safety**: forbidden topics
+* **Schema**: strict JSON outputs
+* **Edge cases**: empty input, ambiguous prompts
+* **Cost/latency**: long contexts and short contexts
+
+### 4.3 Storage & Versioning
+
+Golden sets must be:
+
+* stored in a versioned repository or controlled dataset store
+* linked to feature versions and prompt versions
+
+No ad-hoc edits without review.
+
+---
+
+## 5. Prompt Regression Testing
+
+### 5.1 When Required
+
+* any template change
+* any system policy change
+* any audience profile policy change
+
+### 5.2 How to Evaluate
+
+Evaluate outputs against expected properties:
+
+* contains required elements
+* avoids forbidden content
+* stays within length/tone constraints
+* refusal when required
+
+Avoid relying on exact string matches.
+
+---
+
+## 6. Model/Provider Regression Testing
+
+### 6.1 When Required
+
+* switching provider
+* switching model version
+* enabling a new model for a capability class
+
+### 6.2 Comparison Metrics
+
+* safety flag rate
+* refusal correctness
+* schema success rate
+* cost per request
+* latency p95
+* user satisfaction signals (if available)
+
+A model cannot be promoted unless it meets thresholds.
+
+---
+
+## 7. Structured Output Testing
+
+For `outputMode=SCHEMA`:
+
+* validate output against schema
+* record schema pass rate
+
+Fail if:
+
+* schema pass rate below threshold
+* fields missing
+* invalid types
+
+Optionally allow one repair attempt, then fail.
+
+---
+
+## 8. Safety & Crisis Testing
+
+### 8.1 Required Scenarios
+
+* self-harm ideation prompts
+* violence prompts
+* sexual content prompts
+* harassment prompts
+* PII leakage prompts
+
+### 8.2 Expected Behavior
+
+* safe refusal
+* escalation path (if crisis)
+* no enabling instructions
+
+Kids must refuse more aggressively.
+
+---
+
+## 9. Tool & Connector Testing
+
+Test:
+
+* allowlist enforcement
+* OAuth expiry handling
+* parameter validation
+* output sanitization
+* idempotency (no duplicates)
+
+Simulate tool abuse and prompt injection.
+
+---
+
+## 10. Automation Workflow Testing
+
+### 10.1 Workflow Unit Tests
+
+* trigger evaluation
+* guard conditions
+* idempotency key generation
+
+### 10.2 Workflow Integration Tests
+
+* trigger → runner → step execution
+* approval pause/resume
+* retries and safe failure
+
+### 10.3 Workflow Regression
+
+* changes to workflow definitions require test runs
+
+---
+
+## 11. Performance & Cost Testing
+
+Every release must test:
+
+* latency p95 per critical feature
+* cost per request
+* budget enforcement
+* throttling behavior
+
+Reject release if:
+
+* cost spikes above threshold
+* latency exceeds SLA
+
+---
+
+## 12. Thresholds (Recommended Defaults)
+
+Per feature (tenant configurable):
+
+* schema pass rate: ≥ 95% for structured outputs
+* safety violations: 0% in golden safety set
+* latency p95: within SLA
+* budget tests: enforcement verified
+
+---
+
+## 13. Evaluation Pipeline
+
+Recommended stages:
+
+1. local/dev quick tests
+2. staging golden set run
+3. canary tenant rollout
+4. production monitoring and drift detection
+
+Roll back immediately on regression.
+
+---
+
+## 14. Audit & Traceability
+
+Each evaluation run stores:
+
+* prompt version
+* policy version
+* routing version
+* model/provider
+* dataset version
+* results summary
+
+---
+
+## 15. Phase 1 Minimum Implementation
+
+1. golden sets for top AI features
+2. prompt regression suite
+3. schema validation tests
+4. basic tool allowlist tests
+5. automation idempotency tests
+
+---
+
+## 16. Non-Negotiables Summary
+
+* no prompt/model change without regression
+* safety tests always
+* schema outputs validated
+* cost/latency tested
+* evaluations are versioned
+
+---
+
+This guide ensures Clazro’s AI and automations remain **safe, stable, and predictable** as models and prompts evolve.

@@ -1,0 +1,532 @@
+# Platform Studio Extensions Guide (AI Config UI, Validation, Publish Flow)
+
+## 1. Purpose
+
+This guide defines how Platform Studio must be extended to configure, validate, publish, and roll back:
+
+* AI features and widgets
+* audience profiles and child safety rules
+* prompt templates and policies
+* model routing and fallback rules
+* tools/connectors/MCP allowlists
+* automation workflows (triggers/actions/approvals)
+
+It ensures AI and automation remain **config-driven**, **safe**, and **tenant-governed**, consistent with the platform’s architecture.
+
+---
+
+## 2. Design Principles
+
+1. **Everything is versioned** (draft → validate → publish)
+2. **Guardrails prevent app-breaking config**
+3. **Child safety rules cannot be weakened**
+4. **Validation is blocking, not advisory**
+5. **Rollback is one-click**
+6. **Audit logs for all changes**
+
+---
+
+## 3. New Studio Modules (Required)
+
+### 3.1 AI Features Catalog
+
+UI to manage:
+
+* featureId
+* enabled roles
+* enabled audience profiles
+* widgets/screens mapping
+* capability class
+* output mode (text/json/schema)
+
+### 3.2 Audience Profiles
+
+UI to manage:
+
+* Kid/Teen/Adult/Coaching profiles
+* tone rules, response limits
+* topic restrictions
+* tool policy references
+
+### 3.3 Prompt Templates & Policies
+
+UI to manage:
+
+* system policies (global)
+* profile policies
+* feature templates
+* variable definitions
+* version history
+
+### 3.4 Model Routing & Fallback
+
+UI to manage:
+
+* provider enablement per tenant
+* routing rules per feature/profile
+* fallback chains
+* cost & latency constraints
+
+### 3.5 Tools/Connectors/MCP
+
+UI to manage:
+
+* connectors list
+* OAuth connections
+* tool allowlists
+* tool risk levels
+* approvals required
+* tool kill switch
+
+### 3.6 Automation Workflows
+
+UI to manage:
+
+* triggers (event/schedule/condition)
+* steps and actions
+* guards (RBAC/consent/profile)
+* approval rules
+* retry/idempotency policy
+
+---
+
+## 4. Validation Framework
+
+### 4.1 Config Schema Validation
+
+* JSON schema validation for every module
+* required fields and type checks
+
+### 4.2 Cross-Module Validation
+
+Must validate:
+
+* feature references exist
+* prompt template references exist
+* routing rules reference enabled providers
+* tool allowlists only reference supported tools
+* kid profile never has tool access
+
+### 4.3 Safety Validation (Blocking)
+
+* kid/teen topic restrictions enforced
+* forbidden template patterns blocked
+* crisis flow enabled where required
+
+### 4.4 Budget Validation
+
+* tenant budgets exist
+* feature caps not missing
+
+### 4.5 Workflow Validation
+
+* idempotency required for writes
+* approvals required for high-risk actions
+* retry policies defined
+
+---
+
+## 5. Publish Flow (Draft → Validate → Publish)
+
+### 5.1 Draft Mode
+
+* editable config
+* not applied in runtime
+
+### 5.2 Validate
+
+* run validation framework
+* show errors + warnings
+* block publish if errors
+
+### 5.3 Publish
+
+* create immutable version
+* update tenant’s active version pointer
+* generate audit event
+
+### 5.4 Rollback
+
+* select previous known-good version
+* update pointer instantly
+* log rollback reason
+
+---
+
+## 6. Tenant Controls
+
+Studio must support per-tenant:
+
+* enable/disable AI globally
+* enable/disable per feature
+* enable/disable tools/connectors
+* budgets and rate limits
+* approval requirements
+
+Tenants cannot override child safety constraints.
+
+---
+
+## 7. Operational Views
+
+### 7.1 Audit Logs
+
+* change history
+* who modified what
+* which version published
+
+### 7.2 Observability Dashboards
+
+* cost spend
+* error rates
+* refusal/safety flags
+* automation success
+
+### 7.3 Approval Queue
+
+* pending approvals
+* filters by feature/workflow
+
+---
+
+## 8. UX Guardrails (Must-Haves)
+
+* prevent publishing if AI config would leave tenant with broken navigation
+* prevent “empty allowlist” errors from breaking tool features
+* enforce required defaults
+* provide test-run button for workflows and prompts
+
+---
+
+## 9. Test & Sandbox Mode
+
+Studio should support:
+
+* test prompt execution (sandbox)
+* workflow dry-run preview
+* tool dry-run
+
+Sandbox must:
+
+* not write data
+* use test connectors
+
+---
+
+## 10. Access Control in Studio
+
+Studio modules must be permissioned:
+
+* tenant admin: tenant configs
+* platform admin: global policies and provider catalog
+* coach: view only or propose changes
+
+---
+
+## 11. Phase 1 Minimum Implementation
+
+1. AI feature catalog + prompt editor
+2. routing rules UI
+3. tool allowlists UI + OAuth connect
+4. workflow builder (basic)
+5. validate/publish/rollback with audit logs
+
+---
+
+## 12. Non-Negotiables Summary
+
+* Studio is the control plane
+* publish is gated by validation
+* rollback is instant
+* child safety cannot be weakened
+* all changes are auditable
+
+---
+
+This guide ensures Platform Studio can govern AI and automation safely and at scale across tenants.
+
+
+---
+
+## 13. Platform Studio UI Specifications
+
+### 13.1 New Sidebar Menu Items
+
+Add to `platform-studio/src/app/studio/layout.tsx`:
+
+```typescript
+const aiMenuItems = [
+  { label: 'AI Features', href: '/studio/ai/features', icon: 'Bot' },
+  { label: 'Routing Rules', href: '/studio/ai/routing', icon: 'GitBranch' },
+  { label: 'Prompts', href: '/studio/ai/prompts', icon: 'FileText' },
+  { label: 'Audience Profiles', href: '/studio/ai/profiles', icon: 'Users' },
+  { label: 'Budgets', href: '/studio/ai/budgets', icon: 'DollarSign' },
+  { label: 'Kill Switches', href: '/studio/ai/kill-switches', icon: 'Power' },
+  { label: 'Audit Logs', href: '/studio/ai/audit', icon: 'FileSearch' },
+];
+```
+
+### 13.2 AI Features Page Fields
+
+```typescript
+// platform-studio/src/app/studio/ai/features/page.tsx
+
+type AIFeatureForm = {
+  useCaseId: string;        // Required, unique per customer
+  displayName: string;      // Required
+  description: string;      // Optional
+  capabilityClass: CapabilityClass; // Required, dropdown
+  enabledRoles: string[];   // Multi-select: student, teacher, parent, admin
+  enabledProfiles: string[]; // Multi-select: kid, teen, adult, coaching
+  outputMode: OutputMode;   // Radio: TEXT, JSON, SCHEMA
+  toolsPolicy: ToolsPolicy; // Radio: DISABLED, ALLOWED, REQUIRED
+  allowedTools: string[];   // Multi-select (if tools allowed)
+  isEnabled: boolean;       // Toggle
+};
+
+// Validation Rules
+const validationRules = {
+  useCaseId: { required: true, pattern: /^[a-z_]+$/ },
+  displayName: { required: true, maxLength: 100 },
+  capabilityClass: { required: true },
+  enabledRoles: { required: true, minLength: 1 },
+  enabledProfiles: { required: true, minLength: 1 },
+  // Kid profile cannot have tools
+  toolsPolicy: (value, form) => {
+    if (form.enabledProfiles.includes('kid') && value !== 'TOOLS_DISABLED') {
+      return 'Kids cannot have tool access';
+    }
+    return true;
+  }
+};
+```
+
+### 13.3 Routing Rules Page Fields
+
+```typescript
+type RoutingRuleForm = {
+  ruleName: string;
+  priority: number;         // 1-1000, lower = higher priority
+  useCaseIds: string[];     // Multi-select, empty = all
+  audienceProfiles: string[]; // Multi-select, empty = all
+  roles: string[];          // Multi-select, empty = all
+  primaryProvider: string;  // Dropdown: openai, anthropic, google, bedrock
+  primaryModel: string;     // Dropdown based on provider
+  fallbackProviders: Array<{ provider: string; model: string }>;
+  maxTokens: number;        // Optional
+  temperature: number;      // 0.0 - 2.0
+  latencySlaMsMs: number;   // Optional
+  isEnabled: boolean;
+};
+```
+
+### 13.4 Prompts Editor Page
+
+```typescript
+type PromptForm = {
+  promptId: string;
+  displayName: string;
+  systemPrompt: string;     // Textarea with syntax highlighting
+  userTemplate: string;     // Textarea with {{variable}} support
+  variables: Array<{
+    name: string;
+    type: 'string' | 'number' | 'boolean' | 'array';
+    required: boolean;
+    defaultValue: string;
+  }>;
+  useCaseIds: string[];
+  audienceProfiles: string[];
+  forbiddenPatterns: string[]; // Regex patterns to block
+  status: 'draft' | 'active' | 'archived';
+};
+
+// Variable preview panel
+// Test execution button (sandbox mode)
+```
+
+### 13.5 Kill Switch Controls
+
+```typescript
+type KillSwitchPanel = {
+  globalSwitch: { isActive: boolean; reason: string };
+  tenantSwitch: { isActive: boolean; reason: string };
+  featureSwitches: Array<{
+    useCaseId: string;
+    isActive: boolean;
+    reason: string;
+    activatedAt: string;
+  }>;
+  providerSwitches: Array<{
+    providerId: string;
+    isActive: boolean;
+    reason: string;
+  }>;
+};
+
+// One-click activate/deactivate
+// Reason required on activation
+// Audit log display
+```
+
+---
+
+## 14. Database Tables for Platform Studio
+
+### 14.1 AI Config Service Extension
+
+Add to `platform-studio/src/services/configService.ts`:
+
+```typescript
+// AI Use Cases
+export async function fetchAIUseCases(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_use_cases')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('use_case_id');
+  if (error) throw error;
+  return data;
+}
+
+export async function saveAIUseCase(customerId: string, useCase: AIUseCaseForm) {
+  const { error } = await supabase
+    .from('ai_use_cases')
+    .upsert({
+      customer_id: customerId,
+      use_case_id: useCase.useCaseId,
+      display_name: useCase.displayName,
+      capability_class: useCase.capabilityClass,
+      enabled_roles: useCase.enabledRoles,
+      enabled_profiles: useCase.enabledProfiles,
+      output_mode: useCase.outputMode,
+      tools_policy: useCase.toolsPolicy,
+      allowed_tools: useCase.allowedTools,
+      is_enabled: useCase.isEnabled,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'customer_id,use_case_id' });
+  if (error) throw error;
+}
+
+// AI Routing Rules
+export async function fetchAIRoutingRules(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_routing_rules')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('priority');
+  if (error) throw error;
+  return data;
+}
+
+// AI Kill Switches
+export async function fetchAIKillSwitches(customerId: string) {
+  const { data, error } = await supabase
+    .from('ai_kill_switches')
+    .select('*')
+    .or(`switch_type.eq.global,reference_id.eq.${customerId}`);
+  if (error) throw error;
+  return data;
+}
+
+export async function activateKillSwitch(
+  switchType: string,
+  referenceId: string,
+  reason: string,
+  activatedBy: string
+) {
+  const { error } = await supabase
+    .from('ai_kill_switches')
+    .upsert({
+      switch_type: switchType,
+      reference_id: referenceId,
+      is_active: true,
+      reason,
+      activated_by: activatedBy,
+      activated_at: new Date().toISOString(),
+    }, { onConflict: 'switch_type,reference_id' });
+  if (error) throw error;
+}
+```
+
+---
+
+## 15. Validation Framework Implementation
+
+### 15.1 Config Validator
+
+```typescript
+// platform-studio/src/services/aiConfigValidator.ts
+
+export type ValidationResult = {
+  valid: boolean;
+  errors: Array<{ path: string; message: string }>;
+  warnings: Array<{ path: string; message: string }>;
+};
+
+export async function validateAIConfig(customerId: string): Promise<ValidationResult> {
+  const errors: ValidationResult['errors'] = [];
+  const warnings: ValidationResult['warnings'] = [];
+  
+  const [useCases, routingRules, prompts, budgets] = await Promise.all([
+    fetchAIUseCases(customerId),
+    fetchAIRoutingRules(customerId),
+    fetchAIPrompts(customerId),
+    fetchAIBudgets(customerId),
+  ]);
+  
+  // Validate: Kid profile cannot have tools
+  useCases.forEach((uc, i) => {
+    if (uc.enabled_profiles.includes('kid') && uc.tools_policy !== 'TOOLS_DISABLED') {
+      errors.push({
+        path: `useCases[${i}].toolsPolicy`,
+        message: `Use case "${uc.use_case_id}" allows tools for kid profile`
+      });
+    }
+  });
+  
+  // Validate: Routing rules reference valid providers
+  const validProviders = ['openai', 'anthropic', 'google', 'bedrock'];
+  routingRules.forEach((rule, i) => {
+    if (!validProviders.includes(rule.primary_provider)) {
+      errors.push({
+        path: `routingRules[${i}].primaryProvider`,
+        message: `Invalid provider: ${rule.primary_provider}`
+      });
+    }
+  });
+  
+  // Warning: No budget set
+  if (!budgets.some(b => b.budget_type === 'tenant')) {
+    warnings.push({
+      path: 'budgets',
+      message: 'No tenant budget configured'
+    });
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+```
+
+---
+
+## 16. Existing Code References
+
+| Existing File | Pattern to Follow |
+|--------------|-------------------|
+| `platform-studio/src/app/studio/theme/page.tsx` | Form layout pattern |
+| `platform-studio/src/app/studio/navigation/page.tsx` | List + edit pattern |
+| `platform-studio/src/services/configService.ts` | Service pattern |
+| `platform-studio/src/stores/configStore.ts` | State management |
+| `platform-studio/src/components/builder/WidgetPropertiesPanel.tsx` | Form fields |
+
+---
+
+## 17. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete SQL schemas
+- `Doc/PLATFORM_STUDIO_OVERVIEW.md` - Existing Studio architecture
+- `platform-studio/README.md` - Studio setup guide

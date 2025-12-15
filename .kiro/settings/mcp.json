@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "create_repository"
+      ]
+    },
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=qwgpqdpfxjkygyouwgdr&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage",
+      "disabled": false,
+      "autoApprove": [
+        "list_tables",
+        "list_tables",
+        "list_tables",
+        "apply_migration",
+        "execute_sql",
+        "get_project_url",
+        "get_publishable_keys",
+        "list_migrations",
+        "get_logs",
+        "list_storage_buckets"
+      ]
+    }
+  }
+}

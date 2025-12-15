@@ -7,3 +7,4 @@ export * from "./branding.types";
 export * from "./theme.types";
 export * from "./publish.types";
 export * from "./notification.types";
+export * from "./ai.types";

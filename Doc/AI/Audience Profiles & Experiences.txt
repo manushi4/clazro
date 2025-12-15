@@ -1,0 +1,212 @@
+# Audience Profiles & Experiences (Kid / Teen / Adult / Coaching)
+
+## 1. Purpose
+
+This guide defines **audience profiles** and how AI, automation, tools, tone, UX, and permissions must adapt for each group. It ensures the platform delivers **age-appropriate, role-aware, safe, and effective experiences** while reusing the same underlying AI and automation architecture.
+
+This document is mandatory for all AI features, widgets, automations, MCP tools, and connectors.
+
+---
+
+## 2. Audience Profiles Overview
+
+Audience profiles are **orthogonal to roles** (student, parent, coach, admin) and are resolved at runtime.
+
+| Profile  | Typical Users      | Risk Level | Autonomy  |
+| -------- | ------------------ | ---------- | --------- |
+| Kid      | Young students     | High       | Very Low  |
+| Teen     | Older students     | Medium     | Medium    |
+| Adult    | Parents / learners | Low        | High      |
+| Coaching | Teachers / coaches | Low        | Very High |
+
+Audience profile rules always **override feature logic**.
+
+---
+
+## 3. Profile Definitions & Rules
+
+### 3.1 Kid Profile
+
+**Primary Goal:** Safe learning support and encouragement.
+
+**Tone & UX**
+
+* Simple language, short responses
+* Friendly, encouraging, non-authoritative
+* Visual cues preferred over text
+
+**AI Capabilities (Allowed)**
+
+* Basic explanations
+* Guided hints
+* Positive reinforcement
+* Simple summaries
+
+**AI Capabilities (Restricted)**
+
+* Open-ended chat without guardrails
+* Sensitive or abstract topics
+* Tool use without approval
+
+**Automation Rules**
+
+* Parent/coach visibility required
+* No autonomous actions
+* Notifications routed to adults
+
+**Safety Rules**
+
+* Highest moderation sensitivity
+* Strict refusal on unsafe topics
+* Escalation to parent/coach when needed
+
+---
+
+### 3.2 Teen Profile
+
+**Primary Goal:** Guided autonomy with clear boundaries.
+
+**Tone & UX**
+
+* Clear, respectful, explanatory
+* Encourages critical thinking
+* Transparent refusals
+
+**AI Capabilities (Allowed)**
+
+* Explanations and summaries
+* Practice feedback
+* Structured chat
+
+**AI Capabilities (Restricted)**
+
+* Advice on risky behavior
+* Autonomous tool execution without confirmation
+
+**Automation Rules**
+
+* Explicit user triggers required
+* Limited background automations
+
+**Safety Rules**
+
+* Moderation enabled
+* Escalation on repeated flags
+
+---
+
+### 3.3 Adult Profile
+
+**Primary Goal:** Productivity, clarity, and insight.
+
+**Tone & UX**
+
+* Direct, professional
+* More detail and depth
+* Configurable verbosity
+
+**AI Capabilities (Allowed)**
+
+* Advanced chat
+* Summaries and insights
+* Tool-assisted workflows
+
+**Automation Rules**
+
+* Background automations allowed
+* User-configurable triggers
+
+**Safety Rules**
+
+* Standard moderation
+* Explicit refusals for disallowed advice
+
+---
+
+### 3.4 Coaching Profile
+
+**Primary Goal:** Decision support, planning, and oversight.
+
+**Tone & UX**
+
+* Analytical, reflective
+* Evidence-oriented
+* Action-focused
+
+**AI Capabilities (Allowed)**
+
+* Student insights
+* Planning assistance
+* Drafting content (plans, feedback)
+* Tool and connector usage
+
+**Automation Rules**
+
+* Multi-step workflows (n8n)
+* Approval-based automations
+
+**Safety Rules**
+
+* Full auditability
+* Human-in-the-loop by default
+
+---
+
+## 4. Capability Matrix (Summary)
+
+| Capability            | Kid      | Teen        | Adult    | Coaching |
+| --------------------- | -------- | ----------- | -------- | -------- |
+| Free Chat             | ❌        | ⚠️          | ✅        | ✅        |
+| Summaries             | ✅        | ✅           | ✅        | ✅        |
+| Tool Use              | ❌        | ⚠️          | ✅        | ✅        |
+| Background Automation | ❌        | ⚠️          | ✅        | ✅        |
+| Human Review          | Required | Conditional | Optional | Required |
+
+---
+
+## 5. Enforcement Points
+
+Audience rules are enforced at:
+
+* Platform Studio (config validation)
+* AI & Automation Gateway (runtime checks)
+* Widget rendering layer (UX constraints)
+
+Violations trigger:
+
+* Feature disable
+* Safe fallback
+* Audit event
+
+---
+
+## 6. Design & Implementation Rules
+
+* Audience profile must be resolved before AI execution
+* Prompt templates must be profile-specific
+* Tool access must be profile-gated
+* Automations must respect autonomy level
+
+---
+
+## 7. Metrics & Validation
+
+Each profile must track:
+
+* Safety flags per 1k interactions
+* Refusal rates
+* User satisfaction
+* Escalation frequency
+
+---
+
+## 8. Non-Negotiables
+
+* No single AI behavior fits all audiences
+* Kids are always safety-first
+* Coaches retain human accountability
+* Profiles cannot be overridden at runtime by AI
+
+---
+
+This guide ensures AI experiences are **responsible, adaptive, and aligned** with the platform’s educational and trust goals.

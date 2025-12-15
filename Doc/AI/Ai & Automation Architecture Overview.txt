@@ -1,0 +1,288 @@
+# AI & Automation Architecture Overview
+
+## 1. Purpose
+
+This document defines how **AI**, **automation (n8n)**, **MCP/tool-calling**, and **external connectors** integrate into the existing Clazro platform without refactoring core app logic. It extends current principles: **config-driven UI**, **widget-based rendering**, **Platform Studio governance**, **RBAC**, and **failsafe-first execution**.
+
+---
+
+## 2. Architectural Principles
+
+* **Thin client**: Mobile app renders widgets and sends requests; no direct AI/provider logic.
+* **Single gateway**: All AI, automation, tools, and connectors flow through a governed backend gateway.
+* **Config over code**: Behavior is controlled by published config from Platform Studio.
+* **Least privilege**: Minimal data, minimal scopes, explicit consent.
+* **Fail-safe by default**: No AI or automation failure may break navigation or screens.
+
+---
+
+## 3. High-Level Architecture
+
+Mobile App (Widgets)
+→ AI & Automation Gateway (Policy + Routing)
+→ Providers / n8n / MCP Tools
+
+Platform Studio controls configuration for every step.
+
+---
+
+## 4. Core Components
+
+### 4.1 Mobile App (React Native)
+
+* AI widgets (chat, insights, summaries, copilots)
+* Automation-trigger UI (buttons, events)
+* Deep links to external tools (Google Meet, Canva, etc.)
+* Offline & fallback UI states
+
+### 4.2 Platform Studio
+
+Controls:
+
+* Feature enablement per tenant / role / audience profile
+* Prompt templates & policies
+* Model routing rules
+* Tool & connector permissions
+* Automation workflow references
+* Publish, validate, rollback
+
+### 4.3 AI & Automation Gateway (Backend)
+
+Responsibilities:
+
+* RBAC & consent enforcement
+* Audience profile & safety rules
+* Context assembly & redaction
+* Model selection & fallback
+* Tool-calling governance (MCP)
+* Automation invocation (n8n)
+* Observability, audit logs, cost tracking
+
+### 4.4 n8n (Automation Orchestrator)
+
+* Event & schedule-based workflows
+* Multi-step logic, retries, approvals
+* Calls AI only via Gateway
+* Never acts as system of record
+
+### 4.5 MCP / Tool Layer
+
+* Standardized interface for AI tool usage
+* Tools: calendar, email, docs, storage, etc.
+* Allowlisted, scoped, auditable
+
+---
+
+## 5. Control Plane vs Data Plane
+
+### Control Plane
+
+* Studio-published config (versioned)
+* Remote → cached → default → safe-mode
+
+### Data Plane
+
+* Runtime AI and automation execution
+* Governed entirely by Gateway
+
+---
+
+## 6. Key Runtime Flows
+
+### 6.1 AI Widget Request
+
+1. App → Gateway: AI request with context references
+2. Gateway validates RBAC, policy, audience rules
+3. Gateway routes to model, optionally calls tools
+4. Gateway → App: response + metadata
+
+### 6.2 Automation Trigger
+
+1. App/Backend emits event
+2. Gateway validates event against config
+3. Gateway triggers n8n workflow
+4. n8n executes steps and returns outcome
+
+### 6.3 Meeting Lifecycle (Google Meet)
+
+1. App requests meeting creation
+2. Gateway creates Calendar event + Meet link
+3. App opens Meet via deep link
+4. User returns to app for post-meeting flow
+
+---
+
+## 7. Multi-Model & Tool Governance
+
+* Provider selection by feature, audience, cost, region
+* Automatic fallback on failure
+* Tool calls restricted by allowlists and scopes
+
+---
+
+## 8. Security, Safety & Compliance
+
+* RBAC & consent on every call
+* Child safety enforcement
+* Prompt injection & tool abuse prevention
+* Full audit trail
+* Tenant & global kill switches
+
+---
+
+## 9. Observability & Cost Control
+
+* Trace IDs per execution
+* Token, latency, cost tracking
+* Budgets per tenant & feature
+* Alerts and throttling
+
+---
+
+## 10. Offline & Degraded Mode
+
+* Cached responses where allowed
+* Read-only or non-AI fallback UI
+* Queued or skipped automations with logs
+
+---
+
+## 11. API Contracts (High-Level)
+
+### AI Execution API
+
+POST /ai/execute
+
+* tenantId
+* userId
+* role
+* audienceProfile
+* featureId
+* widgetId
+* input
+* contextRefs
+
+### Automation Trigger API
+
+POST /automation/trigger
+
+* tenantId
+* eventName
+* payloadRef
+
+### Tool Execution API
+
+POST /tools/execute
+
+* toolId
+* action
+* parameters
+
+### Meeting API
+
+POST /integrations/meetings/create
+
+* participants
+* startTime
+* duration
+
+---
+
+## 12. Phase 1 Deliverables
+
+* AI & Automation Gateway
+* Multi-model routing + fallback
+* n8n integration
+* Google Calendar/Meet connector
+* 1–2 AI widgets
+* Basic observability & audit logs
+
+---
+
+This document is intentionally **additive** and aligns with existing Clazro architecture and documentation standards.
+
+
+---
+
+## 13. Integration with Existing System
+
+### 13.1 Existing Tables to Reference
+
+| Table | Integration Point |
+|-------|------------------|
+| `customers` | `customer_id` for tenant isolation |
+| `user_profiles` | User identity, role, age for audience profile |
+| `permissions` | Extend with AI permission codes |
+| `role_permissions` | Map AI permissions to roles |
+| `analytics_events` | Track AI usage events |
+
+### 13.2 Existing Code Patterns
+
+| Pattern | File | How AI Extends |
+|---------|------|----------------|
+| Config Service | `src/services/config/configService.ts` | Add `fetchAIConfig()` |
+| Permission Hook | `src/hooks/usePermissions.ts` | Add `useAIPermission()` |
+| Widget Registry | `src/config/widgetRegistry.ts` | AI widgets already registered |
+| Supabase Client | `src/lib/supabaseClient.ts` | Reuse for AI tables |
+
+### 13.3 New AI Tables Required
+
+```
+ai_providers          - Provider configuration (OpenAI, Claude, etc.)
+ai_models             - Model registry with capabilities
+ai_use_cases          - Feature enablement per customer
+ai_routing_rules      - Model selection rules
+ai_prompts            - Prompt templates
+ai_audience_profiles  - Kid/Teen/Adult/Coaching rules
+ai_budgets            - Cost controls
+ai_kill_switches      - Emergency disable flags
+ai_audit_logs         - Execution logging
+```
+
+See `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` for complete SQL schemas.
+
+---
+
+## 14. Environment Variables
+
+```bash
+# Provider Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Gateway Config
+AI_GATEWAY_URL=https://api.yourapp.com/ai
+AI_DEFAULT_PROVIDER=openai
+AI_DEFAULT_MODEL=gpt-4o-mini
+AI_REQUEST_TIMEOUT_MS=30000
+
+# Budget Defaults
+AI_DEFAULT_DAILY_BUDGET_USD=10.00
+AI_RATE_LIMIT_PER_MINUTE=60
+```
+
+---
+
+## 15. Quick Start Implementation Checklist
+
+```
+□ Step 1: Run AI table migrations (see AI_IMPLEMENTATION_APPENDIX.md)
+□ Step 2: Add AI permissions to permissions table
+□ Step 3: Create src/types/ai.types.ts
+□ Step 4: Create src/services/ai/aiConfigService.ts
+□ Step 5: Create src/hooks/useAIPermission.ts
+□ Step 6: Implement AI Gateway backend service
+□ Step 7: Add AI config pages to Platform Studio
+□ Step 8: Update AI widgets to use new service
+□ Step 9: Set up observability dashboards
+□ Step 10: Test with demo customer
+```
+
+---
+
+## 16. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - SQL schemas, TypeScript types, API specs
+- `Doc/DB_SCHEMA_REFERENCE.md` - Existing database schema
+- `Doc/ARCHITECTURE_OVERVIEW.md` - Platform architecture
+- `Doc/API_CONTRACTS.md` - Existing API patterns

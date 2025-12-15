@@ -1,0 +1,269 @@
+# Security & Threat Model (Prompt Injection, Data Exfiltration, Tool Abuse)
+
+## 1. Purpose
+
+This guide defines Clazro’s security posture and threat model for:
+
+* AI interactions
+* tool/connector usage (including MCP)
+* automations and workflows
+
+It focuses on preventing:
+
+* **prompt injection**
+* **data exfiltration**
+* **tool abuse**
+* **privilege escalation**
+
+This guide is mandatory for all AI, automation, and connector features.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **Assume inputs are hostile** (user prompts, tool outputs, external content)
+2. **Least privilege everywhere** (scopes, permissions, tools)
+3. **Central enforcement** (Gateway, Tool Gateway)
+4. **No secrets in prompts**
+5. **Defense in depth** (multiple controls)
+6. **Auditability is a security feature**
+
+---
+
+## 3. Assets to Protect
+
+* user PII and child data
+* tenant configuration and prompts
+* OAuth tokens and API keys
+* internal data (student progress, notes)
+* tool actions (email, calendar invites)
+
+---
+
+## 4. Threat Actors
+
+* malicious end-users
+* compromised accounts
+* third-party connector compromise
+* external attackers targeting tokens
+* prompt injection via content (docs, webpages)
+
+---
+
+## 5. Threat Categories
+
+### 5.1 Prompt Injection
+
+**Goal**: trick the model into ignoring policies or revealing secrets.
+
+Vectors:
+
+* user message: “ignore previous instructions”
+* tool output includes hidden instructions
+* imported content (docs) includes malicious text
+
+Controls:
+
+* strict system + audience policy layers
+* never allow tool outputs to become system instructions
+* schema/JSON outputs for tool calls
+* tool output sanitization + classification
+* prompt templates disallow “policy override” variables
+
+---
+
+### 5.2 Data Exfiltration
+
+**Goal**: extract sensitive data through AI responses or tool calls.
+
+Vectors:
+
+* model asked to reveal internal prompt/config
+* tool misuse to fetch unauthorized data
+* injecting queries into connectors (calendar/email search)
+
+Controls:
+
+* context minimization + redaction
+* RBAC + consent enforced at gateway
+* tool allowlists per feature/profile
+* query parameter validation (no arbitrary search)
+* response filters (strip PII)
+
+---
+
+### 5.3 Tool Abuse
+
+**Goal**: use tools to perform unintended actions.
+
+Vectors:
+
+* sending spam emails
+* creating mass calendar invites
+* destructive actions (cancel/delete)
+
+Controls:
+
+* tool risk levels (read/write/destructive)
+* approvals for high-risk actions
+* rate limits and quotas per tenant/user
+* idempotency keys and dedupe
+* tool execution sandboxing and domain allowlists
+
+---
+
+### 5.4 Privilege Escalation
+
+**Goal**: perform actions beyond user’s role.
+
+Vectors:
+
+* model attempts to call tool as admin
+* automation runs with elevated credentials
+
+Controls:
+
+* execution identity always explicit
+* role-based tool permissions
+* no workflow may elevate privileges
+* separate service accounts for tenant admin tasks
+
+---
+
+### 5.5 Credential Theft
+
+**Goal**: steal OAuth tokens or API keys.
+
+Controls:
+
+* never place credentials in prompts
+* encrypt tokens at rest
+* rotate and revoke
+* short-lived tokens where possible
+* secure secret store
+
+---
+
+## 6. Security Controls by Layer
+
+### 6.1 Mobile App
+
+* no provider keys
+* only calls Gateway
+* deep links only, no direct connector secrets
+
+### 6.2 AI Gateway
+
+* auth + RBAC + consent enforcement
+* policy layer locked
+* routing and budget enforcement
+* logs with redaction
+
+### 6.3 Tool Gateway (MCP/Connectors)
+
+* strict allowlist
+* schema validation
+* outbound domain restrictions
+* output sanitization
+* audit logs
+
+### 6.4 Automation Runner
+
+* idempotency
+* approval gates
+* safe retries
+* least privilege execution
+
+---
+
+## 7. Secure Tool-Calling Pattern
+
+Tool calls must:
+
+* be requested only from allowlisted features
+* be validated with schema
+* execute with least privilege
+* return structured outputs
+
+Never allow models to:
+
+* choose arbitrary URLs
+* run arbitrary code
+* access unrestricted search across data stores
+
+---
+
+## 8. Content & Data Handling
+
+* redact PII before AI
+* minimize context
+* do not store raw tool outputs with secrets
+* retain only per policy
+
+Kids: strictest retention.
+
+---
+
+## 9. Monitoring & Detection
+
+Detect:
+
+* unusual tool call volume
+* repeated policy refusals
+* repeated failed auth attempts
+* cost spikes
+* schema failures
+
+Response:
+
+* throttle
+* disable feature/tool
+* require re-auth
+* notify admins
+
+---
+
+## 10. Incident Response
+
+* tool kill switch (per tenant/global)
+* provider kill switch
+* rollback prompts/config
+* rotate credentials
+* audit investigation with traceId
+
+---
+
+## 11. Testing & Validation
+
+Minimum tests:
+
+* prompt injection test set
+* tool abuse simulation
+* unauthorized data access attempts
+* OAuth expiry and replay attempts
+* schema fuzzing
+
+---
+
+## 12. Phase 1 Minimum Implementation
+
+1. gateway-only provider access
+2. tool allowlists + schema validation
+3. redaction pipeline
+4. audit logs + traceId
+5. rate limits + budgets
+6. tool kill switch
+
+---
+
+## 13. Non-Negotiables Summary
+
+* assume hostile inputs
+* no secrets in prompts
+* least privilege tools
+* audit everything
+* kill switches and rollback
+
+---
+
+This guide ensures Clazro’s AI and tool ecosystem remains **secure, resilient, and trustworthy** against real-world attacks.

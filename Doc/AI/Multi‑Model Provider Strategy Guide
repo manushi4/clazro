@@ -1,0 +1,568 @@
+1. Purpose
+
+This guide defines how Clazro selects, routes, and governs multiple AI model providers (OpenAI/ChatGPT, Anthropic/Claude, Google/Gemini, AWS Bedrock, etc.) across tenants, roles, and audience profiles—without refactoring app UI or locking the product to one vendor.
+
+This guide works with:
+
+AI & Automation Architecture Overview (Gateway-first, config-driven execution)
+
+AI Product Scope, Principles & Quality Bar (safety + trust requirements)
+
+Audience Profiles & Experiences (Kid/Teen/Adult/Coaching behavior)
+
+Child Safety, Parental Controls & Age Gating (non-negotiable restrictions)
+
+AI Use-Case Catalog & Feature Matrix (feature-by-feature access + limits)
+
+2. Goals
+
+Vendor independence (swap/upgrade providers without touching UI/features)
+
+Best-model-per-job (reasoning vs summarization vs structured extraction vs multimodal)
+
+Profile-aware safety (Kid profile is stricter than Coaching)
+
+Operational resilience (fallback when a provider is down or degraded)
+
+Cost control (budgets, throttles, caching, and tiered models)
+
+Governance (Platform Studio controlled + auditable + rollback)
+
+3. Definitions
+
+Provider: Vendor platform (OpenAI, Anthropic, Google, AWS Bedrock, etc.)
+
+Model: A specific model offering within a provider (versioned)
+
+Capability Class: What the feature needs (chat, summarization, extraction, reasoning, vision, etc.)
+
+Routing Policy: Rules that choose a provider/model at runtime
+
+Fallback Policy: Rules that choose alternatives on failure
+
+Pinned Model: A fixed model version used for stability (vs “latest”)
+
+Safety Wrapper: Your own policy layer applied regardless of provider (age rules, refusals, redaction)
+
+4. Strategy: Provider-Agnostic by Design
+4.1 Mandatory architectural rule
+
+The app never calls providers directly.
+All calls go through the AI & Automation Gateway, which enforces:
+
+tenant + role + audience profile policies
+
+prompt governance + safety wrapper
+
+model routing + fallbacks
+
+logging + audit + budgets
+
+4.2 Provider abstraction contract (single internal interface)
+
+All providers must map into one internal contract:
+
+ModelRequest
+
+tenantId, userId, role, audienceProfile
+
+featureId, widgetId
+
+capabilityClass
+
+messages / input
+
+contextBundle (already redacted)
+
+outputMode (free text / strict JSON / schema)
+
+toolsAllowed (none / limited / allowed list)
+
+latencySLA, budgetPolicy, safetyPolicyVersion
+
+ModelResponse
+
+output
+
+structuredOutput (if schema enforced)
+
+refusalReason (if refused)
+
+safetyFlags
+
+provider/model
+
+tokens/cost/latency
+
+traceId
+
+5. Capability Classes and “Best Fit” Routing
+
+Different AI features need different strengths. Route by capability class, not brand.
+
+5.1 Capability classes you must support
+
+SAFE_GUIDED_CHAT (Kid-safe, short, constrained)
+
+GENERAL_CHAT (Teen/Adult conversational)
+
+DEEP_REASONING (Coaching copilot, planning, complex tasks)
+
+SUMMARIZATION (meeting/class summary, digests)
+
+STRUCTURED_EXTRACTION (JSON, forms, checklists, rubric outputs)
+
+CLASSIFICATION (topic detection, safety labels, intent)
+
+MULTIMODAL_VISION (image understanding, if needed)
+
+EMBEDDINGS / RETRIEVAL (semantic search, RAG)
+
+IMAGE_GENERATION (if you support it—separate governance)
+
+5.2 Default routing philosophy
+
+Use cheaper/faster models for summarization, classification, extraction
+
+Use stronger reasoning models only for features that truly require it
+
+For kids: prioritize safety + simplicity, not creativity
+
+6. Audience Profile Routing Rules
+
+Audience profile rules override everything.
+
+6.1 Kid profile
+
+Only allow: SAFE_GUIDED_CHAT, SUMMARIZATION (restricted), CLASSIFICATION
+
+Deny: autonomous tool use, deep reasoning loops, open-ended generation
+
+Always apply:
+
+stricter safety wrapper
+
+shorter max response length
+
+more conservative refusals
+
+parent/coach visibility requirements
+
+6.2 Teen profile
+
+Allow structured chat + learning assistance
+
+Tool use only with explicit confirmation (and limited scopes)
+
+Higher refusal sensitivity than adults
+
+6.3 Adult profile
+
+Allow broader features, including tool-assisted workflows (if consented)
+
+Cost controls and privacy still enforced
+
+6.4 Coaching profile
+
+Allow deepest reasoning + drafting + tool-assisted workflows
+
+Human-in-the-loop by default for sensitive actions
+
+Full auditability required
+
+7. Tenant-Level Model Strategy
+
+Each tenant may vary by:
+
+budget
+
+latency expectations
+
+compliance needs / region
+
+safety strictness
+
+feature set enabled
+
+Tenant knobs (configurable in Platform Studio)
+
+enabledProviders[]
+
+allowedCapabilityClasses[]
+
+maxCostPerDay, maxCostPerUser, maxCostPerFeature
+
+latencySLA
+
+dataRetentionPolicy
+
+toolAllowlists
+
+approvalRequirements (e.g., coach review required)
+
+Rule: Tenant config can be stricter than global defaults, never looser than child safety rules.
+
+8. Routing Policy Design
+8.1 Routing inputs
+
+Routing must consider:
+
+featureId + capabilityClass
+
+audienceProfile
+
+tenant tier (budget plan)
+
+region/compliance (if applicable)
+
+current provider health (timeouts/error rate)
+
+required output mode (schema/JSON reliability)
+
+toolsAllowed (provider compatibility)
+
+8.2 Routing outputs
+
+Primary: provider/model
+
+Secondary fallback list: 1–3 alternatives
+
+Execution parameters: temperature, max tokens, JSON mode, tool enablement
+
+8.3 Example routing rule (conceptual)
+
+If audienceProfile == Kid → route only to “KidSafeTier” models + strict templates
+
+If capabilityClass == SUMMARIZATION → route to low-cost summarizer model
+
+If capabilityClass == DEEP_REASONING and role == Coach → route to strongest reasoning model
+
+If provider health is degraded → fail over to secondary provider
+
+9. Fallback and Degraded Modes
+9.1 Failure types
+
+provider timeout / outage
+
+rate limiting
+
+invalid output format (schema failure)
+
+tool call failure
+
+safety policy violation
+
+9.2 Fallback rules
+
+Retry (limited, jittered)
+
+Switch model within same provider (same capability)
+
+Switch provider (secondary provider)
+
+Degraded response (simpler model / shorter output)
+
+Non-AI fallback UI (safe-mode content, cached summary, or “try again”)
+
+9.3 Hard rule
+
+Fallback must never relax child safety, RBAC, or consent rules.
+
+10. Model Versioning and Change Management
+10.1 Pinned versions
+
+Production features must use pinned model versions to reduce output drift.
+
+10.2 Rollout process
+
+Dev/test: experiment freely
+
+Staging: pinned candidate + eval suite
+
+Production: gradual rollout (tenant canary → expand)
+
+Rollback: instant via config switch
+
+10.3 Drift controls
+
+regression evaluation on golden prompts
+
+schema validation pass rate thresholds
+
+safety flag rate thresholds
+
+user satisfaction monitoring
+
+11. Tool Use Compatibility
+
+Tool calling differs across providers. Your Gateway must normalize:
+
+tool schema format
+
+tool call parsing and validation
+
+tool allowlists per feature/profile
+
+tool execution safety rules
+
+For minors: tool use is either disabled or heavily restricted per the Child Safety guide.
+
+12. Data Handling Rules (Provider-Agnostic)
+
+Regardless of provider:
+
+minimize context (only what is needed)
+
+redact PII by policy (kids stricter)
+
+no secrets in prompts
+
+no training on user data (where provider options exist; enforce your policy)
+
+log only what is necessary (with privacy controls)
+
+retain only per retention policy
+
+13. Cost Strategy
+13.1 Tiered models per capability
+
+cheap tier: classification, extraction, summaries
+
+standard tier: general chat
+
+premium tier: deep reasoning/coaching copilot (limited access)
+
+13.2 Cost controls
+
+per-tenant budgets
+
+per-feature caps
+
+per-user daily limits
+
+caching for summaries where allowed
+
+truncate context intelligently (RAG, not raw dumps)
+
+14. Quality Bar per Provider
+
+A provider/model may be used in production only if it meets minimum thresholds for the target capability class:
+
+Safety: low unsafe output rate (especially Kid/Teen)
+
+Format reliability: schema/JSON success rate for extraction features
+
+Latency: meets feature SLA
+
+Cost: meets budget targets
+
+Stability: consistent outputs under pinned version
+
+Tool compatibility: works with your tool gateway if required
+
+Providers can be approved per capability class (e.g., “approved for summarization but not tool use”).
+
+15. Required Config Schema (Conceptual)
+
+Your Platform Studio should publish something like:
+
+providers: enabled + credentials references
+
+models: provider → model definitions + tags (cheap/standard/premium)
+
+routingRules[]: conditions → primary model + fallback list
+
+capabilityPolicies: per capability class (max tokens, output mode, tools)
+
+audiencePolicies: kid/teen/adult/coaching constraints
+
+budgets: tenant/feature/user caps
+
+killSwitch: global/tenant/feature flags
+
+16. Adding a New Provider Checklist
+
+Gateway adapter implemented (request/response normalization)
+
+Supports required output modes (text + schema)
+
+Safety wrapper validated (kid/teen)
+
+Observability integrated (tokens/cost/latency/trace)
+
+Included in eval suite + baseline comparison
+
+Routing rules + fallbacks defined
+
+Studio controls added (enable/disable, budgets, approval)
+
+Canary rollout + rollback plan
+
+17. Example “Default Recommendations” (High-Level)
+
+Kids: safest constrained chat + strict refusal behavior, minimal output
+
+Teens: structured chat + learning help, limited tool usage with confirmation
+
+Adults: standard chat + summaries + optional tool flows
+
+Coaches: deeper reasoning models, approved tool access, auditable automations via n8n
+
+(Exact provider/model names remain configurable and pinned per environment.)
+
+18. Non‑Negotiables Summary
+
+Multi-model is controlled by config, not code changes
+
+Safety, RBAC, and consent never change during fallback
+
+Pinned versions + eval-driven rollouts prevent drift
+
+Costs are capped by tenant/feature/user
+
+Tool use is normalized and governed centrally
+
+
+---
+
+## 19. Database Schema for Multi-Model Routing
+
+### 19.1 AI Providers Table
+
+```sql
+CREATE TABLE ai_providers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  api_base_url TEXT,
+  is_enabled BOOLEAN DEFAULT true,
+  supported_capabilities TEXT[] DEFAULT '{}',
+  default_model TEXT,
+  config JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+INSERT INTO ai_providers (provider_id, display_name, supported_capabilities, default_model) VALUES
+  ('openai', 'OpenAI', ARRAY['chat', 'summarization', 'extraction', 'embeddings'], 'gpt-4o-mini'),
+  ('anthropic', 'Anthropic Claude', ARRAY['chat', 'reasoning', 'summarization'], 'claude-3-sonnet'),
+  ('google', 'Google Gemini', ARRAY['chat', 'multimodal', 'summarization'], 'gemini-1.5-flash'),
+  ('bedrock', 'AWS Bedrock', ARRAY['chat', 'summarization'], 'anthropic.claude-3-sonnet');
+```
+
+### 19.2 AI Models Table
+
+```sql
+CREATE TABLE ai_models (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id TEXT REFERENCES ai_providers(provider_id),
+  model_id TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  capability_class TEXT NOT NULL,
+  tier TEXT DEFAULT 'standard',
+  cost_per_1k_input DECIMAL(10,6),
+  cost_per_1k_output DECIMAL(10,6),
+  max_tokens INTEGER DEFAULT 4096,
+  supports_json_mode BOOLEAN DEFAULT false,
+  supports_tools BOOLEAN DEFAULT false,
+  is_enabled BOOLEAN DEFAULT true,
+  UNIQUE(provider_id, model_id)
+);
+
+INSERT INTO ai_models (provider_id, model_id, display_name, capability_class, tier, cost_per_1k_input, cost_per_1k_output) VALUES
+  ('openai', 'gpt-4o-mini', 'GPT-4o Mini', 'GENERAL_CHAT', 'cheap', 0.00015, 0.0006),
+  ('openai', 'gpt-4o', 'GPT-4o', 'DEEP_REASONING', 'premium', 0.005, 0.015),
+  ('anthropic', 'claude-3-haiku', 'Claude 3 Haiku', 'SUMMARIZATION', 'cheap', 0.00025, 0.00125),
+  ('anthropic', 'claude-3-sonnet', 'Claude 3 Sonnet', 'GENERAL_CHAT', 'standard', 0.003, 0.015);
+```
+
+### 19.3 AI Routing Rules Table
+
+```sql
+CREATE TABLE ai_routing_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES customers(id),
+  rule_name TEXT NOT NULL,
+  priority INTEGER DEFAULT 100,
+  use_case_ids TEXT[] DEFAULT '{}',
+  audience_profiles TEXT[] DEFAULT '{}',
+  roles TEXT[] DEFAULT '{}',
+  primary_provider TEXT NOT NULL,
+  primary_model TEXT NOT NULL,
+  fallback_providers JSONB DEFAULT '[]',
+  max_tokens INTEGER,
+  temperature DECIMAL(3,2),
+  is_enabled BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+---
+
+## 20. Routing Function
+
+```sql
+CREATE OR REPLACE FUNCTION get_ai_routing(
+  p_customer_id UUID,
+  p_use_case_id TEXT,
+  p_audience_profile TEXT,
+  p_role TEXT
+)
+RETURNS JSONB AS $$
+DECLARE
+  rule RECORD;
+BEGIN
+  SELECT * INTO rule FROM ai_routing_rules
+  WHERE customer_id = p_customer_id
+    AND is_enabled = true
+    AND (use_case_ids = '{}' OR p_use_case_id = ANY(use_case_ids))
+    AND (audience_profiles = '{}' OR p_audience_profile = ANY(audience_profiles))
+    AND (roles = '{}' OR p_role = ANY(roles))
+  ORDER BY priority ASC
+  LIMIT 1;
+  
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'provider', 'openai',
+      'model', 'gpt-4o-mini',
+      'fallbacks', '[]'::JSONB
+    );
+  END IF;
+  
+  RETURN jsonb_build_object(
+    'provider', rule.primary_provider,
+    'model', rule.primary_model,
+    'fallbacks', rule.fallback_providers,
+    'maxTokens', rule.max_tokens,
+    'temperature', rule.temperature
+  );
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 21. Environment Variables
+
+```bash
+# Provider API Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_AI_API_KEY=...
+AWS_BEDROCK_ACCESS_KEY=...
+AWS_BEDROCK_SECRET_KEY=...
+AWS_BEDROCK_REGION=us-east-1
+
+# Default Configuration
+AI_DEFAULT_PROVIDER=openai
+AI_DEFAULT_MODEL=gpt-4o-mini
+AI_REQUEST_TIMEOUT_MS=30000
+AI_MAX_RETRIES=2
+```
+
+---
+
+## 22. Related Documentation
+
+- `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` - Complete schemas
+- `Doc/AI/AI Abstraction Layer & API Contracts` - API specs
+- `Doc/AI/Model Routing, Selection & Fallback Rules` - Detailed routing

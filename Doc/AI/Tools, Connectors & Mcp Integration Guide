@@ -1,0 +1,361 @@
+# Tools / Connectors / MCP Integration Guide
+
+## 1. Purpose
+
+This guide defines how Clazro integrates **tools**, **external connectors**, and **MCP (Model Context Protocol)** in a way that is:
+
+* **safe** (least privilege, sandboxing)
+* **governed** (allowlists, Studio control)
+* **auditable** (complete logs)
+* **tenant-aware** (per-tenant enablement and scopes)
+* **profile-aware** (Kid/Teen/Adult/Coaching constraints)
+
+Tools are powerful: they can read/write data and trigger real-world actions (meetings, emails, docs). Therefore, tool access must be **more restricted than model access**.
+
+---
+
+## 2. Definitions
+
+* **Tool**: A callable function exposed to AI/automation (e.g., `calendar.createEvent`, `storage.upload`, `crm.search`).
+* **Connector**: Integration to an external product/service (Google Calendar, Google Meet, Zoom, Canva, email, etc.).
+* **MCP Server**: A tool server implementing the MCP standard, hosting one or more tools.
+* **Tool Gateway**: Clazro backend layer that mediates every tool call (auth, policy, audit, sandbox).
+* **Allowlist**: Explicit set of tools permitted for a feature/profile/role/tenant.
+
+---
+
+## 3. Non-Negotiable Principles
+
+1. **No direct tool calls from the mobile app** (prod). All tool execution is server-side.
+2. **No tool access without explicit allowlisting**.
+3. **Least privilege OAuth scopes** per tenant/user.
+4. **Kids: tools disabled by default** (no calendar/email/docs tool access).
+5. **Tool outputs are untrusted** until validated/sanitized.
+6. **Every tool call must be auditable** (who, why, what, result).
+7. **Tool actions must be idempotent** when possible.
+
+---
+
+## 4. Architecture Overview
+
+### 4.1 Tool Call Flow (AI)
+
+1. App → AI Gateway: AI request (featureId, profileId, toolIntent)
+2. AI Gateway → (optional) Tool Gateway: tool call request (allowlisted)
+3. Tool Gateway → Connector/MCP: execute tool action
+4. Tool Gateway → AI Gateway: sanitized result
+5. AI Gateway → App: final response
+
+### 4.2 Tool Call Flow (Automation)
+
+1. Trigger → Workflow runner / n8n
+2. Workflow step calls Tool Gateway (not direct connector)
+3. Tool Gateway executes and logs
+
+---
+
+## 5. Tool Taxonomy & Risk Levels
+
+Tools must be categorized for governance:
+
+### 5.1 Read Tools
+
+* Read-only queries (search, fetch metadata)
+* Lower risk
+
+### 5.2 Write Tools
+
+* Create/update external or internal objects (calendar event, task, doc)
+* Medium to high risk
+
+### 5.3 Destructive Tools
+
+* Delete/cancel actions
+* Very high risk; usually blocked or requires approval
+
+### 5.4 High-Risk Tools
+
+* Messaging (email/SMS), payments, account changes
+* Require human approval and strict audit
+
+---
+
+## 6. Allowlist Model
+
+Tool access must be allowlisted at multiple layers:
+
+### 6.1 Global Allowlist
+
+Defines all tools Clazro supports.
+
+### 6.2 Tenant Allowlist
+
+Tenant chooses which connectors/tools are enabled.
+
+### 6.3 Feature Allowlist
+
+Each AI feature defines allowed tools.
+
+### 6.4 Profile Allowlist
+
+Kid/Teen/Adult/Coaching profile further restricts tools.
+
+### 6.5 Role Allowlist (RBAC)
+
+Role defines whether user can execute a tool.
+
+**Final allowed tools** = intersection of all allowlists.
+
+---
+
+## 7. Authentication & Authorization
+
+### 7.1 OAuth & Scopes
+
+* Use OAuth for Google/Zoom/etc.
+* Store tokens securely server-side
+* Request **minimum scopes** required
+
+Example (Google Calendar):
+
+* read availability: `calendar.readonly` (or free/busy equivalent)
+* create event w/ Meet: calendar write scope
+
+### 7.2 Token Storage
+
+* Encrypted at rest
+* Rotation supported
+* Revocation honored immediately
+
+### 7.3 User vs Tenant Credentials
+
+* Prefer **user-level auth** for personal calendars
+* Tenant-level service accounts only for admin-managed resources
+
+### 7.4 Consent
+
+* Tool consent is separate from AI usage consent
+* Kids require parent/guardian consent
+
+---
+
+## 8. Sandboxing & Execution Controls
+
+### 8.1 Network & Domain Restrictions
+
+* Only allow outbound calls to approved domains
+* Block arbitrary URLs
+
+### 8.2 Parameter Validation
+
+* Strict JSON schemas per tool
+* Reject unknown fields
+* Apply length limits
+
+### 8.3 Output Sanitization
+
+* Remove secrets, tokens, raw PII
+* Normalize into safe structured output
+
+### 8.4 Timeouts & Rate Limits
+
+* per-call timeout (e.g., 5–15s)
+* per-tenant quotas
+* per-user limits
+
+### 8.5 Safe Defaults
+
+* Tools disabled unless explicitly enabled
+* Writes require explicit confirmation signals
+
+---
+
+## 9. Tool Call Approval (Human-in-the-loop)
+
+Some tool actions must require approval:
+
+* sending emails/SMS
+* creating meetings involving minors
+* destructive operations
+
+Approval models:
+
+* in-app confirmation (adult)
+* coach review queue
+* parent approval for minors
+
+Tools should support:
+
+* `dryRun=true` preview
+* approval token requirement
+
+---
+
+## 10. Idempotency & Replay Protection
+
+### 10.1 Idempotency Keys
+
+Every write tool call must accept an `idempotencyKey`.
+
+### 10.2 Deduplication Window
+
+Tool Gateway stores recent keys to prevent duplicates.
+
+### 10.3 Retries
+
+Retries must be safe:
+
+* exponential backoff
+* stop after N attempts
+* avoid double-writes
+
+---
+
+## 11. MCP Integration
+
+### 11.1 MCP Server Registry
+
+Maintain a registry:
+
+* mcpServerId
+* base URL
+* tools exposed
+* authentication method
+* risk category
+
+### 11.2 MCP Tool Schemas
+
+Each MCP tool must have:
+
+* name
+* description
+* input schema
+* output schema
+* risk level
+
+### 11.3 MCP Security
+
+* Mutual auth or signed requests
+* Allowlist which MCP servers each tenant can use
+* No dynamic MCP server URLs from user input
+
+### 11.4 MCP Observability
+
+Log per MCP call:
+
+* mcpServerId
+* tool name
+* inputs (redacted)
+* outputs (redacted)
+* latency, errors
+
+---
+
+## 12. Connector Patterns (Deep Link vs API)
+
+### 12.1 Deep Link Pattern
+
+* App opens external app (Google Meet, Canva)
+* App cannot force return; use return UX:
+
+  * in-app “meeting in progress” state
+  * notifications
+  * post-session screen
+
+### 12.2 API Integration Pattern
+
+* Backend creates/updates assets (calendar event, meet link, document export)
+* App displays resource and opens it
+* Higher control and audit
+
+Prefer API integration where possible for governance.
+
+---
+
+## 13. Audit Logging Requirements
+
+Every tool call must log:
+
+* traceId
+* tenantId
+* userId
+* role
+* audienceProfile
+* featureId/workflowId
+* toolId/action
+* riskLevel
+* parameters (redacted)
+* result status
+* latency and cost (if any)
+
+Audit logs are immutable and tenant-scoped.
+
+---
+
+## 14. Error Handling & Fallback
+
+Tool errors must be classified:
+
+* AUTH_ERROR (token expired)
+* POLICY_DENIED (not allowlisted)
+* VALIDATION_ERROR (bad input)
+* CONNECTOR_ERROR (provider down)
+* TIMEOUT
+
+Fallback rules:
+
+* AI: continue without tool or degrade response
+* Automation: retry safely or mark failed with notification
+
+Tool failure must never crash a screen.
+
+---
+
+## 15. Platform Studio Controls (Required)
+
+Studio must support:
+
+* enable/disable connectors per tenant
+* manage OAuth connections
+* tool allowlists per feature/profile
+* approval rules
+* quotas and budgets
+* view audit logs and runs
+* emergency kill switch (tool-level)
+
+---
+
+## 16. Testing Requirements
+
+Minimum tests:
+
+* allowlist enforcement tests
+* scope minimization checks
+* prompt-injection/tool-abuse simulations
+* idempotency tests
+* audit log completeness checks
+* kid profile tool denial tests
+
+---
+
+## 17. Phase 1 Minimum Implementation
+
+1. Tool Gateway endpoint with allowlist + schema validation
+2. One connector (Google Calendar/Meet) behind Tool Gateway
+3. Audit logs + traceId
+4. Rate limits + timeouts
+5. Kid profile hard blocks for all tools
+
+---
+
+## 18. Non-Negotiables Summary
+
+* Tools are more restricted than AI models
+* All tool calls are allowlisted, authenticated, sandboxed, and audited
+* MCP servers are treated as connectors behind policy
+* Kid profiles cannot access tools
+* Failures degrade gracefully
+
+---
+
+This guide ensures Clazro can safely integrate powerful tools and connectors while maintaining trust, compliance, and platform stability.

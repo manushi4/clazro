@@ -296,6 +296,65 @@ GlobalErrorBoundary
 
 ---
 
+---
+
+## 🤖 AI & Automation Layer
+
+### Current State (Implemented)
+
+**AI Content Tables:**
+- `ai_insights` — Parent AI insights
+- `ai_predictions` — Student predictions
+- `ai_recommendations` — Study recommendations
+- `ai_alerts` — Academic alerts
+
+**AI Widgets (Implemented):**
+- `ai.recommendations` — Student recommendations
+- `parent.ai-insights-preview` — Parent insights
+- `parent.ai-predictions` — Parent predictions
+- `parent.ai-recommendations` — Parent recommendations
+- `parent.ai-alerts` — Parent alerts
+
+### Planned State (Registry Pattern)
+
+Following the same pattern as widgets for full flexibility:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AI REGISTRY PATTERN                       │
+├─────────────────────────────────────────────────────────────┤
+│  Definition Tables (Global Catalog)                          │
+│  - ai_feature_definitions                                    │
+│  - ai_provider_definitions (OpenAI, Anthropic, etc.)         │
+│  - ai_model_definitions                                      │
+│  - mcp_tool_definitions                                      │
+│  - automation_definitions                                    │
+│  - prompt_definitions                                        │
+│  - audience_profile_definitions                              │
+├─────────────────────────────────────────────────────────────┤
+│  Assignment Tables (Per-Customer)                            │
+│  - customer_ai_features                                      │
+│  - customer_ai_providers                                     │
+│  - customer_ai_models                                        │
+│  - customer_mcp_tools                                        │
+│  - customer_automations                                      │
+│  - customer_prompts                                          │
+│  - customer_audience_profiles                                │
+├─────────────────────────────────────────────────────────────┤
+│  Supporting Tables                                           │
+│  - customer_ai_routing_rules                                 │
+│  - customer_ai_budgets                                       │
+│  - ai_kill_switches                                          │
+│  - ai_audit_logs                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Principle:** Same as widgets — add unlimited AI features, providers, tools, and automations without code changes.
+
+**Documentation:** See `Doc/AI/AI_MASTER_IMPLEMENTATION_GUIDE.md` for full roadmap.
+
+---
+
 ## 🎯 Summary
 
 This architecture ensures:
@@ -307,10 +366,11 @@ This architecture ensures:
 ✅ **Multi-Role** — Student, Teacher, Parent, Admin  
 ✅ **Safe** — Fallbacks at every level  
 ✅ **Scalable** — Add widgets/screens without breaking existing  
+✅ **AI-Ready** — Registry pattern for unlimited AI flexibility  
 
 **Core Philosophy:**
 ```
-Code = Universe of possibilities (widgets, screens, features)
+Code = Universe of possibilities (widgets, screens, features, AI)
 Config = Each customer's unique universe
 App = Renders config dynamically
 ```

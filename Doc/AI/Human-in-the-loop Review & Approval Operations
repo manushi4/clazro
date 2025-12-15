@@ -1,0 +1,246 @@
+# Human-in-the-Loop Review & Approval Operations
+
+## 1. Purpose
+
+This guide defines how Clazro implements **human review and approvals** for AI outputs, tool actions, and automations—especially when:
+
+* minors are involved
+* actions have external side effects (emails, meetings)
+* decisions may be sensitive or high-impact
+
+Human-in-the-loop (HITL) ensures safety, trust, and accountability without blocking low-risk features.
+
+---
+
+## 2. Core Principles (Non-Negotiable)
+
+1. **High-risk actions require human approval**
+2. **Review is auditable and role-bound**
+3. **Approvals are previewable (dry-run)**
+4. **No approvals by unauthorized roles**
+5. **Approvals do not leak sensitive data**
+6. **Timeouts and defaults are safe**
+
+---
+
+## 3. When HITL is Required
+
+HITL must be enforced for:
+
+### 3.1 Minors
+
+* any tool/connector action involving minors
+* any outbound communication to minors
+* any AI-generated recommendations that can change plans
+
+### 3.2 External Communication
+
+* email/SMS/WhatsApp
+* calendar invites to real participants
+
+### 3.3 Destructive / Irreversible Actions
+
+* canceling meetings
+* deleting resources
+
+### 3.4 Sensitive Content
+
+* mental health indicators
+* self-harm signals
+* harassment or abuse signals
+
+---
+
+## 4. Review Roles
+
+| Role            | Can Review            | Can Approve           | Notes            |
+| --------------- | --------------------- | --------------------- | ---------------- |
+| Parent/Guardian | Minor-related actions | Minor-related actions | Default for kids |
+| Coach/Teacher   | Coaching workflows    | Coaching workflows    | Must be logged   |
+| Tenant Admin    | Tenant workflows      | Tenant workflows      | Platform scope   |
+| Platform Admin  | Global policies       | Global approvals      | Emergency only   |
+
+Review/approve is controlled by RBAC + consent.
+
+---
+
+## 5. Approval Object Model
+
+Every approval request must include:
+
+* approvalId
+* tenantId
+* requesterId
+* targetEntityRefs (student/session/meeting)
+* workflowId + stepId
+* actionType (sendMessage/createMeeting/etc.)
+* previewPayload (redacted)
+* riskLevel
+* requiredApproverRole
+* expiryTime
+
+Approvals are immutable; only status changes.
+
+---
+
+## 6. Approval Workflow Types
+
+### 6.1 Synchronous Approval
+
+* user triggers action
+* approval UI shown immediately
+* approve/deny blocks execution
+
+Use for:
+
+* adult self-confirmation
+* low latency needs
+
+### 6.2 Asynchronous Approval
+
+* workflow creates approval request
+* sent to approval queue
+* approver notified
+* execution resumes on approval
+
+Use for:
+
+* parent/coach approvals
+* scheduled workflows
+
+---
+
+## 7. Approval Queue Operations
+
+### 7.1 Queue States
+
+* PENDING
+* APPROVED
+* DENIED
+* EXPIRED
+* CANCELED
+
+### 7.2 Queue Views
+
+Approvers need:
+
+* list of pending approvals
+* filters (risk level, student, workflow)
+* ability to inspect preview safely
+
+---
+
+## 8. Dry-Run / Preview Requirements
+
+All actions requiring approval must support preview:
+
+* generated message text
+* meeting details
+* list of affected entities
+* tool calls that would be executed
+
+Preview must be:
+
+* redact PII where possible
+* show exactly what will happen
+* include estimated cost (if AI)
+
+---
+
+## 9. Timeouts & Defaults
+
+If approval expires:
+
+* no action taken
+* workflow marked safe-failed
+* notifications sent if required
+
+Defaults must be safe:
+
+* expire rather than auto-approve
+* no retries that bypass approval
+
+---
+
+## 10. Notifications
+
+Approvers must be notified via:
+
+* in-app notifications
+* optional email/SMS (adult only)
+
+Notifications should include:
+
+* minimal summary
+* deep link to approval screen
+
+---
+
+## 11. Audit & Logging
+
+Every approval must log:
+
+* who requested
+* who approved/denied
+* timestamp
+* policy versions
+* traceId
+* before/after state
+
+Audit logs are immutable and tenant-scoped.
+
+---
+
+## 12. Security Requirements
+
+* approvals must be authenticated and role-validated
+* prevent replay attacks (approval token)
+* approval preview must not expose secrets
+* ensure idempotency of approved actions
+
+---
+
+## 13. Platform Studio Requirements
+
+Studio must allow:
+
+* configure which workflows require HITL
+* set risk rules by audience profile
+* configure approver roles
+* define expiry times
+* audit approval history
+
+---
+
+## 14. Testing & Validation
+
+Required tests:
+
+* unauthorized approval attempts
+* expiry behavior
+* kid workflow approval enforcement
+* replay protection
+* audit log completeness
+
+---
+
+## 15. Phase 1 Minimum Implementation
+
+1. approval object + storage
+2. approval queue API
+3. in-app approval UI
+4. workflow pause/resume on approval
+5. immutable audit logs
+
+---
+
+## 16. Non-Negotiables Summary
+
+* minors require adult review for actions
+* approvals are previewable
+* approvals expire safely
+* all decisions are audited
+
+---
+
+This guide ensures Clazro stays **safe, accountable, and trusted** while enabling powerful automations and tool integrations.

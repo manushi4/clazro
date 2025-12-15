@@ -935,6 +935,154 @@ validate_customer_config(customer_id, config) → ValidationResult
 
 ---
 
+# 📦 10. AI Content Tables (Existing)
+
+These tables store AI-generated content and insights. They follow the same localization pattern as other content tables.
+
+## **10.1 `ai_insights`**
+
+AI-powered insights for parents about child performance.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | uuid (PK) | — |
+| `customer_id` | uuid (FK) | — |
+| `user_id` | uuid | Parent user ID |
+| `child_user_id` | uuid | Child being analyzed |
+| `insight_type` | text | performance / attendance / behavior / recommendation / alert / achievement |
+| `category` | text | academic / attendance / social / health / general |
+| `title_en` | text | English title |
+| `title_hi` | text | Hindi title |
+| `description_en` | text | English description |
+| `description_hi` | text | Hindi description |
+| `priority` | text | low / normal / high |
+| `action_url` | text | Deep link for action |
+| `action_label_en` | text | Action button label (EN) |
+| `action_label_hi` | text | Action button label (HI) |
+| `is_read` | boolean | Read status |
+| `is_dismissed` | boolean | Dismissed status |
+| `valid_until` | timestamptz | Expiry time |
+| `metadata` | jsonb | Additional data |
+| `created_at` | timestamptz | — |
+| `updated_at` | timestamptz | — |
+
+---
+
+## **10.2 `ai_predictions`**
+
+AI predictions about student performance.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | uuid (PK) | — |
+| `customer_id` | uuid (FK) | — |
+| `student_user_id` | text | Student being predicted |
+| `prediction_type` | text | performance / attendance / behavior / risk / achievement |
+| `title_en` | text | English title |
+| `title_hi` | text | Hindi title |
+| `description_en` | text | English description |
+| `description_hi` | text | Hindi description |
+| `confidence_score` | decimal | 0.0 to 1.0 |
+| `priority` | text | high / medium / low |
+| `category` | text | Category tag |
+| `predicted_outcome` | text | Predicted result |
+| `recommendation_en` | text | Recommendation (EN) |
+| `recommendation_hi` | text | Recommendation (HI) |
+| `valid_until` | timestamptz | Prediction validity |
+| `is_read` | boolean | Read status |
+| `created_at` | timestamptz | — |
+| `updated_at` | timestamptz | — |
+
+---
+
+## **10.3 `ai_recommendations`** (RLS Enabled)
+
+AI-generated study and activity recommendations.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | uuid (PK) | — |
+| `customer_id` | uuid (FK) | — |
+| `student_user_id` | uuid | Target student |
+| `recommendation_type` | text | study / practice / resource / activity / schedule / goal |
+| `title_en` | text | English title |
+| `title_hi` | text | Hindi title |
+| `description_en` | text | English description |
+| `description_hi` | text | Hindi description |
+| `action_label_en` | text | Action button (EN) |
+| `action_label_hi` | text | Action button (HI) |
+| `action_route` | text | Navigation route |
+| `action_params` | jsonb | Route parameters |
+| `priority` | text | high / medium / low |
+| `category` | text | Category tag |
+| `icon` | text | Icon name |
+| `relevance_score` | decimal | 0.0 to 1.0 |
+| `valid_until` | timestamptz | Recommendation validity |
+| `is_dismissed` | boolean | User dismissed |
+| `is_completed` | boolean | User completed action |
+| `created_at` | timestamptz | — |
+| `updated_at` | timestamptz | — |
+
+---
+
+## **10.4 `ai_alerts`** (RLS Enabled)
+
+AI-generated alerts for academic/behavioral issues.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | uuid (PK) | — |
+| `customer_id` | uuid (FK) | — |
+| `student_user_id` | uuid | Target student |
+| `alert_type` | text | academic / attendance / behavior / deadline / performance / engagement |
+| `severity` | text | critical / high / medium / low |
+| `title_en` | text | English title |
+| `title_hi` | text | Hindi title |
+| `description_en` | text | English description |
+| `description_hi` | text | Hindi description |
+| `action_required_en` | text | Required action (EN) |
+| `action_required_hi` | text | Required action (HI) |
+| `action_route` | text | Navigation route |
+| `action_params` | jsonb | Route parameters |
+| `category` | text | Category tag |
+| `icon` | text | Icon name |
+| `triggered_at` | timestamptz | When alert triggered |
+| `expires_at` | timestamptz | Alert expiry |
+| `is_acknowledged` | boolean | User acknowledged |
+| `acknowledged_at` | timestamptz | When acknowledged |
+| `is_resolved` | boolean | Issue resolved |
+| `resolved_at` | timestamptz | When resolved |
+| `created_at` | timestamptz | — |
+| `updated_at` | timestamptz | — |
+
+---
+
+# 📦 11. AI Registry Tables (Planned - Full Flexibility)
+
+> **Status**: TO BE IMPLEMENTED
+> **Pattern**: Same as widgets - Global Definitions + Per-Customer Assignments
+> This allows unlimited AI features, providers, tools, and automations without code changes.
+
+See `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md` for full schema definitions:
+
+| Entity | Definition Table (Global) | Assignment Table (Per-Customer) |
+|--------|--------------------------|--------------------------------|
+| AI Features | `ai_feature_definitions` | `customer_ai_features` |
+| AI Providers | `ai_provider_definitions` | `customer_ai_providers` |
+| AI Models | `ai_model_definitions` | `customer_ai_models` |
+| MCP Tools | `mcp_tool_definitions` | `customer_mcp_tools` |
+| Automations | `automation_definitions` | `customer_automations` |
+| Prompts | `prompt_definitions` | `customer_prompts` |
+| Audience Profiles | `audience_profile_definitions` | `customer_audience_profiles` |
+
+Supporting tables:
+- `customer_ai_routing_rules` - Model routing per customer
+- `customer_ai_budgets` - Usage budgets
+- `ai_kill_switches` - Emergency shutoff
+- `ai_audit_logs` - Comprehensive audit trail
+
+---
+
 # 🧩 Entity Relationship Summary
 
 ```
@@ -944,14 +1092,42 @@ customers
   ├── navigation_tabs
   ├── navigation_screens
   ├── screen_layouts          ← Universal widget placement
-  ├── customer_branding       ← NEW: White-label/personalization
+  ├── customer_branding       ← White-label/personalization
   ├── customer_themes
   ├── customer_role_permissions
   ├── config_audit_log
-  └── config_change_events
+  ├── config_change_events
+  │
+  │ ── AI Content (Existing) ──
+  ├── ai_insights             ← Parent AI insights
+  ├── ai_predictions          ← Student predictions
+  ├── ai_recommendations      ← Study recommendations (RLS)
+  └── ai_alerts               ← Academic alerts (RLS)
+  │
+  │ ── AI Registry (Planned) ──
+  ├── customer_ai_features    ← Per-customer AI features
+  ├── customer_ai_providers   ← Per-customer providers
+  ├── customer_ai_models      ← Per-customer models
+  ├── customer_mcp_tools      ← Per-customer MCP tools
+  ├── customer_automations    ← Per-customer automations
+  ├── customer_prompts        ← Per-customer prompts
+  ├── customer_audience_profiles
+  ├── customer_ai_routing_rules
+  ├── customer_ai_budgets
+  └── ai_audit_logs
 
 widget_definitions (global)    ← Widget metadata
 screen_definitions (global)    ← Screen metadata
+
+── AI Registry Definitions (Planned) ──
+ai_feature_definitions (global)
+ai_provider_definitions (global)
+ai_model_definitions (global)
+mcp_tool_definitions (global)
+automation_definitions (global)
+prompt_definitions (global)
+audience_profile_definitions (global)
+ai_kill_switches (global)
 
 roles
   └── role_permissions
@@ -971,6 +1147,8 @@ user_profiles
 | Fixed 5 tabs | Dynamic 1-10 tabs via `navigation_tabs` |
 | Widgets tied to dashboard | Widgets can appear anywhere |
 | — | `screen_definitions` for screen metadata |
+| — | AI content tables (`ai_insights`, `ai_predictions`, etc.) |
+| — | AI registry pattern (planned) for full flexibility |
 
 ---
 
@@ -980,6 +1158,8 @@ user_profiles
 - Widget IDs must match `widget_definitions` and `widgetRegistry.ts`
 - Feature IDs must match `featureRegistry.ts`
 - Permission codes must match `PERMISSIONS_RBAC_SPEC.md`
+- AI widget IDs must match `src/config/widgetRegistry.ts`
+- AI tables documented in `Doc/AI/AI_IMPLEMENTATION_APPENDIX.md`
 - This schema supports:
   - Multi-tenant
   - **Universal widgets** (any widget, any screen)
@@ -988,6 +1168,8 @@ user_profiles
   - Dynamic themes
   - RBAC + overrides
   - Live config reload
+  - **AI content** (insights, predictions, recommendations, alerts)
+  - **AI registry pattern** (planned - unlimited AI features, providers, tools, automations)
 
 ```
 End of DB_SCHEMA_REFERENCE.md

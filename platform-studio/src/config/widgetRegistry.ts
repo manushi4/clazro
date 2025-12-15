@@ -582,6 +582,20 @@ export const widgetRegistry: Record<string, WidgetMetadata> = {
     requiredFeatureId: "ai_tutor",
   },
 
+  // ============ AUTOMATION WIDGETS ============
+  "automation.n8n-test": {
+    id: "automation.n8n-test",
+    name: "n8n Webhook Test",
+    description: "Test n8n automation webhooks",
+    category: "automation",
+    icon: "webhook",
+    allowedRoles: ["student", "teacher", "parent", "admin"],
+    allowedScreenTypes: ["dashboard", "hub"],
+    supportedSizes: ["standard", "expanded"],
+    defaultSize: "standard",
+    requiredFeatureId: "automation",
+  },
+
   // ============ PROFILE & UTILITY WIDGETS ============
   "profile.card": {
     id: "profile.card",
@@ -1106,6 +1120,7 @@ export const WIDGET_CATEGORIES: { id: WidgetCategory; label: string; icon: strin
   { id: "progress", label: "Progress", icon: "trending-up" },
   { id: "social", label: "Social", icon: "users" },
   { id: "ai", label: "AI", icon: "bot" },
+  { id: "automation", label: "Automation", icon: "webhook" },
   { id: "profile", label: "Profile", icon: "user" },
   { id: "notifications", label: "Notifications", icon: "bell" },
   { id: "actions", label: "Actions", icon: "zap" },

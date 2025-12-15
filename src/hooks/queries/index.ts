@@ -38,3 +38,42 @@ export * from './useTeacherDetailQuery';
 export * from './useAiInsightDetailQuery';
 export * from './usePredictionDetailQuery';
 export * from './useComparisonDetailsQuery';
+
+// Student schedule queries
+export * from './useLiveClassQuery';
+
+// AI queries
+export * from './useAIToolsQuery';
+
+// Notes queries
+export * from './useNotesSummaryQuery';
+
+// Recent viewed queries
+export * from './useRecentViewedQuery';
+
+// Quest queries
+export * from './useActiveQuestsQuery';
+
+// Weak areas/topics queries
+export * from './useWeakAreasQuery';
+
+// Week calendar queries
+export * from './useWeekCalendarQuery';
+
+// Upcoming events queries
+export * from './useUpcomingEventsQuery';
+
+// Notifications preview queries
+export * from './useNotificationsPreviewQuery';
+
+// Tasks overview queries
+export * from './useTasksOverviewQuery';
+
+// Downloads summary queries
+export * from './useDownloadsSummaryQuery';
+
+// Analytics snapshot queries
+export * from './useAnalyticsSnapshotQuery';
+
+// Connections list queries
+export * from './useConnectionsListQuery';

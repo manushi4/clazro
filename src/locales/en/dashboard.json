@@ -344,6 +344,248 @@
         "viewDetails": "View Details",
         "retry": "Retry"
       }
+    },
+    "liveClass": {
+      "title": "Live Class",
+      "subtitle": "Join your upcoming live sessions",
+      "defaultName": "Live Class",
+      "labels": {
+        "now": "Now",
+        "inMinutes": "In {{count}} min",
+        "inHours": "In {{count}} hr",
+        "participants": "{{count}} joined"
+      },
+      "states": {
+        "empty": "No live classes scheduled",
+        "loading": "Loading live classes...",
+        "error": "Unable to load live classes"
+      },
+      "actions": {
+        "joinNow": "Join Now",
+        "joinClass": "Join Class",
+        "retry": "Retry"
+      }
+    },
+    "aiTools": {
+      "title": "AI Tools",
+      "subtitle": "AI-powered learning assistants",
+      "offlineNote": "Some tools require internet",
+      "states": {
+        "empty": "No AI tools available",
+        "loading": "Loading AI tools...",
+        "error": "Failed to load AI tools"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Try Again"
+      }
+    },
+    "notesSummary": {
+      "title": "My Notes",
+      "subtitle": "Your study notes at a glance",
+      "labels": {
+        "totalNotes": "Notes",
+        "totalWords": "Words",
+        "pinned": "Pinned",
+        "words": "{{count}} words",
+        "recent": "Recent"
+      },
+      "states": {
+        "empty": "No notes yet. Start taking notes!",
+        "loading": "Loading notes...",
+        "error": "Failed to load notes"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Try Again",
+        "addNote": "Add Note"
+      }
+    },
+    "recentViewed": {
+      "title": "Recently Viewed",
+      "subtitle": "Pick up where you left off",
+      "types": {
+        "video": "Video",
+        "lesson": "Lesson",
+        "note": "Note",
+        "assignment": "Assignment",
+        "test": "Test",
+        "resource": "Resource"
+      },
+      "labels": {
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "completed": "Completed",
+        "inProgress": "In Progress"
+      },
+      "states": {
+        "empty": "No recent activity",
+        "emptyHint": "Start learning to see your history here",
+        "loading": "Loading history...",
+        "error": "Failed to load history"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Try Again",
+        "clearHistory": "Clear History"
+      }
+    },
+    "weekCalendar": {
+      "title": "Week Calendar",
+      "subtitle": "Your weekly schedule at a glance",
+      "labels": {
+        "today": "Today",
+        "live": "Live",
+        "totalEvents": "{{count}} events this week"
+      },
+      "states": {
+        "empty": "No classes scheduled this week",
+        "loading": "Loading schedule...",
+        "error": "Failed to load schedule"
+      },
+      "actions": {
+        "viewAll": "View Full Schedule",
+        "retry": "Try Again"
+      }
+    },
+    "upcomingEvents": {
+      "title": "Upcoming Events",
+      "subtitle": "{{count}} events this week",
+      "types": {
+        "exam": "Exam",
+        "holiday": "Holiday",
+        "sports": "Sports",
+        "cultural": "Cultural",
+        "meeting": "Meeting",
+        "deadline": "Deadline",
+        "general": "Event"
+      },
+      "labels": {
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "inDays": "In {{count}} days",
+        "allDay": "All Day",
+        "totalEvents": "{{count}} upcoming events"
+      },
+      "states": {
+        "empty": "No upcoming events",
+        "loading": "Loading events...",
+        "error": "Failed to load events"
+      },
+      "actions": {
+        "viewAll": "View All Events",
+        "retry": "Try Again"
+      }
+    },
+    "notificationsPreview": {
+      "title": "Notifications",
+      "subtitle": "{{count}} unread",
+      "labels": {
+        "total": "{{count}} notifications",
+        "urgent": "Urgent"
+      },
+      "states": {
+        "empty": "No notifications",
+        "loading": "Loading notifications...",
+        "error": "Failed to load notifications"
+      },
+      "actions": {
+        "viewAll": "View All",
+        "retry": "Try Again",
+        "markAllRead": "Mark All Read"
+      }
+    },
+    "tasksOverview": {
+      "title": "Tasks Overview",
+      "subtitle": "{{count}} pending tasks",
+      "types": {
+        "assignment": "Assignment",
+        "test": "Test"
+      },
+      "labels": {
+        "assignments": "Assignments",
+        "tests": "Tests",
+        "dueToday": "Due Today",
+        "total": "{{count}} total tasks",
+        "overdue": "Overdue",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "inDays": "In {{count}} days",
+        "noDue": "No due date",
+        "points": "pts"
+      },
+      "states": {
+        "empty": "No pending tasks",
+        "loading": "Loading tasks...",
+        "error": "Failed to load tasks"
+      },
+      "actions": {
+        "viewAll": "View All Tasks",
+        "retry": "Try Again"
+      }
+    },
+    "downloadsSummary": {
+      "title": "Downloads",
+      "subtitle": "{{count}} downloaded files",
+      "types": {
+        "video": "Video",
+        "pdf": "PDF",
+        "document": "Document",
+        "audio": "Audio",
+        "image": "Image",
+        "resource": "Resource"
+      },
+      "labels": {
+        "files": "Files",
+        "storage": "Storage",
+        "recent": "this week",
+        "total": "{{count}} total downloads"
+      },
+      "states": {
+        "empty": "No downloads yet",
+        "loading": "Loading downloads...",
+        "error": "Failed to load downloads"
+      },
+      "actions": {
+        "viewAll": "View All Downloads",
+        "retry": "Try Again",
+        "clearAll": "Clear All"
+      }
+    },
+    "connectionsList": {
+      "title": "Connections",
+      "subtitle": "Your study network",
+      "types": {
+        "classmate": "Classmate",
+        "study_buddy": "Study Buddy",
+        "friend": "Friend",
+        "mentor": "Mentor",
+        "mentee": "Mentee"
+      },
+      "labels": {
+        "total": "Total",
+        "online": "Online",
+        "pending": "Pending",
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "unknown": "Unknown",
+        "mutualSubjects": "Mutual subjects"
+      },
+      "states": {
+        "empty": "No connections yet",
+        "loading": "Loading connections...",
+        "error": "Couldn't load connections"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Retry",
+        "findConnections": "Find Connections",
+        "message": "Message",
+        "viewProfile": "View Profile"
+      }
     }
   }
 }

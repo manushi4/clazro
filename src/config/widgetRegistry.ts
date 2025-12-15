@@ -14,6 +14,7 @@ import { ProfileAchievementsWidget } from "../components/widgets/profile/Profile
 import { ProfileActivityWidget } from "../components/widgets/profile/ProfileActivityWidget";
 import { SubjectProgressWidget } from "../components/widgets/progress/SubjectProgressWidget";
 import { StudyStreakWidget } from "../components/widgets/progress/StudyStreakWidget";
+import { StreakTrackerWidget } from "../components/widgets/progress/StreakTrackerWidget";
 import { LearningGoalsWidget } from "../components/widgets/progress/LearningGoalsWidget";
 import { StatsGridWidget } from "../components/widgets/stats/StatsGridWidget";
 import { ActiveQuestsWidget } from "../components/widgets/gamification/ActiveQuestsWidget";
@@ -21,6 +22,22 @@ import { PeersLeaderboardWidget } from "../components/widgets/social/PeersLeader
 import { ContinueLearningWidget } from "../components/widgets/study/ContinueLearningWidget";
 import { WeakAreasWidget } from "../components/widgets/progress/WeakAreasWidget";
 import { AnalyticsSnapshotWidget } from "../components/widgets/analytics/AnalyticsSnapshotWidget";
+// Schedule widgets
+import { LiveClassWidget } from "../components/widgets/schedule/LiveClassWidget";
+import { WeekCalendarWidget } from "../components/widgets/schedule/WeekCalendarWidget";
+import { UpcomingEventsWidget } from "../components/widgets/schedule/UpcomingEventsWidget";
+// AI widgets
+import { AIToolsWidget } from "../components/widgets/ai/AIToolsWidget";
+// Study widgets
+import { NotesSummaryWidget } from "../components/widgets/study/NotesSummaryWidget";
+import { RecentViewedWidget } from "../components/widgets/study/RecentViewedWidget";
+import { DownloadsSummaryWidget } from "../components/widgets/study/DownloadsSummaryWidget";
+// Social widgets
+import { ConnectionsListWidget } from "../components/widgets/social/ConnectionsListWidget";
+// Notifications widgets
+import { NotificationsPreviewWidget as StudentNotificationsPreviewWidget } from "../components/widgets/notifications/NotificationsPreviewWidget";
+// Assessment widgets
+import { TasksOverviewWidget } from "../components/widgets/assessment/TasksOverviewWidget";
 // Parent widgets
 import { ChildrenOverviewWidget } from "../components/widgets/parent/ChildrenOverviewWidget";
 import { AttendanceSummaryWidget } from "../components/widgets/parent/AttendanceSummaryWidget";
@@ -64,6 +81,36 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
   "schedule.today": {
     component: TodayScheduleWidget,
     metadata: buildMetadata("schedule.today", "dashboard:widgets.todaySchedule.title", "dashboard:widgets.todaySchedule.subtitle", "home.dashboard"),
+  },
+  "live.class": {
+    component: LiveClassWidget,
+    metadata: {
+      id: "live.class",
+      titleKey: "dashboard:widgets.liveClass.title",
+      descriptionKey: "dashboard:widgets.liveClass.subtitle",
+      featureId: "schedule.live",
+      roles: ["student"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showParticipants: true,
+        showJoinButton: true,
+        showTeacher: true,
+        showSubject: true,
+        showCountdown: true,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
   },
   "actions.quick": {
     component: QuickActionsWidget,
@@ -143,6 +190,38 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
       requiredPermissions: [],
     },
   },
+  "streak.tracker": {
+    component: StreakTrackerWidget,
+    metadata: {
+      id: "streak.tracker",
+      titleKey: "dashboard:widgets.studyStreak.title",
+      descriptionKey: "dashboard:widgets.studyStreak.subtitle",
+      featureId: "progress.analytics",
+      roles: ["student", "parent"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showCurrentStreak: true,
+        showLongestStreak: true,
+        showWeeklyGoal: true,
+        showAchievements: true,
+        showRecentActivity: false,
+        maxAchievements: 2,
+        enableTap: true,
+        showMotivation: true,
+      },
+      requiredPermissions: [],
+    },
+  },
   "progress.goals": {
     component: LearningGoalsWidget,
     metadata: {
@@ -186,6 +265,40 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
         maxQueries: 1,
         staleTimeMs: 5 * 60 * 1000,
         prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxTopics: 4,
+        showScore: true,
+        showPracticeButton: true,
+        showDifficulty: true,
+        showSubject: true,
+        showChapter: false,
+        sortBy: "score",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  // Alias for progress.weak-areas with spec-compliant ID
+  "weak.topics": {
+    component: WeakAreasWidget,
+    metadata: {
+      id: "weak.topics",
+      titleKey: "dashboard:widgets.weakAreas.title",
+      descriptionKey: "dashboard:widgets.weakAreas.subtitle",
+      featureId: "progress.analytics",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
         allowBackgroundRefresh: true,
       },
       defaultConfig: {
@@ -297,6 +410,290 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
   "ai.recommendations": {
     component: RecommendationsWidget,
     metadata: buildMetadata("ai.recommendations", "dashboard:widgets.recommendations.title", "dashboard:widgets.recommendations.subtitle", "ai.tutor", ["ai.tutor.use"]),
+  },
+  "ai.tools": {
+    component: AIToolsWidget,
+    metadata: {
+      id: "ai.tools",
+      titleKey: "dashboard:widgets.aiTools.title",
+      descriptionKey: "dashboard:widgets.aiTools.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxTools: 6,
+        layoutStyle: "grid",
+        showDescription: true,
+        showIcon: true,
+        columns: 2,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "notes.summary": {
+    component: NotesSummaryWidget,
+    metadata: {
+      id: "notes.summary",
+      titleKey: "dashboard:widgets.notesSummary.title",
+      descriptionKey: "dashboard:widgets.notesSummary.subtitle",
+      featureId: "study.notes",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxNotes: 5,
+        layoutStyle: "list",
+        showPinned: true,
+        showWordCount: true,
+        showTags: true,
+        showStats: true,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "recent.viewed": {
+    component: RecentViewedWidget,
+    metadata: {
+      id: "recent.viewed",
+      titleKey: "dashboard:widgets.recentViewed.title",
+      descriptionKey: "dashboard:widgets.recentViewed.subtitle",
+      featureId: "study.history",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        layoutStyle: "list",
+        showProgress: true,
+        showIcon: true,
+        showType: true,
+        showTimeAgo: true,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "week.calendar": {
+    component: WeekCalendarWidget,
+    metadata: {
+      id: "week.calendar",
+      titleKey: "dashboard:widgets.weekCalendar.title",
+      descriptionKey: "dashboard:widgets.weekCalendar.subtitle",
+      featureId: "schedule.calendar",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showWeekNavigation: true,
+        showEventCount: true,
+        showEventTime: true,
+        showSubjectColor: true,
+        showLiveIndicator: true,
+        maxEventsPerDay: 3,
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "upcoming.events": {
+    component: UpcomingEventsWidget,
+    metadata: {
+      id: "upcoming.events",
+      titleKey: "dashboard:widgets.upcomingEvents.title",
+      descriptionKey: "dashboard:widgets.upcomingEvents.subtitle",
+      featureId: "schedule.events",
+      roles: ["student", "parent", "teacher"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 10 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showDescription: true,
+        showLocation: true,
+        showTime: true,
+        showImportantBadge: true,
+        showEventType: true,
+        layoutStyle: "list",
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "notifications.preview": {
+    component: StudentNotificationsPreviewWidget,
+    metadata: {
+      id: "notifications.preview",
+      titleKey: "dashboard:widgets.notificationsPreview.title",
+      descriptionKey: "dashboard:widgets.notificationsPreview.subtitle",
+      featureId: "notifications",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showBody: true,
+        showTime: true,
+        showPriorityBadge: true,
+        showCategory: false,
+        showUnreadIndicator: true,
+        layoutStyle: "list",
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "tasks.overview": {
+    component: TasksOverviewWidget,
+    metadata: {
+      id: "tasks.overview",
+      titleKey: "dashboard:widgets.tasksOverview.title",
+      descriptionKey: "dashboard:widgets.tasksOverview.subtitle",
+      featureId: "assessment",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 2,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showCounts: true,
+        showOverdue: true,
+        showDueDate: true,
+        showType: true,
+        showScore: false,
+        layoutStyle: "list",
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "downloads.summary": {
+    component: DownloadsSummaryWidget,
+    metadata: {
+      id: "downloads.summary",
+      titleKey: "dashboard:widgets.downloadsSummary.title",
+      descriptionKey: "dashboard:widgets.downloadsSummary.subtitle",
+      featureId: "study.downloads",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showStorage: true,
+        showRecent: true,
+        showTypeBreakdown: false,
+        showFileSize: true,
+        layoutStyle: "list",
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "connections.list": {
+    component: ConnectionsListWidget,
+    metadata: {
+      id: "connections.list",
+      titleKey: "dashboard:widgets.connectionsList.title",
+      descriptionKey: "dashboard:widgets.connectionsList.subtitle",
+      featureId: "peers.network",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showOnlineStatus: true,
+        showXP: true,
+        showStreak: true,
+        showMutualSubjects: true,
+        showStats: true,
+        layoutStyle: "list",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
   },
   "peers.leaderboard": {
     component: PeersLeaderboardWidget,

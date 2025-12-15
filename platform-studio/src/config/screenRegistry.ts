@@ -84,6 +84,16 @@ export const screenRegistry: Record<string, ScreenDefinition> = {
     pull_to_refresh: true,
     header_visible: true,
   },
+  "test-center": {
+    screen_id: "test-center",
+    name: "Test Center",
+    screen_type: "hub",
+    allowed_roles: ["student"],
+    default_layout: "vertical",
+    scrollable: true,
+    pull_to_refresh: true,
+    header_visible: true,
+  },
   "social-home": {
     screen_id: "social-home",
     name: "Social",

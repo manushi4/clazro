@@ -47,6 +47,14 @@ const LAYOUT_STYLE_WIDGETS = [
   "parent.ai-recommendations",
   "parent.ai-alerts",
   "parent.comparison-analytics",
+  // Student notifications
+  "notifications.preview",
+  // Assessment widgets
+  "tasks.overview",
+  // Study widgets
+  "downloads.summary",
+  // Social widgets
+  "connections.list",
 ];
 
 // Widget-specific layout options
@@ -78,6 +86,14 @@ const WIDGET_LAYOUT_OPTIONS: Record<string, string[]> = {
   "parent.payment-history": ["list", "cards", "compact"],
   "parent.ai-predictions": ["list", "cards", "compact"],
   "parent.ai-recommendations": ["list", "cards", "compact"],
+  // Student notifications
+  "notifications.preview": ["list", "cards", "compact"],
+  // Assessment widgets
+  "tasks.overview": ["list", "cards", "compact"],
+  // Study widgets
+  "downloads.summary": ["list", "cards", "compact"],
+  // Social widgets
+  "connections.list": ["list", "cards", "compact"],
   "parent.ai-alerts": ["list", "cards", "compact"],
   "parent.comparison-analytics": ["list", "cards", "compact"],
   // Default for other widgets
@@ -576,6 +592,50 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
       },
     ],
   },
+  "streak.tracker": {
+    sections: [
+      {
+        title: "Streak Display",
+        icon: "🔥",
+        fields: [
+          { key: "showCurrentStreak", label: "Show Current Streak", type: "boolean", default: true },
+          { key: "showLongestStreak", label: "Show Longest Streak", type: "boolean", default: true },
+          { key: "showWeeklyGoal", label: "Show Weekly Goal Progress", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Stats",
+        icon: "📊",
+        fields: [
+          { key: "showTotalDays", label: "Show Total Study Days", type: "boolean", default: true },
+          { key: "showTotalHours", label: "Show Total Study Hours", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Achievements",
+        icon: "🏆",
+        fields: [
+          { key: "showAchievements", label: "Show Recent Achievements", type: "boolean", default: true },
+          { key: "maxAchievements", label: "Max Achievements", type: "number", min: 1, max: 6, default: 2 },
+        ],
+      },
+      {
+        title: "Activity",
+        icon: "📅",
+        fields: [
+          { key: "showRecentActivity", label: "Show Recent Activity", type: "boolean", default: false },
+          { key: "showMotivation", label: "Show Motivation Message", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
   "stats.grid": {
     sections: [
       {
@@ -603,6 +663,344 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
         icon: "🎨",
         fields: [
           { key: "showTrends", label: "Show Trend Indicators", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "ai.tools": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🤖",
+        fields: [
+          { key: "maxTools", label: "Max Tools to Show", type: "number", min: 2, max: 10, default: 6 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["grid", "list", "cards"], default: "grid" },
+          { key: "columns", label: "Grid Columns", type: "select", options: ["2", "3"], default: "2" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "showIcon", label: "Show Tool Icons", type: "boolean", default: true },
+          { key: "showDescription", label: "Show Descriptions", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "notes.summary": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📝",
+        fields: [
+          { key: "maxNotes", label: "Max Notes to Show", type: "number", min: 2, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "grid", "cards"], default: "list" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📋",
+        fields: [
+          { key: "showPinned", label: "Show Pinned Notes First", type: "boolean", default: true },
+          { key: "showWordCount", label: "Show Word Count", type: "boolean", default: true },
+          { key: "showTags", label: "Show Tags", type: "boolean", default: true },
+          { key: "showStats", label: "Show Stats Banner", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "recent.viewed": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🕐",
+        fields: [
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 2, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "grid", "cards"], default: "list" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📋",
+        fields: [
+          { key: "showProgress", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showIcon", label: "Show Content Icon", type: "boolean", default: true },
+          { key: "showType", label: "Show Content Type", type: "boolean", default: true },
+          { key: "showTimeAgo", label: "Show Time Ago", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "week.calendar": {
+    sections: [
+      {
+        title: "Navigation",
+        icon: "📅",
+        fields: [
+          { key: "showWeekNavigation", label: "Show Week Navigation", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Day Display",
+        icon: "📆",
+        fields: [
+          { key: "showEventCount", label: "Show Event Count", type: "boolean", default: true },
+          { key: "compactMode", label: "Compact Mode (dots only)", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Event Details",
+        icon: "📋",
+        fields: [
+          { key: "showEventTime", label: "Show Event Time", type: "boolean", default: true },
+          { key: "showSubjectColor", label: "Show Subject Color", type: "boolean", default: true },
+          { key: "showLiveIndicator", label: "Show Live Indicator", type: "boolean", default: true },
+          { key: "maxEventsPerDay", label: "Max Events Per Day", type: "number", min: 1, max: 5, default: 3 },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "upcoming.events": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📅",
+        fields: [
+          { key: "maxItems", label: "Max Events to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+        ],
+      },
+      {
+        title: "Event Details",
+        icon: "📋",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showLocation", label: "Show Location", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showEventType", label: "Show Event Type Badge", type: "boolean", default: true },
+          { key: "showImportantBadge", label: "Show Important Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "notifications.preview": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔔",
+        fields: [
+          { key: "maxItems", label: "Max Notifications", type: "number", min: 1, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📋",
+        fields: [
+          { key: "showBody", label: "Show Message Body", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Category Badge", type: "boolean", default: false },
+          { key: "showPriorityBadge", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showUnreadIndicator", label: "Show Unread Indicator", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "tasks.overview": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxItems", label: "Max Tasks to Show", type: "number", min: 1, max: 15, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+        ],
+      },
+      {
+        title: "Stats Banner",
+        icon: "📊",
+        fields: [
+          { key: "showCounts", label: "Show Stats Banner", type: "boolean", default: true },
+          { key: "showOverdue", label: "Show Overdue Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Task Details",
+        icon: "📝",
+        fields: [
+          { key: "showType", label: "Show Task Type Badge", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+          { key: "showScore", label: "Show Max Score", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "downloads.summary": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📥",
+        fields: [
+          { key: "maxItems", label: "Max Downloads to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+        ],
+      },
+      {
+        title: "Storage Info",
+        icon: "💾",
+        fields: [
+          { key: "showStorage", label: "Show Storage Banner", type: "boolean", default: true },
+          { key: "showRecent", label: "Show Recent Badge", type: "boolean", default: true },
+          { key: "showTypeBreakdown", label: "Show Type Breakdown", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Item Details",
+        icon: "📝",
+        fields: [
+          { key: "showFileSize", label: "Show File Size", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "connections.list": {
+    sections: [
+      {
+        title: "Display",
+        icon: "👥",
+        fields: [
+          { key: "maxItems", label: "Max Connections to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Stats Banner",
+        icon: "📊",
+        fields: [
+          { key: "showStats", label: "Show Stats Banner", type: "boolean", default: true },
+          { key: "showOnlineStatus", label: "Show Online Status", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Connection Details",
+        icon: "📝",
+        fields: [
+          { key: "showXP", label: "Show XP Points", type: "boolean", default: true },
+          { key: "showStreak", label: "Show Streak Days", type: "boolean", default: true },
+          { key: "showMutualSubjects", label: "Show Mutual Subjects", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "analytics.snapshot": {
+    sections: [
+      {
+        title: "This Week Overview",
+        icon: "📊",
+        fields: [
+          { key: "showThisWeek", label: "Show This Week Section", type: "boolean", default: true },
+          { key: "showTrends", label: "Show Trend Indicators", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Subject Analytics",
+        icon: "📚",
+        fields: [
+          { key: "showSubjects", label: "Show Subject Breakdown", type: "boolean", default: true },
+          { key: "maxSubjects", label: "Max Subjects to Show", type: "number", min: 1, max: 6, default: 3 },
+        ],
+      },
+      {
+        title: "Streak & Focus",
+        icon: "🔥",
+        fields: [
+          { key: "showStreak", label: "Show Streak & Focus", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Recommendations",
+        icon: "💡",
+        fields: [
+          { key: "showRecommendations", label: "Show Suggestions", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "📐",
+        fields: [
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
           { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
         ],
       },
@@ -639,6 +1037,43 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
         title: "Actions",
         icon: "⚡",
         fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "weak.topics": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxTopics", label: "Max Topics to Show", type: "number", min: 1, max: 10, default: 4 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📊",
+        fields: [
+          { key: "showScore", label: "Show Mastery Score", type: "boolean", default: true },
+          { key: "showDifficulty", label: "Show Difficulty Badge", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject Name", type: "boolean", default: true },
+          { key: "showChapter", label: "Show Chapter Name", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Sorting",
+        icon: "🔄",
+        fields: [
+          { key: "sortBy", label: "Sort By", type: "select", options: ["score", "attempts", "recent"], default: "score" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showPracticeButton", label: "Show Practice Button", type: "boolean", default: true },
           { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
         ],
       },

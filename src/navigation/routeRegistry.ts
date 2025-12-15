@@ -23,6 +23,8 @@ const registry: Record<string, RouteDefinition> = {
   "study-hub": { screenId: "study-hub", component: DynamicScreen },
   "ask.doubts": { screenId: "ask.doubts", component: DynamicScreen },
   "doubts-home": { screenId: "doubts-home", component: DynamicScreen },
+  "assignments-home": { screenId: "assignments-home", component: DynamicScreen },
+  "test-center": { screenId: "test-center", component: DynamicScreen },
   "progress.analytics": { screenId: "progress.analytics", component: DynamicScreen },
   "progress-home": { screenId: "progress-home", component: DynamicScreen },
   "admin.panel": { screenId: "admin.panel", component: DynamicScreen },

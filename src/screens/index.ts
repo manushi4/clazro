@@ -21,3 +21,15 @@ export { AnnouncementDetailScreen } from "./announcements";
 
 // Fee screens
 export { FeeDetailScreen } from "./fees";
+
+// Doubts screens
+export { DoubtDetailScreen, DoubtSubmitScreen } from "./doubts";
+
+// Schedule screens
+export { ClassDetailScreen, LiveClassScreen } from "./schedule";
+
+// Parent screens
+export { AssignmentDetailScreen } from "./parent";
+
+// AI screens
+export { AITutorScreen } from "./ai";

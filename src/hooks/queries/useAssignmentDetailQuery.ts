@@ -42,13 +42,17 @@ export function useAssignmentDetailQuery(assignmentId: string) {
   const customerId = useCustomerId();
   const lang = i18n.language;
 
+  if (__DEV__) {
+    console.log('[useAssignmentDetailQuery] Hook called with:', { assignmentId, customerId, lang });
+  }
+
   return useQuery({
     queryKey: ['assignment-detail', customerId, assignmentId, lang],
     queryFn: async (): Promise<AssignmentDetail | null> => {
       const supabase = getSupabaseClient();
 
       if (__DEV__) {
-        console.log('[useAssignmentDetailQuery] Fetching:', assignmentId);
+        console.log('[useAssignmentDetailQuery] queryFn executing:', { assignmentId, customerId });
       }
 
       const { data, error } = await supabase
@@ -61,12 +65,23 @@ export function useAssignmentDetailQuery(assignmentId: string) {
         .eq('id', assignmentId)
         .single();
 
+      if (__DEV__) {
+        console.log('[useAssignmentDetailQuery] Query result:', { data, error });
+      }
+
       if (error) {
         if (__DEV__) console.log('[useAssignmentDetailQuery] error:', error);
         throw error;
       }
 
-      if (!data) return null;
+      if (!data) {
+        if (__DEV__) console.log('[useAssignmentDetailQuery] No data returned');
+        return null;
+      }
+
+      if (__DEV__) {
+        console.log('[useAssignmentDetailQuery] Data found:', data.id, data.title_en);
+      }
 
       const now = new Date();
       const dueDate = data.due_date ? new Date(data.due_date) : null;

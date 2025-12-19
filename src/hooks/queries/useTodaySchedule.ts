@@ -19,11 +19,12 @@ export type ScheduleItem = {
   subjectColor?: string;
 };
 
-// Fallback mock data when database is empty
+// Fallback mock data when database is empty - using mock- prefix to identify mock items
 const FALLBACK_SCHEDULE: ScheduleItem[] = [
-  { id: "1", title: "Mathematics", time: "9:00 AM", duration: "1h", location: "Room 101", type: "class", status: "upcoming" },
-  { id: "2", title: "Physics Lab", time: "11:00 AM", duration: "2h", location: "Lab 3", type: "lab", status: "upcoming" },
-  { id: "3", title: "English Essay Due", time: "2:00 PM", duration: "", location: "", type: "assignment", status: "due" },
+  { id: "mock-1", title: "Mathematics", time: "9:00 AM", duration: "1h", location: "Room 101", type: "class", status: "upcoming" },
+  { id: "mock-2", title: "Physics Lab", time: "11:00 AM", duration: "2h", location: "Lab 3", type: "lab", status: "upcoming" },
+  { id: "mock-3", title: "English Essay Due", time: "2:00 PM", duration: "", location: "", type: "assignment", status: "due" },
+  { id: "mock-4", title: "Live Chemistry Class", time: "4:00 PM", duration: "1h", location: "Online", type: "live", status: "live" },
 ];
 
 async function fetchTodaySchedule(customerId: string): Promise<ScheduleItem[]> {

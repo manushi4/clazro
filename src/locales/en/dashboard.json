@@ -613,9 +613,432 @@
         "viewProfile": "View Profile"
       }
     },
+    "learningInsights": {
+      "title": "Learning Insights",
+      "subtitle": "AI-powered learning analysis",
+      "types": {
+        "strength": "Strength",
+        "weakness": "Area to Improve",
+        "recommendation": "Recommendation",
+        "trend": "Trend",
+        "achievement": "Achievement",
+        "alert": "Alert"
+      },
+      "labels": {
+        "newInsights": "{{count}} new insights for you",
+        "subject": "Subject",
+        "metric": "Score"
+      },
+      "states": {
+        "empty": "No insights yet",
+        "emptyHint": "Keep learning to get personalized insights",
+        "loading": "Analyzing your learning...",
+        "error": "Couldn't load insights"
+      },
+      "actions": {
+        "viewAll": "View All Insights ({{count}})",
+        "retry": "Retry",
+        "view": "View",
+        "dismiss": "Dismiss"
+      }
+    },
+    "suggestedPeers": {
+      "title": "Suggested Peers",
+      "subtitle": "People you may know",
+      "types": {
+        "classmate": "Classmate",
+        "study_buddy": "Study Buddy",
+        "recommended": "Recommended",
+        "mutual_friend": "Mutual Friend"
+      },
+      "labels": {
+        "matchScore": "Match",
+        "mutualSubjects": "Mutual subjects",
+        "mutualConnections": "mutual connections",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "states": {
+        "empty": "No suggestions right now",
+        "emptyHint": "Check back later for new peer suggestions",
+        "loading": "Finding peers...",
+        "error": "Couldn't load suggestions"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Retry",
+        "connect": "Connect",
+        "dismiss": "Dismiss",
+        "viewProfile": "View Profile"
+      }
+    },
     "n8nTest": {
       "title": "n8n Automation Test",
       "subtitle": "Test webhook automation workflows"
+    },
+    "performancePredictions": {
+      "title": "Performance Predictions",
+      "subtitle": "AI-powered performance forecasts",
+      "types": {
+        "exam_score": "Exam Score",
+        "subject_grade": "Subject Grade",
+        "improvement": "Improvement",
+        "risk": "Risk Alert",
+        "milestone": "Milestone",
+        "trend": "Trend"
+      },
+      "labels": {
+        "confidence": "{{value}}% confidence",
+        "positive": "{{count}} positive",
+        "needsAttention": "{{count}} needs attention",
+        "subject": "Subject",
+        "predicted": "Predicted",
+        "current": "Current",
+        "target": "Target"
+      },
+      "states": {
+        "empty": "No predictions yet",
+        "emptyHint": "Keep learning to get performance predictions",
+        "loading": "Analyzing performance...",
+        "error": "Couldn't load predictions"
+      },
+      "actions": {
+        "viewAll": "View All Predictions ({{count}})",
+        "retry": "Retry",
+        "view": "View",
+        "dismiss": "Dismiss"
+      }
+    },
+    "weakTopicAlerts": {
+      "title": "Weak Topic Alerts",
+      "subtitle": "Topics needing attention",
+      "types": {
+        "declining": "Declining",
+        "critical": "Critical",
+        "stagnant": "Stagnant",
+        "opportunity": "Opportunity",
+        "urgent": "Urgent",
+        "improvement": "Improvement"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "labels": {
+        "attentionNeeded": "{{count}} topics need immediate attention",
+        "daysSince": "{{count}} days since practice",
+        "scoreChange": "{{value}}% change",
+        "topic": "Topic",
+        "subject": "Subject"
+      },
+      "states": {
+        "empty": "No weak topic alerts",
+        "emptyHint": "Great job! Keep up the good work",
+        "loading": "Analyzing weak topics...",
+        "error": "Couldn't load alerts"
+      },
+      "actions": {
+        "viewAll": "View All Alerts ({{count}})",
+        "retry": "Retry",
+        "practice": "Practice",
+        "dismiss": "Dismiss"
+      }
+    },
+    "studyRecommendations": {
+      "title": "Study Recommendations",
+      "subtitle": "Personalized learning suggestions",
+      "types": {
+        "content": "Content",
+        "practice": "Practice",
+        "revision": "Revision",
+        "challenge": "Challenge",
+        "remedial": "Remedial",
+        "enrichment": "Enrichment"
+      },
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "labels": {
+        "confidence": "{{value}}%",
+        "highPriority": "{{count}} high priority recommendations",
+        "minutes": "{{count}} min",
+        "subject": "Subject",
+        "topic": "Topic"
+      },
+      "states": {
+        "empty": "No recommendations right now",
+        "emptyHint": "Keep learning to get personalized suggestions",
+        "loading": "Finding recommendations...",
+        "error": "Couldn't load recommendations"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Retry",
+        "start": "Start",
+        "dismiss": "Dismiss"
+      }
+    },
+    "reminders": {
+      "title": "Reminders",
+      "subtitle": "Upcoming tasks and reminders",
+      "types": {
+        "study": "Study",
+        "assignment": "Assignment",
+        "test": "Test",
+        "revision": "Revision",
+        "break": "Break",
+        "goal": "Goal",
+        "custom": "Custom"
+      },
+      "repeat": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "custom": "Custom"
+      },
+      "time": {
+        "inMinutes": "In {{count}} min",
+        "inHours": "In {{count}} hr",
+        "inDays": "In {{count}} days",
+        "tomorrow": "Tomorrow",
+        "overdueMinutes": "{{count}}m overdue",
+        "overdueHours": "{{count}}h overdue",
+        "overdueDays": "{{count}}d overdue"
+      },
+      "labels": {
+        "overdue": "{{count}} overdue reminders",
+        "upcoming": "{{count}} upcoming"
+      },
+      "states": {
+        "empty": "No reminders",
+        "emptyHint": "You're all caught up!",
+        "loading": "Loading reminders...",
+        "error": "Couldn't load reminders"
+      },
+      "actions": {
+        "viewAll": "View All ({{count}})",
+        "retry": "Retry",
+        "view": "View",
+        "snooze": "Snooze",
+        "complete": "Complete",
+        "dismiss": "Dismiss"
+      }
+    },
+    "streakProtection": {
+      "title": "Streak Protection",
+      "subtitle": "Keep your learning streak alive",
+      "status": {
+        "safe": "Streak Protected",
+        "atRisk": "At Risk",
+        "critical": "Critical!",
+        "lost": "Streak Lost"
+      },
+      "urgency": {
+        "critical": "Only {{hours}}h left!",
+        "atRisk": "{{hours}}h until streak loss",
+        "hint": "Complete a session to stay safe"
+      },
+      "labels": {
+        "dayStreak": "day streak",
+        "longest": "Longest: {{days}} days",
+        "shields": "Protection Shields",
+        "shieldsLeft": "{{count}} left this month",
+        "weekGoal": "Weekly Goal",
+        "days": "days",
+        "nextMilestone": "{{days}} days to milestone",
+        "reward": "Reward: {{reward}}"
+      },
+      "states": {
+        "empty": "Start your streak!",
+        "emptyHint": "Complete a study session to begin",
+        "loading": "Loading streak...",
+        "error": "Couldn't load streak"
+      },
+      "actions": {
+        "retry": "Retry",
+        "useShield": "Use Shield",
+        "continue": "Continue Learning",
+        "viewDetails": "View Details"
+      }
+    },
+    "rewardShop": {
+      "title": "Reward Shop",
+      "subtitle": "Redeem your coins and XP for rewards",
+      "badges": {
+        "featured": "Featured",
+        "new": "New",
+        "limited": "Limited"
+      },
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "labels": {
+        "stockLeft": "{{count}} left",
+        "soldOut": "Sold Out",
+        "coins": "Coins",
+        "xp": "XP"
+      },
+      "states": {
+        "empty": "No rewards available",
+        "emptyHint": "Check back soon for new items!",
+        "loading": "Loading rewards...",
+        "error": "Couldn't load rewards"
+      },
+      "actions": {
+        "retry": "Retry",
+        "viewAll": "Browse All Rewards ({{count}})",
+        "redeem": "Redeem"
+      }
+    },
+    "xpBalance": {
+      "title": "XP & Coins",
+      "subtitle": "Your rewards balance",
+      "labels": {
+        "coins": "Coins",
+        "xp": "XP",
+        "level": "Level",
+        "today": "Today",
+        "thisWeek": "This Week",
+        "classRank": "Class Rank",
+        "schoolRank": "School Rank",
+        "nextLevel": "Next Level",
+        "multiplier": "Multiplier Active"
+      },
+      "states": {
+        "empty": "Start earning XP!",
+        "emptyHint": "Complete activities to earn rewards",
+        "loading": "Loading balance...",
+        "error": "Couldn't load balance"
+      },
+      "actions": {
+        "retry": "Retry",
+        "visitShop": "Visit Reward Shop",
+        "viewHistory": "View History"
+      }
+    },
+    "communityFeed": {
+      "title": "Community Feed",
+      "subtitle": "See what others are sharing",
+      "types": {
+        "post": "Post",
+        "achievement": "Achievement",
+        "question": "Question",
+        "poll": "Poll",
+        "announcement": "Announcement",
+        "milestone": "Milestone",
+        "challenge": "Challenge"
+      },
+      "labels": {
+        "pinned": "Pinned",
+        "featured": "Featured",
+        "verified": "Verified"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "states": {
+        "empty": "No posts yet",
+        "emptyHint": "Be the first to share something!",
+        "loading": "Loading feed...",
+        "error": "Couldn't load feed"
+      },
+      "actions": {
+        "retry": "Retry",
+        "viewAll": "View Community Feed",
+        "like": "Like",
+        "comment": "Comment",
+        "share": "Share"
+      }
+    },
+    "studyGroups": {
+      "title": "Study Groups",
+      "subtitle": "Learn together with peers",
+      "types": {
+        "study": "Study",
+        "project": "Project",
+        "examPrep": "Exam Prep",
+        "homework": "Homework",
+        "discussion": "Discussion",
+        "tutoring": "Tutoring"
+      },
+      "labels": {
+        "joined": "Joined",
+        "myGroups": "{{count}} groups joined",
+        "members": "{{count}} members",
+        "private": "Private"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "meeting": {
+        "soon": "Soon",
+        "inHours": "In {{count}}h",
+        "inDays": "In {{count}}d"
+      },
+      "states": {
+        "empty": "No study groups yet",
+        "emptyHint": "Join or create a group to study together!",
+        "loading": "Loading groups...",
+        "error": "Couldn't load groups"
+      },
+      "actions": {
+        "retry": "Retry",
+        "viewAll": "View All Groups",
+        "join": "Join",
+        "leave": "Leave",
+        "create": "Create Group"
+      }
+    },
+    "peerMatches": {
+      "title": "Peer Matches",
+      "subtitle": "AI-suggested study partners",
+      "types": {
+        "studyBuddy": "Study Buddy",
+        "subjectExpert": "Subject Expert",
+        "goalPartner": "Goal Partner",
+        "mentor": "Mentor",
+        "mentee": "Mentee",
+        "projectPartner": "Project Partner"
+      },
+      "labels": {
+        "connected": "{{count}} connected",
+        "matchScore": "Match"
+      },
+      "stats": {
+        "level": "Lv {{level}}"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "unknown": "Unknown"
+      },
+      "states": {
+        "empty": "No matches found yet",
+        "emptyHint": "Keep learning to find study partners!",
+        "loading": "Finding matches...",
+        "error": "Couldn't find matches"
+      },
+      "actions": {
+        "retry": "Retry",
+        "viewAll": "Find More Matches",
+        "connect": "Connect"
+      }
     }
   }
 }

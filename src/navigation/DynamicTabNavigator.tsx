@@ -14,6 +14,8 @@ import { useBranding } from "../context/BrandingContext";
 import { resolveScreen } from "./routeRegistry";
 import { DynamicScreen } from "./DynamicScreen";
 import { BrandedHeader } from "../components/branding/BrandedHeader";
+import { useUnreadNotificationCount } from "../hooks/queries/useNotificationQuery";
+import { useDemoUser } from "../hooks/useDemoUser";
 import { SettingsScreen, LanguageSelectionScreen } from "../screens/settings";
 import { EditProfileScreen, HelpFeedbackScreen } from "../screens/profile";
 import { GlobalAnalyticsScreen, SubjectAnalyticsScreen, SubjectProgressScreen, SubjectPerformanceScreen, SubjectDetailScreen, SubjectReportScreen } from "../screens/progress";
@@ -22,6 +24,10 @@ import { AnnouncementDetailScreen } from "../screens/announcements";
 import { FeeDetailScreen, FeePaymentScreen, PaymentDetailScreen } from "../screens/fees";
 import { ChildStatsScreen, ChildWeakAreaScreen, AssignmentDetailScreen, TeacherDetailScreen, AiInsightDetailScreen, PredictionDetailScreen, ComparisonDetailsScreen } from "../screens/parent";
 import { MessageDetailScreen, ComposeMessageScreen } from "../screens/messages";
+import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
+import { ClassDetailScreen, LiveClassScreen, LiveClassesListScreen } from "../screens/schedule";
+import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
+import { AITutorScreen } from "../screens/ai";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -76,6 +82,32 @@ const COMMON_SCREENS = [
   { screenId: "ai-alerts", component: DynamicScreen },
   { screenId: "comparison-analytics", component: DynamicScreen },
   { screenId: "comparison-details", component: ComparisonDetailsScreen },
+  // Student screens (accessible via widget navigation)
+  { screenId: "study-hub", component: DynamicScreen },
+  { screenId: "doubts-home", component: DynamicScreen },
+  { screenId: "doubt-detail", component: DoubtDetailScreen },
+  { screenId: "doubt-submit", component: DoubtSubmitScreen },
+  { screenId: "class-detail", component: ClassDetailScreen },
+  { screenId: "live-class", component: LiveClassScreen },
+  { screenId: "live-classes-list", component: LiveClassesListScreen },
+  { screenId: "assignments-home", component: DynamicScreen },
+  { screenId: "progress-home", component: DynamicScreen },
+  { screenId: "profile-home", component: DynamicScreen },
+  { screenId: "schedule-screen", component: DynamicScreen },
+  // Test center (accessible via widget navigation)
+  { screenId: "test-center", component: DynamicScreen },
+  // Test detail (accessible via widget navigation)
+  { screenId: "test-detail", component: TestDetailScreen },
+  // Test attempt (accessible from test detail)
+  { screenId: "test-attempt", component: TestAttemptScreen },
+  // Test result (accessible from test attempt after submission)
+  { screenId: "test-result", component: TestResultScreen },
+  // Test review (accessible from test result)
+  { screenId: "test-review", component: TestReviewScreen },
+  // AI Tutor (accessible from dashboard widgets)
+  { screenId: "ai-tutor", component: AITutorScreen },
+  // Settings home (dynamic widget-based settings screen)
+  { screenId: "settings-home", component: DynamicScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons
@@ -231,6 +263,11 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
   const currentTab = tabs.find((t) => t.tabId === tabId);
   const rootScreenId = currentTab?.initialRoute;
 
+  // Debug logging
+  if (__DEV__) {
+    console.log(`[TabStack] tabId=${tabId}, rootScreenId=${rootScreenId}, screens from config=${screens.length}`);
+  }
+
   const enabledScreens = useMemo(() => {
     const filtered = screens.filter((s) => {
       if (s.requiredPermissions && s.requiredPermissions.some((code) => !has(code))) return false;
@@ -239,6 +276,9 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
     
     // If no screens from config, create a default screen using the tab's root screen
     if (filtered.length === 0 && rootScreenId) {
+      if (__DEV__) {
+        console.log(`[TabStack] Using rootScreenId as default: ${rootScreenId}`);
+      }
       return [{ screenId: rootScreenId, tabId, orderIndex: 0, enabled: true }];
     }
     
@@ -259,7 +299,10 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
               <ScreenErrorBoundaryWrapper screenId={screen.screenId}>
                 {(() => {
                   const resolved = resolveScreen(screen.screenId);
-                  const Component = resolved.component ?? DynamicScreen;
+                  if (__DEV__) {
+                    console.log(`[TabStack] Rendering screen: ${screen.screenId}, resolved:`, resolved?.screenId);
+                  }
+                  const Component = resolved?.component ?? DynamicScreen;
                   const screenIdToUse = (route.params as { screenId?: string })?.screenId ?? screen.screenId;
                   return (
                     <Component
@@ -286,6 +329,7 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
                   screenId={screen.screenId}
                   role={role}
                   navigation={navigation}
+                  route={route}
                   onFocused={() => trackNavigation(screen.screenId, { tabId })}
                 />
               </ScreenErrorBoundaryWrapper>
@@ -307,6 +351,8 @@ export const DynamicTabNavigator: React.FC<DynamicTabNavigatorProps> = ({ role }
   const useStaticNav = process.env.USE_DYNAMIC_NAV === "false";
   const { t } = useTranslation("common");
   const { trackTabChange } = useAnalytics();
+  const { userId } = useDemoUser();
+  const { data: unreadCount = 0 } = useUnreadNotificationCount(userId);
 
   const enabledTabs = useMemo(
     () =>
@@ -333,7 +379,7 @@ export const DynamicTabNavigator: React.FC<DynamicTabNavigatorProps> = ({ role }
   if (tabsToRender.length === 0) {
     return (
       <View style={[styles.container, styles.loadingContainer, { backgroundColor: colors.background }]}>
-        <BrandedHeader />
+        <BrandedHeader notificationCount={unreadCount} />
         <View style={styles.loadingContent}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -344,7 +390,7 @@ export const DynamicTabNavigator: React.FC<DynamicTabNavigatorProps> = ({ role }
   return (
     <View style={styles.container}>
       {/* Branded Header */}
-      <BrandedHeader />
+      <BrandedHeader notificationCount={unreadCount} />
       
       {/* Tab Navigator */}
       <Tab.Navigator

@@ -7,6 +7,10 @@ import { AnnouncementDetailScreen } from "../screens/announcements";
 import { FeeDetailScreen, FeePaymentScreen, PaymentDetailScreen } from "../screens/fees";
 import { ChildStatsScreen, ChildWeakAreaScreen, AssignmentDetailScreen, TeacherDetailScreen, AiInsightDetailScreen, PredictionDetailScreen, ComparisonDetailsScreen } from "../screens/parent";
 import { MessageDetailScreen, ComposeMessageScreen } from "../screens/messages";
+import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
+import { ClassDetailScreen, LiveClassScreen } from "../screens/schedule";
+import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
+import { AITutorScreen } from "../screens/ai";
 
 export type RouteDefinition = {
   screenId: string;
@@ -187,6 +191,46 @@ const registry: Record<string, RouteDefinition> = {
   // Subject report (Fixed screen - detailed subject report with grades, tests, attendance)
   "subject-report": { screenId: "subject-report", component: SubjectReportScreen },
   "SubjectReport": { screenId: "SubjectReport", component: SubjectReportScreen },
+  
+  // Doubt detail (Fixed screen - view doubt details and teacher response)
+  "doubt-detail": { screenId: "doubt-detail", component: DoubtDetailScreen },
+  "DoubtDetail": { screenId: "DoubtDetail", component: DoubtDetailScreen },
+  
+  // Doubt submit (Fixed screen - submit a new doubt)
+  "doubt-submit": { screenId: "doubt-submit", component: DoubtSubmitScreen },
+  "DoubtSubmit": { screenId: "DoubtSubmit", component: DoubtSubmitScreen },
+  
+  // Class detail (Fixed screen - view class/period details)
+  "class-detail": { screenId: "class-detail", component: ClassDetailScreen },
+  "ClassDetail": { screenId: "ClassDetail", component: ClassDetailScreen },
+
+  // Live class (Fixed screen - view and join live class)
+  "live-class": { screenId: "live-class", component: LiveClassScreen },
+  "LiveClass": { screenId: "LiveClass", component: LiveClassScreen },
+
+  // Test detail (Fixed screen - view test details and start test)
+  "test-detail": { screenId: "test-detail", component: TestDetailScreen },
+  "TestDetail": { screenId: "TestDetail", component: TestDetailScreen },
+
+  // Test attempt (Fixed screen - take test with questions and timer)
+  "test-attempt": { screenId: "test-attempt", component: TestAttemptScreen },
+  "TestAttempt": { screenId: "TestAttempt", component: TestAttemptScreen },
+
+  // Test result (Fixed screen - show test results after submission)
+  "test-result": { screenId: "test-result", component: TestResultScreen },
+  "TestResult": { screenId: "TestResult", component: TestResultScreen },
+
+  // Test review (Fixed screen - review answers after test)
+  "test-review": { screenId: "test-review", component: TestReviewScreen },
+  "TestReview": { screenId: "TestReview", component: TestReviewScreen },
+
+  // AI Tutor (Fixed screen - AI-powered tutoring chat)
+  "ai-tutor": { screenId: "ai-tutor", component: AITutorScreen },
+  "AITutor": { screenId: "AITutor", component: AITutorScreen },
+
+  // Settings home (Dynamic screen - widget-based settings)
+  "settings-home": { screenId: "settings-home", component: DynamicScreen },
+  "SettingsHome": { screenId: "SettingsHome", component: DynamicScreen },
 };
 
 export function resolveScreen(screenId: string) {

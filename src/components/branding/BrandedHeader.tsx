@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native";
 import { useBranding } from "../../context/BrandingContext";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { AppText } from "../../ui/components/AppText";
@@ -11,6 +12,8 @@ type Props = {
   onBackPress?: () => void;
   rightAction?: React.ReactNode;
   title?: string; // Override title (otherwise uses app name)
+  onNotificationPress?: () => void;
+  notificationCount?: number;
 };
 
 export const BrandedHeader: React.FC<Props> = ({
@@ -18,10 +21,21 @@ export const BrandedHeader: React.FC<Props> = ({
   onBackPress,
   rightAction,
   title,
+  onNotificationPress,
+  notificationCount = 0,
 }) => {
   const branding = useBranding();
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
+  const handleNotificationPress = () => {
+    if (onNotificationPress) {
+      onNotificationPress();
+    } else {
+      navigation.navigate("notifications");
+    }
+  };
 
   const displayTitle = title || branding?.appName || "Learning App";
   const logoUrl = branding?.logoSmallUrl || branding?.logoUrl;
@@ -82,8 +96,15 @@ export const BrandedHeader: React.FC<Props> = ({
         {/* Right section - Actions */}
         <View style={styles.rightSection}>
           {rightAction || (
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleNotificationPress}>
               <Icon name="bell-outline" size={22} color={colors.onSurfaceVariant} />
+              {notificationCount > 0 && (
+                <View style={[styles.badge, { backgroundColor: colors.error }]}>
+                  <AppText style={[styles.badgeText, { color: colors.onError }]}>
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </AppText>
+                </View>
+              )}
             </TouchableOpacity>
           )}
         </View>
@@ -145,5 +166,21 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     padding: 4,
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
 });

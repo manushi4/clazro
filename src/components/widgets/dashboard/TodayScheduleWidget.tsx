@@ -13,12 +13,12 @@ import { addBreadcrumb } from "../../../error/errorReporting";
 // Widget ID for analytics
 const WIDGET_ID = "schedule.today";
 
-// Mock schedule data for demo (fallback when offline or API fails)
+// Mock schedule data for demo (fallback when offline or API fails) - using mock- prefix to identify mock items
 const MOCK_SCHEDULE = [
-  { id: "1", title: "Mathematics", time: "9:00 AM", duration: "1h", location: "Room 101", type: "class", status: "upcoming" },
-  { id: "2", title: "Physics Lab", time: "11:00 AM", duration: "2h", location: "Lab 3", type: "lab", status: "upcoming" },
-  { id: "3", title: "English Essay Due", time: "2:00 PM", duration: "", location: "", type: "assignment", status: "due" },
-  { id: "4", title: "Live Chemistry Class", time: "4:00 PM", duration: "1h", location: "Online", type: "live", status: "live" },
+  { id: "mock-1", title: "Mathematics", time: "9:00 AM", duration: "1h", location: "Room 101", type: "class", status: "upcoming" },
+  { id: "mock-2", title: "Physics Lab", time: "11:00 AM", duration: "2h", location: "Lab 3", type: "lab", status: "upcoming" },
+  { id: "mock-3", title: "English Essay Due", time: "2:00 PM", duration: "", location: "", type: "assignment", status: "due" },
+  { id: "mock-4", title: "Live Chemistry Class", time: "4:00 PM", duration: "1h", location: "Online", type: "live", status: "live" },
 ];
 
 const TYPE_ICONS: Record<string, string> = {
@@ -140,7 +140,12 @@ export const TodayScheduleWidget: React.FC<WidgetProps> = ({
       level: "info",
       data: { itemId: item.id, itemType: item.type },
     });
-    onNavigate?.(`schedule/${item.id}`, { type: item.type });
+    // Navigate to live-class for live items, class-detail for others
+    if (item.type === "live" || item.status === "live") {
+      onNavigate?.("live-class", { classId: item.id });
+    } else {
+      onNavigate?.("class-detail", { classId: item.id, type: item.type });
+    }
   };
 
   // Handle view all tap

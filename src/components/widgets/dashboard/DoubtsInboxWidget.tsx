@@ -63,17 +63,17 @@ export const DoubtsInboxWidget: React.FC<WidgetProps> = ({
   const handleItemPress = (doubt: any, index: number) => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "item_tap", itemId: doubt.id, position: index });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_item_tap`, level: "info", data: { doubtId: doubt.id } });
-    onNavigate?.(`doubt/${doubt.id}`);
+    onNavigate?.("doubt-detail", { doubtId: doubt.id });
   };
 
   const handleAskNew = () => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "ask_new" });
-    onNavigate?.("ask-doubt");
+    onNavigate?.("doubt-submit");
   };
   
   const handleViewAll = () => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "view_all" });
-    onNavigate?.("doubts");
+    onNavigate?.("doubts-home");
   };
 
   if (isLoading) {

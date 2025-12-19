@@ -28,12 +28,27 @@ import { WeekCalendarWidget } from "../components/widgets/schedule/WeekCalendarW
 import { UpcomingEventsWidget } from "../components/widgets/schedule/UpcomingEventsWidget";
 // AI widgets
 import { AIToolsWidget } from "../components/widgets/ai/AIToolsWidget";
+import { LearningInsightsWidget } from "../components/widgets/ai/LearningInsightsWidget";
+import { PerformancePredictionsWidget } from "../components/widgets/ai/PerformancePredictionsWidget";
+import { WeakTopicAlertsWidget } from "../components/widgets/ai/WeakTopicAlertsWidget";
+import { StudyRecommendationsWidget } from "../components/widgets/ai/StudyRecommendationsWidget";
+// Automation widgets
+import { RemindersWidget } from "../components/widgets/automation/RemindersWidget";
+import { StreakProtectionWidget } from "../components/widgets/automation/StreakProtectionWidget";
+// Rewards widgets
+import { RewardShopPreviewWidget } from "../components/widgets/rewards/RewardShopPreviewWidget";
+import { XpBalanceWidget } from "../components/widgets/rewards/XpBalanceWidget";
+// Community widgets
+import { CommunityFeedWidget } from "../components/widgets/social/CommunityFeedWidget";
+import { StudyGroupsWidget } from "../components/widgets/social/StudyGroupsWidget";
+import { PeerMatchesWidget } from "../components/widgets/social/PeerMatchesWidget";
 // Study widgets
 import { NotesSummaryWidget } from "../components/widgets/study/NotesSummaryWidget";
 import { RecentViewedWidget } from "../components/widgets/study/RecentViewedWidget";
 import { DownloadsSummaryWidget } from "../components/widgets/study/DownloadsSummaryWidget";
 // Social widgets
 import { ConnectionsListWidget } from "../components/widgets/social/ConnectionsListWidget";
+import { SuggestedPeersWidget } from "../components/widgets/social/SuggestedPeersWidget";
 // Notifications widgets
 import { NotificationsPreviewWidget as StudentNotificationsPreviewWidget } from "../components/widgets/notifications/NotificationsPreviewWidget";
 // Assessment widgets
@@ -69,6 +84,8 @@ import { ParentComparisonAnalyticsWidget } from "../components/widgets/parent/Pa
 import { AITutorChatWidget } from "../components/widgets/ai/AITutorChatWidget";
 // Automation widgets
 import { N8nTestWidget } from "../components/widgets/automation/N8nTestWidget";
+// Settings widgets
+import { SettingsAccountWidget, SettingsNotificationsWidget, SettingsAppearanceWidget, SettingsAboutWidget, SettingsLogoutWidget } from "../components/widgets/settings";
 import type { WidgetComponent, WidgetId, WidgetMetadata } from "../types/widget.types";
 
 type WidgetRegistryEntry = {
@@ -473,6 +490,146 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
       requiredPermissions: ["ai.tutor.use"],
     },
   },
+  "ai.learning-insights": {
+    component: LearningInsightsWidget,
+    metadata: {
+      id: "ai.learning-insights",
+      titleKey: "dashboard:widgets.learningInsights.title",
+      descriptionKey: "dashboard:widgets.learningInsights.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showDescription: true,
+        showMetric: true,
+        showAction: true,
+        showSubject: true,
+        layoutStyle: "list",
+        filterType: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "ai.performance-predictions": {
+    component: PerformancePredictionsWidget,
+    metadata: {
+      id: "ai.performance-predictions",
+      titleKey: "dashboard:widgets.performancePredictions.title",
+      descriptionKey: "dashboard:widgets.performancePredictions.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showDescription: true,
+        showConfidence: true,
+        showAction: true,
+        showSubject: true,
+        showProgress: true,
+        layoutStyle: "list",
+        filterType: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "ai.weak-topic-alerts": {
+    component: WeakTopicAlertsWidget,
+    metadata: {
+      id: "ai.weak-topic-alerts",
+      titleKey: "dashboard:widgets.weakTopicAlerts.title",
+      descriptionKey: "dashboard:widgets.weakTopicAlerts.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showDescription: true,
+        showScore: true,
+        showAction: true,
+        showSubject: true,
+        showSeverity: true,
+        showDaysSince: true,
+        layoutStyle: "list",
+        filterType: "all",
+        filterSeverity: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "ai.study-recommendations": {
+    component: StudyRecommendationsWidget,
+    metadata: {
+      id: "ai.study-recommendations",
+      titleKey: "dashboard:widgets.studyRecommendations.title",
+      descriptionKey: "dashboard:widgets.studyRecommendations.subtitle",
+      featureId: "ai.tutor",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showDescription: true,
+        showConfidence: true,
+        showAction: true,
+        showSubject: true,
+        showTime: true,
+        showDifficulty: true,
+        showReason: true,
+        layoutStyle: "list",
+        filterType: "all",
+        filterDifficulty: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
   "notes.summary": {
     component: NotesSummaryWidget,
     metadata: {
@@ -727,6 +884,39 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
       requiredPermissions: [],
     },
   },
+  "suggestions.peers": {
+    component: SuggestedPeersWidget,
+    metadata: {
+      id: "suggestions.peers",
+      titleKey: "dashboard:widgets.suggestedPeers.title",
+      descriptionKey: "dashboard:widgets.suggestedPeers.subtitle",
+      featureId: "peers.network",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showMatchScore: true,
+        showMutualSubjects: true,
+        showMutualConnections: true,
+        showOnlineStatus: true,
+        showMatchReasons: true,
+        layoutStyle: "list",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
   // ============ AUTOMATION WIDGETS ============
   "automation.n8n-test": {
     component: N8nTestWidget,
@@ -752,6 +942,241 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
         webhookUrl: "",
         showResponse: true,
         enableCustomMessage: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "automation.reminders": {
+    component: RemindersWidget,
+    metadata: {
+      id: "automation.reminders",
+      titleKey: "dashboard:widgets.reminders.title",
+      descriptionKey: "dashboard:widgets.reminders.subtitle",
+      featureId: "automation",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showDescription: true,
+        showTime: true,
+        showAction: true,
+        showRepeat: true,
+        showPriority: true,
+        showOverdue: true,
+        layoutStyle: "list",
+        filterType: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "automation.streak-protection": {
+    component: StreakProtectionWidget,
+    metadata: {
+      id: "automation.streak-protection",
+      titleKey: "dashboard:widgets.streakProtection.title",
+      descriptionKey: "dashboard:widgets.streakProtection.subtitle",
+      featureId: "automation",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showShields: true,
+        showWeekProgress: true,
+        showMilestone: true,
+        showQuickAction: true,
+        showUrgencyBanner: true,
+        layoutStyle: "card",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "rewards.shop-preview": {
+    component: RewardShopPreviewWidget,
+    metadata: {
+      id: "rewards.shop-preview",
+      titleKey: "dashboard:widgets.rewardShop.title",
+      descriptionKey: "dashboard:widgets.rewardShop.subtitle",
+      featureId: "rewards",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 4,
+        showFeaturedOnly: false,
+        showPrice: true,
+        showDiscount: true,
+        showRarity: true,
+        showStock: true,
+        showBadges: true,
+        layoutStyle: "cards",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "rewards.xp-balance": {
+    component: XpBalanceWidget,
+    metadata: {
+      id: "rewards.xp-balance",
+      titleKey: "dashboard:widgets.xpBalance.title",
+      descriptionKey: "dashboard:widgets.xpBalance.subtitle",
+      featureId: "rewards",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showCoins: true,
+        showXp: true,
+        showLevel: true,
+        showProgress: true,
+        showRank: true,
+        showMultiplier: true,
+        showEarnings: true,
+        layoutStyle: "card",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "community.feed": {
+    component: CommunityFeedWidget,
+    metadata: {
+      id: "community.feed",
+      titleKey: "dashboard:widgets.communityFeed.title",
+      descriptionKey: "dashboard:widgets.communityFeed.subtitle",
+      featureId: "social",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 2 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showAuthorInfo: true,
+        showEngagement: true,
+        showPostType: true,
+        showPinnedFirst: true,
+        layoutStyle: "list",
+        filterType: "all",
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "study.groups": {
+    component: StudyGroupsWidget,
+    metadata: {
+      id: "study.groups",
+      titleKey: "dashboard:widgets.studyGroups.title",
+      descriptionKey: "dashboard:widgets.studyGroups.subtitle",
+      featureId: "social",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 2,
+        staleTimeMs: 3 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showMemberCount: true,
+        showSubject: true,
+        showNextMeeting: true,
+        showGroupType: true,
+        layoutStyle: "list",
+        filterType: "all",
+        showMyGroupsOnly: false,
+        compactMode: false,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "peer.matches": {
+    component: PeerMatchesWidget,
+    metadata: {
+      id: "peer.matches",
+      titleKey: "dashboard:widgets.peerMatches.title",
+      descriptionKey: "dashboard:widgets.peerMatches.subtitle",
+      featureId: "social",
+      roles: ["student"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 1,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showMatchScore: true,
+        showCommonSubjects: true,
+        showPeerStats: true,
+        showOnlineStatus: true,
+        layoutStyle: "list",
+        filterType: "all",
+        compactMode: false,
+        enableTap: true,
       },
       requiredPermissions: [],
     },
@@ -1831,6 +2256,27 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
   "home.dashboard.peersGroups": {
     component: PeersGroupsWidget,
     metadata: buildMetadata("home.dashboard.peersGroups", "dashboard:widgets.peersGroups.title", "dashboard:widgets.peersGroups.subtitle", "peers.network"),
+  },
+  // Settings widgets
+  "settings.account": {
+    component: SettingsAccountWidget,
+    metadata: buildMetadata("settings.account", "settings:sections.account", "settings:sections.accountDesc", "settings"),
+  },
+  "settings.notifications": {
+    component: SettingsNotificationsWidget,
+    metadata: buildMetadata("settings.notifications", "settings:sections.notifications", "settings:sections.notificationsDesc", "settings"),
+  },
+  "settings.appearance": {
+    component: SettingsAppearanceWidget,
+    metadata: buildMetadata("settings.appearance", "settings:sections.appearance", "settings:sections.appearanceDesc", "settings"),
+  },
+  "settings.about": {
+    component: SettingsAboutWidget,
+    metadata: buildMetadata("settings.about", "settings:sections.about", "settings:sections.aboutDesc", "settings"),
+  },
+  "settings.logout": {
+    component: SettingsLogoutWidget,
+    metadata: buildMetadata("settings.logout", "settings:logout.button", "settings:logout.message", "settings"),
   },
 };
 

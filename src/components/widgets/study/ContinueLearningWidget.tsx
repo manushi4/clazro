@@ -53,7 +53,25 @@ export const ContinueLearningWidget: React.FC<WidgetProps> = ({ config, onNaviga
     if (!enableTap) return;
     trackWidgetEvent(WIDGET_ID, "click", { action: "item_tap", itemType: item.item_type, itemId: item.id });
     addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_item_tap`, level: "info", data: { itemType: item.item_type } });
-    onNavigate?.(item.route);
+    
+    // Map item types to proper screen routes
+    const routeMap: Record<string, string> = {
+      lesson: "study-hub",
+      video: "study-hub",
+      resource: "study-hub",
+      ai_session: "doubts-home",
+      assignment: "assignments-home",
+      test_review: "progress-home",
+      doubt: "doubt-detail",
+    };
+    const targetRoute = routeMap[item.item_type] || "study-hub";
+    onNavigate?.(targetRoute, { itemId: item.item_id || item.id, itemType: item.item_type });
+  };
+
+  const handleViewAll = () => {
+    trackWidgetEvent(WIDGET_ID, "click", { action: "view_all" });
+    addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_view_all`, level: "info" });
+    onNavigate?.("study-hub");
   };
 
 
@@ -179,6 +197,8 @@ export const ContinueLearningWidget: React.FC<WidgetProps> = ({ config, onNaviga
     </View>
   );
 
+  const showViewAll = config?.showViewAll !== false;
+
   return (
     <View style={styles.container}>
       {!isOnline && (
@@ -188,6 +208,14 @@ export const ContinueLearningWidget: React.FC<WidgetProps> = ({ config, onNaviga
         </View>
       )}
       {layoutStyle === "horizontal" ? renderHorizontalLayout() : renderVerticalLayout()}
+      {showViewAll && (
+        <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAll}>
+          <AppText style={[styles.viewAllText, { color: colors.primary }]}>
+            {t("widgets.continueLearning.actions.viewAll", { defaultValue: "View All" })}
+          </AppText>
+          <Icon name="arrow-right" size={14} color={colors.primary} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -223,4 +251,6 @@ const styles = StyleSheet.create({
   progressBarSmall: { width: 60, height: 3, borderRadius: 2 },
   progressTextSmall: { fontSize: 10, fontWeight: "500" },
   timeAgoSmall: { fontSize: 10 },
+  viewAllButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, paddingVertical: 8 },
+  viewAllText: { fontSize: 13, fontWeight: "500" },
 });

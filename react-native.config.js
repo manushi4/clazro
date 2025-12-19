@@ -11,5 +11,11 @@ module.exports = {
         ios: null, // disable auto-linking for iOS if not needed
       },
     },
+    'react-native-document-picker': {
+      platforms: {
+        android: null, // disable auto-linking - incompatible with RN 0.80
+        ios: null,
+      },
+    },
   },
 };

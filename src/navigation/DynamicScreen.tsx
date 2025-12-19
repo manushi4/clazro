@@ -48,44 +48,21 @@ export const DynamicScreen: React.FC<Props> = ({
   const handleWidgetNavigate = useCallback((route: string, params?: Record<string, any>) => {
     trackWidgetEvent("navigation", "click", { route, ...params });
     
-    // Map widget routes to actual screens
-    const routeMap: Record<string, { screen: string; params?: any }> = {
-      // Quick Actions
-      "study": { screen: "StudyHub" },
-      "ask-doubt": { screen: "AskDoubt" },
-      "test": { screen: "TakeTest" },
-      "live": { screen: "LiveClass" },
-      // Assignments
-      "assignments": { screen: "Assignments" },
-      // Doubts
-      "doubts": { screen: "DoubtsInbox" },
-      // Schedule
-      "schedule": { screen: "Schedule" },
-      // Progress
-      "progress": { screen: "Progress" },
-    };
-
-    // Check if route starts with a detail pattern (e.g., "assignment/123")
-    const [baseRoute, id] = route.split("/");
-    
-    if (routeMap[baseRoute]) {
-      const { screen, params: defaultParams } = routeMap[baseRoute];
-      try {
-        navigation.navigate(screen, { ...defaultParams, ...params, id });
-      } catch (e) {
-        // Screen doesn't exist yet - show placeholder
-        Alert.alert(
-          "Coming Soon",
-          `The ${screen} screen is under development.`,
-          [{ text: "OK" }]
-        );
-      }
-    } else if (route) {
-      // Try direct navigation for screens registered in COMMON_SCREENS
+    // Direct navigation - all routes should be registered in routeRegistry
+    if (route) {
       if (__DEV__) {
         console.log(`[DynamicScreen] Navigating to: ${route}`, params);
       }
-      navigation.navigate(route, params);
+      try {
+        navigation.navigate(route, params);
+      } catch (e) {
+        console.warn(`[DynamicScreen] Navigation failed for route: ${route}`, e);
+        Alert.alert(
+          "Navigation Error",
+          `Unable to navigate to ${route}. Please try again.`,
+          [{ text: "OK" }]
+        );
+      }
     }
   }, [navigation, trackWidgetEvent]);
 
@@ -101,6 +78,9 @@ export const DynamicScreen: React.FC<Props> = ({
   useEffect(() => {
     if (__DEV__) {
       console.log(`[DynamicScreen] screenId=${screenId}, role=${role}, widgets=`, widgets?.length ?? 0);
+      if (widgets && widgets.length > 0) {
+        console.log(`[DynamicScreen] Widget IDs:`, widgets.map(w => w.widgetId).join(', '));
+      }
     }
   }, [screenId, role, widgets]);
 

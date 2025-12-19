@@ -15,7 +15,7 @@ export type CalendarEvent = {
   title: string;
   subject_name: string;
   subject_color: string;
-  class_type: 'lecture' | 'lab' | 'live' | 'assignment' | 'test';
+  class_type: 'lecture' | 'lab' | 'tutorial' | 'live' | 'exam';
   start_time: string;
   end_time: string;
   room?: string;

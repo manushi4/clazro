@@ -1,12 +1,15 @@
 /**
  * Notifications Preview Widget
  * Displays recent notifications with unread count and priority indicators
+ * Supports full screen mode with filters, mark all read, and delete
  */
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '../../../theme/useAppTheme';
 import { useNotificationsPreviewQuery, NotificationItem } from '../../../hooks/queries/useNotificationsPreviewQuery';
+import { useMarkNotificationRead, useDeleteNotification, useMarkAllNotificationsRead } from '../../../hooks/queries/useNotificationQuery';
+import { useDemoUser } from '../../../hooks/useDemoUser';
 import { AppText } from '../../../ui/components/AppText';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { WidgetProps } from '../../../types/widget.types';
@@ -20,7 +23,13 @@ type NotificationsPreviewConfig = {
   showUnreadIndicator?: boolean;
   layoutStyle?: 'list' | 'cards' | 'compact';
   enableTap?: boolean;
+  showAll?: boolean;
+  showFilters?: boolean;
+  showMarkAllRead?: boolean;
+  showCategories?: boolean;
 };
+
+type FilterType = 'all' | 'unread' | 'high';
 
 export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
   config = {},
@@ -28,6 +37,7 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
 }) => {
   const { t } = useTranslation('dashboard');
   const { colors, borderRadius } = useAppTheme();
+  const { userId } = useDemoUser();
 
   const {
     maxItems = 5,
@@ -38,15 +48,80 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
     showUnreadIndicator = true,
     layoutStyle = 'list',
     enableTap = true,
+    showAll = false,
+    showFilters = false,
+    showMarkAllRead = false,
   } = config as NotificationsPreviewConfig;
 
-  const { data, isLoading, error, refetch } = useNotificationsPreviewQuery(maxItems);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  const handleNotificationPress = (notification: NotificationItem) => {
-    if (enableTap && onNavigate) {
-      onNavigate(`notification/${notification.id}`);
+  // Use higher limit for full screen mode
+  const effectiveMaxItems = showAll ? 100 : maxItems;
+  const { data, isLoading, error, refetch } = useNotificationsPreviewQuery(effectiveMaxItems);
+  
+  // Mutations
+  const markAsRead = useMarkNotificationRead();
+  const deleteNotification = useDeleteNotification();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const handleNotificationPress = useCallback((notification: NotificationItem) => {
+    if (!enableTap) return;
+    
+    // Mark as read if unread
+    if (!notification.is_read) {
+      markAsRead.mutate(notification.id);
     }
-  };
+    
+    // Navigate to detail
+    if (onNavigate) {
+      onNavigate("notification-detail", { notificationId: notification.id });
+    }
+  }, [enableTap, markAsRead, onNavigate]);
+
+  const handleDelete = useCallback((notification: NotificationItem) => {
+    // Prevent deleting urgent/important notifications
+    if (notification.priority === 'high') {
+      Alert.alert(
+        t('widgets.notificationsPreview.actions.cannotDeleteTitle', { defaultValue: 'Cannot Delete' }),
+        t('widgets.notificationsPreview.actions.cannotDeleteMessage', { defaultValue: 'Urgent notifications cannot be deleted. Please contact support if you need to remove this notification.' }),
+        [{ text: t('common.ok', { defaultValue: 'OK' }) }]
+      );
+      return;
+    }
+
+    Alert.alert(
+      t('widgets.notificationsPreview.actions.deleteTitle', { defaultValue: 'Delete Notification' }),
+      t('widgets.notificationsPreview.actions.deleteMessage', { defaultValue: 'Are you sure you want to delete this notification?' }),
+      [
+        { text: t('common.cancel', { defaultValue: 'Cancel' }), style: 'cancel' },
+        { 
+          text: t('common.delete', { defaultValue: 'Delete' }), 
+          style: 'destructive',
+          onPress: () => deleteNotification.mutate(notification.id),
+        },
+      ]
+    );
+  }, [deleteNotification, t]);
+
+  const handleMarkAllRead = useCallback(() => {
+    if (userId && data && data.unreadCount > 0) {
+      markAllRead.mutate(userId);
+    }
+  }, [userId, data, markAllRead]);
+
+  // Filter notifications
+  const filteredNotifications = React.useMemo(() => {
+    if (!data?.notifications) return [];
+    
+    switch (activeFilter) {
+      case 'unread':
+        return data.notifications.filter(n => !n.is_read);
+      case 'high':
+        return data.notifications.filter(n => n.priority === 'high');
+      default:
+        return data.notifications;
+    }
+  }, [data?.notifications, activeFilter]);
 
   // Loading state
   if (isLoading) {
@@ -68,14 +143,14 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
       <View style={[styles.errorContainer, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium }]}>
         <Icon name="bell-alert" size={24} color={colors.error} />
         <AppText style={[styles.errorText, { color: colors.error }]}>
-          {t('widgets.notificationsPreview.states.error')}
+          {t('widgets.notificationsPreview.states.error', { defaultValue: 'Failed to load notifications' })}
         </AppText>
         <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: colors.primary }]}
           onPress={() => refetch()}
         >
           <AppText style={styles.retryText}>
-            {t('widgets.notificationsPreview.actions.retry')}
+            {t('widgets.notificationsPreview.actions.retry', { defaultValue: 'Retry' })}
           </AppText>
         </TouchableOpacity>
       </View>
@@ -83,25 +158,72 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
   }
 
   // Empty state
-  if (!data || data.notifications.length === 0) {
+  if (!data || filteredNotifications.length === 0) {
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium }]}>
-        <Icon name="bell-check" size={32} color={colors.onSurfaceVariant} />
-        <AppText style={[styles.emptyText, { color: colors.onSurfaceVariant }]}>
-          {t('widgets.notificationsPreview.states.empty')}
-        </AppText>
+      <View style={[styles.container, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium }]}>
+        {/* Header for full screen */}
+        {showAll && (
+          <View style={styles.header}>
+            <AppText style={[styles.title, { color: colors.onSurface }]}>
+              {t('widgets.notificationsPreview.title', { defaultValue: 'Notifications' })}
+            </AppText>
+          </View>
+        )}
+        {/* Filters */}
+        {showFilters && renderFilters()}
+        <View style={styles.emptyContent}>
+          <Icon name="bell-check" size={32} color={colors.onSurfaceVariant} />
+          <AppText style={[styles.emptyText, { color: colors.onSurfaceVariant }]}>
+            {activeFilter === 'all' 
+              ? t('widgets.notificationsPreview.states.empty', { defaultValue: 'No notifications' })
+              : t('widgets.notificationsPreview.states.emptyFiltered', { defaultValue: 'No notifications match this filter' })
+            }
+          </AppText>
+        </View>
       </View>
     );
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return colors.error;
-      case 'normal': return colors.primary;
-      case 'low': return colors.onSurfaceVariant;
-      default: return colors.onSurfaceVariant;
-    }
-  };
+  function renderFilters() {
+    const filters: { key: FilterType; label: string; icon: string }[] = [
+      { key: 'all', label: t('widgets.notificationsPreview.filters.all', { defaultValue: 'All' }), icon: 'bell' },
+      { key: 'unread', label: t('widgets.notificationsPreview.filters.unread', { defaultValue: 'Unread' }), icon: 'bell-badge' },
+      { key: 'high', label: t('widgets.notificationsPreview.filters.urgent', { defaultValue: 'Urgent' }), icon: 'alert' },
+    ];
+
+    return (
+      <View style={styles.filtersContainer}>
+        {filters.map(filter => (
+          <TouchableOpacity
+            key={filter.key}
+            style={[
+              styles.filterChip,
+              { 
+                backgroundColor: activeFilter === filter.key ? colors.primary : colors.surface,
+                borderColor: activeFilter === filter.key ? colors.primary : colors.outline,
+              },
+            ]}
+            onPress={() => setActiveFilter(filter.key)}
+          >
+            <Icon 
+              name={filter.icon} 
+              size={14} 
+              color={activeFilter === filter.key ? colors.onPrimary : colors.onSurfaceVariant} 
+            />
+            <AppText 
+              style={[
+                styles.filterText, 
+                { color: activeFilter === filter.key ? colors.onPrimary : colors.onSurfaceVariant }
+              ]}
+            >
+              {filter.label}
+            </AppText>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }
+
 
   const renderNotification = (notification: NotificationItem) => {
     const isCompact = layoutStyle === 'compact';
@@ -117,6 +239,7 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
           },
         ]}
         onPress={() => handleNotificationPress(notification)}
+        onLongPress={() => handleDelete(notification)}
         disabled={!enableTap}
         activeOpacity={0.7}
       >
@@ -181,12 +304,29 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
               <View style={[styles.priorityBadge, { backgroundColor: `${colors.error}15` }]}>
                 <Icon name="alert" size={10} color={colors.error} />
                 <AppText style={[styles.priorityText, { color: colors.error }]}>
-                  {t('widgets.notificationsPreview.labels.urgent')}
+                  {t('widgets.notificationsPreview.labels.urgent', { defaultValue: 'Urgent' })}
                 </AppText>
               </View>
             )}
           </View>
         </View>
+
+        {/* Delete button for full screen mode - hidden for urgent notifications */}
+        {showAll && notification.priority !== 'high' && (
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDelete(notification)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon name="trash-can-outline" size={18} color={colors.error} />
+          </TouchableOpacity>
+        )}
+        {/* Lock icon for urgent notifications */}
+        {showAll && notification.priority === 'high' && (
+          <View style={styles.lockedIcon}>
+            <Icon name="lock" size={16} color={colors.onSurfaceVariant} />
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -197,43 +337,74 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
       <View style={styles.header}>
         <View>
           <AppText style={[styles.title, { color: colors.onSurface }]}>
-            {t('widgets.notificationsPreview.title')}
+            {t('widgets.notificationsPreview.title', { defaultValue: 'Notifications' })}
           </AppText>
           <AppText style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
-            {t('widgets.notificationsPreview.subtitle', { count: data.unreadCount })}
+            {t('widgets.notificationsPreview.subtitle', { count: data.unreadCount, defaultValue: '{{count}} unread' })}
           </AppText>
         </View>
-        {data.unreadCount > 0 && (
-          <View style={[styles.unreadCounter, { backgroundColor: colors.errorContainer }]}>
-            <AppText style={[styles.unreadCountText, { color: colors.error }]}>
-              {data.unreadCount}
-            </AppText>
-          </View>
-        )}
+        <View style={styles.headerActions}>
+          {/* Mark all read button */}
+          {showMarkAllRead && data.unreadCount > 0 && (
+            <TouchableOpacity
+              style={[styles.markAllButton, { backgroundColor: colors.primaryContainer }]}
+              onPress={handleMarkAllRead}
+              disabled={markAllRead.isPending}
+            >
+              <Icon name="check-all" size={16} color={colors.primary} />
+              <AppText style={[styles.markAllText, { color: colors.primary }]}>
+                {t('widgets.notificationsPreview.actions.markAllRead', { defaultValue: 'Mark all read' })}
+              </AppText>
+            </TouchableOpacity>
+          )}
+          {/* Unread counter */}
+          {!showMarkAllRead && data.unreadCount > 0 && (
+            <View style={[styles.unreadCounter, { backgroundColor: colors.errorContainer }]}>
+              <AppText style={[styles.unreadCountText, { color: colors.error }]}>
+                {data.unreadCount}
+              </AppText>
+            </View>
+          )}
+        </View>
       </View>
+
+      {/* Filters */}
+      {showFilters && renderFilters()}
 
       {/* Notifications List */}
       <View style={styles.listContainer}>
-        {data.notifications.map(renderNotification)}
+        {filteredNotifications.map(renderNotification)}
       </View>
 
-      {/* Footer */}
-      <View style={[styles.footer, { borderTopColor: colors.outline }]}>
-        <AppText style={[styles.totalText, { color: colors.onSurfaceVariant }]}>
-          {t('widgets.notificationsPreview.labels.total', { count: data.totalCount })}
-        </AppText>
-        <TouchableOpacity
-          style={styles.viewAllButton}
-          onPress={() => onNavigate?.('notifications')}
-        >
-          <AppText style={[styles.viewAllText, { color: colors.primary }]}>
-            {t('widgets.notificationsPreview.actions.viewAll')}
+      {/* Footer - only show in preview mode */}
+      {!showAll && (
+        <View style={[styles.footer, { borderTopColor: colors.outline }]}>
+          <AppText style={[styles.totalText, { color: colors.onSurfaceVariant }]}>
+            {t('widgets.notificationsPreview.labels.total', { count: data.totalCount, defaultValue: '{{count}} total' })}
           </AppText>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.viewAllButton}
+            onPress={() => onNavigate?.('notifications')}
+          >
+            <AppText style={[styles.viewAllText, { color: colors.primary }]}>
+              {t('widgets.notificationsPreview.actions.viewAll', { defaultValue: 'View All' })}
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Long press hint for full screen */}
+      {showAll && (
+        <View style={styles.hintContainer}>
+          <AppText style={[styles.hintText, { color: colors.onSurfaceVariant }]}>
+            {t('widgets.notificationsPreview.hints.longPress', { defaultValue: 'Long press to delete' })}
+          </AppText>
+        </View>
+      )}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -253,6 +424,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  markAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  markAllText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
   unreadCounter: {
     minWidth: 24,
     height: 24,
@@ -265,6 +453,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  filtersContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  filterText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
   listContainer: {
     gap: 8,
   },
@@ -274,6 +479,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     gap: 12,
     borderLeftWidth: 3,
+    alignItems: 'center',
   },
   iconContainer: {
     width: 36,
@@ -344,6 +550,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
   },
+  deleteButton: {
+    padding: 8,
+  },
+  lockedIcon: {
+    padding: 8,
+    opacity: 0.5,
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -361,6 +574,14 @@ const styles = StyleSheet.create({
   viewAllText: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  hintContainer: {
+    alignItems: 'center',
+    paddingTop: 8,
+  },
+  hintText: {
+    fontSize: 11,
+    fontStyle: 'italic',
   },
   // Skeleton styles
   skeletonHeader: {
@@ -397,7 +618,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  emptyContainer: {
+  emptyContent: {
     padding: 24,
     alignItems: 'center',
     gap: 8,

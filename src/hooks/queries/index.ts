@@ -13,6 +13,7 @@ export * from './useScreenLayoutQuery';
 export * from './useSubjectsQuery';
 export * from './useClassesQuery';
 export * from './useAssignmentsQuery';
+export * from './useAssignmentsTestsQuery';
 export * from './useTestsQuery';
 export * from './useQuickActionsQuery';
 
@@ -77,3 +78,59 @@ export * from './useAnalyticsSnapshotQuery';
 
 // Connections list queries
 export * from './useConnectionsListQuery';
+
+// Peer suggestions queries
+export * from './usePeerSuggestionsQuery';
+
+// Learning insights queries
+export * from './useLearningInsightsQuery';
+
+// Performance predictions queries
+export * from './usePerformancePredictionsQuery';
+
+// Weak topic alerts queries
+export * from './useWeakTopicAlertsQuery';
+
+// Study recommendations queries
+export * from './useStudyRecommendationsQuery';
+
+// Reminders queries
+export * from './useRemindersQuery';
+
+// Streak protection queries
+export * from './useStreakProtectionQuery';
+
+// Reward shop queries
+export * from './useRewardShopQuery';
+
+// XP balance queries
+export * from './useXpBalanceQuery';
+
+// Community feed queries
+export * from './useCommunityFeedQuery';
+
+// Study groups queries
+export * from './useStudyGroupsQuery';
+
+// Peer matches queries
+export * from './usePeerMatchesQuery';
+
+// Class detail queries
+export * from './useClassDetailQuery';
+
+// Live class detail queries
+export * from './useLiveClassDetailQuery';
+
+// Submission queries
+export * from './useSubmissionQuery';
+
+// Test detail queries
+export * from './useTestDetailQuery';
+
+// Test attempt queries
+export * from './useTestQuestionsQuery';
+export * from './useTestAttemptMutation';
+export * from './useTestAttemptQuery';
+
+// AI Tutor queries
+export * from './useAITutorQuery';

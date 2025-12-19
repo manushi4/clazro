@@ -1,11 +1,11 @@
 # 👩‍🏫 TEACHER APP - COMPLETE SPECIFICATION
 
-> **Version:** 1.0.0
+> **Version:** 1.1.0
 > **Date:** December 2024
 > **Scope:** Teacher Role Only
 > **Purpose:** Single source of truth for implementing the teacher mobile app
 > **Reference:** Based on STUDENT_COMPLETE_SPEC.md and PARENT_COMPLETE_SPEC.md structure
-> **Status:** Initial Draft
+> **Status:** Enhanced with Phase 85-88 UX Research
 
 ---
 
@@ -33,28 +33,39 @@
 ### 1.1 Scope
 
 This specification covers the **Teacher** role:
-- **14 Dynamic Screens** (widget-based, configurable via Platform Studio)
+- **20 Dynamic Screens** (widget-based, configurable via Platform Studio)
 - **10 Fixed Screens** (essential functionality, not configurable)
-- **28 Widgets** (0 built, 28 to build)
+- **40 Widgets** (0 built, 40 to build)
 - Complete navigation structure
 - Full Platform Studio compatibility
 - White-label/branding support
 - All API endpoints and database tables
+- **AI-Powered Features** (Phase 85-88 enhancements)
+- **Voice Assessment System** (multi-language support)
+- **Professional Development** (micro-credentials, learning paths)
+- **Automation Engine** (workflow automation)
 
 ### 1.2 Current Implementation Status
 
 | Component | Total | Built | Remaining |
 |-----------|-------|-------|-----------|
-| Screens | 24 | 0 | 24 |
-| Widgets | 28 | 0 | 28 |
-| Query Hooks | 12 | 0 | 12 |
-| Mutation Hooks | 10 | 0 | 10 |
-| DB Tables | 10 | 2 | 8 |
-| Permissions | 22 | 6 | 16 |
+| Screens | 30 | 0 | 30 |
+| Widgets | 40 | 0 | 40 |
+| Query Hooks | 19 | 0 | 19 |
+| Mutation Hooks | 11 | 0 | 11 |
+| DB Tables | 16 | 2 | 14 |
+| Permissions | 30 | 6 | 24 |
 
 **Built Components:**
 - Types: `teacher.types.ts` (from Bckup_old reference)
 - Service: `teacherDashboardService.ts` (from Bckup_old reference)
+
+**Phase 85-88 Enhancements (from Bckup_old):**
+- AI Teaching Insights with predictive analytics
+- Voice-based assessment system with multi-language support
+- Professional development with micro-credentials
+- Automated admin tasks with workflow engine
+- Enhanced attendance with swipe-based marking
 
 ### 1.3 Teacher Role Purpose
 
@@ -216,6 +227,14 @@ export const TEACHER_SCREENS = {
   'attendance-reports': { type: 'dynamic', customization: 'medium', allowed_roles: ['teacher'] },
   'notifications-teacher': { type: 'dynamic', customization: 'medium', allowed_roles: ['teacher'] },
   'profile-teacher': { type: 'dynamic', customization: 'medium', allowed_roles: ['teacher'] },
+
+  // NEW SCREENS (Phase 85-88 Enhancements)
+  'ai-teaching-insights': { type: 'dynamic', customization: 'full', allowed_roles: ['teacher'] },
+  'voice-assessment-hub': { type: 'dynamic', customization: 'full', allowed_roles: ['teacher'] },
+  'professional-development': { type: 'dynamic', customization: 'full', allowed_roles: ['teacher'] },
+  'automated-admin-tasks': { type: 'dynamic', customization: 'medium', allowed_roles: ['teacher'] },
+  'ai-analytics-dashboard': { type: 'dynamic', customization: 'full', allowed_roles: ['teacher'] },
+  'question-bank': { type: 'dynamic', customization: 'medium', allowed_roles: ['teacher'] },
 };
 ```
 
@@ -305,6 +324,14 @@ type TeacherRole = {
 | `message_parents` | Message parents | action |
 | `view_analytics` | View class analytics | view |
 | `export_reports` | Export data/reports | action |
+| `view_ai_insights` | View AI teaching insights | view |
+| `implement_ai_insight` | Act on AI recommendations | action |
+| `create_voice_assessment` | Create voice-based assessments | action |
+| `view_proctoring` | View proctoring sessions | view |
+| `manage_automation` | Manage automation rules | action |
+| `view_professional_dev` | View professional development | view |
+| `earn_credentials` | Earn micro-credentials | action |
+| `view_question_bank` | Access question bank | view |
 
 ### 5.3 Feature Dependencies
 
@@ -320,6 +347,11 @@ type TeacherRole = {
 | `teacher.communication` | Messaging | enabled |
 | `teacher.analytics` | Analytics dashboard | enabled |
 | `teacher.ai_grading` | AI-assisted grading | disabled |
+| `teacher.ai_insights` | AI teaching insights & predictions | disabled |
+| `teacher.voice_assessment` | Voice-based assessment system | disabled |
+| `teacher.professional_dev` | Professional development & credentials | disabled |
+| `teacher.automation` | Automated admin tasks | disabled |
+| `teacher.ai_analytics` | AI-powered analytics dashboard | disabled |
 
 ---
 
@@ -380,7 +412,7 @@ profile tab:
 
 ## 7. SCREENS SPECIFICATION
 
-### 7.1 Dynamic Screens - Full Customization (6 Screens)
+### 7.1 Dynamic Screens - Full Customization (10 Screens)
 
 | Screen ID | Name | Type | Default Widgets | Customization |
 |-----------|------|------|-----------------|---------------|
@@ -388,10 +420,14 @@ profile tab:
 | `class-hub` | Classes Hub | hub | class-cards, class-stats, recent-activity | 🟢 Full |
 | `grading-hub` | Grading Hub | dashboard | grading-stats, pending-submissions, recent-grades, rubric-templates | 🟢 Full |
 | `attendance-hub` | Attendance Hub | dashboard | today-attendance, attendance-stats, alerts, quick-mark | 🟢 Full |
-| `communication-hub` | Communication Hub | hub | messages-inbox, announcements, parent-contacts, templates | 🟢 Full |
+| `communication-hub` | Communication Hub | hub | messages-inbox, announcements, parent-contacts, templates, ai-targeting | 🟢 Full |
 | `analytics-home` | Analytics Dashboard | dashboard | class-performance, student-trends, comparison, recommendations | 🟢 Full |
+| `ai-teaching-insights` | AI Teaching Insights | dashboard | ai-insights-summary, student-predictions, learning-gaps, teaching-effectiveness, actionable-recommendations | 🟢 Full |
+| `voice-assessment-hub` | Voice Assessment Hub | hub | voice-assessments-list, proctoring-status, voice-response-analytics, multi-language-support | 🟢 Full |
+| `professional-development` | Professional Development | dashboard | credentials-earned, learning-paths, ai-coaching, skill-gaps, certification-progress | 🟢 Full |
+| `ai-analytics-dashboard` | AI Analytics Dashboard | dashboard | predictive-analytics, intervention-alerts, performance-forecasts, engagement-metrics | 🟢 Full |
 
-### 7.2 Dynamic Screens - Medium Customization (8 Screens)
+### 7.2 Dynamic Screens - Medium Customization (10 Screens)
 
 | Screen ID | Name | Type | Configurable Sections | Customization |
 |-----------|------|------|----------------------|---------------|
@@ -399,10 +435,12 @@ profile tab:
 | `student-detail-teacher` | Student Detail | detail | profile_card, progress_summary, attendance_summary, recent_submissions | 🟡 Medium |
 | `assignment-create` | Create Assignment | form | basic_info, questions, rubric, settings | 🟡 Medium |
 | `test-create` | Create Test | form | basic_info, questions, settings, time_limits | 🟡 Medium |
-| `attendance-mark` | Mark Attendance | list | class_selector, student_list, quick_actions, summary | 🟡 Medium |
+| `attendance-mark` | Mark Attendance | list | class_selector, student_list, quick_actions, summary, swipe_marking | 🟡 Medium |
 | `attendance-reports` | Attendance Reports | dashboard | period_selector, stats, charts, alerts | 🟡 Medium |
 | `notifications-teacher` | Notifications | list | category_filters, notification_list, time_groups | 🟡 Medium |
 | `profile-teacher` | Profile | hub | profile_card, stats, classes, quick_links | 🟡 Medium |
+| `automated-admin-tasks` | Automated Admin Tasks | dashboard | automation_rules, task_queue, workflow_templates, execution_history | 🟡 Medium |
+| `question-bank` | Question Bank | hub | question_list, filters, categories, import_export | 🟡 Medium |
 
 ### 7.3 Fixed Screens (10 Screens)
 
@@ -517,6 +555,42 @@ type TeacherWidgetProps = {
 | `analytics.student-comparison` | Student Comparison | analytics | Compare student progress |
 | `analytics.trends` | Performance Trends | analytics | Historical trends chart |
 | `analytics.predictions` | AI Predictions | ai | Performance predictions |
+
+### 8.8 AI Teaching Insights Widgets (Tier 2 - Phase 85-88)
+
+| Widget ID | Name | Category | Description |
+|-----------|------|----------|-------------|
+| `ai.insights-summary` | AI Insights Summary | ai | Overview of AI-generated teaching insights |
+| `ai.student-predictions` | Student Predictions | ai | Predictive analytics for student outcomes |
+| `ai.learning-gaps` | Learning Gaps | ai | Identified learning gaps across class |
+| `ai.teaching-effectiveness` | Teaching Effectiveness | ai | AI analysis of teaching methods |
+| `ai.actionable-recommendations` | Actionable Recommendations | ai | Prioritized action items from AI |
+
+### 8.9 Voice Assessment Widgets (Tier 2 - Phase 85-88)
+
+| Widget ID | Name | Category | Description |
+|-----------|------|----------|-------------|
+| `voice.assessments-list` | Voice Assessments List | assessment | List of voice-based assessments |
+| `voice.proctoring-status` | Proctoring Status | assessment | Real-time proctoring session status |
+| `voice.response-analytics` | Voice Response Analytics | analytics | Analytics on voice responses |
+| `voice.multi-language` | Multi-Language Support | assessment | Language selection for voice assessments |
+
+### 8.10 Professional Development Widgets (Tier 3 - Phase 85-88)
+
+| Widget ID | Name | Category | Description |
+|-----------|------|----------|-------------|
+| `pd.credentials-earned` | Credentials Earned | professional | Micro-credentials and badges earned |
+| `pd.learning-paths` | Learning Paths | professional | Personalized learning path progress |
+| `pd.ai-coaching` | AI Coaching | ai | AI-powered coaching recommendations |
+| `pd.skill-gaps` | Skill Gaps | professional | Identified professional skill gaps |
+
+### 8.11 Automation Widgets (Tier 3 - Phase 85-88)
+
+| Widget ID | Name | Category | Description |
+|-----------|------|----------|-------------|
+| `automation.rules-list` | Automation Rules | automation | List of active automation rules |
+| `automation.task-queue` | Task Queue | automation | Pending automated tasks |
+| `automation.execution-history` | Execution History | automation | History of automated task runs |
 
 ---
 
@@ -691,14 +765,125 @@ type AttendanceQuickMarkConfig = {
   showStudentPhotos: boolean;         // default: true
   showStudentRoll: boolean;           // default: true
 
-  // Interaction
-  markingMethod: "tap" | "swipe" | "both";  // default: "tap"
+  // Interaction (Phase 87 Enhanced)
+  markingMethod: "tap" | "swipe" | "both";  // default: "both"
   defaultStatus: "present" | "none";  // default: "none"
   showMarkAllPresent: boolean;        // default: true
+  enableHapticFeedback: boolean;      // default: true
+  enableBatchOperations: boolean;     // default: true
+  swipeLeftAction: "absent" | "late"; // default: "absent"
+  swipeRightAction: "present" | "excused"; // default: "present"
 
   // Summary
   showLiveCount: boolean;             // default: true
   showSubmitButton: boolean;          // default: true
+  showUndoOption: boolean;            // default: true
+};
+```
+
+### 9.9 AI Insights Summary (`ai.insights-summary`)
+
+```typescript
+type AIInsightsSummaryConfig = {
+  // Display
+  maxInsights: number;                // default: 5, range: 1-10
+  showPriorityBadge: boolean;         // default: true
+  showConfidenceScore: boolean;       // default: true
+  showAffectedStudents: boolean;      // default: true
+  
+  // Filtering
+  insightTypes: ("performance" | "engagement" | "attendance" | "behavior")[];
+  minConfidence: number;              // default: 0.7, range: 0-1
+  
+  // Actions
+  enableQuickAction: boolean;         // default: true
+  showDismiss: boolean;               // default: true
+  showViewAll: boolean;               // default: true
+};
+```
+
+### 9.10 Student Predictions (`ai.student-predictions`)
+
+```typescript
+type StudentPredictionsConfig = {
+  // Display
+  maxStudents: number;                // default: 10
+  showRiskLevel: boolean;             // default: true
+  showPredictedOutcome: boolean;      // default: true
+  showContributingFactors: boolean;   // default: true
+  
+  // Filtering
+  riskFilter: "all" | "high" | "medium" | "low";  // default: "all"
+  predictionType: "grade" | "dropout" | "engagement";  // default: "grade"
+  
+  // Actions
+  enableIntervention: boolean;        // default: true
+  showContactParent: boolean;         // default: true
+};
+```
+
+### 9.11 Voice Assessment (`voice.assessments-list`)
+
+```typescript
+type VoiceAssessmentsConfig = {
+  // Display
+  maxItems: number;                   // default: 5
+  showLanguage: boolean;              // default: true
+  showDuration: boolean;              // default: true
+  showResponseCount: boolean;         // default: true
+  showAccuracyScore: boolean;         // default: true
+  
+  // Filtering
+  statusFilter: "all" | "active" | "completed" | "draft";
+  languageFilter: string[];           // default: ["en", "hi"]
+  
+  // Actions
+  enableCreate: boolean;              // default: true
+  enableProctoring: boolean;          // default: true
+  showAnalytics: boolean;             // default: true
+};
+```
+
+### 9.12 Credentials Earned (`pd.credentials-earned`)
+
+```typescript
+type CredentialsEarnedConfig = {
+  // Display
+  layoutStyle: "grid" | "list" | "badges";  // default: "badges"
+  maxItems: number;                   // default: 6
+  showProgress: boolean;              // default: true
+  showExpiryDate: boolean;            // default: true
+  showIssuer: boolean;                // default: true
+  
+  // Filtering
+  categoryFilter: "all" | "teaching" | "technology" | "leadership";
+  statusFilter: "all" | "earned" | "in_progress" | "expired";
+  
+  // Actions
+  enableShare: boolean;               // default: true
+  showViewAll: boolean;               // default: true
+};
+```
+
+### 9.13 Automation Rules (`automation.rules-list`)
+
+```typescript
+type AutomationRulesConfig = {
+  // Display
+  maxItems: number;                   // default: 5
+  showTrigger: boolean;               // default: true
+  showLastRun: boolean;               // default: true
+  showStatus: boolean;                // default: true
+  showSuccessRate: boolean;           // default: true
+  
+  // Filtering
+  statusFilter: "all" | "active" | "paused" | "error";
+  categoryFilter: "all" | "grading" | "attendance" | "communication" | "reports";
+  
+  // Actions
+  enableToggle: boolean;              // default: true
+  enableEdit: boolean;                // default: true
+  showCreateNew: boolean;             // default: true
 };
 ```
 
@@ -797,6 +982,51 @@ type AttendanceQuickMarkConfig = {
 | `get_teacher_performance` | Teacher metrics | `{teacher_id}` | TeacherPerformance |
 | `get_comparison_data` | Compare students | `{class_id}` | ComparisonData |
 | `export_report` | Export data | `{type, filters}` | ReportFile |
+
+### 10.9 AI Teaching Insights APIs (Phase 85-88)
+
+| Function | Purpose | Request | Response |
+|----------|---------|---------|----------|
+| `get_ai_insights` | Get AI insights | `{teacher_id, class_id?, type?}` | AIInsight[] |
+| `get_student_predictions` | Predictive analytics | `{teacher_id, class_id?}` | StudentPrediction[] |
+| `get_learning_gaps` | Learning gap analysis | `{class_id}` | LearningGap[] |
+| `acknowledge_insight` | Mark insight seen | `{insight_id}` | void |
+| `implement_insight` | Act on insight | `{insight_id, notes}` | AIInsight |
+| `get_teaching_effectiveness` | Teaching metrics | `{teacher_id, period}` | TeachingEffectiveness |
+
+### 10.10 Voice Assessment APIs (Phase 85-88)
+
+| Function | Purpose | Request | Response |
+|----------|---------|---------|----------|
+| `get_voice_assessments` | List assessments | `{teacher_id, status?}` | VoiceAssessment[] |
+| `create_voice_assessment` | Create assessment | `{assessment_data}` | VoiceAssessment |
+| `update_voice_assessment` | Update assessment | `{assessment_id, data}` | VoiceAssessment |
+| `get_voice_responses` | Get responses | `{assessment_id}` | VoiceResponse[] |
+| `grade_voice_response` | Grade response | `{response_id, grade_data}` | VoiceResponse |
+| `get_proctoring_session` | Proctoring data | `{session_id}` | ProctoringSession |
+| `flag_proctoring_issue` | Flag issue | `{session_id, flag_data}` | void |
+
+### 10.11 Professional Development APIs (Phase 85-88)
+
+| Function | Purpose | Request | Response |
+|----------|---------|---------|----------|
+| `get_teacher_credentials` | Get credentials | `{teacher_id}` | TeacherCredential[] |
+| `get_learning_paths` | Learning paths | `{teacher_id}` | LearningPath[] |
+| `update_credential_progress` | Update progress | `{credential_id, progress}` | TeacherCredential |
+| `get_ai_coaching` | AI coaching tips | `{teacher_id}` | CoachingRecommendation[] |
+| `get_skill_gaps` | Skill gap analysis | `{teacher_id}` | SkillGap[] |
+
+### 10.12 Automation APIs (Phase 85-88)
+
+| Function | Purpose | Request | Response |
+|----------|---------|---------|----------|
+| `get_automation_rules` | List rules | `{teacher_id, category?}` | AutomationRule[] |
+| `create_automation_rule` | Create rule | `{rule_data}` | AutomationRule |
+| `update_automation_rule` | Update rule | `{rule_id, data}` | AutomationRule |
+| `toggle_automation_rule` | Enable/disable | `{rule_id, is_active}` | AutomationRule |
+| `get_task_queue` | Pending tasks | `{teacher_id}` | AutomationTask[] |
+| `get_execution_history` | Run history | `{rule_id?, limit?}` | ExecutionLog[] |
+| `run_automation_manually` | Manual trigger | `{rule_id}` | ExecutionLog |
 
 ---
 
@@ -1065,7 +1295,163 @@ CREATE TABLE teacher_announcements (
 );
 ```
 
-### 11.6 Performance & Analytics Tables
+### 11.6 AI Teaching Insights Tables (Phase 85-88)
+
+#### `ai_teaching_insights`
+```sql
+CREATE TABLE ai_teaching_insights (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID NOT NULL REFERENCES teachers(id),
+  class_id UUID REFERENCES classes(id),
+  insight_type TEXT NOT NULL CHECK (insight_type IN 
+    ('performance', 'engagement', 'attendance', 'behavior', 'learning_gap', 'intervention')),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  affected_students UUID[] DEFAULT '{}',
+  confidence_score DECIMAL(3,2) NOT NULL CHECK (confidence_score BETWEEN 0 AND 1),
+  priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+  recommended_actions JSONB DEFAULT '[]',
+  data_sources JSONB DEFAULT '{}',
+  is_acknowledged BOOLEAN DEFAULT false,
+  acknowledged_at TIMESTAMPTZ,
+  is_implemented BOOLEAN DEFAULT false,
+  implementation_notes TEXT,
+  implemented_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 11.7 Voice Assessment Tables (Phase 85-88)
+
+#### `voice_assessments`
+```sql
+CREATE TABLE voice_assessments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID NOT NULL REFERENCES teachers(id),
+  class_id UUID REFERENCES classes(id),
+  subject_id UUID REFERENCES subjects(id),
+  title_en TEXT NOT NULL,
+  title_hi TEXT,
+  description_en TEXT,
+  description_hi TEXT,
+  language TEXT DEFAULT 'en' CHECK (language IN ('en', 'hi', 'both')),
+  questions JSONB NOT NULL DEFAULT '[]',
+  duration_minutes INTEGER,
+  max_attempts INTEGER DEFAULT 1,
+  enable_proctoring BOOLEAN DEFAULT false,
+  proctoring_settings JSONB DEFAULT '{}',
+  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'active', 'completed', 'archived')),
+  start_at TIMESTAMPTZ,
+  end_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+#### `voice_responses`
+```sql
+CREATE TABLE voice_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  assessment_id UUID NOT NULL REFERENCES voice_assessments(id),
+  student_id UUID NOT NULL REFERENCES user_profiles(id),
+  question_index INTEGER NOT NULL,
+  audio_url TEXT NOT NULL,
+  transcription TEXT,
+  language_detected TEXT,
+  duration_seconds INTEGER,
+  accuracy_score DECIMAL(5,2),
+  pronunciation_score DECIMAL(5,2),
+  fluency_score DECIMAL(5,2),
+  ai_feedback JSONB,
+  manual_score DECIMAL(5,2),
+  manual_feedback TEXT,
+  graded_by UUID REFERENCES teachers(id),
+  graded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(assessment_id, student_id, question_index)
+);
+```
+
+#### `proctoring_sessions`
+```sql
+CREATE TABLE proctoring_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  assessment_id UUID NOT NULL REFERENCES voice_assessments(id),
+  student_id UUID NOT NULL REFERENCES user_profiles(id),
+  session_start TIMESTAMPTZ NOT NULL,
+  session_end TIMESTAMPTZ,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'flagged', 'terminated')),
+  flags JSONB DEFAULT '[]',
+  environment_check JSONB DEFAULT '{}',
+  integrity_score DECIMAL(5,2),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 11.8 Professional Development Tables (Phase 85-88)
+
+#### `teacher_credentials`
+```sql
+CREATE TABLE teacher_credentials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID NOT NULL REFERENCES teachers(id),
+  credential_type TEXT NOT NULL CHECK (credential_type IN 
+    ('micro_credential', 'badge', 'certificate', 'certification')),
+  name_en TEXT NOT NULL,
+  name_hi TEXT,
+  description_en TEXT,
+  description_hi TEXT,
+  category TEXT CHECK (category IN ('teaching', 'technology', 'leadership', 'subject_mastery', 'assessment')),
+  issuer TEXT,
+  issued_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  credential_url TEXT,
+  badge_image_url TEXT,
+  requirements_met JSONB DEFAULT '{}',
+  status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'earned', 'expired', 'revoked')),
+  progress_percentage INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 11.9 Automation Tables (Phase 85-88)
+
+#### `automation_rules`
+```sql
+CREATE TABLE automation_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID NOT NULL REFERENCES teachers(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  category TEXT NOT NULL CHECK (category IN 
+    ('grading', 'attendance', 'communication', 'reports', 'reminders', 'alerts')),
+  trigger_type TEXT NOT NULL CHECK (trigger_type IN 
+    ('schedule', 'event', 'condition', 'manual')),
+  trigger_config JSONB NOT NULL DEFAULT '{}',
+  action_type TEXT NOT NULL CHECK (action_type IN 
+    ('send_message', 'generate_report', 'update_record', 'create_alert', 'notify')),
+  action_config JSONB NOT NULL DEFAULT '{}',
+  conditions JSONB DEFAULT '[]',
+  is_active BOOLEAN DEFAULT true,
+  last_run_at TIMESTAMPTZ,
+  last_run_status TEXT CHECK (last_run_status IN ('success', 'failed', 'partial')),
+  run_count INTEGER DEFAULT 0,
+  success_count INTEGER DEFAULT 0,
+  error_log JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 11.10 Performance & Analytics Tables
 
 #### `teacher_performance_summary` (View)
 ```sql
@@ -1108,6 +1494,13 @@ GROUP BY t.id, t.full_name;
 | `useTeacherAnalytics` | Analytics data | `src/hooks/queries/teacher/useTeacherAnalyticsQuery.ts` |
 | `useClassAnalytics` | Class-level analytics | `src/hooks/queries/teacher/useClassAnalyticsQuery.ts` |
 | `useStudentProgress` | Individual student progress | `src/hooks/queries/teacher/useStudentProgressQuery.ts` |
+| `useAITeachingInsights` | AI-generated insights | `src/hooks/queries/teacher/useAITeachingInsightsQuery.ts` |
+| `useStudentPredictions` | Predictive analytics | `src/hooks/queries/teacher/useStudentPredictionsQuery.ts` |
+| `useLearningGaps` | Learning gap analysis | `src/hooks/queries/teacher/useLearningGapsQuery.ts` |
+| `useVoiceAssessments` | Voice assessments list | `src/hooks/queries/teacher/useVoiceAssessmentsQuery.ts` |
+| `useProctoringSession` | Proctoring session data | `src/hooks/queries/teacher/useProctoringSessionQuery.ts` |
+| `useProfessionalDevelopment` | Credentials & learning paths | `src/hooks/queries/teacher/useProfessionalDevelopmentQuery.ts` |
+| `useAutomationRules` | Automation rules list | `src/hooks/queries/teacher/useAutomationRulesQuery.ts` |
 
 ### 12.2 Teacher Mutations
 
@@ -1123,6 +1516,7 @@ GROUP BY t.id, t.full_name;
 | `useSendMessage` | Send message | `src/hooks/mutations/teacher/useSendMessage.ts` |
 | `useCreateAnnouncement` | Create announcement | `src/hooks/mutations/teacher/useCreateAnnouncement.ts` |
 | `useAcknowledgeAlert` | Acknowledge alert | `src/hooks/mutations/teacher/useAcknowledgeAlert.ts` |
+| `useImplementAIInsight` | Act on AI insight | `src/hooks/mutations/teacher/useImplementAIInsight.ts` |
 
 ### 12.3 Shared Hooks (Reused)
 
@@ -1341,6 +1735,99 @@ export function useGradeSubmission() {
 - [ ] Integration tests
 - [ ] E2E tests
 
+### 13.9 Phase 9: AI Teaching Insights (Week 17-18) - Phase 85-88
+
+#### Database
+- [ ] Create `ai_teaching_insights` table
+- [ ] Add AI insight RPC functions
+- [ ] Set up insight generation triggers
+
+#### Screens
+- [ ] `AITeachingInsightsScreen` - AI insights dashboard
+
+#### Widgets
+- [ ] `AIInsightsSummaryWidget` - Insights overview
+- [ ] `StudentPredictionsWidget` - Predictive analytics
+- [ ] `LearningGapsWidget` - Gap analysis
+- [ ] `TeachingEffectivenessWidget` - Teaching metrics
+- [ ] `ActionableRecommendationsWidget` - Action items
+
+#### Hooks
+- [ ] `useAITeachingInsights` - Query hook
+- [ ] `useStudentPredictions` - Query hook
+- [ ] `useLearningGaps` - Query hook
+- [ ] `useImplementAIInsight` - Mutation hook
+
+### 13.10 Phase 10: Voice Assessment System (Week 19-20) - Phase 85-88
+
+#### Database
+- [ ] Create `voice_assessments` table
+- [ ] Create `voice_responses` table
+- [ ] Create `proctoring_sessions` table
+- [ ] Add voice assessment RPC functions
+
+#### Screens
+- [ ] `VoiceAssessmentHubScreen` - Voice assessments hub
+
+#### Widgets
+- [ ] `VoiceAssessmentsListWidget` - Assessments list
+- [ ] `ProctoringStatusWidget` - Proctoring status
+- [ ] `VoiceResponseAnalyticsWidget` - Response analytics
+- [ ] `MultiLanguageSupportWidget` - Language selection
+
+#### Hooks
+- [ ] `useVoiceAssessments` - Query hook
+- [ ] `useProctoringSession` - Query hook
+
+#### Integration
+- [ ] Voice recording service
+- [ ] Speech-to-text integration
+- [ ] Multi-language support (EN/HI)
+- [ ] Proctoring service integration
+
+### 13.11 Phase 11: Professional Development (Week 21-22) - Phase 85-88
+
+#### Database
+- [ ] Create `teacher_credentials` table
+- [ ] Add credential RPC functions
+- [ ] Set up learning path tracking
+
+#### Screens
+- [ ] `ProfessionalDevelopmentScreen` - PD dashboard
+
+#### Widgets
+- [ ] `CredentialsEarnedWidget` - Credentials display
+- [ ] `LearningPathsWidget` - Learning paths
+- [ ] `AICoachingWidget` - AI coaching
+- [ ] `SkillGapsWidget` - Skill gap analysis
+
+#### Hooks
+- [ ] `useProfessionalDevelopment` - Query hook
+
+### 13.12 Phase 12: Automation Engine (Week 23-24) - Phase 85-88
+
+#### Database
+- [ ] Create `automation_rules` table
+- [ ] Add automation RPC functions
+- [ ] Set up automation execution engine
+
+#### Screens
+- [ ] `AutomatedAdminTasksScreen` - Automation dashboard
+- [ ] `QuestionBankScreen` - Question bank
+
+#### Widgets
+- [ ] `AutomationRulesWidget` - Rules list
+- [ ] `TaskQueueWidget` - Task queue
+- [ ] `ExecutionHistoryWidget` - History
+
+#### Hooks
+- [ ] `useAutomationRules` - Query hook
+
+#### Integration
+- [ ] Workflow engine setup
+- [ ] Scheduled task runner
+- [ ] Event-based triggers
+
 ---
 
 ## 14. CROSS-CUTTING CONCERNS
@@ -1423,19 +1910,20 @@ const createAssignment = {
 
 | Category | Total | Built | Remaining | Notes |
 |----------|-------|-------|-----------|-------|
-| **Dynamic Screens (Full)** | 6 | 0 | 6 | Widget-based, fully customizable |
-| **Dynamic Screens (Medium)** | 8 | 0 | 8 | Section-based customization |
+| **Dynamic Screens (Full)** | 10 | 0 | 10 | Widget-based, fully customizable |
+| **Dynamic Screens (Medium)** | 10 | 0 | 10 | Section-based customization |
 | **Fixed Screens** | 10 | 0 | 10 | Essential functionality only |
-| **Total Screens** | 24 | 0 | 24 | + detail/child screens |
+| **Total Screens** | 30 | 0 | 30 | + detail/child screens |
 | **Widgets (Tier 1)** | 14 | 0 | 14 | Dashboard, class, grading |
-| **Widgets (Tier 2)** | 8 | 0 | 8 | Attendance, communication |
-| **Widgets (Tier 3)** | 6 | 0 | 6 | Analytics, AI |
-| **Total Widgets** | 28 | 0 | 28 | |
-| **Query Hooks** | 12 | 0 | 12 | |
-| **Mutation Hooks** | 10 | 0 | 10 | |
-| **API Endpoints** | 40+ | - | - | RPC functions |
-| **Database Tables** | 10 | 2 | 8 | |
-| **Permissions** | 22 | 6 | 16 | |
+| **Widgets (Tier 2)** | 17 | 0 | 17 | Attendance, communication, AI insights, voice |
+| **Widgets (Tier 3)** | 9 | 0 | 9 | Analytics, professional dev, automation |
+| **Total Widgets** | 40 | 0 | 40 | +12 from Phase 85-88 |
+| **Query Hooks** | 19 | 0 | 19 | +7 from Phase 85-88 |
+| **Mutation Hooks** | 11 | 0 | 11 | +1 from Phase 85-88 |
+| **API Endpoints** | 50+ | - | - | RPC functions |
+| **Database Tables** | 16 | 2 | 14 | +6 from Phase 85-88 |
+| **Permissions** | 30 | 6 | 24 | +8 from Phase 85-88 |
+| **Feature Flags** | 15 | 0 | 15 | +5 from Phase 85-88 |
 | **Navigation Tabs** | 5 | 0 | 5 | |
 
 ### Platform Studio Compatibility
@@ -1453,10 +1941,10 @@ const createAssignment = {
 
 | Metric | Student | Parent | Teacher |
 |--------|---------|--------|---------|
-| Dynamic Screens | 15 | 12 | 14 |
+| Dynamic Screens | 15 | 12 | 20 |
 | Fixed Screens | 12 | 8 | 10 |
-| Total Widgets | 28 | 24 | 28 |
-| Unique Features | Learning, Tests, AI Tutor | Fee Payment, Child Monitoring | Class Management, Grading, Live Class |
+| Total Widgets | 28 | 24 | 40 |
+| Unique Features | Learning, Tests, AI Tutor | Fee Payment, Child Monitoring | Class Management, Grading, Live Class, AI Insights, Voice Assessment, Professional Dev, Automation |
 
 ---
 
@@ -1481,3 +1969,4 @@ const createAssignment = {
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | Dec 13, 2024 | Initial specification based on Bckup_old teacher services and UX research |
+| 1.1.0 | Dec 15, 2024 | Enhanced with Phase 85-88 features: +6 screens, +12 widgets, +7 query hooks, +1 mutation hook, +6 DB tables, +8 permissions, +5 feature flags. Added AI Teaching Insights, Voice Assessment, Professional Development, and Automation Engine. |

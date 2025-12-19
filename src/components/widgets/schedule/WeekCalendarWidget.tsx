@@ -51,7 +51,8 @@ export const WeekCalendarWidget: React.FC<WidgetProps> = ({
 
   const handleEventPress = (event: CalendarEvent) => {
     if (enableTap && onNavigate) {
-      onNavigate(`class/${event.id}`);
+      // Navigate to class-detail screen with classId
+      onNavigate("class-detail", { classId: event.id });
     }
   };
 

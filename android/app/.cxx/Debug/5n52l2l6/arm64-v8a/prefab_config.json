@@ -1,12 +1,12 @@
 {
   "enabled": true,
-  "prefabPath": "C:\\Users\\singh\\.gradle\\caches\\modules-2\\files-2.1\\com.google.prefab\\cli\\2.1.0\\aa32fec809c44fa531f01dcfb739b5b3304d3050\\cli-2.1.0-all.jar",
+  "prefabPath": "C:\\Users\\dnyan\\.gradle\\caches\\modules-2\\files-2.1\\com.google.prefab\\cli\\2.1.0\\aa32fec809c44fa531f01dcfb739b5b3304d3050\\cli-2.1.0-all.jar",
   "packages": [
     "C:\\comeplete\\node_modules\\react-native-vision-camera\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
-    "C:\\Users\\singh\\.gradle\\caches\\9.0.0\\transforms\\c9e7d8179b156d5f9724bb4c9ec6b7cb\\transformed\\jetified-react-android-0.80.2-debug\\prefab",
+    "C:\\Users\\dnyan\\.gradle\\caches\\9.0.0\\transforms\\c9e7d8179b156d5f9724bb4c9ec6b7cb\\transformed\\jetified-react-android-0.80.2-debug\\prefab",
     "C:\\comeplete\\node_modules\\react-native-reanimated\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
     "C:\\comeplete\\node_modules\\react-native-worklets\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
-    "C:\\Users\\singh\\.gradle\\caches\\9.0.0\\transforms\\ab95a681d1757658c6c3a9a3296bf131\\transformed\\jetified-hermes-android-0.80.2-debug\\prefab",
-    "C:\\Users\\singh\\.gradle\\caches\\9.0.0\\transforms\\ad956c4f6b4daea98c21f21db7aad621\\transformed\\jetified-fbjni-0.7.0\\prefab"
+    "C:\\Users\\dnyan\\.gradle\\caches\\9.0.0\\transforms\\ab95a681d1757658c6c3a9a3296bf131\\transformed\\jetified-hermes-android-0.80.2-debug\\prefab",
+    "C:\\Users\\dnyan\\.gradle\\caches\\9.0.0\\transforms\\ad956c4f6b4daea98c21f21db7aad621\\transformed\\jetified-fbjni-0.7.0\\prefab"
   ]
 }

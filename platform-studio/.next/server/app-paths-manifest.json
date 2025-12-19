@@ -1,7 +1,6 @@
 {
-  "/studio/screens/page": "app/studio/screens/page.js",
-  "/studio/debug/page": "app/studio/debug/page.js",
+  "/page": "app/page.js",
+  "/studio/page": "app/studio/page.js",
   "/studio/navigation/page": "app/studio/navigation/page.js",
-  "/studio/notifications/page": "app/studio/notifications/page.js",
-  "/studio/theme/page": "app/studio/theme/page.js"
+  "/studio/screens/page": "app/studio/screens/page.js"
 }

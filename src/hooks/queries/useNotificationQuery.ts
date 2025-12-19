@@ -87,9 +87,15 @@ export function useMarkNotificationRead() {
         ["notification", customerId, notificationId],
         data
       );
-      // Invalidate notifications list
+      // Invalidate all notification-related queries
       queryClient.invalidateQueries({
-        queryKey: ["notifications", customerId],
+        queryKey: ["notifications"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-preview"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-unread-count"],
       });
     },
   });
@@ -118,10 +124,84 @@ export function useDeleteNotification() {
       queryClient.removeQueries({
         queryKey: ["notification", customerId, notificationId],
       });
-      // Invalidate notifications list
+      // Invalidate all notification-related queries
       queryClient.invalidateQueries({
-        queryKey: ["notifications", customerId],
+        queryKey: ["notifications"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-preview"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-unread-count"],
       });
     },
+  });
+}
+
+/**
+ * Mark all notifications as read mutation
+ */
+export function useMarkAllNotificationsRead() {
+  const queryClient = useQueryClient();
+  const customerId = useCustomerId();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString(),
+        })
+        .eq("customer_id", customerId)
+        .eq("user_id", userId)
+        .eq("is_read", false);
+
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      // Invalidate all notification-related queries
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-preview"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notifications-unread-count"],
+      });
+    },
+  });
+}
+
+/**
+ * Get unread notification count for badge display
+ */
+export function useUnreadNotificationCount(userId: string | undefined) {
+  const customerId = useCustomerId();
+  const { isOnline } = useNetworkStatus();
+
+  return useQuery({
+    queryKey: ["notifications-unread-count", customerId, userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+
+      const supabase = getSupabaseClient();
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("*", { count: "exact", head: true })
+        .eq("customer_id", customerId)
+        .eq("user_id", userId)
+        .eq("is_read", false);
+
+      if (error) throw error;
+      return count ?? 0;
+    },
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000, // 5 minutes cache
+    enabled: !!customerId && !!userId,
+    retry: isOnline ? 2 : 0,
   });
 }

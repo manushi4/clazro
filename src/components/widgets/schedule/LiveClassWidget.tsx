@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, TouchableOpacity, Linking } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Linking, ScrollView } from "react-native";
 import type { WidgetProps } from "../../../types/widget.types";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { useLiveClassQuery } from "../../../hooks/queries/useLiveClassQuery";
@@ -39,6 +39,9 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
   const showSubject = config?.showSubject !== false;
   const showCountdown = config?.showCountdown !== false;
   const enableTap = config?.enableTap !== false;
+  const showViewAll = config?.showViewAll !== false;
+  const maxItems = (config?.maxItems as number) || (size === "compact" ? 1 : size === "expanded" ? 3 : 2);
+  const layoutStyle = (config?.layoutStyle as string) || "list"; // "list" | "cards"
 
   // Track widget render
   useEffect(() => {
@@ -65,7 +68,7 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
   }, [error]);
 
   // Handle join class
-  const handleJoinClass = async (meetingUrl: string, classId: string) => {
+  const handleJoinClass = async (meetingUrl: string | undefined, classId: string) => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "join_class", classId });
     addBreadcrumb({
       category: "widget",
@@ -78,18 +81,23 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
       try {
         await Linking.openURL(meetingUrl);
       } catch (err) {
-        // Fallback to navigation
-        onNavigate?.(`live-class/${classId}`);
+        onNavigate?.("live-class", { classId });
       }
     } else {
-      onNavigate?.(`live-class/${classId}`);
+      onNavigate?.("live-class", { classId });
     }
   };
 
   // Handle card tap
   const handleCardPress = (classId: string) => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "card_tap", classId });
-    onNavigate?.(`class/${classId}`);
+    onNavigate?.("live-class", { classId });
+  };
+
+  // Handle view all
+  const handleViewAll = () => {
+    trackWidgetEvent(WIDGET_ID, "click", { action: "view_all" });
+    onNavigate?.("live-classes-list", {});
   };
 
   // Calculate time until class
@@ -113,6 +121,15 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
       text: t("widgets.liveClass.labels.inHours", { defaultValue: "In {{count}} hr", count: diffHours }), 
       isLive: false 
     };
+  };
+
+  // Format time
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString(i18n.language === "hi" ? "hi-IN" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Loading state
@@ -146,7 +163,7 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
     );
   }
 
-  // Empty state - no live classes
+  // Empty state
   if (!data || data.length === 0) {
     return (
       <View style={[styles.emptyContainer, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium }]}>
@@ -158,24 +175,136 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
     );
   }
 
-  // Get the next/current live class
-  const liveClass = data[0];
-  const timeInfo = getTimeUntil(liveClass.start_time);
-  const title = getLocalizedField(liveClass, "title", i18n.language);
-  const subjectTitle = liveClass.subject ? getLocalizedField(liveClass.subject, "title", i18n.language) : null;
+  const displayClasses = data.slice(0, maxItems);
+  const hasMore = data.length > maxItems;
 
-  const CardWrapper = enableTap ? TouchableOpacity : View;
+  // Render a single class item
+  const renderClassItem = (liveClass: any, index: number) => {
+    const timeInfo = getTimeUntil(liveClass.start_time);
+    const title = getLocalizedField(liveClass, "title", i18n.language);
+    const subjectTitle = liveClass.subject ? getLocalizedField(liveClass.subject, "title", i18n.language) : null;
+    const isFirst = index === 0;
 
+    const CardWrapper = enableTap ? TouchableOpacity : View;
+
+    return (
+      <CardWrapper
+        key={liveClass.id}
+        style={[
+          styles.classItem,
+          { backgroundColor: colors.surface, borderRadius: borderRadius.small },
+          timeInfo.isLive && { borderWidth: 2, borderColor: colors.tertiary },
+          isFirst && layoutStyle === "list" && { marginTop: 0 },
+        ]}
+        activeOpacity={0.8}
+        onPress={() => handleCardPress(liveClass.id)}
+      >
+        {/* Live indicator */}
+        {timeInfo.isLive && (
+          <View style={[styles.liveBadgeSmall, { backgroundColor: colors.tertiary }]}>
+            <View style={styles.liveDotSmall} />
+            <AppText style={styles.liveTextSmall}>LIVE</AppText>
+          </View>
+        )}
+
+        <View style={styles.classItemContent}>
+          <View style={[styles.iconContainerSmall, { backgroundColor: `${colors.tertiary}20` }]}>
+            <Icon name="video" size={16} color={colors.tertiary} />
+          </View>
+          
+          <View style={styles.classItemInfo}>
+            <AppText style={[styles.classItemTitle, { color: colors.onSurface }]} numberOfLines={1}>
+              {title}
+            </AppText>
+            <View style={styles.classItemMeta}>
+              <AppText style={[styles.classItemTime, { color: colors.onSurfaceVariant }]}>
+                {formatTime(liveClass.start_time)}
+              </AppText>
+              {showSubject && subjectTitle && (
+                <>
+                  <AppText style={[styles.metaSeparator, { color: colors.onSurfaceVariant }]}>•</AppText>
+                  <AppText style={[styles.classItemSubject, { color: colors.primary }]} numberOfLines={1}>
+                    {subjectTitle}
+                  </AppText>
+                </>
+              )}
+            </View>
+            {showTeacher && liveClass.teacher_name && (
+              <View style={styles.teacherRow}>
+                <Icon name="account" size={12} color={colors.onSurfaceVariant} />
+                <AppText style={[styles.teacherText, { color: colors.onSurfaceVariant }]}>
+                  {liveClass.teacher_name}
+                </AppText>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.classItemActions}>
+            {showCountdown && (
+              <View style={[styles.timeBadgeSmall, { backgroundColor: timeInfo.isLive ? colors.tertiary : colors.primaryContainer }]}>
+                <AppText style={[styles.timeBadgeText, { color: timeInfo.isLive ? "#fff" : colors.primary }]}>
+                  {timeInfo.text}
+                </AppText>
+              </View>
+            )}
+            {showJoinButton && (
+              <TouchableOpacity
+                style={[styles.joinButtonSmall, { backgroundColor: timeInfo.isLive ? colors.tertiary : colors.primary }]}
+                onPress={() => handleJoinClass(liveClass.meeting_url, liveClass.id)}
+              >
+                <Icon name={timeInfo.isLive ? "video" : "arrow-right"} size={14} color="#fff" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </CardWrapper>
+    );
+  };
+
+  // Cards layout - horizontal scroll
+  if (layoutStyle === "cards") {
+    return (
+      <View style={styles.widgetContainer}>
+        {/* Header */}
+        <View style={styles.widgetHeader}>
+          <View style={styles.widgetTitleRow}>
+            <Icon name="video" size={18} color={colors.tertiary} />
+            <AppText style={[styles.widgetTitle, { color: colors.onSurface }]}>
+              {t("widgets.liveClass.title", { defaultValue: "Live Classes" })}
+            </AppText>
+          </View>
+          {showViewAll && (
+            <TouchableOpacity onPress={handleViewAll} style={styles.viewAllButton}>
+              <AppText style={[styles.viewAllText, { color: colors.primary }]}>
+                {t("widgets.liveClass.actions.viewAll", { defaultValue: "View All" })}
+              </AppText>
+              <Icon name="chevron-right" size={16} color={colors.primary} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Horizontal scroll cards */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardsContainer}>
+          {displayClasses.map((liveClass, index) => renderClassItem(liveClass, index))}
+          {hasMore && (
+            <TouchableOpacity
+              style={[styles.moreCard, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.small }]}
+              onPress={handleViewAll}
+            >
+              <Icon name="plus-circle" size={24} color={colors.primary} />
+              <AppText style={[styles.moreText, { color: colors.primary }]}>
+                +{data.length - maxItems} more
+              </AppText>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // Default list layout
   return (
-    <CardWrapper
-      style={[
-        styles.container,
-        { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium },
-        timeInfo.isLive && { borderWidth: 2, borderColor: colors.tertiary },
-      ]}
-      activeOpacity={0.8}
-      onPress={() => handleCardPress(liveClass.id)}
-    >
+    <View style={[styles.container, { backgroundColor: colors.surfaceVariant, borderRadius: borderRadius.medium }]}>
       {/* Offline indicator */}
       {!isOnline && (
         <View style={[styles.offlineBadge, { backgroundColor: colors.surface }]}>
@@ -183,90 +312,219 @@ export const LiveClassWidget: React.FC<WidgetProps> = ({
         </View>
       )}
 
-      {/* Live indicator */}
-      {timeInfo.isLive && (
-        <View style={[styles.liveBadge, { backgroundColor: colors.tertiary }]}>
-          <View style={styles.liveDot} />
-          <AppText style={styles.liveText}>LIVE</AppText>
-        </View>
-      )}
-
       {/* Header */}
-      <View style={styles.header}>
-        <View style={[styles.iconContainer, { backgroundColor: `${colors.tertiary}20` }]}>
-          <Icon name="video" size={20} color={colors.tertiary} />
-        </View>
-        <View style={styles.headerText}>
-          <AppText style={[styles.title, { color: colors.onSurface }]} numberOfLines={1}>
-            {title}
-          </AppText>
-          {showSubject && subjectTitle && (
-            <AppText style={[styles.subject, { color: colors.onSurfaceVariant }]} numberOfLines={1}>
-              {subjectTitle}
-            </AppText>
-          )}
-        </View>
-        {showCountdown && (
-          <View style={[styles.timeBadge, { backgroundColor: timeInfo.isLive ? colors.tertiary : colors.primary }]}>
-            <AppText style={styles.timeText}>{timeInfo.text}</AppText>
+      <View style={styles.listHeader}>
+        <View style={styles.listHeaderLeft}>
+          <View style={[styles.iconContainer, { backgroundColor: `${colors.tertiary}20` }]}>
+            <Icon name="video" size={20} color={colors.tertiary} />
           </View>
+          <View>
+            <AppText style={[styles.listTitle, { color: colors.onSurface }]}>
+              {t("widgets.liveClass.title", { defaultValue: "Live Classes" })}
+            </AppText>
+            <AppText style={[styles.listSubtitle, { color: colors.onSurfaceVariant }]}>
+              {t("widgets.liveClass.subtitle", { defaultValue: "{{count}} scheduled today", count: data.length })}
+            </AppText>
+          </View>
+        </View>
+        {showViewAll && (
+          <TouchableOpacity onPress={handleViewAll} style={styles.viewAllButtonCompact}>
+            <AppText style={[styles.viewAllText, { color: colors.primary }]}>
+              {t("widgets.liveClass.actions.viewAll", { defaultValue: "View All" })}
+            </AppText>
+            <Icon name="chevron-right" size={16} color={colors.primary} />
+          </TouchableOpacity>
         )}
       </View>
 
-      {/* Details */}
-      <View style={styles.details}>
-        {showTeacher && liveClass.teacher_name && (
-          <View style={styles.detailRow}>
-            <Icon name="account" size={14} color={colors.onSurfaceVariant} />
-            <AppText style={[styles.detailText, { color: colors.onSurfaceVariant }]}>
-              {liveClass.teacher_name}
-            </AppText>
-          </View>
-        )}
-        {showParticipants && liveClass.participants_count !== undefined && (
-          <View style={styles.detailRow}>
-            <Icon name="account-group" size={14} color={colors.onSurfaceVariant} />
-            <AppText style={[styles.detailText, { color: colors.onSurfaceVariant }]}>
-              {t("widgets.liveClass.labels.participants", { 
-                defaultValue: "{{count}} joined", 
-                count: liveClass.participants_count 
-              })}
-            </AppText>
-          </View>
-        )}
+      {/* Class list */}
+      <View style={styles.classList}>
+        {displayClasses.map((liveClass, index) => renderClassItem(liveClass, index))}
       </View>
 
-      {/* Join button */}
-      {showJoinButton && (
-        <TouchableOpacity
-          style={[
-            styles.joinButton,
-            { backgroundColor: timeInfo.isLive ? colors.tertiary : colors.primary },
-          ]}
-          onPress={() => handleJoinClass(liveClass.meeting_url, liveClass.id)}
-        >
-          <Icon name={timeInfo.isLive ? "video" : "video-outline"} size={18} color="#fff" />
-          <AppText style={styles.joinText}>
-            {timeInfo.isLive
-              ? t("widgets.liveClass.actions.joinNow", { defaultValue: "Join Now" })
-              : t("widgets.liveClass.actions.joinClass", { defaultValue: `Join ${liveClassName}` })}
+      {/* Show more indicator */}
+      {hasMore && !showViewAll && (
+        <TouchableOpacity onPress={handleViewAll} style={styles.showMoreButton}>
+          <AppText style={[styles.showMoreText, { color: colors.primary }]}>
+            {t("widgets.liveClass.actions.showMore", { defaultValue: "+{{count}} more classes", count: data.length - maxItems })}
           </AppText>
         </TouchableOpacity>
       )}
-    </CardWrapper>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  widgetContainer: {
+    gap: 12,
+  },
+  widgetHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  widgetTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  widgetTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  cardsContainer: {
+    gap: 12,
+    paddingRight: 4,
+  },
   container: {
     padding: 16,
     gap: 12,
     position: "relative",
   },
-  header: {
+  listHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  listHeaderLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+  },
+  listTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  listSubtitle: {
+    fontSize: 12,
+  },
+  classList: {
+    gap: 8,
+  },
+  classItem: {
+    padding: 12,
+    position: "relative",
+    minWidth: 280,
+  },
+  classItemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  iconContainerSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  classItemInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  classItemTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  classItemMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  classItemTime: {
+    fontSize: 12,
+  },
+  metaSeparator: {
+    fontSize: 12,
+  },
+  classItemSubject: {
+    fontSize: 12,
+    fontWeight: "500",
+    flex: 1,
+  },
+  teacherRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 2,
+  },
+  teacherText: {
+    fontSize: 11,
+  },
+  classItemActions: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  timeBadgeSmall: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  timeBadgeText: {
+    fontSize: 10,
+    fontWeight: "600",
+  },
+  joinButtonSmall: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  liveBadgeSmall: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  liveDotSmall: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: "#fff",
+  },
+  liveTextSmall: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "700",
+  },
+  moreCard: {
+    width: 100,
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  moreText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  viewAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  viewAllButtonCompact: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  viewAllText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  showMoreButton: {
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  showMoreText: {
+    fontSize: 13,
+    fontWeight: "500",
   },
   iconContainer: {
     width: 40,
@@ -275,82 +533,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerText: {
-    flex: 1,
-    gap: 2,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  subject: {
-    fontSize: 12,
-  },
-  timeBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  timeText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  details: {
-    flexDirection: "row",
-    gap: 16,
-    paddingLeft: 52,
-  },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  detailText: {
-    fontSize: 12,
-  },
-  joinButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  joinText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  liveBadge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#fff",
-  },
-  liveText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "700",
-  },
   offlineBadge: {
     position: "absolute",
     top: 8,
     left: 8,
     padding: 4,
     borderRadius: 10,
+    zIndex: 1,
   },
   skeletonHeader: {
     height: 40,

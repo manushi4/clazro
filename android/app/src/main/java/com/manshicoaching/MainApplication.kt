@@ -16,7 +16,7 @@ class MainApplication : Application(), ReactApplication {
       override fun getPackages() =
           PackageList(this).packages.apply {
             // Packages that cannot be autolinked yet can be added manually here, for example:
-            // add(MyReactNativePackage())
+            add(FilePickerPackage())
           }
 
       override fun getUseDeveloperSupport() = BuildConfig.DEBUG

@@ -611,6 +611,429 @@
                                             "message": "संदेश",
                                             "viewProfile": "प्रोफ़ाइल देखें"
                                         }
+                                    },
+                                    "learningInsights": {
+                                        "title": "सीखने की अंतर्दृष्टि",
+                                        "subtitle": "AI-संचालित सीखने का विश्लेषण",
+                                        "types": {
+                                            "strength": "ताकत",
+                                            "weakness": "सुधार का क्षेत्र",
+                                            "recommendation": "सिफारिश",
+                                            "trend": "रुझान",
+                                            "achievement": "उपलब्धि",
+                                            "alert": "अलर्ट"
+                                        },
+                                        "labels": {
+                                            "newInsights": "आपके लिए {{count}} नई अंतर्दृष्टि",
+                                            "subject": "विषय",
+                                            "metric": "स्कोर"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई अंतर्दृष्टि नहीं",
+                                            "emptyHint": "व्यक्तिगत अंतर्दृष्टि पाने के लिए सीखते रहें",
+                                            "loading": "आपकी सीखने का विश्लेषण हो रहा है...",
+                                            "error": "अंतर्दृष्टि लोड नहीं हो सकी"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी अंतर्दृष्टि देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "view": "देखें",
+                                            "dismiss": "हटाएं"
+                                        }
+                                    },
+                                    "suggestedPeers": {
+                                        "title": "सुझाए गए साथी",
+                                        "subtitle": "जिन्हें आप जान सकते हैं",
+                                        "types": {
+                                            "classmate": "सहपाठी",
+                                            "study_buddy": "अध्ययन साथी",
+                                            "recommended": "अनुशंसित",
+                                            "mutual_friend": "साझा मित्र"
+                                        },
+                                        "labels": {
+                                            "matchScore": "मिलान",
+                                            "mutualSubjects": "साझा विषय",
+                                            "mutualConnections": "साझा कनेक्शन",
+                                            "online": "ऑनलाइन",
+                                            "offline": "ऑफ़लाइन"
+                                        },
+                                        "states": {
+                                            "empty": "अभी कोई सुझाव नहीं",
+                                            "emptyHint": "नए साथी सुझावों के लिए बाद में देखें",
+                                            "loading": "साथी खोज रहे हैं...",
+                                            "error": "सुझाव लोड नहीं हो सके"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "connect": "जुड़ें",
+                                            "dismiss": "हटाएं",
+                                            "viewProfile": "प्रोफ़ाइल देखें"
+                                        }
+                                    },
+                                    "performancePredictions": {
+                                        "title": "प्रदर्शन भविष्यवाणी",
+                                        "subtitle": "AI-संचालित प्रदर्शन पूर्वानुमान",
+                                        "types": {
+                                            "exam_score": "परीक्षा स्कोर",
+                                            "subject_grade": "विषय ग्रेड",
+                                            "improvement": "सुधार",
+                                            "risk": "जोखिम चेतावनी",
+                                            "milestone": "मील का पत्थर",
+                                            "trend": "रुझान"
+                                        },
+                                        "labels": {
+                                            "confidence": "{{value}}% विश्वास",
+                                            "positive": "{{count}} सकारात्मक",
+                                            "needsAttention": "{{count}} ध्यान देने योग्य",
+                                            "subject": "विषय",
+                                            "predicted": "अनुमानित",
+                                            "current": "वर्तमान",
+                                            "target": "लक्ष्य"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई भविष्यवाणी नहीं",
+                                            "emptyHint": "प्रदर्शन भविष्यवाणी पाने के लिए सीखते रहें",
+                                            "loading": "प्रदर्शन का विश्लेषण हो रहा है...",
+                                            "error": "भविष्यवाणी लोड नहीं हो सकी"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी भविष्यवाणी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "view": "देखें",
+                                            "dismiss": "हटाएं"
+                                        }
+                                    },
+                                    "weakTopicAlerts": {
+                                        "title": "कमजोर विषय अलर्ट",
+                                        "subtitle": "ध्यान देने योग्य विषय",
+                                        "types": {
+                                            "declining": "गिरावट",
+                                            "critical": "गंभीर",
+                                            "stagnant": "रुका हुआ",
+                                            "opportunity": "अवसर",
+                                            "urgent": "तत्काल",
+                                            "improvement": "सुधार"
+                                        },
+                                        "severity": {
+                                            "critical": "गंभीर",
+                                            "high": "उच्च",
+                                            "medium": "मध्यम",
+                                            "low": "कम"
+                                        },
+                                        "labels": {
+                                            "attentionNeeded": "{{count}} विषयों पर तत्काल ध्यान देने की जरूरत",
+                                            "daysSince": "{{count}} दिन से अभ्यास नहीं",
+                                            "scoreChange": "{{value}}% बदलाव",
+                                            "topic": "विषय",
+                                            "subject": "विषय"
+                                        },
+                                        "states": {
+                                            "empty": "कोई कमजोर विषय अलर्ट नहीं",
+                                            "emptyHint": "बहुत बढ़िया! अच्छा काम जारी रखें",
+                                            "loading": "कमजोर विषयों का विश्लेषण हो रहा है...",
+                                            "error": "अलर्ट लोड नहीं हो सके"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी अलर्ट देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "practice": "अभ्यास करें",
+                                            "dismiss": "हटाएं"
+                                        }
+                                    },
+                                    "studyRecommendations": {
+                                        "title": "अध्ययन सिफारिशें",
+                                        "subtitle": "व्यक्तिगत सीखने के सुझाव",
+                                        "types": {
+                                            "content": "सामग्री",
+                                            "practice": "अभ्यास",
+                                            "revision": "पुनरावलोकन",
+                                            "challenge": "चुनौती",
+                                            "remedial": "उपचारात्मक",
+                                            "enrichment": "संवर्धन"
+                                        },
+                                        "difficulty": {
+                                            "easy": "आसान",
+                                            "medium": "मध्यम",
+                                            "hard": "कठिन"
+                                        },
+                                        "labels": {
+                                            "confidence": "{{value}}%",
+                                            "highPriority": "{{count}} उच्च प्राथमिकता सिफारिशें",
+                                            "minutes": "{{count}} मिनट",
+                                            "subject": "विषय",
+                                            "topic": "टॉपिक"
+                                        },
+                                        "states": {
+                                            "empty": "अभी कोई सिफारिश नहीं",
+                                            "emptyHint": "व्यक्तिगत सुझाव पाने के लिए सीखते रहें",
+                                            "loading": "सिफारिशें खोज रहे हैं...",
+                                            "error": "सिफारिशें लोड नहीं हो सकीं"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "start": "शुरू करें",
+                                            "dismiss": "हटाएं"
+                                        }
+                                    },
+                                    "reminders": {
+                                        "title": "रिमाइंडर",
+                                        "subtitle": "आगामी कार्य और रिमाइंडर",
+                                        "types": {
+                                            "study": "अध्ययन",
+                                            "assignment": "असाइनमेंट",
+                                            "test": "परीक्षा",
+                                            "revision": "पुनरावलोकन",
+                                            "break": "ब्रेक",
+                                            "goal": "लक्ष्य",
+                                            "custom": "कस्टम"
+                                        },
+                                        "repeat": {
+                                            "daily": "दैनिक",
+                                            "weekly": "साप्ताहिक",
+                                            "monthly": "मासिक",
+                                            "custom": "कस्टम"
+                                        },
+                                        "time": {
+                                            "inMinutes": "{{count}} मिनट में",
+                                            "inHours": "{{count}} घंटे में",
+                                            "inDays": "{{count}} दिनों में",
+                                            "tomorrow": "कल",
+                                            "overdueMinutes": "{{count}} मिनट देरी",
+                                            "overdueHours": "{{count}} घंटे देरी",
+                                            "overdueDays": "{{count}} दिन देरी"
+                                        },
+                                        "labels": {
+                                            "overdue": "{{count}} देरी से रिमाइंडर",
+                                            "upcoming": "{{count}} आगामी"
+                                        },
+                                        "states": {
+                                            "empty": "कोई रिमाइंडर नहीं",
+                                            "emptyHint": "आप अप टू डेट हैं!",
+                                            "loading": "रिमाइंडर लोड हो रहे हैं...",
+                                            "error": "रिमाइंडर लोड नहीं हो सके"
+                                        },
+                                        "actions": {
+                                            "viewAll": "सभी देखें ({{count}})",
+                                            "retry": "पुनः प्रयास करें",
+                                            "view": "देखें",
+                                            "snooze": "स्नूज़",
+                                            "complete": "पूर्ण",
+                                            "dismiss": "हटाएं"
+                                        }
+                                    },
+                                    "streakProtection": {
+                                        "title": "स्ट्रीक सुरक्षा",
+                                        "subtitle": "अपनी सीखने की स्ट्रीक जारी रखें",
+                                        "status": {
+                                            "safe": "स्ट्रीक सुरक्षित",
+                                            "atRisk": "खतरे में",
+                                            "critical": "गंभीर!",
+                                            "lost": "स्ट्रीक खो गई"
+                                        },
+                                        "urgency": {
+                                            "critical": "केवल {{hours}} घंटे बचे!",
+                                            "atRisk": "स्ट्रीक खोने में {{hours}} घंटे",
+                                            "hint": "सुरक्षित रहने के लिए एक सत्र पूरा करें"
+                                        },
+                                        "labels": {
+                                            "dayStreak": "दिन की स्ट्रीक",
+                                            "longest": "सबसे लंबी: {{days}} दिन",
+                                            "shields": "सुरक्षा शील्ड",
+                                            "shieldsLeft": "इस महीने {{count}} बचे",
+                                            "weekGoal": "साप्ताहिक लक्ष्य",
+                                            "days": "दिन",
+                                            "nextMilestone": "माइलस्टोन तक {{days}} दिन",
+                                            "reward": "इनाम: {{reward}}"
+                                        },
+                                        "states": {
+                                            "empty": "अपनी स्ट्रीक शुरू करें!",
+                                            "emptyHint": "शुरू करने के लिए एक अध्ययन सत्र पूरा करें",
+                                            "loading": "स्ट्रीक लोड हो रही है...",
+                                            "error": "स्ट्रीक लोड नहीं हो सकी"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "useShield": "शील्ड उपयोग करें",
+                                            "continue": "सीखना जारी रखें",
+                                            "viewDetails": "विवरण देखें"
+                                        }
+                                    },
+                                    "rewardShop": {
+                                        "title": "रिवॉर्ड शॉप",
+                                        "subtitle": "अपने सिक्के और XP रिवॉर्ड के लिए रिडीम करें",
+                                        "badges": {
+                                            "featured": "फीचर्ड",
+                                            "new": "नया",
+                                            "limited": "सीमित"
+                                        },
+                                        "rarity": {
+                                            "common": "सामान्य",
+                                            "uncommon": "असामान्य",
+                                            "rare": "दुर्लभ",
+                                            "epic": "महाकाव्य",
+                                            "legendary": "पौराणिक"
+                                        },
+                                        "labels": {
+                                            "stockLeft": "{{count}} बचे",
+                                            "soldOut": "बिक गया",
+                                            "coins": "सिक्के",
+                                            "xp": "XP"
+                                        },
+                                        "states": {
+                                            "empty": "कोई रिवॉर्ड उपलब्ध नहीं",
+                                            "emptyHint": "नए आइटम के लिए जल्द वापस आएं!",
+                                            "loading": "रिवॉर्ड लोड हो रहे हैं...",
+                                            "error": "रिवॉर्ड लोड नहीं हो सके"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "viewAll": "सभी रिवॉर्ड देखें ({{count}})",
+                                            "redeem": "रिडीम करें"
+                                        }
+                                    },
+                                    "xpBalance": {
+                                        "title": "XP और सिक्के",
+                                        "subtitle": "आपका रिवॉर्ड बैलेंस",
+                                        "labels": {
+                                            "coins": "सिक्के",
+                                            "xp": "XP",
+                                            "level": "स्तर",
+                                            "today": "आज",
+                                            "thisWeek": "इस सप्ताह",
+                                            "classRank": "कक्षा रैंक",
+                                            "schoolRank": "स्कूल रैंक",
+                                            "nextLevel": "अगला स्तर",
+                                            "multiplier": "मल्टीप्लायर सक्रिय"
+                                        },
+                                        "states": {
+                                            "empty": "XP कमाना शुरू करें!",
+                                            "emptyHint": "रिवॉर्ड कमाने के लिए गतिविधियां पूरी करें",
+                                            "loading": "बैलेंस लोड हो रहा है...",
+                                            "error": "बैलेंस लोड नहीं हो सका"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "visitShop": "रिवॉर्ड शॉप देखें",
+                                            "viewHistory": "इतिहास देखें"
+                                        }
+                                    },
+                                    "communityFeed": {
+                                        "title": "कम्युनिटी फीड",
+                                        "subtitle": "देखें दूसरे क्या शेयर कर रहे हैं",
+                                        "types": {
+                                            "post": "पोस्ट",
+                                            "achievement": "उपलब्धि",
+                                            "question": "प्रश्न",
+                                            "poll": "पोल",
+                                            "announcement": "घोषणा",
+                                            "milestone": "मील का पत्थर",
+                                            "challenge": "चुनौती"
+                                        },
+                                        "labels": {
+                                            "pinned": "पिन किया गया",
+                                            "featured": "फीचर्ड",
+                                            "verified": "सत्यापित"
+                                        },
+                                        "time": {
+                                            "justNow": "अभी",
+                                            "minutesAgo": "{{count}} मिनट पहले",
+                                            "hoursAgo": "{{count}} घंटे पहले",
+                                            "daysAgo": "{{count}} दिन पहले"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई पोस्ट नहीं",
+                                            "emptyHint": "कुछ शेयर करने वाले पहले बनें!",
+                                            "loading": "फीड लोड हो रही है...",
+                                            "error": "फीड लोड नहीं हो सकी"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "viewAll": "कम्युनिटी फीड देखें",
+                                            "like": "पसंद करें",
+                                            "comment": "टिप्पणी करें",
+                                            "share": "शेयर करें"
+                                        }
+                                    },
+                                    "studyGroups": {
+                                        "title": "स्टडी ग्रुप्स",
+                                        "subtitle": "साथियों के साथ मिलकर सीखें",
+                                        "types": {
+                                            "study": "अध्ययन",
+                                            "project": "प्रोजेक्ट",
+                                            "examPrep": "परीक्षा तैयारी",
+                                            "homework": "होमवर्क",
+                                            "discussion": "चर्चा",
+                                            "tutoring": "ट्यूटरिंग"
+                                        },
+                                        "labels": {
+                                            "joined": "शामिल",
+                                            "myGroups": "{{count}} ग्रुप्स में शामिल",
+                                            "members": "{{count}} सदस्य",
+                                            "private": "निजी"
+                                        },
+                                        "time": {
+                                            "justNow": "अभी",
+                                            "minutesAgo": "{{count}} मिनट पहले",
+                                            "hoursAgo": "{{count}} घंटे पहले",
+                                            "daysAgo": "{{count}} दिन पहले"
+                                        },
+                                        "meeting": {
+                                            "soon": "जल्द",
+                                            "inHours": "{{count}} घंटे में",
+                                            "inDays": "{{count}} दिन में"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई स्टडी ग्रुप नहीं",
+                                            "emptyHint": "साथ में पढ़ने के लिए ग्रुप बनाएं या जुड़ें!",
+                                            "loading": "ग्रुप्स लोड हो रहे हैं...",
+                                            "error": "ग्रुप्स लोड नहीं हो सके"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "viewAll": "सभी ग्रुप्स देखें",
+                                            "join": "जुड़ें",
+                                            "leave": "छोड़ें",
+                                            "create": "ग्रुप बनाएं"
+                                        }
+                                    },
+                                    "peerMatches": {
+                                        "title": "पीयर मैच",
+                                        "subtitle": "AI-सुझाए अध्ययन साथी",
+                                        "types": {
+                                            "studyBuddy": "स्टडी बडी",
+                                            "subjectExpert": "विषय विशेषज्ञ",
+                                            "goalPartner": "लक्ष्य साथी",
+                                            "mentor": "मेंटर",
+                                            "mentee": "मेंटी",
+                                            "projectPartner": "प्रोजेक्ट साथी"
+                                        },
+                                        "labels": {
+                                            "connected": "{{count}} जुड़े हुए",
+                                            "matchScore": "मैच"
+                                        },
+                                        "stats": {
+                                            "level": "स्तर {{level}}"
+                                        },
+                                        "time": {
+                                            "justNow": "अभी",
+                                            "minutesAgo": "{{count}} मिनट पहले",
+                                            "hoursAgo": "{{count}} घंटे पहले",
+                                            "daysAgo": "{{count}} दिन पहले",
+                                            "unknown": "अज्ञात"
+                                        },
+                                        "states": {
+                                            "empty": "अभी तक कोई मैच नहीं मिला",
+                                            "emptyHint": "अध्ययन साथी खोजने के लिए सीखते रहें!",
+                                            "loading": "मैच खोज रहे हैं...",
+                                            "error": "मैच नहीं मिल सके"
+                                        },
+                                        "actions": {
+                                            "retry": "पुनः प्रयास करें",
+                                            "viewAll": "और मैच खोजें",
+                                            "connect": "जुड़ें"
+                                        }
                                     }
                 }
 }

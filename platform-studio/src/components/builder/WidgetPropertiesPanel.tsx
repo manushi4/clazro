@@ -55,6 +55,22 @@ const LAYOUT_STYLE_WIDGETS = [
   "downloads.summary",
   // Social widgets
   "connections.list",
+  "suggestions.peers",
+  // AI widgets
+  "ai.learning-insights",
+  "ai.performance-predictions",
+  "ai.weak-topic-alerts",
+  "ai.study-recommendations",
+  // Automation widgets
+  "automation.reminders",
+  "automation.streak-protection",
+  // Rewards widgets
+  "rewards.shop-preview",
+  "rewards.xp-balance",
+  // Community widgets
+  "community.feed",
+  "study.groups",
+  "peer.matches",
 ];
 
 // Widget-specific layout options
@@ -94,6 +110,22 @@ const WIDGET_LAYOUT_OPTIONS: Record<string, string[]> = {
   "downloads.summary": ["list", "cards", "compact"],
   // Social widgets
   "connections.list": ["list", "cards", "compact"],
+  "suggestions.peers": ["list", "cards", "compact"],
+  // AI widgets
+  "ai.learning-insights": ["list", "cards"],
+  "ai.performance-predictions": ["list", "cards"],
+  "ai.weak-topic-alerts": ["list", "cards"],
+  "ai.study-recommendations": ["list", "cards"],
+  // Automation widgets
+  "automation.reminders": ["list", "cards"],
+  "automation.streak-protection": ["card", "compact"],
+  // Rewards widgets
+  "rewards.shop-preview": ["cards", "list"],
+  "rewards.xp-balance": ["card", "compact"],
+  // Community widgets
+  "community.feed": ["list", "cards"],
+  "study.groups": ["list", "cards"],
+  "peer.matches": ["list", "cards"],
   "parent.ai-alerts": ["list", "cards", "compact"],
   "parent.comparison-analytics": ["list", "cards", "compact"],
   // Default for other widgets
@@ -947,6 +979,432 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
           { key: "showXP", label: "Show XP Points", type: "boolean", default: true },
           { key: "showStreak", label: "Show Streak Days", type: "boolean", default: true },
           { key: "showMutualSubjects", label: "Show Mutual Subjects", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "suggestions.peers": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔍",
+        fields: [
+          { key: "maxItems", label: "Max Suggestions to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards", "compact"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Match Info",
+        icon: "🎯",
+        fields: [
+          { key: "showMatchScore", label: "Show Match Score", type: "boolean", default: true },
+          { key: "showMatchReasons", label: "Show Match Reasons", type: "boolean", default: true },
+          { key: "showOnlineStatus", label: "Show Online Status", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Peer Details",
+        icon: "📝",
+        fields: [
+          { key: "showMutualSubjects", label: "Show Mutual Subjects", type: "boolean", default: true },
+          { key: "showMutualConnections", label: "Show Mutual Connections", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "ai.learning-insights": {
+    sections: [
+      {
+        title: "Display",
+        icon: "💡",
+        fields: [
+          { key: "maxItems", label: "Max Insights to Show", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filter",
+        icon: "🔍",
+        fields: [
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "strength", "weakness", "recommendation", "trend", "achievement", "alert"], default: "all" },
+        ],
+      },
+      {
+        title: "Insight Details",
+        icon: "📝",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showMetric", label: "Show Metric Value", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+          { key: "showAction", label: "Show Action Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "ai.performance-predictions": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📈",
+        fields: [
+          { key: "maxItems", label: "Max Predictions to Show", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filter",
+        icon: "🔍",
+        fields: [
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "exam_score", "subject_grade", "improvement", "risk", "milestone", "trend"], default: "all" },
+        ],
+      },
+      {
+        title: "Prediction Details",
+        icon: "📝",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showConfidence", label: "Show Confidence Score", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+          { key: "showProgress", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showAction", label: "Show Action Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "ai.weak-topic-alerts": {
+    sections: [
+      {
+        title: "Display",
+        icon: "⚠️",
+        fields: [
+          { key: "maxItems", label: "Max Alerts to Show", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filter",
+        icon: "🔍",
+        fields: [
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "declining", "critical", "stagnant", "opportunity", "urgent", "improvement"], default: "all" },
+          { key: "filterSeverity", label: "Min Severity", type: "select", options: ["all", "3", "4", "5"], default: "all" },
+        ],
+      },
+      {
+        title: "Alert Details",
+        icon: "📝",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showScore", label: "Show Score Change", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject & Topic", type: "boolean", default: true },
+          { key: "showSeverity", label: "Show Severity Badge", type: "boolean", default: true },
+          { key: "showDaysSince", label: "Show Days Since Practice", type: "boolean", default: true },
+          { key: "showAction", label: "Show Action Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "ai.study-recommendations": {
+    sections: [
+      {
+        title: "Display",
+        icon: "💡",
+        fields: [
+          { key: "maxItems", label: "Max Recommendations", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filter",
+        icon: "🔍",
+        fields: [
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "content", "practice", "revision", "challenge", "remedial", "enrichment"], default: "all" },
+          { key: "filterDifficulty", label: "Filter by Difficulty", type: "select", options: ["all", "easy", "medium", "hard"], default: "all" },
+        ],
+      },
+      {
+        title: "Recommendation Details",
+        icon: "📝",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showConfidence", label: "Show Confidence Score", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject & Topic", type: "boolean", default: true },
+          { key: "showTime", label: "Show Estimated Time", type: "boolean", default: true },
+          { key: "showDifficulty", label: "Show Difficulty Badge", type: "boolean", default: true },
+          { key: "showReason", label: "Show Reason", type: "boolean", default: true },
+          { key: "showAction", label: "Show Action Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "automation.reminders": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔔",
+        fields: [
+          { key: "maxItems", label: "Max Reminders", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filter",
+        icon: "🔍",
+        fields: [
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "study", "assignment", "test", "revision", "break", "goal", "custom"], default: "all" },
+          { key: "showOverdue", label: "Show Overdue Reminders", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Reminder Details",
+        icon: "📝",
+        fields: [
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showRepeat", label: "Show Repeat Info", type: "boolean", default: true },
+          { key: "showPriority", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showAction", label: "Show Action Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "automation.streak-protection": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔥",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["card", "compact"], default: "card" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Streak Info",
+        icon: "🛡️",
+        fields: [
+          { key: "showShields", label: "Show Protection Shields", type: "boolean", default: true },
+          { key: "showWeekProgress", label: "Show Weekly Progress", type: "boolean", default: true },
+          { key: "showMilestone", label: "Show Next Milestone", type: "boolean", default: true },
+          { key: "showUrgencyBanner", label: "Show Urgency Banner", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showQuickAction", label: "Show Quick Action Button", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "rewards.shop-preview": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🎁",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 1, max: 10, default: 4 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["cards", "list"], default: "cards" },
+          { key: "showFeaturedOnly", label: "Show Featured Only", type: "boolean", default: false },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Item Details",
+        icon: "💰",
+        fields: [
+          { key: "showPrice", label: "Show Price", type: "boolean", default: true },
+          { key: "showDiscount", label: "Show Discount Badge", type: "boolean", default: true },
+          { key: "showRarity", label: "Show Rarity Badge", type: "boolean", default: true },
+          { key: "showStock", label: "Show Stock Count", type: "boolean", default: true },
+          { key: "showBadges", label: "Show Featured/New/Limited Badges", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "rewards.xp-balance": {
+    sections: [
+      {
+        title: "Balance Display",
+        icon: "💰",
+        fields: [
+          { key: "showCoins", label: "Show Coins Balance", type: "boolean", default: true },
+          { key: "showXp", label: "Show XP Total", type: "boolean", default: true },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["card", "compact"], default: "card" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Level & Progress",
+        icon: "⭐",
+        fields: [
+          { key: "showLevel", label: "Show Level Info", type: "boolean", default: true },
+          { key: "showProgress", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showMultiplier", label: "Show Active Multiplier", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Stats",
+        icon: "📊",
+        fields: [
+          { key: "showEarnings", label: "Show Today/Week Earnings", type: "boolean", default: true },
+          { key: "showRank", label: "Show Class Rank", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "community.feed": {
+    sections: [
+      {
+        title: "Display",
+        icon: "👥",
+        fields: [
+          { key: "maxItems", label: "Max Posts", type: "number", min: 1, max: 20, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "post", "achievement", "question", "announcement", "milestone", "challenge"], default: "all" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Post Details",
+        icon: "📝",
+        fields: [
+          { key: "showAuthorInfo", label: "Show Author Info", type: "boolean", default: true },
+          { key: "showEngagement", label: "Show Likes/Comments", type: "boolean", default: true },
+          { key: "showPostType", label: "Show Post Type Badge", type: "boolean", default: true },
+          { key: "showPinnedFirst", label: "Show Pinned First", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "study.groups": {
+    sections: [
+      {
+        title: "Display",
+        icon: "👥",
+        fields: [
+          { key: "maxItems", label: "Max Groups", type: "number", min: 1, max: 20, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "study", "project", "exam_prep", "homework", "discussion", "tutoring"], default: "all" },
+          { key: "showMyGroupsOnly", label: "Show My Groups Only", type: "boolean", default: false },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Group Details",
+        icon: "📋",
+        fields: [
+          { key: "showMemberCount", label: "Show Member Count", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+          { key: "showNextMeeting", label: "Show Next Meeting", type: "boolean", default: true },
+          { key: "showGroupType", label: "Show Group Type Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "peer.matches": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔍",
+        fields: [
+          { key: "maxItems", label: "Max Matches", type: "number", min: 1, max: 20, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+          { key: "filterType", label: "Filter by Type", type: "select", options: ["all", "study_buddy", "subject_expert", "goal_partner", "mentor", "mentee", "project_partner"], default: "all" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Match Details",
+        icon: "📋",
+        fields: [
+          { key: "showMatchScore", label: "Show Match Score", type: "boolean", default: true },
+          { key: "showCommonSubjects", label: "Show Common Subjects", type: "boolean", default: true },
+          { key: "showPeerStats", label: "Show Peer Stats", type: "boolean", default: true },
+          { key: "showOnlineStatus", label: "Show Online Status", type: "boolean", default: true },
         ],
       },
       {

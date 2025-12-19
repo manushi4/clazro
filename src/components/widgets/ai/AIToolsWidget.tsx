@@ -4,7 +4,8 @@
  * Follows Widget Development Guide phases 1-7
  */
 import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import type { WidgetProps } from "../../../types/widget.types";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { useTranslation } from "react-i18next";
@@ -19,6 +20,13 @@ import { getLocalizedField } from "../../../utils/getLocalizedField";
 const WIDGET_ID = "ai.tools";
 
 export const AIToolsWidget: React.FC<WidgetProps> = ({ config, onNavigate, size = "standard" }) => {
+  const navigation = useNavigation<any>();
+  
+  // Debug: Check if onNavigate is provided
+  if (__DEV__) {
+    console.log('[AIToolsWidget] onNavigate provided:', !!onNavigate, 'config:', config);
+  }
+  
   const { colors, borderRadius } = useAppTheme();
   const { t } = useTranslation("dashboard");
   const renderStart = useRef(Date.now());
@@ -54,13 +62,22 @@ export const AIToolsWidget: React.FC<WidgetProps> = ({ config, onNavigate, size 
 
   // Event handlers
   const handleToolPress = (tool: AITool) => {
-    if (!isOnline && tool.requires_online) {
-      // Show offline message for online-only tools
-      return;
+    if (__DEV__) {
+      console.log('[AIToolsWidget] Tool pressed:', tool.tool_key, 'route:', tool.route);
     }
-    trackWidgetEvent(WIDGET_ID, "click", { action: "tool_tap", toolKey: tool.tool_key });
-    addBreadcrumb({ category: "widget", message: `${WIDGET_ID}_tool_tap`, level: "info", data: { toolKey: tool.tool_key } });
-    onNavigate?.(tool.route);
+    
+    trackWidgetEvent(WIDGET_ID, "click", { tool: tool.tool_key, route: tool.route });
+    addBreadcrumb({
+      category: "navigation",
+      message: `AI Tool pressed: ${tool.tool_key}`,
+      level: "info",
+      data: { route: tool.route },
+    });
+
+    // Navigate to the tool's screen
+    if (tool.route) {
+      navigation.navigate(tool.route);
+    }
   };
 
   const handleViewAll = () => {
@@ -127,11 +144,9 @@ export const AIToolsWidget: React.FC<WidgetProps> = ({ config, onNavigate, size 
           { 
             backgroundColor: colors.surfaceVariant, 
             borderRadius: borderRadius.medium,
-            opacity: isDisabled ? 0.5 : 1,
           },
         ]}
-        onPress={enableTap ? () => handleToolPress(tool) : undefined}
-        disabled={!enableTap || isDisabled}
+        onPress={() => handleToolPress(tool)}
         activeOpacity={0.7}
       >
         {showIcon && (
@@ -215,11 +230,9 @@ export const AIToolsWidget: React.FC<WidgetProps> = ({ config, onNavigate, size 
                   { 
                     backgroundColor: colors.surfaceVariant, 
                     borderRadius: borderRadius.medium,
-                    opacity: isDisabled ? 0.5 : 1,
                   },
                 ]}
-                onPress={enableTap ? () => handleToolPress(tool) : undefined}
-                disabled={!enableTap || isDisabled}
+                onPress={() => handleToolPress(tool)}
                 activeOpacity={0.7}
               >
                 {showIcon && (

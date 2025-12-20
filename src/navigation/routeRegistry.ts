@@ -11,6 +11,7 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
+import { LoginAdminScreen, TwoFactorSetupScreen } from "../screens/admin";
 
 export type RouteDefinition = {
   screenId: string;
@@ -231,6 +232,16 @@ const registry: Record<string, RouteDefinition> = {
   // Settings home (Dynamic screen - widget-based settings)
   "settings-home": { screenId: "settings-home", component: DynamicScreen },
   "SettingsHome": { screenId: "SettingsHome", component: DynamicScreen },
+
+  // Admin screens (Fixed - Sprint 1)
+  "login-admin": { screenId: "login-admin", component: LoginAdminScreen },
+  "LoginAdmin": { screenId: "LoginAdmin", component: LoginAdminScreen },
+  "2fa-setup": { screenId: "2fa-setup", component: TwoFactorSetupScreen },
+  "TwoFactorSetup": { screenId: "TwoFactorSetup", component: TwoFactorSetupScreen },
+
+  // Admin dashboard (Dynamic screen - widget-based)
+  "admin-home": { screenId: "admin-home", component: DynamicScreen },
+  "AdminHome": { screenId: "AdminHome", component: DynamicScreen },
 };
 
 export function resolveScreen(screenId: string) {

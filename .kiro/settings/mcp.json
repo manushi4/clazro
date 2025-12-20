@@ -27,7 +27,8 @@
         "get_publishable_keys",
         "list_migrations",
         "get_logs",
-        "list_storage_buckets"
+        "list_storage_buckets",
+        "get_advisors"
       ]
     }
   }

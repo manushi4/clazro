@@ -8,5 +8,120 @@
   "audit": "ऑडिट लॉग",
   "create_customer": "कस्टमर बनाएँ",
   "name": "नाम",
-  "slug": "स्लग"
+  "slug": "स्लग",
+  "widgets": {
+    "adminStats": {
+      "title": "प्लेटफ़ॉर्म आँकड़े",
+      "totalUsers": "कुल उपयोगकर्ता",
+      "activeUsers": "सक्रिय उपयोगकर्ता",
+      "revenue": "राजस्व",
+      "alerts": "अलर्ट",
+      "statHint": "{{label}}: {{value}}"
+    },
+    "alerts": {
+      "title": "अलर्ट",
+      "viewAll": "सभी देखें",
+      "severity": {
+        "critical": "गंभीर",
+        "warning": "चेतावनी",
+        "info": "जानकारी"
+      },
+      "empty": {
+        "title": "सब ठीक है!",
+        "message": "इस समय कोई अलर्ट नहीं"
+      },
+      "alertHint": "{{severity}} अलर्ट: {{title}}",
+      "acknowledgeHint": "अलर्ट स्वीकार करें"
+    },
+    "systemHealth": {
+      "title": "सिस्टम स्वास्थ्य",
+      "status": {
+        "healthy": "स्वस्थ",
+        "warning": "चेतावनी",
+        "critical": "गंभीर",
+        "unknown": "अज्ञात"
+      },
+      "metrics": {
+        "uptime": "अपटाइम",
+        "cpu": "सीपीयू",
+        "memory": "मेमोरी",
+        "activeUsers": "सक्रिय उपयोगकर्ता"
+      },
+      "lastChecked": "अंतिम जांच: {{time}}",
+      "viewDetails": "विवरण देखें",
+      "refreshHint": "सिस्टम स्वास्थ्य रीफ्रेश करें",
+      "viewDetailsHint": "सिस्टम मॉनिटरिंग विवरण देखें"
+    },
+    "adminHero": {
+      "title": "एडमिन डैशबोर्ड",
+      "subtitle": "{{appName}} डैशबोर्ड",
+      "defaultName": "एडमिन",
+      "greetings": {
+        "morning": "सुप्रभात",
+        "afternoon": "नमस्कार",
+        "evening": "शुभ संध्या"
+      },
+      "stats": {
+        "users": "उपयोगकर्ता",
+        "revenue": "राजस्व",
+        "alerts": "अलर्ट"
+      },
+      "avatarHint": "प्रोफ़ाइल देखें",
+      "notificationsHint": "सूचनाएं देखें",
+      "settingsHint": "सेटिंग्स खोलें",
+      "usersStatHint": "{{count}} कुल उप��ोगकर्ता",
+      "revenueStatHint": "राजस्व: {{amount}}",
+      "alertsStatHint": "{{count}} सक्रिय अलर्ट"
+    }
+  },
+  "login": {
+    "title": "एडमिन लॉगिन",
+    "subtitle": "{{appName}} प्रशासन",
+    "emailLabel": "ईमेल",
+    "emailHint": "अपना एडमिन ईमेल पता दर्ज करें",
+    "passwordLabel": "पासवर्ड",
+    "passwordHint": "अपना पासवर्ड दर्ज करें",
+    "loginButton": "साइन इन करें",
+    "loginButtonHint": "एडमिन पैनल में साइन इन करने के लिए टैप करें",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "secureLogin": "सुरक्षित एडमिन एक्सेस",
+    "logoAlt": "ऐप लोगो",
+    "errors": {
+      "emailRequired": "ईमेल आवश्यक है",
+      "emailInvalid": "कृपया एक वैध ईमेल दर्ज करें",
+      "passwordRequired": "पासवर्ड आवश्यक है",
+      "passwordShort": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए",
+      "loginFailed": "लॉगिन विफल। कृपया पुनः प्रयास करें।",
+      "accessDenied": "पहुंच अस्वीकृत। एडमिन विशेषाधिकार आवश्यक।",
+      "accountSuspended": "खाता निलंबित है। कृपया सहायता से संपर्क करें।"
+    }
+  },
+  "twoFactor": {
+    "title": "दो-कारक प्रमाणीकरण",
+    "setupTitle": "2FA सेटअप करें",
+    "verifyTitle": "2FA सत्यापित करें",
+    "scanQR": "QR कोड स्कैन करें",
+    "scanQRDescription": "अपना प्रमाणक ऐप (Google Authenticator, Authy, आदि) खोलें और इस QR कोड को स्कैन करें।",
+    "qrCodeAlt": "प्रमाणक ऐप के लिए QR कोड",
+    "manualEntry": "मैन्युअल प्रविष्टि कोड:",
+    "copySecret": "गुप्त कोड कॉपी करें",
+    "copySecretHint": "गुप्त कोड कॉपी करने के लिए डबल टैप करें",
+    "generatingQR": "QR कोड जनरेट हो रहा है...",
+    "enterCode": "सत्यापन कोड दर्ज करें",
+    "enterCodeDescription": "सेटअप सत्यापित करने के लिए अपने प्रमाणक ऐप से 6-अंकीय कोड दर्ज करें।",
+    "codeLabel": "सत्यापन कोड",
+    "codeHint": "अपने प्रमाणक ऐप से 6-अंकीय कोड दर्ज करें",
+    "verifyButton": "सत्यापित करें और 2FA सक्षम करें",
+    "nextButton": "अगला",
+    "setupComplete": "2FA सक्षम!",
+    "setupCompleteDescription": "आपके खाते के लिए दो-कारक प्रमाणीकरण अब सक्षम है। साइन इन करने के लिए आपको अपने प्रमाणक ऐप की आवश्यकता होगी।",
+    "backupTip": "सुझाव: अपने बैकअप कोड को सुरक्षित स्थान पर सहेजें, यदि आप अपने प्रमाणक ऐप तक पहुंच खो देते हैं।",
+    "continueButton": "डैशबोर्ड पर जारी रखें",
+    "skipTitle": "2FA सेटअप छोड़ें?",
+    "skipMessage": "दो-कारक प्रमाणीकरण सुरक्षा की एक अतिरिक्त परत जोड़ता है। क्या आप वाकई छोड़ना चाहते हैं?",
+    "errors": {
+      "invalidCode": "अमान्य सत्यापन कोड",
+      "codeRequired": "सत्यापन कोड आवश्यक है"
+    }
+  }
 }

@@ -28,6 +28,7 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen, LiveClassesListScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
+import { LoginAdminScreen, TwoFactorSetupScreen } from "../screens/admin";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -108,6 +109,9 @@ const COMMON_SCREENS = [
   { screenId: "ai-tutor", component: AITutorScreen },
   // Settings home (dynamic widget-based settings screen)
   { screenId: "settings-home", component: DynamicScreen },
+  // Admin screens (Sprint 1) - auth flow screens only
+  { screenId: "login-admin", component: LoginAdminScreen },
+  { screenId: "2fa-setup", component: TwoFactorSetupScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons

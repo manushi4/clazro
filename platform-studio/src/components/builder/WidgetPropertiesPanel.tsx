@@ -2433,6 +2433,134 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
       },
     ],
   },
+  // ============ ADMIN WIDGETS ============
+  "admin.hero-card": {
+    sections: [
+      {
+        title: "User Info",
+        icon: "👤",
+        fields: [
+          { key: "showAvatar", label: "Show Avatar", type: "boolean", default: true },
+          { key: "avatarStyle", label: "Avatar Style", type: "select", options: ["circle", "rounded", "square"], default: "circle" },
+        ],
+      },
+      {
+        title: "Quick Stats",
+        icon: "📊",
+        fields: [
+          { key: "showQuickStats", label: "Show Quick Stats", type: "boolean", default: true },
+          { key: "statsLayout", label: "Stats Layout", type: "select", options: ["horizontal", "grid"], default: "horizontal" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showNotificationBadge", label: "Show Notification Badge", type: "boolean", default: true },
+          { key: "showSettingsButton", label: "Show Settings Button", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.stats-grid": {
+    sections: [
+      {
+        title: "Stats Visibility",
+        icon: "📊",
+        fields: [
+          { key: "showTotalUsers", label: "Show Total Users", type: "boolean", default: true },
+          { key: "showActiveUsers", label: "Show Active Users", type: "boolean", default: true },
+          { key: "showTotalRevenue", label: "Show Total Revenue", type: "boolean", default: true },
+          { key: "showSystemAlerts", label: "Show System Alerts", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "columns", label: "Columns", type: "select", options: ["2", "3", "4"], default: "2" },
+          { key: "showIcons", label: "Show Icons", type: "boolean", default: true },
+          { key: "showTrend", label: "Show Trend Indicators", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Interaction",
+        icon: "👆",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.system-health": {
+    sections: [
+      {
+        title: "Metrics Visibility",
+        icon: "📊",
+        fields: [
+          { key: "showUptime", label: "Show Uptime", type: "boolean", default: true },
+          { key: "showActiveUsers", label: "Show Active Users", type: "boolean", default: true },
+          { key: "showServerLoad", label: "Show CPU Usage", type: "boolean", default: true },
+          { key: "showApiStatus", label: "Show Memory Usage", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "⚠️",
+        fields: [
+          { key: "warningThreshold", label: "Warning Threshold (%)", type: "number", min: 50, max: 90, default: 70 },
+          { key: "criticalThreshold", label: "Critical Threshold (%)", type: "number", min: 70, max: 100, default: 90 },
+        ],
+      },
+      {
+        title: "Refresh",
+        icon: "🔄",
+        fields: [
+          { key: "autoRefresh", label: "Auto Refresh", type: "boolean", default: true },
+          { key: "refreshInterval", label: "Refresh Interval (seconds)", type: "number", min: 10, max: 300, default: 30 },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "👁️",
+        fields: [
+          { key: "showDetailsLink", label: "Show Details Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.alerts": {
+    sections: [
+      {
+        title: "Display",
+        icon: "🔔",
+        fields: [
+          { key: "maxItems", label: "Max Alerts to Show", type: "number", min: 1, max: 20, default: 5 },
+          { key: "severityFilter", label: "Severity Filter", type: "select", options: ["all", "critical", "warning", "info"], default: "all" },
+          { key: "showAcknowledged", label: "Show Acknowledged Alerts", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Alert Details",
+        icon: "📋",
+        fields: [
+          { key: "showSeverity", label: "Show Severity Badge", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showSource", label: "Show Source", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Navigation", type: "boolean", default: true },
+          { key: "showAcknowledge", label: "Show Acknowledge Button", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+          { key: "showDismiss", label: "Show Dismiss Button", type: "boolean", default: false },
+        ],
+      },
+    ],
+  },
 };
 
 type FieldConfig = {

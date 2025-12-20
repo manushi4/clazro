@@ -251,6 +251,7 @@ export const DEFAULT_PERMISSIONS: PermissionSet[] = [
   {
     role: "admin",
     permissions: [
+      "view_dashboard",
       "feature.view",
       "feature.manage",
       "permissions.manage",

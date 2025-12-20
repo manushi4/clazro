@@ -1,4 +1,9 @@
 import { HeroCardWidget } from "../components/widgets/dashboard/HeroCardWidget";
+// Admin widgets
+import { AdminHeroWidget } from "../components/widgets/admin/AdminHeroWidget";
+import { AdminStatsWidget } from "../components/widgets/admin/AdminStatsWidget";
+import { SystemHealthWidget } from "../components/widgets/admin/SystemHealthWidget";
+import { AlertsWidget } from "../components/widgets/admin/AlertsWidget";
 import { TodayScheduleWidget } from "../components/widgets/dashboard/TodayScheduleWidget";
 import { QuickActionsWidget } from "../components/widgets/dashboard/QuickActionsWidget";
 import { AssignmentsTestsWidget } from "../components/widgets/dashboard/AssignmentsTestsWidget";
@@ -2220,6 +2225,137 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
       requiredPermissions: [],
     },
   },
+  // ============ ADMIN WIDGETS ============
+  "admin.hero-card": {
+    component: AdminHeroWidget,
+    metadata: {
+      id: "admin.hero-card",
+      titleKey: "admin:widgets.adminHero.title",
+      descriptionKey: "admin:widgets.adminHero.subtitle",
+      featureId: "admin.dashboard",
+      roles: ["admin", "super_admin"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 3,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showAvatar: true,
+        showQuickStats: true,
+        showNotificationBadge: true,
+        showSettingsButton: true,
+        avatarStyle: "circle",
+        statsLayout: "horizontal",
+      },
+      requiredPermissions: [],
+    },
+  },
+  "admin.stats-grid": {
+    component: AdminStatsWidget,
+    metadata: {
+      id: "admin.stats-grid",
+      titleKey: "admin:widgets.adminStats.title",
+      descriptionKey: "admin:widgets.adminStats.title",
+      featureId: "admin.dashboard",
+      roles: ["admin", "super_admin"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 3,
+        staleTimeMs: 5 * 60 * 1000,
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showTotalUsers: true,
+        showActiveUsers: true,
+        showTotalRevenue: true,
+        showSystemAlerts: true,
+        columns: 2,
+        showIcons: true,
+        showTrend: true,
+        enableTap: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "admin.system-health": {
+    component: SystemHealthWidget,
+    metadata: {
+      id: "admin.system-health",
+      titleKey: "admin:widgets.systemHealth.title",
+      descriptionKey: "admin:widgets.systemHealth.title",
+      featureId: "admin.dashboard",
+      roles: ["admin", "super_admin"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 2,
+        staleTimeMs: 30 * 1000, // 30 seconds for health data
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        showUptime: true,
+        showActiveUsers: true,
+        showServerLoad: true,
+        showApiStatus: true,
+        warningThreshold: 70,
+        criticalThreshold: 90,
+        autoRefresh: true,
+        refreshInterval: 30,
+        showDetailsLink: true,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "admin.alerts": {
+    component: AlertsWidget,
+    metadata: {
+      id: "admin.alerts",
+      titleKey: "admin:widgets.alerts.title",
+      descriptionKey: "admin:widgets.alerts.subtitle",
+      featureId: "admin.dashboard",
+      roles: ["admin", "super_admin"],
+      requiresOnline: true,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 2,
+        staleTimeMs: 60 * 1000, // 1 minute for alerts
+        prefetchOnDashboardLoad: true,
+        allowBackgroundRefresh: true,
+      },
+      defaultConfig: {
+        maxItems: 5,
+        showSeverity: true,
+        showTime: true,
+        showSource: true,
+        severityFilter: "all",
+        showAcknowledged: false,
+        enableTap: true,
+        showAcknowledge: true,
+        showViewAll: true,
+        showDismiss: false,
+      },
+      requiredPermissions: [],
+    },
+  },
+
   // Legacy long IDs (for backward compatibility)
   "home.dashboard.heroCard": {
     component: HeroCardWidget,

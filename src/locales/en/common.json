@@ -19,10 +19,14 @@
     "down": "Down",
     "delete": "Delete",
     "goBack": "Go Back",
-    "ok": "OK"
+    "back": "Go back",
+    "ok": "OK",
+    "skip": "Skip"
   },
   "status": {
     "loading": "Loading...",
+    "verifying": "Verifying...",
+    "copied": "Copied!",
     "safe_mode": "Safe Mode",
     "offline_title": "Offline",
     "offline_action": "Go online to perform this action.",

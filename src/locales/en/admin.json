@@ -8,5 +8,120 @@
   "audit": "Audit Log",
   "create_customer": "Create Customer",
   "name": "Name",
-  "slug": "Slug"
+  "slug": "Slug",
+  "widgets": {
+    "adminStats": {
+      "title": "Platform Stats",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "revenue": "Revenue",
+      "alerts": "Alerts",
+      "statHint": "{{label}}: {{value}}"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "viewAll": "View All",
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info"
+      },
+      "empty": {
+        "title": "All Clear!",
+        "message": "No alerts at this time"
+      },
+      "alertHint": "{{severity}} alert: {{title}}",
+      "acknowledgeHint": "Acknowledge alert"
+    },
+    "systemHealth": {
+      "title": "System Health",
+      "status": {
+        "healthy": "Healthy",
+        "warning": "Warning",
+        "critical": "Critical",
+        "unknown": "Unknown"
+      },
+      "metrics": {
+        "uptime": "Uptime",
+        "cpu": "CPU",
+        "memory": "Memory",
+        "activeUsers": "Active Users"
+      },
+      "lastChecked": "Last checked: {{time}}",
+      "viewDetails": "View Details",
+      "refreshHint": "Refresh system health",
+      "viewDetailsHint": "View system monitoring details"
+    },
+    "adminHero": {
+      "title": "Admin Dashboard",
+      "subtitle": "{{appName}} Dashboard",
+      "defaultName": "Admin",
+      "greetings": {
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening"
+      },
+      "stats": {
+        "users": "Users",
+        "revenue": "Revenue",
+        "alerts": "Alerts"
+      },
+      "avatarHint": "View profile",
+      "notificationsHint": "View notifications",
+      "settingsHint": "Open settings",
+      "usersStatHint": "{{count}} total users",
+      "revenueStatHint": "Revenue: {{amount}}",
+      "alertsStatHint": "{{count}} active alerts"
+    }
+  },
+  "login": {
+    "title": "Admin Login",
+    "subtitle": "{{appName}} Administration",
+    "emailLabel": "Email",
+    "emailHint": "Enter your admin email address",
+    "passwordLabel": "Password",
+    "passwordHint": "Enter your password",
+    "loginButton": "Sign In",
+    "loginButtonHint": "Tap to sign in to admin panel",
+    "forgotPassword": "Forgot Password?",
+    "secureLogin": "Secure admin access",
+    "logoAlt": "App logo",
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "passwordRequired": "Password is required",
+      "passwordShort": "Password must be at least 6 characters",
+      "loginFailed": "Login failed. Please try again.",
+      "accessDenied": "Access denied. Admin privileges required.",
+      "accountSuspended": "Account is suspended. Please contact support."
+    }
+  },
+  "twoFactor": {
+    "title": "Two-Factor Authentication",
+    "setupTitle": "Setup 2FA",
+    "verifyTitle": "Verify 2FA",
+    "scanQR": "Scan QR Code",
+    "scanQRDescription": "Open your authenticator app (Google Authenticator, Authy, etc.) and scan this QR code.",
+    "qrCodeAlt": "QR code for authenticator app",
+    "manualEntry": "Manual entry code:",
+    "copySecret": "Copy secret code",
+    "copySecretHint": "Double tap to copy the secret code",
+    "generatingQR": "Generating QR code...",
+    "enterCode": "Enter Verification Code",
+    "enterCodeDescription": "Enter the 6-digit code from your authenticator app to verify setup.",
+    "codeLabel": "Verification Code",
+    "codeHint": "Enter the 6-digit code from your authenticator app",
+    "verifyButton": "Verify & Enable 2FA",
+    "nextButton": "Next",
+    "setupComplete": "2FA Enabled!",
+    "setupCompleteDescription": "Two-factor authentication is now enabled for your account. You'll need your authenticator app to sign in.",
+    "backupTip": "Tip: Save your backup codes in a secure location in case you lose access to your authenticator app.",
+    "continueButton": "Continue to Dashboard",
+    "skipTitle": "Skip 2FA Setup?",
+    "skipMessage": "Two-factor authentication adds an extra layer of security. Are you sure you want to skip?",
+    "errors": {
+      "invalidCode": "Invalid verification code",
+      "codeRequired": "Verification code is required"
+    }
+  }
 }

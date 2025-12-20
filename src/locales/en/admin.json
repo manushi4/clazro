@@ -52,6 +52,14 @@
       "refreshHint": "Refresh system health",
       "viewDetailsHint": "View system monitoring details"
     },
+    "quickActions": {
+      "title": "Quick Actions",
+      "addUser": "Add User",
+      "reports": "Reports",
+      "settings": "Settings",
+      "audit": "Audit Logs",
+      "actionHint": "Tap to {{action}}"
+    },
     "adminHero": {
       "title": "Admin Dashboard",
       "subtitle": "{{appName}} Dashboard",

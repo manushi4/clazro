@@ -52,6 +52,14 @@
       "refreshHint": "सिस्टम स्वास्थ्य रीफ्रेश करें",
       "viewDetailsHint": "सिस्टम मॉनिटरिंग विवरण देखें"
     },
+    "quickActions": {
+      "title": "त्वरित कार्य",
+      "addUser": "उपयोगकर्ता जोड़ें",
+      "reports": "रिपोर्ट",
+      "settings": "सेटिंग्स",
+      "audit": "ऑडिट लॉग",
+      "actionHint": "{{action}} के लिए टैप करें"
+    },
     "adminHero": {
       "title": "एडमिन डैशबोर्ड",
       "subtitle": "{{appName}} डैशबोर्ड",

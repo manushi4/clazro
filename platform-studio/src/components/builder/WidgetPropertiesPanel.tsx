@@ -2561,6 +2561,37 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
       },
     ],
   },
+  "admin.quick-actions": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "columns", label: "Number of Columns", type: "select", options: ["2", "3", "4"], default: "2" },
+          { key: "style", label: "Button Style", type: "select", options: ["filled", "outlined", "minimal"], default: "filled" },
+          { key: "iconSize", label: "Icon Size", type: "select", options: ["small", "medium", "large"], default: "medium" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "👁️",
+        fields: [
+          { key: "showLabels", label: "Show Labels", type: "boolean", default: true },
+          { key: "showIcons", label: "Show Icons", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions Visibility",
+        icon: "⚡",
+        fields: [
+          { key: "showAddUser", label: "Show Add User", type: "boolean", default: true },
+          { key: "showReports", label: "Show Reports", type: "boolean", default: true },
+          { key: "showSettings", label: "Show Settings", type: "boolean", default: true },
+          { key: "showAudit", label: "Show Audit Logs", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
 };
 
 type FieldConfig = {

@@ -1275,6 +1275,18 @@ export const widgetRegistry: Record<string, WidgetMetadata> = {
     supportedSizes: ["compact", "standard"],
     defaultSize: "standard",
   },
+  "admin.quick-actions": {
+    id: "admin.quick-actions",
+    name: "Quick Actions",
+    description: "4 quick action buttons for Add User, Reports, Settings, and Audit Logs",
+    category: "actions",
+    icon: "lightning-bolt",
+    allowedRoles: ["admin"],
+    allowedScreenTypes: ["dashboard"],
+    supportedSizes: ["compact", "standard", "expanded"],
+    defaultSize: "standard",
+    requiredFeatureId: "admin.dashboard",
+  },
 };
 
 // Helper functions

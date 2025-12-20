@@ -4,6 +4,7 @@ import { AdminHeroWidget } from "../components/widgets/admin/AdminHeroWidget";
 import { AdminStatsWidget } from "../components/widgets/admin/AdminStatsWidget";
 import { SystemHealthWidget } from "../components/widgets/admin/SystemHealthWidget";
 import { AlertsWidget } from "../components/widgets/admin/AlertsWidget";
+import { QuickActionsWidget } from "../components/widgets/admin/QuickActionsWidget";
 import { TodayScheduleWidget } from "../components/widgets/dashboard/TodayScheduleWidget";
 import { QuickActionsWidget } from "../components/widgets/dashboard/QuickActionsWidget";
 import { AssignmentsTestsWidget } from "../components/widgets/dashboard/AssignmentsTestsWidget";
@@ -2351,6 +2352,39 @@ const registry: Record<WidgetId, WidgetRegistryEntry> = {
         showAcknowledge: true,
         showViewAll: true,
         showDismiss: false,
+      },
+      requiredPermissions: [],
+    },
+  },
+  "admin.quick-actions": {
+    component: QuickActionsWidget,
+    metadata: {
+      id: "admin.quick-actions",
+      titleKey: "admin:widgets.quickActions.title",
+      descriptionKey: "admin:widgets.quickActions.title",
+      featureId: "admin.dashboard",
+      roles: ["admin", "super_admin"],
+      requiresOnline: false,
+      deprecated: false,
+      version: "1.0.0",
+      supportedSizes: ["compact", "standard", "expanded"],
+      defaultSize: "standard",
+      dataPolicy: {
+        maxQueries: 0,
+        staleTimeMs: 0,
+        prefetchOnDashboardLoad: false,
+        allowBackgroundRefresh: false,
+      },
+      defaultConfig: {
+        columns: 2,
+        showLabels: true,
+        showIcons: true,
+        iconSize: "medium",
+        style: "filled",
+        showAddUser: true,
+        showReports: true,
+        showSettings: true,
+        showAudit: true,
       },
       requiredPermissions: [],
     },

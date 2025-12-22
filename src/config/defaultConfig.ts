@@ -43,6 +43,7 @@ export const DEFAULT_FEATURES: FeatureToggle[] = [
 ];
 
 export const DEFAULT_NAVIGATION_TABS: NavigationConfig["tabs"] = [
+  // Student tabs
   {
     tabId: "HomeTab",
     role: "student",
@@ -92,6 +93,57 @@ export const DEFAULT_NAVIGATION_TABS: NavigationConfig["tabs"] = [
     orderIndex: 4,
     enabled: true,
     featureId: "app.settings",
+  },
+  // Admin tabs
+  {
+    tabId: "AdminHomeTab",
+    role: "admin",
+    label: "Dashboard",
+    icon: "home",
+    initialRoute: "admin-home",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    tabId: "AdminUsersTab",
+    role: "admin",
+    label: "Users",
+    icon: "people",
+    initialRoute: "users-management",
+    orderIndex: 1,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    tabId: "AdminFinanceTab",
+    role: "admin",
+    label: "Finance",
+    icon: "wallet",
+    initialRoute: "finance-dashboard",
+    orderIndex: 2,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    tabId: "AdminAnalyticsTab",
+    role: "admin",
+    label: "Analytics",
+    icon: "chart",
+    initialRoute: "analytics-dashboard",
+    orderIndex: 3,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    tabId: "AdminSettingsTab",
+    role: "admin",
+    label: "Settings",
+    icon: "settings",
+    initialRoute: "system-settings",
+    orderIndex: 4,
+    enabled: true,
+    featureId: "admin.dashboard",
   },
 ];
 
@@ -173,6 +225,42 @@ export const DEFAULT_NAVIGATION_SCREENS: NavigationConfig["screens"] = [
     orderIndex: 1,
     enabled: true,
     featureId: "app.settings",
+  },
+  // Admin screens
+  {
+    screenId: "admin-home",
+    tabId: "AdminHomeTab",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    screenId: "users-management",
+    tabId: "AdminUsersTab",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    screenId: "finance-dashboard",
+    tabId: "AdminFinanceTab",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    screenId: "analytics-dashboard",
+    tabId: "AdminAnalyticsTab",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
+  },
+  {
+    screenId: "system-settings",
+    tabId: "AdminSettingsTab",
+    orderIndex: 0,
+    enabled: true,
+    featureId: "admin.dashboard",
   },
 ];
 

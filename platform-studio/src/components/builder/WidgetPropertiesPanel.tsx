@@ -71,6 +71,19 @@ const LAYOUT_STYLE_WIDGETS = [
   "community.feed",
   "study.groups",
   "peer.matches",
+  // Admin widgets
+  "users.recent-registrations",
+  "finance.revenue-summary",
+  "finance.expense-summary",
+  "admin.profile-activity",
+  // Media widgets
+  "media.banner",
+  "media.banner-1",
+  "media.banner-2",
+  "media.banner-3",
+  "media.hero",
+  "media.promo",
+  "media.ad",
 ];
 
 // Widget-specific layout options
@@ -128,6 +141,19 @@ const WIDGET_LAYOUT_OPTIONS: Record<string, string[]> = {
   "peer.matches": ["list", "cards"],
   "parent.ai-alerts": ["list", "cards", "compact"],
   "parent.comparison-analytics": ["list", "cards", "compact"],
+  // Admin widgets
+  "users.recent-registrations": ["list", "cards"],
+  "finance.revenue-summary": ["standard", "compact"],
+  "finance.expense-summary": ["standard", "compact"],
+  "admin.profile-activity": ["timeline", "list", "cards"],
+  // Media widgets
+  "media.banner": ["single", "carousel", "grid"],
+  "media.banner-1": ["single", "carousel", "grid"],
+  "media.banner-2": ["single", "carousel", "grid"],
+  "media.banner-3": ["single", "carousel", "grid"],
+  "media.hero": ["single", "carousel"],
+  "media.promo": ["carousel", "grid"],
+  "media.ad": ["single", "compact"],
   // Default for other widgets
   default: ["list", "cards", "grid", "timeline"],
 };
@@ -2588,6 +2614,766 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
           { key: "showReports", label: "Show Reports", type: "boolean", default: true },
           { key: "showSettings", label: "Show Settings", type: "boolean", default: true },
           { key: "showAudit", label: "Show Audit Logs", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.recent-activity": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 3, max: 15, default: 5 },
+          { key: "showAvatar", label: "Show Avatar", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showIcon", label: "Show Activity Icon", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Filtering",
+        icon: "🔍",
+        fields: [
+          { key: "typeFilter", label: "Activity Type", type: "select", options: ["all", "user_created", "user_updated", "payment_received", "setting_changed", "login", "content_created"], default: "all" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  // ============ ADMIN USER MANAGEMENT WIDGETS ============
+  "users.pending-approvals": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 3, max: 15, default: 5 },
+          { key: "showOrganization", label: "Show Organization", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showQuickActions", label: "Show Quick Actions", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to View", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "users.bulk-actions": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "columns", label: "Number of Columns", type: "select", options: ["2", "3"], default: "2" },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "👁️",
+        fields: [
+          { key: "showLabels", label: "Show Labels", type: "boolean", default: true },
+          { key: "showCounts", label: "Show User Counts", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "users.recent-registrations": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 3, max: 15, default: 5 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "cards"], default: "list" },
+        ],
+      },
+      {
+        title: "User Info",
+        icon: "👤",
+        fields: [
+          { key: "showAvatar", label: "Show Avatar", type: "boolean", default: true },
+          { key: "showRole", label: "Show Role Badge", type: "boolean", default: true },
+          { key: "showStatus", label: "Show Status", type: "boolean", default: true },
+          { key: "showTime", label: "Show Registration Time", type: "boolean", default: true },
+          { key: "showEmail", label: "Show Email", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "finance.revenue-summary": {
+    sections: [
+      {
+        title: "Revenue Display",
+        icon: "💰",
+        fields: [
+          { key: "showTotalRevenue", label: "Show Total Revenue", type: "boolean", default: true },
+          { key: "showGrowthPercentage", label: "Show Growth Percentage", type: "boolean", default: true },
+          { key: "abbreviateNumbers", label: "Abbreviate Numbers (K/L/Cr)", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Period Selection",
+        icon: "📅",
+        fields: [
+          { key: "showPeriodSelector", label: "Show Period Selector", type: "boolean", default: true },
+          { key: "defaultPeriod", label: "Default Period", type: "select", options: ["today", "week", "month", "quarter", "year"], default: "month" },
+        ],
+      },
+      {
+        title: "Breakdown",
+        icon: "📊",
+        fields: [
+          { key: "showBreakdown", label: "Show Revenue Breakdown", type: "boolean", default: true },
+          { key: "showComparison", label: "Show Comparison Stats", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewDetails", label: "Show View Details Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "finance.expense-summary": {
+    sections: [
+      {
+        title: "Expense Display",
+        icon: "💸",
+        fields: [
+          { key: "showTotalExpenses", label: "Show Total Expenses", type: "boolean", default: true },
+          { key: "showGrowthPercentage", label: "Show Growth Percentage", type: "boolean", default: true },
+          { key: "abbreviateNumbers", label: "Abbreviate Numbers (K/L/Cr)", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Period Selection",
+        icon: "📅",
+        fields: [
+          { key: "showPeriodSelector", label: "Show Period Selector", type: "boolean", default: true },
+          { key: "defaultPeriod", label: "Default Period", type: "select", options: ["week", "month", "quarter", "year"], default: "month" },
+        ],
+      },
+      {
+        title: "Breakdown",
+        icon: "📊",
+        fields: [
+          { key: "showBreakdown", label: "Show Category Breakdown", type: "boolean", default: true },
+          { key: "showPendingExpenses", label: "Show Pending & Stats", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewDetails", label: "Show View Details Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "finance.collection-rate": {
+    sections: [
+      {
+        title: "Collection Display",
+        icon: "📊",
+        fields: [
+          { key: "showProgressBar", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showAmounts", label: "Show Amount Breakdown", type: "boolean", default: true },
+          { key: "showTrendIndicator", label: "Show Status Indicator", type: "boolean", default: true },
+          { key: "abbreviateNumbers", label: "Abbreviate Numbers (K/L/Cr)", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Period Selection",
+        icon: "📅",
+        fields: [
+          { key: "showPeriodSelector", label: "Show Period Selector", type: "boolean", default: true },
+          { key: "defaultPeriod", label: "Default Period", type: "select", options: ["week", "month", "quarter", "year"], default: "month" },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "🎯",
+        fields: [
+          { key: "thresholdGood", label: "Good Rate Threshold (%)", type: "number", min: 50, max: 100, default: 80 },
+          { key: "thresholdWarning", label: "Warning Rate Threshold (%)", type: "number", min: 30, max: 90, default: 60 },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewDetails", label: "Show View Details Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.student-fees-dashboard": {
+    sections: [
+      {
+        title: "Display Options",
+        icon: "📊",
+        fields: [
+          { key: "showCollectionRate", label: "Show Collection Rate Progress", type: "boolean", default: true },
+          { key: "showTodayStats", label: "Show Today's Collection", type: "boolean", default: true },
+          { key: "showOverdue", label: "Show Overdue Card", type: "boolean", default: true },
+          { key: "cardStyle", label: "Card Style", type: "select", options: ["compact", "detailed"], default: "detailed" },
+        ],
+      },
+      {
+        title: "Overdue Settings",
+        icon: "⚠️",
+        fields: [
+          { key: "overdueThresholdDays", label: "Overdue Threshold (Days)", type: "number", min: 7, max: 90, default: 30 },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableReminder", label: "Enable Send Reminder Button", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.fee-collection-trend": {
+    sections: [
+      {
+        title: "Chart Options",
+        icon: "📊",
+        fields: [
+          { key: "chartType", label: "Chart Type", type: "select", options: ["bar", "line", "area"], default: "bar" },
+          { key: "showExpected", label: "Show Expected Amount", type: "boolean", default: true },
+          { key: "monthsToShow", label: "Default Months", type: "select", options: ["6", "12"], default: "6" },
+        ],
+      },
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "showGrowth", label: "Show Growth Indicator", type: "boolean", default: true },
+          { key: "showYearTotal", label: "Show Year Total Section", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "admin.teacher-payroll": {
+    sections: [
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "showProgress", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showNextDue", label: "Show Next Payment Due", type: "boolean", default: true },
+          { key: "showProcessButton", label: "Show Process Salaries Button", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Alerts",
+        icon: "🔔",
+        fields: [
+          { key: "alertOnOverdue", label: "Show Overdue Alerts", type: "boolean", default: true },
+          { key: "overdueDays", label: "Overdue Threshold (days)", type: "number", min: 1, max: 30, default: 7 },
+        ],
+      },
+    ],
+  },
+  "admin.batch-performance": {
+    sections: [
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "topN", label: "Number of Batches", type: "number", min: 3, max: 10, default: 5 },
+          { key: "showTrend", label: "Show Trend Indicator", type: "boolean", default: true },
+          { key: "showStudentCount", label: "Show Student Count", type: "boolean", default: true },
+          { key: "showOverallAvg", label: "Show Overall Average", type: "boolean", default: true },
+          { key: "showRankBadges", label: "Show Rank Badges", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Performance Thresholds",
+        icon: "🎯",
+        fields: [
+          { key: "colorCodePerformance", label: "Color Code Performance", type: "boolean", default: true },
+          { key: "excellentThreshold", label: "Excellent Threshold (%)", type: "number", min: 70, max: 100, default: 85 },
+          { key: "goodThreshold", label: "Good Threshold (%)", type: "number", min: 50, max: 90, default: 70 },
+        ],
+      },
+    ],
+  },
+  "admin.attendance-overview": {
+    sections: [
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "showTeacherAttendance", label: "Show Teacher Attendance", type: "boolean", default: true },
+          { key: "showAbsentList", label: "Show Absent List", type: "boolean", default: true },
+          { key: "absentListLimit", label: "Absent List Limit", type: "number", min: 3, max: 10, default: 5 },
+          { key: "showWeeklyTrend", label: "Show Weekly Trend", type: "boolean", default: true },
+          { key: "showAlerts", label: "Show Alerts", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "🎯",
+        fields: [
+          { key: "lowAttendanceThreshold", label: "Low Attendance Threshold (%)", type: "number", min: 50, max: 95, default: 80 },
+        ],
+      },
+    ],
+  },
+  "admin.admission-stats": {
+    sections: [
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "showConversionRate", label: "Show Conversion Rate", type: "boolean", default: true },
+          { key: "showProgramBreakdown", label: "Show Program Breakdown", type: "boolean", default: true },
+          { key: "showPendingFollowUp", label: "Show Pending Follow-ups", type: "boolean", default: true },
+          { key: "showTrends", label: "Show Trend Indicators", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showAddButton", label: "Show Add Inquiry Button", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "analytics.kpi-grid": {
+    sections: [
+      {
+        title: "Grid Layout",
+        icon: "📊",
+        fields: [
+          { key: "columns", label: "Grid Columns", type: "select", options: ["1", "2", "3"], default: "2" },
+          { key: "limit", label: "Max Metrics", type: "number", min: 1, max: 12, default: 6 },
+        ],
+      },
+      {
+        title: "Filtering",
+        icon: "🔍",
+        fields: [
+          { key: "category", label: "Category Filter", type: "text", placeholder: "e.g., finance, users" },
+          { key: "role", label: "Role Filter", type: "select", options: ["admin", "teacher", "parent", "student"], default: "admin" },
+        ],
+      },
+      {
+        title: "Display Options",
+        icon: "👁️",
+        fields: [
+          { key: "showIcon", label: "Show Icons", type: "boolean", default: true },
+          { key: "showTrend", label: "Show Trend Indicators", type: "boolean", default: true },
+          { key: "showGrowth", label: "Show Growth Percentage", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  // ============ ADMIN CONTENT WIDGETS ============
+  "content.stats": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "showTypeBreakdown", label: "Show Type Breakdown", type: "boolean", default: true },
+          { key: "showStatusBreakdown", label: "Show Status Breakdown", type: "boolean", default: true },
+          { key: "abbreviateNumbers", label: "Abbreviate Numbers", type: "boolean", default: true },
+          { key: "maxTypes", label: "Max Types to Show", type: "number", min: 2, max: 8, default: 4 },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewDetails", label: "Show View Details Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "content.list": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 5, max: 20, default: 10 },
+          { key: "showSearch", label: "Show Search", type: "boolean", default: true },
+          { key: "showFilters", label: "Show Filters", type: "boolean", default: true },
+          { key: "showTypeFilter", label: "Show Type Filter", type: "boolean", default: true },
+          { key: "showStatusFilter", label: "Show Status Filter", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Content Info",
+        icon: "📄",
+        fields: [
+          { key: "showViews", label: "Show View Count", type: "boolean", default: true },
+          { key: "showRating", label: "Show Rating", type: "boolean", default: true },
+          { key: "showDuration", label: "Show Duration", type: "boolean", default: true },
+          { key: "showCategory", label: "Show Category", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Default Filters",
+        icon: "🔍",
+        fields: [
+          { key: "defaultTypeFilter", label: "Default Type Filter", type: "select", options: ["all", "course", "lesson", "video", "quiz", "resource", "assessment", "document"], default: "all" },
+          { key: "defaultStatusFilter", label: "Default Status Filter", type: "select", options: ["all", "published", "draft", "review", "archived"], default: "all" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "content.categories": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxCategories", label: "Max Categories", type: "number", min: 4, max: 12, default: 8 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["grid", "list"], default: "grid" },
+          { key: "columns", label: "Grid Columns", type: "number", min: 2, max: 4, default: 2 },
+        ],
+      },
+      {
+        title: "Category Info",
+        icon: "📁",
+        fields: [
+          { key: "showCount", label: "Show Item Count", type: "boolean", default: true },
+          { key: "showViews", label: "Show Total Views", type: "boolean", default: true },
+          { key: "showRating", label: "Show Avg Rating", type: "boolean", default: true },
+          { key: "showPublished", label: "Show Published Count", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewAll", label: "Show View All", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to Filter", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  // ============ ADMIN PROFILE WIDGETS ============
+  "admin.profile-activity": {
+    sections: [
+      {
+        title: "Layout",
+        icon: "📐",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["timeline", "list", "cards"], default: "timeline" },
+          { key: "maxItems", label: "Max Items", type: "number", min: 5, max: 20, default: 10 },
+          { key: "compactMode", label: "Compact Mode", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "showTodayStats", label: "Show Today's Stats Banner", type: "boolean", default: true },
+          { key: "showTime", label: "Show Time", type: "boolean", default: true },
+          { key: "showGroupHeaders", label: "Group by Date", type: "boolean", default: true },
+          { key: "showIcon", label: "Show Activity Icons", type: "boolean", default: true },
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+          { key: "showIpAddress", label: "Show IP Address", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Filtering",
+        icon: "🔍",
+        fields: [
+          { key: "typeFilter", label: "Activity Type Filter", type: "select", options: ["all", "user_created", "user_updated", "user_suspended", "payment_received", "setting_changed", "login", "logout", "content_created", "content_updated", "alert_acknowledged", "report_generated", "bulk_action", "permission_changed"], default: "all" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "enableTap", label: "Enable Tap to View", type: "boolean", default: true },
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  // ============ MEDIA WIDGETS ============
+  "media.banner": {
+    sections: [
+      {
+        title: "Media Source",
+        icon: "🖼️",
+        fields: [
+          { key: "mediaType", label: "Media Type", type: "select", options: ["image", "video", "youtube", "carousel", "lottie"], default: "image" },
+          { key: "mediaUrl", label: "Media URL", type: "text", placeholder: "https://example.com/image.jpg" },
+          { key: "bannerId", label: "Banner ID (from DB)", type: "text", placeholder: "Optional: fetch from database" },
+          { key: "slot", label: "Slot Name (from DB)", type: "text", placeholder: "e.g., dashboard-top, promo-1" },
+        ],
+      },
+      {
+        title: "Content Overlay",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Title", type: "text", placeholder: "Banner title" },
+          { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Banner subtitle" },
+          { key: "ctaText", label: "CTA Button Text", type: "text", placeholder: "e.g., Learn More" },
+          { key: "ctaAction", label: "CTA Action", type: "select", options: ["navigate", "link", "video"], default: "navigate" },
+          { key: "ctaUrl", label: "CTA URL/Screen", type: "text", placeholder: "Screen name or URL" },
+        ],
+      },
+      {
+        title: "Display Options",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["16:9", "4:3", "1:1", "21:9", "9:16"], default: "16:9" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 32, default: 12 },
+          { key: "fullWidth", label: "Full Width (edge-to-edge)", type: "boolean", default: false },
+          { key: "showOverlay", label: "Show Content Overlay", type: "boolean", default: true },
+          { key: "overlayGradient", label: "Gradient Overlay", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Video/Carousel Options",
+        icon: "🎬",
+        fields: [
+          { key: "autoPlay", label: "Auto Play", type: "boolean", default: true },
+          { key: "autoPlayInterval", label: "Auto Play Interval (ms)", type: "number", min: 2000, max: 15000, default: 5000 },
+          { key: "loop", label: "Loop", type: "boolean", default: true },
+          { key: "showPlayButton", label: "Show Play Button (video)", type: "boolean", default: true },
+          { key: "showIndicators", label: "Show Carousel Indicators", type: "boolean", default: true },
+          { key: "showControls", label: "Show Navigation Arrows", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Interaction",
+        icon: "👆",
+        fields: [
+          { key: "enableTap", label: "Enable Tap Action", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.banner-1": {
+    sections: [
+      {
+        title: "Media Source",
+        icon: "🖼️",
+        fields: [
+          { key: "mediaType", label: "Media Type", type: "select", options: ["image", "video", "youtube", "carousel"], default: "image" },
+          { key: "mediaUrl", label: "Media URL", type: "text", placeholder: "https://example.com/image.jpg" },
+          { key: "slot", label: "Slot Name", type: "text", placeholder: "e.g., banner-1-slot" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Title", type: "text", placeholder: "Banner title" },
+          { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Banner subtitle" },
+          { key: "ctaText", label: "CTA Button", type: "text", placeholder: "e.g., Learn More" },
+          { key: "ctaUrl", label: "CTA URL/Screen", type: "text", placeholder: "Screen name or URL" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["16:9", "4:3", "1:1", "21:9"], default: "16:9" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 32, default: 12 },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.banner-2": {
+    sections: [
+      {
+        title: "Media Source",
+        icon: "🖼️",
+        fields: [
+          { key: "mediaType", label: "Media Type", type: "select", options: ["image", "video", "youtube", "carousel"], default: "image" },
+          { key: "mediaUrl", label: "Media URL", type: "text", placeholder: "https://example.com/image.jpg" },
+          { key: "slot", label: "Slot Name", type: "text", placeholder: "e.g., banner-2-slot" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Title", type: "text", placeholder: "Banner title" },
+          { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Banner subtitle" },
+          { key: "ctaText", label: "CTA Button", type: "text", placeholder: "e.g., Learn More" },
+          { key: "ctaUrl", label: "CTA URL/Screen", type: "text", placeholder: "Screen name or URL" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["16:9", "4:3", "1:1", "21:9"], default: "16:9" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 32, default: 12 },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.banner-3": {
+    sections: [
+      {
+        title: "Media Source",
+        icon: "🖼️",
+        fields: [
+          { key: "mediaType", label: "Media Type", type: "select", options: ["image", "video", "youtube", "carousel"], default: "image" },
+          { key: "mediaUrl", label: "Media URL", type: "text", placeholder: "https://example.com/image.jpg" },
+          { key: "slot", label: "Slot Name", type: "text", placeholder: "e.g., banner-3-slot" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Title", type: "text", placeholder: "Banner title" },
+          { key: "subtitle", label: "Subtitle", type: "text", placeholder: "Banner subtitle" },
+          { key: "ctaText", label: "CTA Button", type: "text", placeholder: "e.g., Learn More" },
+          { key: "ctaUrl", label: "CTA URL/Screen", type: "text", placeholder: "Screen name or URL" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["16:9", "4:3", "1:1", "21:9"], default: "16:9" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 32, default: 12 },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.hero": {
+    sections: [
+      {
+        title: "Hero Content",
+        icon: "🖼️",
+        fields: [
+          { key: "mediaUrl", label: "Hero Image URL", type: "text", placeholder: "https://example.com/hero.jpg" },
+          { key: "slot", label: "Slot Name", type: "text", placeholder: "e.g., hero-main" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Hero Title", type: "text", placeholder: "Welcome!" },
+          { key: "subtitle", label: "Hero Subtitle", type: "text", placeholder: "Start your journey" },
+          { key: "ctaText", label: "CTA Button", type: "text", placeholder: "Get Started" },
+          { key: "ctaUrl", label: "CTA Screen", type: "text", placeholder: "dashboard" },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["21:9", "16:9", "4:3"], default: "21:9" },
+          { key: "fullWidth", label: "Full Width", type: "boolean", default: true },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+          { key: "overlayGradient", label: "Gradient", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.promo": {
+    sections: [
+      {
+        title: "Carousel Source",
+        icon: "🎠",
+        fields: [
+          { key: "bannerId", label: "Carousel ID (from DB)", type: "text", placeholder: "promo-carousel-1" },
+          { key: "slot", label: "Slot Name", type: "text", placeholder: "e.g., promo-main" },
+        ],
+      },
+      {
+        title: "Carousel Options",
+        icon: "🎬",
+        fields: [
+          { key: "autoPlay", label: "Auto Play", type: "boolean", default: true },
+          { key: "autoPlayInterval", label: "Interval (ms)", type: "number", min: 2000, max: 10000, default: 4000 },
+          { key: "loop", label: "Loop", type: "boolean", default: true },
+          { key: "showIndicators", label: "Show Dots", type: "boolean", default: true },
+          { key: "showControls", label: "Show Arrows", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["16:9", "4:3", "1:1"], default: "16:9" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 24, default: 12 },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "media.ad": {
+    sections: [
+      {
+        title: "Ad Content",
+        icon: "📢",
+        fields: [
+          { key: "mediaUrl", label: "Ad Image URL", type: "text", placeholder: "https://example.com/ad.jpg" },
+          { key: "slot", label: "Ad Slot", type: "text", placeholder: "e.g., ad-footer" },
+        ],
+      },
+      {
+        title: "Content",
+        icon: "📝",
+        fields: [
+          { key: "title", label: "Ad Title", type: "text", placeholder: "Special Offer!" },
+          { key: "ctaText", label: "CTA Button", type: "text", placeholder: "Learn More" },
+          { key: "ctaAction", label: "CTA Action", type: "select", options: ["link", "navigate"], default: "link" },
+          { key: "ctaUrl", label: "CTA URL", type: "text", placeholder: "https://..." },
+        ],
+      },
+      {
+        title: "Display",
+        icon: "🎨",
+        fields: [
+          { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["4:3", "16:9", "1:1"], default: "4:3" },
+          { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 16, default: 8 },
+          { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
         ],
       },
     ],

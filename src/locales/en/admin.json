@@ -9,6 +9,51 @@
   "create_customer": "Create Customer",
   "name": "Name",
   "slug": "Slug",
+  "screens": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "subtitle": "Platform overview and management",
+      "impersonating": "Viewing as {{name}}",
+      "exitImpersonation": "Exit",
+      "states": {
+        "loading": "Loading dashboard...",
+        "error": "Failed to load dashboard",
+        "empty": "No widgets configured"
+      }
+    },
+    "userManagement": {
+      "title": "User Management",
+      "subtitle": "Manage all platform users"
+    },
+    "financeOverview": {
+      "title": "Finance Dashboard",
+      "subtitle": "Financial overview and reports"
+    },
+    "analytics": {
+      "title": "Analytics Dashboard",
+      "subtitle": "Platform analytics and insights"
+    },
+    "contentManagement": {
+      "title": "Content Management",
+      "subtitle": "Manage platform content"
+    },
+    "orgManagement": {
+      "title": "Organization Management",
+      "subtitle": "Manage organization structure"
+    },
+    "settings": {
+      "title": "System Settings",
+      "subtitle": "Configure platform settings"
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "subtitle": "View system activity logs"
+    },
+    "profile": {
+      "title": "Admin Profile",
+      "subtitle": "Your admin account"
+    }
+  },
   "widgets": {
     "adminStats": {
       "title": "Platform Stats",
@@ -58,7 +103,29 @@
       "reports": "Reports",
       "settings": "Settings",
       "audit": "Audit Logs",
+      "impersonate": "Impersonate",
       "actionHint": "Tap to {{action}}"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "viewAll": "View All",
+      "empty": {
+        "title": "No Activity Yet",
+        "message": "Recent system activities will appear here"
+      },
+      "activityHint": "{{actor}}: {{action}}",
+      "types": {
+        "user_created": "User Created",
+        "user_updated": "User Updated",
+        "user_suspended": "User Suspended",
+        "user_activated": "User Activated",
+        "payment_received": "Payment Received",
+        "setting_changed": "Setting Changed",
+        "login": "Login",
+        "content_created": "Content Created",
+        "content_updated": "Content Updated",
+        "alert_acknowledged": "Alert Acknowledged"
+      }
     },
     "adminHero": {
       "title": "Admin Dashboard",
@@ -80,6 +147,854 @@
       "usersStatHint": "{{count}} total users",
       "revenueStatHint": "Revenue: {{amount}}",
       "alertsStatHint": "{{count}} active alerts"
+    },
+    "userStats": {
+      "title": "User Statistics",
+      "subtitle": "Overview of user metrics",
+      "total": "Total Users",
+      "active": "Active Users",
+      "pending": "Pending",
+      "suspended": "Suspended",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "pendingApprovals": "Pending",
+      "suspendedUsers": "Suspended",
+      "states": {
+        "loading": "Loading statistics...",
+        "error": "Failed to load statistics",
+        "empty": "No user data available"
+      }
+    },
+    "userList": {
+      "title": "Users",
+      "subtitle": "Manage all users",
+      "searchPlaceholder": "Search users...",
+      "allRoles": "All",
+      "lastActive": "Last active",
+      "noUsers": "No users found",
+      "roles": {
+        "student": "Student",
+        "teacher": "Teacher",
+        "parent": "Parent",
+        "admin": "Admin"
+      },
+      "statuses": {
+        "active": "Active",
+        "pending": "Pending",
+        "suspended": "Suspended"
+      },
+      "states": {
+        "loading": "Loading users...",
+        "error": "Failed to load users",
+        "empty": "No users found"
+      }
+    },
+    "pendingApprovals": {
+      "title": "Pending Approvals",
+      "subtitle": "Users awaiting approval",
+      "noPending": "No pending approvals",
+      "approveTitle": "Approve User",
+      "approveMessage": "Are you sure you want to approve {{name}}?",
+      "rejectTitle": "Reject User",
+      "rejectMessage": "Are you sure you want to reject {{name}}?",
+      "states": {
+        "loading": "Loading pending approvals...",
+        "error": "Failed to load pending approvals",
+        "empty": "No pending approvals"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "viewAll": "View All"
+      },
+      "approveSuccess": "User approved successfully",
+      "rejectSuccess": "User rejected",
+      "approveError": "Failed to approve user",
+      "rejectError": "Failed to reject user",
+      "userHint": "{{name}} - {{role}} - Requested {{time}}",
+      "approveHint": "Approve {{name}}",
+      "rejectHint": "Reject {{name}}"
+    },
+    "roleDistribution": {
+      "title": "Users by Role",
+      "subtitle": "Distribution of users across roles",
+      "totalUsers": "Total Users",
+      "roles": {
+        "student": "Students",
+        "teacher": "Teachers",
+        "parent": "Parents",
+        "admin": "Admins"
+      },
+      "states": {
+        "loading": "Loading distribution...",
+        "error": "Failed to load role distribution",
+        "empty": "No user data available"
+      },
+      "roleHint": "{{role}}: {{count}} users ({{percentage}}%)",
+      "viewAllHint": "View all analytics"
+    },
+    "bulkActions": {
+      "title": "Bulk Actions",
+      "subtitle": "Perform bulk operations on users",
+      "importUsers": "Import Users",
+      "exportUsers": "Export Users",
+      "bulkApprove": "Bulk Approve",
+      "sendEmail": "Send Email",
+      "bulkSuspend": "Bulk Suspend",
+      "resetPasswords": "Reset Passwords",
+      "exportTitle": "Export Users",
+      "exportMessage": "Choose export format",
+      "exportStarted": "Export started. You will be notified when ready.",
+      "bulkApproveTitle": "Bulk Approve",
+      "bulkApproveMessage": "This will approve all pending users. Continue?",
+      "bulkApproveSuccess": "All pending users have been approved.",
+      "bulkSuspendTitle": "Bulk Suspend",
+      "bulkSuspendMessage": "Select users to suspend from the user list.",
+      "resetPasswordsTitle": "Reset Passwords",
+      "resetPasswordsMessage": "This will send password reset emails to selected users."
+    },
+    "recentRegistrations": {
+      "title": "Recent Registrations",
+      "subtitle": "Newly registered users",
+      "states": {
+        "loading": "Loading registrations...",
+        "error": "Failed to load registrations",
+        "empty": "No recent registrations"
+      },
+      "empty": {
+        "title": "No Recent Registrations",
+        "message": "New user registrations will appear here"
+      },
+      "actions": {
+        "viewAll": "View All",
+        "retry": "Retry"
+      },
+      "userHint": "{{name}} - {{role}} - Registered {{time}}"
+    },
+    "revenueSummary": {
+      "title": "Revenue",
+      "subtitle": "Revenue overview and breakdown",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading revenue data...",
+        "error": "Failed to load revenue data",
+        "empty": "No revenue data"
+      },
+      "periods": {
+        "today": "Today",
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "vsLast": {
+        "today": "vs yesterday",
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter",
+        "year": "vs last year"
+      },
+      "breakdown": {
+        "fees": "Fees",
+        "subscriptions": "Subscriptions",
+        "other": "Other"
+      },
+      "pending": "Pending",
+      "collectionRate": "Collection",
+      "actions": {
+        "viewAll": "View All",
+        "export": "Export"
+      }
+    },
+    "expenseSummary": {
+      "title": "Expenses",
+      "subtitle": "Expense overview and breakdown",
+      "viewDetails": "View Details",
+      "totalExpenses": "Total Expenses",
+      "states": {
+        "loading": "Loading expense data...",
+        "error": "Failed to load expense data",
+        "empty": "No expense data"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "vsLast": {
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter",
+        "year": "vs last year"
+      },
+      "categories": {
+        "salary": "Salary",
+        "utilities": "Utilities",
+        "materials": "Materials",
+        "other": "Other"
+      },
+      "pending": "Pending",
+      "transactions": "Transactions",
+      "average": "Average",
+      "actions": {
+        "viewAll": "View All",
+        "export": "Export"
+      }
+    },
+    "netProfit": {
+      "title": "Net Profit",
+      "subtitle": "Revenue minus expenses",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading profit data...",
+        "error": "Failed to load profit data",
+        "empty": "No financial data"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "vsLast": {
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter",
+        "year": "vs last year"
+      },
+      "labels": {
+        "profit": "Profit",
+        "loss": "Loss",
+        "revenue": "Revenue",
+        "expenses": "Expenses",
+        "profitMargin": "Profit Margin",
+        "transactions": "Transactions",
+        "avgTransaction": "Avg. Transaction"
+      },
+      "actions": {
+        "viewAll": "View All",
+        "export": "Export"
+      }
+    },
+    "transactions": {
+      "title": "Recent Transactions",
+      "subtitle": "Financial transactions list",
+      "states": {
+        "loading": "Loading transactions...",
+        "error": "Failed to load transactions",
+        "empty": "No transactions"
+      },
+      "categories": {
+        "fees": "Fees",
+        "subscription": "Subscription",
+        "salary": "Salary",
+        "utilities": "Utilities",
+        "materials": "Materials",
+        "other": "Other"
+      },
+      "statuses": {
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed"
+      },
+      "types": {
+        "income": "Income",
+        "expense": "Expense"
+      },
+      "actions": {
+        "viewAll": "View All"
+      },
+      "showingOf": "Showing {{showing}} of {{total}}",
+      "itemHint": "{{type}}: {{amount}} - {{description}}"
+    },
+    "monthlyChart": {
+      "title": "Monthly Trend",
+      "subtitle": "Revenue vs expenses over time",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading chart...",
+        "error": "Failed to load chart",
+        "empty": "No data available"
+      },
+      "periods": {
+        "3months": "3M",
+        "6months": "6M",
+        "12months": "12M"
+      },
+      "labels": {
+        "revenue": "Revenue",
+        "expenses": "Expenses",
+        "totalRevenue": "Total Revenue",
+        "totalExpenses": "Total Expenses",
+        "netProfit": "Net Profit"
+      }
+    },
+    "pendingPayments": {
+      "title": "Pending Payments",
+      "subtitle": "Outstanding payments list",
+      "states": {
+        "loading": "Loading payments...",
+        "error": "Failed to load payments",
+        "empty": "No pending payments"
+      },
+      "categories": {
+        "fees": "Fees",
+        "subscription": "Subscription",
+        "salary": "Salary",
+        "utilities": "Utilities",
+        "materials": "Materials",
+        "other": "Other"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "overdue": "Overdue"
+      },
+      "labels": {
+        "totalPending": "Total Pending",
+        "overdue": "Overdue"
+      },
+      "actions": {
+        "viewAll": "View All"
+      },
+      "showingOf": "Showing {{showing}} of {{total}}",
+      "daysOverdue": "{{days}}d overdue",
+      "itemHint": "{{amount}} - {{description}} ({{status}})"
+    },
+    "categoryBreakdown": {
+      "title": "Category Breakdown",
+      "subtitle": "Revenue and expense breakdown by category",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading breakdown...",
+        "error": "Failed to load data",
+        "empty": "No data available"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "types": {
+        "revenue": "Revenue",
+        "expense": "Expense",
+        "both": "Both"
+      },
+      "labels": {
+        "revenue": "Revenue",
+        "expenses": "Expenses",
+        "totalRevenue": "Total Revenue",
+        "totalExpenses": "Total Expenses"
+      }
+    },
+    "collectionRate": {
+      "title": "Collection Rate",
+      "subtitle": "Fee collection efficiency",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading collection data...",
+        "error": "Failed to load data",
+        "empty": "No collection data"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "status": {
+        "excellent": "Excellent",
+        "moderate": "Moderate",
+        "needsAttention": "Needs Attention"
+      },
+      "labels": {
+        "collected": "Collected",
+        "pending": "Pending",
+        "total": "Total"
+      },
+      "actions": {
+        "viewAll": "View All",
+        "export": "Export"
+      }
+    },
+    "trends": {
+      "title": "Trends",
+      "subtitle": "Analytics trends over time",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading trends...",
+        "error": "Failed to load trends",
+        "empty": "No trend data available"
+      },
+      "metrics": {
+        "users": "Users",
+        "revenue": "Revenue",
+        "engagement": "Engagement",
+        "content": "Content"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter"
+      },
+      "vsLast": {
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter"
+      },
+      "stats": {
+        "average": "Average",
+        "highest": "Highest",
+        "lowest": "Lowest"
+      }
+    },
+    "engagement": {
+      "title": "Engagement",
+      "subtitle": "User engagement metrics and activity",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading engagement data...",
+        "error": "Failed to load engagement data",
+        "empty": "No engagement data available"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter"
+      },
+      "metrics": {
+        "dau": "Daily Active",
+        "wau": "Weekly Active",
+        "engagement": "Engagement Rate",
+        "retention": "Retention Rate"
+      },
+      "activityTrend": "Activity Trend",
+      "byRole": "Users by Role",
+      "topUsers": "Most Active Users",
+      "lastActive": "Active",
+      "sessions": "sessions",
+      "avgSession": "Avg Session",
+      "totalSessions": "Total Sessions",
+      "churnRate": "Churn Rate",
+      "roles": {
+        "student": "Students",
+        "teacher": "Teachers",
+        "parent": "Parents",
+        "admin": "Admins"
+      }
+    },
+    "growth": {
+      "title": "Growth Metrics",
+      "subtitle": "Key growth indicators and targets",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading growth data...",
+        "error": "Failed to load growth data",
+        "empty": "No growth data available"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter"
+      },
+      "vsLast": {
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter"
+      },
+      "overallGrowth": "Overall Growth",
+      "metrics": {
+        "users": "New Users",
+        "revenue": "Revenue",
+        "engagement": "Engagement Rate",
+        "content": "Content Views"
+      },
+      "ofTarget": "of target",
+      "userGrowthTrend": "User Growth Trend",
+      "revenueGrowthTrend": "Revenue Growth Trend",
+      "bestPerforming": "Best Performing",
+      "needsAttention": "Needs Attention",
+      "onTrack": "On Track",
+      "belowTarget": "Below Target",
+      "metricHint": "{{label}}: {{value}}, {{change}}% change"
+    },
+    "comparisons": {
+      "title": "Period Comparisons",
+      "subtitle": "Compare metrics across time periods",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading comparison data...",
+        "error": "Failed to load comparison data",
+        "empty": "No comparison data available"
+      },
+      "periods": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "trend": {
+        "positive": "Positive Trend",
+        "negative": "Negative Trend",
+        "neutral": "Stable"
+      },
+      "summaryStats": "{{improved}} improved, {{declined}} declined, {{stable}} stable",
+      "current": "Current",
+      "previous": "Previous",
+      "metrics": {
+        "users": "New Users",
+        "revenue": "Revenue",
+        "engagement": "Engagement Rate",
+        "content": "Content Views",
+        "sessions": "Active Sessions"
+      },
+      "metricHint": "{{label}}: {{current}} vs {{previous}}, {{change}}% change"
+    },
+    "contentStats": {
+      "title": "Content Statistics",
+      "subtitle": "Overview of content library",
+      "viewDetails": "View Details",
+      "states": {
+        "loading": "Loading content stats...",
+        "error": "Failed to load content stats",
+        "empty": "No content available"
+      },
+      "totalContent": "Total Content",
+      "views": "Views",
+      "rating": "Avg Rating",
+      "recent": "This Week",
+      "byType": "By Type",
+      "byStatus": "By Status",
+      "types": {
+        "course": "Courses",
+        "lesson": "Lessons",
+        "resource": "Resources",
+        "assessment": "Assessments",
+        "video": "Videos",
+        "document": "Documents",
+        "quiz": "Quizzes"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived",
+        "review": "In Review"
+      },
+      "typeHint": "{{type}}: {{count}} items"
+    },
+    "contentList": {
+      "title": "Content Library",
+      "subtitle": "Manage all content items",
+      "searchPlaceholder": "Search content...",
+      "allTypes": "All",
+      "allStatuses": "All Status",
+      "noContent": "No content found",
+      "types": {
+        "course": "Course",
+        "lesson": "Lesson",
+        "resource": "Resource",
+        "assessment": "Assessment",
+        "video": "Video",
+        "document": "Document",
+        "quiz": "Quiz"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived",
+        "review": "Review"
+      },
+      "states": {
+        "loading": "Loading content...",
+        "error": "Failed to load content",
+        "empty": "No content available"
+      },
+      "contentHint": "{{title}} - {{type}} - {{status}}"
+    },
+    "contentCategories": {
+      "title": "Content Categories",
+      "subtitle": "Browse content by category",
+      "summary": "{{categories}} categories, {{content}} items",
+      "items": "items",
+      "categoryHint": "{{category}}: {{count}} items",
+      "states": {
+        "loading": "Loading categories...",
+        "error": "Failed to load categories",
+        "empty": "No categories found"
+      }
+    },
+    "orgTree": {
+      "title": "Organization Structure",
+      "subtitle": "Hierarchical organization view",
+      "summary": "{{orgs}} orgs, {{depts}} depts, {{classes}} classes",
+      "nodeHint": "{{name}} - {{type}} with {{count}} members",
+      "types": {
+        "organization": "Organization",
+        "department": "Department",
+        "class": "Class",
+        "batch": "Batch"
+      },
+      "states": {
+        "loading": "Loading organization...",
+        "error": "Failed to load organization",
+        "empty": "No organizations found"
+      },
+      "actions": {
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "viewAll": "View All"
+      }
+    },
+    "classList": {
+      "title": "Classes",
+      "subtitle": "Manage all classes",
+      "summary": "{{total}} total, {{active}} active",
+      "searchPlaceholder": "Search classes...",
+      "classHint": "{{name}} - {{members}} members - {{department}}",
+      "statuses": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "states": {
+        "loading": "Loading classes...",
+        "error": "Failed to load classes",
+        "empty": "No classes found"
+      },
+      "actions": {
+        "addClass": "Add Class",
+        "viewAll": "View All"
+      }
+    },
+    "profileCard": {
+      "title": "Admin Profile",
+      "subtitle": "Your admin account information",
+      "states": {
+        "loading": "Loading profile...",
+        "error": "Failed to load profile",
+        "empty": "No profile data"
+      },
+      "stats": {
+        "xp": "XP",
+        "streak": "Streak",
+        "badges": "Badges"
+      },
+      "actions": {
+        "edit": "Edit Profile",
+        "settings": "Settings"
+      },
+      "labels": {
+        "role": "Role",
+        "email": "Email",
+        "lastActive": "Last Active",
+        "memberSince": "Member Since"
+      }
+    },
+    "quickCreate": {
+      "title": "Quick Create",
+      "subtitle": "Add new organization entities",
+      "createTitle": "Create {{type}}",
+      "createHint": "Create new {{type}}",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter name...",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description (optional)...",
+      "parentLabel": "Select {{type}}",
+      "noParents": "No {{type}}s available. Create one first.",
+      "nameRequired": "Please enter a name",
+      "parentRequired": "Please select a parent for this {{type}}",
+      "success": "Success",
+      "error": "Error",
+      "types": {
+        "organization": "Organization",
+        "department": "Department",
+        "class": "Class",
+        "batch": "Batch"
+      },
+      "typeDescriptions": {
+        "organization": "Add new organization",
+        "department": "Add new department",
+        "class": "Add new class",
+        "batch": "Add new batch"
+      },
+      "states": {
+        "loading": "Creating...",
+        "error": "Failed to create",
+        "success": "Created successfully"
+      }
+    },
+    "profileActivity": {
+      "title": "Activity Log",
+      "subtitle": "Your recent admin activities",
+      "todayProgress": "Today's Activity",
+      "actions": "Actions",
+      "types": "Types",
+      "viewAll": "View All Activity",
+      "states": {
+        "loading": "Loading activity...",
+        "error": "Failed to load activity",
+        "empty": "No Activity Yet",
+        "emptyMessage": "Your admin activities will appear here"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}}d ago"
+      },
+      "activityHint": "{{title}} - {{time}}",
+      "activityTypes": {
+        "user_created": "User Created",
+        "user_updated": "User Updated",
+        "user_suspended": "User Suspended",
+        "user_activated": "User Activated",
+        "user_deleted": "User Deleted",
+        "payment_received": "Payment Received",
+        "setting_changed": "Settings Changed",
+        "login": "Logged In",
+        "logout": "Logged Out",
+        "content_created": "Content Created",
+        "content_updated": "Content Updated",
+        "content_deleted": "Content Deleted",
+        "alert_acknowledged": "Alert Acknowledged",
+        "report_generated": "Report Generated",
+        "bulk_action": "Bulk Action",
+        "permission_changed": "Permission Changed",
+        "impersonation_started": "Impersonation Started",
+        "impersonation_ended": "Impersonation Ended"
+      },
+      "actions": {
+        "retry": "Retry",
+        "viewAll": "View All"
+      }
+    },
+    "studentFees": {
+      "title": "Fee Collection",
+      "collected": "Collected",
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "students": "students",
+      "collectionRate": "Collection Rate",
+      "today": "Today",
+      "collectedFrom": "collected from",
+      "sendReminder": "Send Reminder to Defaulters",
+      "states": {
+        "loading": "Loading fee data...",
+        "error": "Failed to load fee data",
+        "empty": "No fee data available"
+      }
+    },
+    "feeCollectionTrend": {
+      "title": "Fee Collection Trend",
+      "actual": "Collected",
+      "expected": "Expected",
+      "monthGrowth": "Month-over-Month",
+      "yearTotal": "Year to Date",
+      "ofTarget": "of target",
+      "periods": {
+        "sixMonths": "6M",
+        "twelveMonths": "12M"
+      },
+      "states": {
+        "loading": "Loading trend data...",
+        "error": "Failed to load trend data",
+        "empty": "No collection data available"
+      }
+    },
+    "teacherPayroll": {
+      "title": "Teacher Payroll",
+      "totalPayroll": "Total Payroll",
+      "paid": "Paid",
+      "pending": "Pending",
+      "teachers": "teachers",
+      "progress": "Progress",
+      "nextPaymentDue": "Next Payment Due",
+      "overdueAlert": "Overdue Alert",
+      "teachersOverdue": "teachers overdue by {{days}}+ days",
+      "processSalaries": "Process Salaries",
+      "states": {
+        "loading": "Loading payroll data...",
+        "error": "Failed to load payroll data",
+        "empty": "No payroll data available"
+      }
+    },
+    "batchPerformance": {
+      "title": "Batch Performance",
+      "avg": "Avg",
+      "students": "students",
+      "vsLastTerm": "vs last term",
+      "overallAverage": "Overall Average",
+      "rank": "Rank",
+      "states": {
+        "loading": "Loading batch performance...",
+        "error": "Failed to load batch performance",
+        "empty": "No batch data available"
+      }
+    },
+    "attendanceOverview": {
+      "title": "Today's Attendance",
+      "students": "Students",
+      "teachers": "Teachers",
+      "vsAvg": "vs avg",
+      "absentToday": "Absent Today",
+      "more": "more...",
+      "weeklyTrend": "Weekly Trend",
+      "avg": "Avg",
+      "states": {
+        "loading": "Loading attendance...",
+        "error": "Failed to load attendance data",
+        "empty": "No attendance data available"
+      }
+    },
+    "admissionStats": {
+      "title": "Admissions",
+      "inquiries": "Inquiries",
+      "admitted": "Admitted",
+      "conversion": "Conversion",
+      "byProgram": "By Program",
+      "pendingFollowUp": "inquiries pending follow-up",
+      "addNewInquiry": "Add New Inquiry",
+      "states": {
+        "loading": "Loading admission data...",
+        "error": "Failed to load admission data",
+        "empty": "No admission data available"
+      }
+    }
+  },
+  "userDetail": {
+    "title": "User Details",
+    "subtitle": "View and manage user",
+    "noUserSelected": "No user selected. Please select a user from the list.",
+    "sections": {
+      "profile": "Profile",
+      "activity": "Activity",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit User",
+      "suspend": "Suspend User",
+      "activate": "Activate User",
+      "impersonate": "Impersonate",
+      "resetPassword": "Reset Password",
+      "delete": "Delete User"
+    },
+    "confirmSuspend": {
+      "title": "Suspend User",
+      "message": "Are you sure you want to suspend {{name}}? They will not be able to access the platform.",
+      "confirm": "Suspend",
+      "cancel": "Cancel"
+    },
+    "confirmDelete": {
+      "title": "Delete User",
+      "message": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "states": {
+      "loading": "Loading user details...",
+      "error": "Failed to load user details",
+      "notFound": "User not found"
     }
   },
   "login": {
@@ -131,5 +1046,52 @@
       "invalidCode": "Invalid verification code",
       "codeRequired": "Verification code is required"
     }
+  },
+  "passwordReset": {
+    "title": "Reset Password",
+    "requestTitle": "Forgot your password?",
+    "requestDescription": "Enter your email address and we'll send you a link to reset your password.",
+    "emailLabel": "Email",
+    "emailHint": "Enter your email address",
+    "submitButton": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "successTitle": "Check your email",
+    "successDescription": "We've sent a password reset link to {{email}}. Please check your inbox and follow the instructions.",
+    "tipSpam": "• Check your spam folder if you don't see the email",
+    "tipExpiry": "• The link expires in 1 hour",
+    "resendLink": "Didn't receive email? Try again",
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "resetFailed": "Failed to send reset email. Please try again."
+    }
+  },
+  "impersonation": {
+    "title": "Impersonate User",
+    "warning": "Impersonation allows you to view the app as another user. All actions are logged for audit purposes.",
+    "searchPlaceholder": "Search by name or email...",
+    "selectUser": "Select User",
+    "noUsers": "No users found",
+    "confirmTitle": "Start Impersonation",
+    "confirmMessage": "You are about to view the app as {{name}}. All actions will be logged for audit purposes. Continue?",
+    "start": "Start",
+    "startButton": "Start Impersonation",
+    "startAs": "Start as {{name}}",
+    "error": "Failed to start impersonation. Please try again.",
+    "errorLoading": "Failed to load users",
+    "loading": "Loading users...",
+    "active": "Impersonating",
+    "exit": "Exit Impersonation",
+    "userCount": "{{count}} users found",
+    "selectedUser": "Selected:",
+    "lastActive": "Active",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "neverActive": "Never",
+    "emptyTitle": "No Users Found",
+    "emptyMessage": "Try adjusting your search or filter criteria.",
+    "all": "All"
   }
 }

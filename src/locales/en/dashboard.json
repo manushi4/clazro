@@ -1039,6 +1039,19 @@
         "viewAll": "Find More Matches",
         "connect": "Connect"
       }
+    },
+    "kpiGrid": {
+      "title": "Key Metrics",
+      "subtitle": "Performance indicators at a glance",
+      "states": {
+        "loading": "Loading metrics...",
+        "empty": "No metrics available",
+        "error": "Failed to load metrics"
+      },
+      "actions": {
+        "viewAll": "View Analytics",
+        "retry": "Retry"
+      }
     }
   }
 }

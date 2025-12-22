@@ -110,6 +110,71 @@ const DEFAULT_SCREEN_LAYOUTS: Record<string, ScreenWidgetConfig[]> = {
     { widgetId: "actions.quick", position: 3, size: "standard", enabled: true, customProps: { columns: "2" } },
     { widgetId: "assignments.upcoming", position: 4, size: "standard", enabled: true, customProps: { maxItems: 3 } },
   ],
+  
+  // ============ ADMIN SCREENS ============
+  
+  // Admin Dashboard
+  "admin-home": [
+    { widgetId: "admin.hero-card", position: 1, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "admin.stats-grid", position: 2, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "admin.system-health", position: 3, size: "compact", enabled: true, customProps: {} },
+    { widgetId: "admin.alerts", position: 4, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "admin.quick-actions", position: 5, size: "standard", enabled: true, customProps: { columns: 4 } },
+    { widgetId: "admin.recent-activity", position: 6, size: "standard", enabled: true, customProps: { maxItems: 10 } },
+  ],
+  
+  // Admin Finance Dashboard
+  "finance-dashboard": [
+    { widgetId: "finance.revenue-summary", position: 1, size: "standard", enabled: true, customProps: { showBreakdown: true, period: "month" } },
+    { widgetId: "finance.expense-summary", position: 2, size: "standard", enabled: true, customProps: { showBreakdown: true, period: "month" } },
+    { widgetId: "finance.net-profit", position: 3, size: "compact", enabled: true, customProps: { showTrend: true } },
+    { widgetId: "finance.collection-rate", position: 4, size: "compact", enabled: true, customProps: {} },
+    { widgetId: "finance.monthly-chart", position: 5, size: "expanded", enabled: true, customProps: { months: 6 } },
+    { widgetId: "finance.category-breakdown", position: 6, size: "standard", enabled: true, customProps: { type: "expense" } },
+    { widgetId: "finance.transactions", position: 7, size: "expanded", enabled: true, customProps: { maxItems: 10, showFilters: true } },
+    { widgetId: "finance.pending-payments", position: 8, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+  ],
+  
+  // Admin Analytics Dashboard
+  "analytics-dashboard": [
+    { widgetId: "analytics.kpi-grid", position: 1, size: "standard", enabled: true, customProps: { columns: 2, limit: 6 } },
+    { widgetId: "analytics.trends", position: 2, size: "expanded", enabled: true, customProps: { period: "month", metrics: ["users", "revenue", "engagement"] } },
+    { widgetId: "analytics.engagement", position: 3, size: "standard", enabled: true, customProps: { showBreakdown: true } },
+    { widgetId: "analytics.growth", position: 4, size: "standard", enabled: true, customProps: { period: "month" } },
+    { widgetId: "analytics.comparisons", position: 5, size: "expanded", enabled: true, customProps: { compareWith: "previous_period" } },
+  ],
+  
+  // Admin User Management
+  "users-management": [
+    { widgetId: "users.overview-stats", position: 1, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "users.role-distribution", position: 2, size: "compact", enabled: true, customProps: { chartStyle: "bar" } },
+    { widgetId: "users.pending-approvals", position: 3, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "users.list", position: 4, size: "expanded", enabled: true, customProps: { maxItems: 10, showSearch: true, showFilters: true } },
+    { widgetId: "users.recent-registrations", position: 5, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "users.bulk-actions", position: 6, size: "compact", enabled: true, customProps: { columns: 2 } },
+  ],
+  
+  // Admin Content Management
+  "content-management": [
+    { widgetId: "content.stats", position: 1, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "content.categories", position: 2, size: "compact", enabled: true, customProps: {} },
+    { widgetId: "content.list", position: 3, size: "expanded", enabled: true, customProps: { maxItems: 10, showFilters: true } },
+  ],
+  
+  // Admin Organization Management
+  "org-management": [
+    { widgetId: "org.tree", position: 1, size: "expanded", enabled: true, customProps: { expandLevel: 2 } },
+    { widgetId: "org.class-list", position: 2, size: "standard", enabled: true, customProps: { maxItems: 10 } },
+    { widgetId: "org.quick-create", position: 3, size: "compact", enabled: true, customProps: {} },
+  ],
+  
+  // Admin System Settings
+  "system-settings": [
+    { widgetId: "settings.account", position: 1, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "settings.notifications", position: 2, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "settings.appearance", position: 3, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "settings.about", position: 4, size: "compact", enabled: true, customProps: {} },
+  ],
   // Study/Library screens
   "study": [
     { widgetId: "hero.greeting", position: 1, size: "compact", enabled: true, customProps: { variant: "study" } },
@@ -212,12 +277,11 @@ export async function fetchScreenLayout(
   }));
 
   // Return database layouts if available
-  // For parent/teacher/admin roles, don't use fallback - show empty if not configured
-  if (layouts.length > 0 || role !== "student") {
+  if (layouts.length > 0) {
     return layouts;
   }
 
-  // Only use fallback for student role (backward compatibility)
+  // Use fallback layouts for all roles when database is empty
   return getFallbackLayout(screenId);
 }
 

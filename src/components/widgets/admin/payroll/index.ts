@@ -1,0 +1,1 @@
+export { TeacherPayrollWidget } from './TeacherPayrollWidget';

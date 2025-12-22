@@ -320,6 +320,16 @@ export const screenRegistry: Record<string, ScreenDefinition> = {
     pull_to_refresh: true,
     header_visible: true,
   },
+  "users-management": {
+    screen_id: "users-management",
+    name: "User Management",
+    screen_type: "hub",
+    allowed_roles: ["admin", "super_admin"],
+    default_layout: "vertical",
+    scrollable: true,
+    pull_to_refresh: true,
+    header_visible: true,
+  },
 
   // Multi-role screens
   "notifications": {

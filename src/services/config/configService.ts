@@ -226,12 +226,27 @@ const DEFAULT_SCREEN_LAYOUTS: Record<string, ScreenWidgetConfig[]> = {
 // Get fallback layout based on screen ID
 // Handles multiple formats: "home.dashboard", "student-home", "ask.doubts", etc.
 function getFallbackLayout(screenId: string): ScreenWidgetConfig[] {
-  // Try exact match first
+  // Try exact match first - this is the most important check
   if (DEFAULT_SCREEN_LAYOUTS[screenId]) {
     return DEFAULT_SCREEN_LAYOUTS[screenId];
   }
 
-  // Extract key part from different formats
+  // For admin screens, don't try to extract parts - they should have exact matches
+  // Admin screens use format: "admin-home", "finance-dashboard", "users-management", etc.
+  if (screenId.includes("admin") || 
+      screenId.includes("finance") || 
+      screenId.includes("analytics") || 
+      screenId.includes("users") || 
+      screenId.includes("content") || 
+      screenId.includes("org") || 
+      screenId.includes("system") ||
+      screenId.includes("settings")) {
+    // Return empty array if no exact match for admin screens
+    // This prevents falling back to student layouts
+    return [];
+  }
+
+  // Extract key part from different formats (for student/parent/teacher screens only)
   let key = screenId;
   
   // Handle "home.dashboard" format -> extract first part "home"

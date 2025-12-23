@@ -295,9 +295,13 @@ const registry: Record<string, RouteDefinition> = {
   "finance-reports": { screenId: "finance-reports", component: FinanceReportsScreen },
   "FinanceReports": { screenId: "FinanceReports", component: FinanceReportsScreen },
 
-  // Admin Analytics Dashboard (Dynamic screen - widget-based)
+  // Admin Analytics Dashboard (Fixed screen - legacy)
   "analytics-dashboard": { screenId: "analytics-dashboard", component: AnalyticsDashboardScreen },
   "AnalyticsDashboard": { screenId: "AnalyticsDashboard", component: AnalyticsDashboardScreen },
+
+  // Admin Analytics Dashboard (Dynamic screen - widget-based)
+  "admin-analytics": { screenId: "admin-analytics", component: DynamicScreen },
+  "AdminAnalytics": { screenId: "AdminAnalytics", component: DynamicScreen },
 
   // Admin Content Management (Dynamic screen - widget-based)
   "content-management": { screenId: "content-management", component: ContentManagementScreen },

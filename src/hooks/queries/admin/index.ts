@@ -80,3 +80,32 @@ export { useStudentAttendanceDetailQuery } from './useStudentAttendanceDetailQue
 export type { StudentAttendanceDetailData, AttendanceRecord, AttendanceStats, MonthlyAttendance } from './useStudentAttendanceDetailQuery';
 export { useAdmissionDetailQuery } from './useAdmissionDetailQuery';
 export type { AdmissionDetailData, AdmissionStatus, AdmissionSource, FollowUpRecord, StatusHistoryRecord } from './useAdmissionDetailQuery';
+
+// Sprint 6: Finance Reports
+export { useFinanceReportsQuery } from './useFinanceReportsQuery';
+export type {
+  FinanceReportsData,
+  ReportPeriod,
+  ReportType,
+  MonthlyTrendPoint,
+  CategoryItem,
+  CollectionMetrics,
+  PeriodComparison,
+  UseFinanceReportsQueryOptions,
+} from './useFinanceReportsQuery';
+
+// Sprint 7: Analytics Dashboard
+export { useAnalyticsDashboardQuery } from './useAnalyticsDashboardQuery';
+export type {
+  AnalyticsDashboardData,
+  AnalyticsPeriod,
+  AnalyticsMetric,
+  KpiMetric,
+  TrendDataPoint,
+  TrendData,
+  EngagementData,
+  GrowthMetric,
+  GrowthData,
+  ComparisonData,
+  UseAnalyticsDashboardQueryOptions,
+} from './useAnalyticsDashboardQuery';

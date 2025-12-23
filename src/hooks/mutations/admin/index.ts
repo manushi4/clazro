@@ -30,8 +30,16 @@ export type { UpdateUserInput, UpdateUserResult } from './useUpdateUser';
 export { useImpersonateUser, useEndImpersonation, useImpersonationSession } from './useImpersonateUser';
 export type { ImpersonateUserInput, ImpersonationResult, ImpersonationSession } from './useImpersonateUser';
 
-// Sprint 6
-// export { useExportReport } from './useExportReport';
+// Sprint 6: Export Reports
+export { useExportReport, useExportAvailability, useSupportedExportFormats } from './useExportReport';
+export type {
+  ExportFormat,
+  ExportReportType,
+  ExportPeriod,
+  ExportReportInput,
+  ExportReportResult,
+  ExportProgress,
+} from './useExportReport';
 
 // Sprint 9
 // export { useUpdateSettings } from './useUpdateSettings';

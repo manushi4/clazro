@@ -22,8 +22,8 @@ export { UserCreateScreen } from './UserCreateScreen';
 // Sprint 5: Finance Dashboard
 export { FinanceDashboardScreen } from './finance';
 
-// Sprint 6: Finance Reports
-export { FinanceReportsScreen } from './FinanceReportsScreen';
+// Sprint 6: Finance Reports (Dynamic screen - widget-based)
+export { FinanceReportsScreen } from './finance/FinanceReportsScreen';
 
 // Sprint 7: Analytics
 export { AnalyticsDashboardScreen } from './AnalyticsDashboardScreen';

@@ -5,3 +5,4 @@ export { TransactionsWidget } from './TransactionsWidget';
 export { PendingPaymentsWidget } from './PendingPaymentsWidget';
 export { MonthlyChartWidget } from './MonthlyChartWidget';
 export { CategoryBreakdownWidget } from './CategoryBreakdownWidget';
+export { CollectionRateWidget } from './CollectionRateWidget';

@@ -25,6 +25,16 @@ type Session = {
   [key: string]: any;
 };
 
+type ImpersonationState = {
+  userId: string;
+  name: string;
+  role: string;
+  email?: string;
+  originalAdminId: string;
+  originalAdminName?: string;
+  startedAt?: string;
+};
+
 type AuthState = {
   // State
   user: User | null;
@@ -32,6 +42,7 @@ type AuthState = {
   role: Role | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  impersonating: ImpersonationState | null;
 
   // Actions
   setUser: (user: User | null) => void;
@@ -41,6 +52,8 @@ type AuthState = {
   login: (user: User, session: Session, role: Role) => void;
   logout: () => void;
   reset: () => void;
+  setImpersonating: (state: ImpersonationState) => void;
+  clearImpersonating: () => void;
 };
 
 const initialState = {
@@ -49,6 +62,7 @@ const initialState = {
   role: null,
   isAuthenticated: false,
   isLoading: true,
+  impersonating: null,
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -91,6 +105,12 @@ export const useAuthStore = create<AuthState>()(
 
       reset: () =>
         set(initialState),
+
+      setImpersonating: (impersonating) =>
+        set({ impersonating }),
+
+      clearImpersonating: () =>
+        set({ impersonating: null }),
     }),
     {
       name: 'auth-storage',

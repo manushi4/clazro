@@ -134,3 +134,6 @@ export * from './useTestAttemptQuery';
 
 // AI Tutor queries
 export * from './useAITutorQuery';
+
+// Media banner queries
+export * from './useMediaBannerQuery';

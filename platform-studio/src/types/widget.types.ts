@@ -16,7 +16,11 @@ export type WidgetCategory =
   | "notifications"
   | "actions"
   | "content"
-  | "analytics";
+  | "analytics"
+  | "media"
+  | "fees"
+  | "payroll"
+  | "academic";
 
 export type WidgetSize = "compact" | "standard" | "expanded";
 

@@ -28,7 +28,37 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen, LiveClassesListScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
-import { LoginAdminScreen, TwoFactorSetupScreen } from "../screens/admin";
+import { 
+  LoginAdminScreen, 
+  TwoFactorSetupScreen,
+  UserDetailScreen,
+  UserImpersonationScreen,
+  UserCreateScreen,
+  FinanceReportsScreen,
+  ContentManagementScreen,
+  OrgManagementScreen,
+  AuditLogsScreen,
+  AdminProfileScreen,
+  StudentFeeDetailScreen,
+  StudentFeesListScreen,
+  MonthlyFeeReportScreen,
+  FeeReportsScreen,
+  TeacherPayrollDetailScreen,
+  TeacherPayrollListScreen,
+  PayrollProcessingScreen,
+  BatchDetailScreen,
+  BatchListScreen,
+  BatchAnalyticsScreen,
+  BatchStudentsScreen,
+  StudentAttendanceDetailScreen,
+  AbsentStudentsListScreen,
+  AttendanceDashboardScreen,
+  AbsentListScreen,
+  AdmissionDetailScreen,
+  AdmissionCreateScreen,
+  AdmissionsListScreen,
+  AdmissionsDashboardScreen,
+} from "../screens/admin";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -112,6 +142,40 @@ const COMMON_SCREENS = [
   // Admin screens (Sprint 1) - auth flow screens only
   { screenId: "login-admin", component: LoginAdminScreen },
   { screenId: "2fa-setup", component: TwoFactorSetupScreen },
+  // Admin screens (Sprint 2-9) - secondary screens accessible from tab navigation
+  // NOTE: Tab root screens (admin-home, users-management, finance-dashboard, analytics-dashboard, system-settings)
+  // are NOT included here to avoid duplicate screen registration error
+  { screenId: "users-detail", component: UserDetailScreen },
+  { screenId: "users-create", component: UserCreateScreen },
+  { screenId: "user-impersonation", component: UserImpersonationScreen },
+  { screenId: "finance-reports", component: FinanceReportsScreen },
+  { screenId: "content-management", component: ContentManagementScreen },
+  { screenId: "org-management", component: OrgManagementScreen },
+  { screenId: "audit-logs", component: AuditLogsScreen },
+  { screenId: "admin-profile", component: AdminProfileScreen },
+  // Admin Fees screens (Phase 2)
+  { screenId: "student-fees-list", component: StudentFeesListScreen },
+  { screenId: "student-fee-detail", component: StudentFeeDetailScreen },
+  { screenId: "monthly-fee-report", component: MonthlyFeeReportScreen },
+  { screenId: "fee-reports", component: FeeReportsScreen },
+  // Admin Payroll screens (Phase 3)
+  { screenId: "teacher-payroll-list", component: TeacherPayrollListScreen },
+  { screenId: "teacher-payroll-detail", component: TeacherPayrollDetailScreen },
+  { screenId: "payroll-processing", component: PayrollProcessingScreen },
+  // Admin Academic screens (Phase 4)
+  { screenId: "batch-list", component: BatchListScreen },
+  { screenId: "batch-detail", component: BatchDetailScreen },
+  { screenId: "batch-analytics", component: BatchAnalyticsScreen },
+  { screenId: "batch-students", component: BatchStudentsScreen },
+  { screenId: "student-attendance-detail", component: StudentAttendanceDetailScreen },
+  { screenId: "absent-students-list", component: AbsentStudentsListScreen },
+  { screenId: "attendance-dashboard", component: AttendanceDashboardScreen },
+  { screenId: "absent-list", component: AbsentListScreen },
+  // Admin Admissions screens (Phase 5)
+  { screenId: "admission-detail", component: AdmissionDetailScreen },
+  { screenId: "admission-create", component: AdmissionCreateScreen },
+  { screenId: "admissions-list", component: AdmissionsListScreen },
+  { screenId: "admissions-dashboard", component: AdmissionsDashboardScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons

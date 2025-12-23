@@ -41,6 +41,7 @@ export const QuickActionsWidget: React.FC<WidgetProps> = ({
   const showReports = config?.showReports !== false;
   const showSettings = config?.showSettings !== false;
   const showAudit = config?.showAudit !== false;
+  const showImpersonate = config?.showImpersonate === true; // Off by default
 
   // Track widget render
   useEffect(() => {
@@ -99,6 +100,13 @@ export const QuickActionsWidget: React.FC<WidgetProps> = ({
       colorKey: 'tertiary',
       route: 'audit-logs',
     },
+    {
+      id: 'impersonate',
+      labelKey: 'widgets.quickActions.impersonate',
+      icon: 'account-switch',
+      colorKey: 'secondary',
+      route: 'user-impersonation',
+    },
   ];
 
   // Filter actions based on config
@@ -108,6 +116,7 @@ export const QuickActionsWidget: React.FC<WidgetProps> = ({
       case 'reports': return showReports;
       case 'settings': return showSettings;
       case 'audit': return showAudit;
+      case 'impersonate': return showImpersonate;
       default: return true;
     }
   });

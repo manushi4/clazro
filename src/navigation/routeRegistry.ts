@@ -11,7 +11,33 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
-import { LoginAdminScreen, TwoFactorSetupScreen } from "../screens/admin";
+import { 
+  LoginAdminScreen, 
+  TwoFactorSetupScreen, 
+  PasswordResetScreen, 
+  AdminDashboardScreen, 
+  UserManagementScreen, 
+  UserDetailScreen,
+  UserImpersonationScreen,
+  UserCreateScreen,
+  FinanceDashboardScreen,
+  FinanceReportsScreen,
+  AnalyticsDashboardScreen,
+  ContentManagementScreen,
+  OrgManagementScreen,
+  SystemSettingsScreen,
+  AuditLogsScreen,
+  AdminProfileScreen,
+  StudentFeeDetailScreen,
+  StudentFeesListScreen,
+  MonthlyFeeReportScreen,
+  TeacherPayrollDetailScreen,
+  PayrollProcessingScreen,
+  BatchDetailScreen,
+  StudentAttendanceDetailScreen,
+  AdmissionDetailScreen,
+  AdmissionCreateScreen,
+} from "../screens/admin";
 
 export type RouteDefinition = {
   screenId: string;
@@ -238,10 +264,100 @@ const registry: Record<string, RouteDefinition> = {
   "LoginAdmin": { screenId: "LoginAdmin", component: LoginAdminScreen },
   "2fa-setup": { screenId: "2fa-setup", component: TwoFactorSetupScreen },
   "TwoFactorSetup": { screenId: "TwoFactorSetup", component: TwoFactorSetupScreen },
+  "password-reset": { screenId: "password-reset", component: PasswordResetScreen },
+  "PasswordReset": { screenId: "PasswordReset", component: PasswordResetScreen },
 
   // Admin dashboard (Dynamic screen - widget-based)
-  "admin-home": { screenId: "admin-home", component: DynamicScreen },
-  "AdminHome": { screenId: "AdminHome", component: DynamicScreen },
+  "admin-home": { screenId: "admin-home", component: AdminDashboardScreen },
+  "AdminHome": { screenId: "AdminHome", component: AdminDashboardScreen },
+
+  // Admin User Management (Dynamic screen - widget-based)
+  "users-management": { screenId: "users-management", component: UserManagementScreen },
+  "UsersManagement": { screenId: "UsersManagement", component: UserManagementScreen },
+
+  // Admin User Detail (Dynamic screen - widget-based)
+  "users-detail": { screenId: "users-detail", component: UserDetailScreen },
+  "UsersDetail": { screenId: "UsersDetail", component: UserDetailScreen },
+
+  // Admin User Create (Dynamic screen - widget-based)
+  "users-create": { screenId: "users-create", component: UserCreateScreen },
+  "UsersCreate": { screenId: "UsersCreate", component: UserCreateScreen },
+
+  // Admin User Impersonation (Fixed screen - complex interaction)
+  "user-impersonation": { screenId: "user-impersonation", component: UserImpersonationScreen },
+  "UserImpersonation": { screenId: "UserImpersonation", component: UserImpersonationScreen },
+
+  // Admin Finance Dashboard (Dynamic screen - widget-based)
+  "finance-dashboard": { screenId: "finance-dashboard", component: FinanceDashboardScreen },
+  "FinanceDashboard": { screenId: "FinanceDashboard", component: FinanceDashboardScreen },
+
+  // Admin Finance Reports (Dynamic screen - widget-based)
+  "finance-reports": { screenId: "finance-reports", component: FinanceReportsScreen },
+  "FinanceReports": { screenId: "FinanceReports", component: FinanceReportsScreen },
+
+  // Admin Analytics Dashboard (Fixed screen - legacy)
+  "analytics-dashboard": { screenId: "analytics-dashboard", component: AnalyticsDashboardScreen },
+  "AnalyticsDashboard": { screenId: "AnalyticsDashboard", component: AnalyticsDashboardScreen },
+
+  // Admin Analytics Dashboard (Dynamic screen - widget-based)
+  "admin-analytics": { screenId: "admin-analytics", component: DynamicScreen },
+  "AdminAnalytics": { screenId: "AdminAnalytics", component: DynamicScreen },
+
+  // Admin Content Management (Dynamic screen - widget-based)
+  "content-management": { screenId: "content-management", component: ContentManagementScreen },
+  "ContentManagement": { screenId: "ContentManagement", component: ContentManagementScreen },
+
+  // Admin Organization Management (Dynamic screen - widget-based)
+  "org-management": { screenId: "org-management", component: OrgManagementScreen },
+  "OrgManagement": { screenId: "OrgManagement", component: OrgManagementScreen },
+
+  // Admin System Settings (Dynamic screen - widget-based)
+  "system-settings": { screenId: "system-settings", component: SystemSettingsScreen },
+  "SystemSettings": { screenId: "SystemSettings", component: SystemSettingsScreen },
+
+  // Admin Audit Logs (Dynamic screen - widget-based)
+  "audit-logs": { screenId: "audit-logs", component: AuditLogsScreen },
+  "AuditLogs": { screenId: "AuditLogs", component: AuditLogsScreen },
+
+  // Admin Profile (Dynamic screen - widget-based)
+  "admin-profile": { screenId: "admin-profile", component: AdminProfileScreen },
+  "AdminProfile": { screenId: "AdminProfile", component: AdminProfileScreen },
+
+  // Admin Student Fee Detail (Fixed screen - Phase 2 Fees Module)
+  "student-fee-detail": { screenId: "student-fee-detail", component: StudentFeeDetailScreen },
+  "StudentFeeDetail": { screenId: "StudentFeeDetail", component: StudentFeeDetailScreen },
+
+  // Admin Student Fees List (Fixed screen - Phase 2 Fees Module)
+  "student-fees-list": { screenId: "student-fees-list", component: StudentFeesListScreen },
+  "StudentFeesList": { screenId: "StudentFeesList", component: StudentFeesListScreen },
+
+  // Admin Monthly Fee Report (Fixed screen - Phase 2 Fees Module)
+  "monthly-fee-report": { screenId: "monthly-fee-report", component: MonthlyFeeReportScreen },
+  "MonthlyFeeReport": { screenId: "MonthlyFeeReport", component: MonthlyFeeReportScreen },
+
+  // Admin Teacher Payroll Detail (Fixed screen - Phase 3 Payroll Module)
+  "teacher-payroll-detail": { screenId: "teacher-payroll-detail", component: TeacherPayrollDetailScreen },
+  "TeacherPayrollDetail": { screenId: "TeacherPayrollDetail", component: TeacherPayrollDetailScreen },
+
+  // Admin Payroll Processing (Fixed screen - Phase 3 Payroll Module)
+  "payroll-processing": { screenId: "payroll-processing", component: PayrollProcessingScreen },
+  "PayrollProcessing": { screenId: "PayrollProcessing", component: PayrollProcessingScreen },
+
+  // Admin Batch Detail (Fixed screen - Phase 4 Academic Module)
+  "batch-detail": { screenId: "batch-detail", component: BatchDetailScreen },
+  "BatchDetail": { screenId: "BatchDetail", component: BatchDetailScreen },
+
+  // Admin Student Attendance Detail (Fixed screen - Phase 4 Academic Module)
+  "student-attendance-detail": { screenId: "student-attendance-detail", component: StudentAttendanceDetailScreen },
+  "StudentAttendanceDetail": { screenId: "StudentAttendanceDetail", component: StudentAttendanceDetailScreen },
+
+  // Admin Admission Detail (Fixed screen - Phase 5 Admissions Module)
+  "admission-detail": { screenId: "admission-detail", component: AdmissionDetailScreen },
+  "AdmissionDetail": { screenId: "AdmissionDetail", component: AdmissionDetailScreen },
+
+  // Admin Admission Create (Fixed screen - Phase 5 Admissions Module)
+  "admission-create": { screenId: "admission-create", component: AdmissionCreateScreen },
+  "AdmissionCreate": { screenId: "AdmissionCreate", component: AdmissionCreateScreen },
 };
 
 export function resolveScreen(screenId: string) {

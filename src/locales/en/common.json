@@ -718,5 +718,19 @@
     "progress.analytics": "Progress",
     "profile.home": "Profile",
     "admin.panel": "Admin"
+  },
+  "widgets": {
+    "mediaBanner": {
+      "title": "Media Banner",
+      "subtitle": "Display images, videos, or carousels",
+      "mediaItem": "Media item",
+      "loadError": "Failed to load media",
+      "noMedia": "No media configured",
+      "configure": "Configure media in Platform Studio",
+      "previous": "Previous",
+      "next": "Next",
+      "play": "Play video",
+      "pause": "Pause video"
+    }
   }
 }

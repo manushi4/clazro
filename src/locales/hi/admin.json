@@ -9,6 +9,51 @@
   "create_customer": "कस्टमर बनाएँ",
   "name": "नाम",
   "slug": "स्लग",
+  "screens": {
+    "dashboard": {
+      "title": "एडमिन डैशबोर्ड",
+      "subtitle": "प्लेटफ़ॉर्म अवलोकन और प्रबंधन",
+      "impersonating": "{{name}} के रूप में देख रहे हैं",
+      "exitImpersonation": "बाहर निकलें",
+      "states": {
+        "loading": "डैशबोर्ड लोड हो रहा है...",
+        "error": "डैशबोर्ड लोड करने में विफल",
+        "empty": "कोई विजेट कॉन्फ़िगर नहीं"
+      }
+    },
+    "userManagement": {
+      "title": "उपयोगकर्ता प्रबंधन",
+      "subtitle": "सभी प्लेटफ़ॉर्म उपयोगकर्ताओं को प्रबंधित करें"
+    },
+    "financeOverview": {
+      "title": "वित्त डैशबोर्ड",
+      "subtitle": "वित्तीय अवलोकन और रिपोर्ट"
+    },
+    "analytics": {
+      "title": "एनालिटिक्स डैशबोर्ड",
+      "subtitle": "प्लेटफ़ॉर्म एनालिटिक्स और अंतर्दृष्टि"
+    },
+    "contentManagement": {
+      "title": "सामग्री प्रबंधन",
+      "subtitle": "प्लेटफ़ॉर्म सामग्री प्रबंधित करें"
+    },
+    "orgManagement": {
+      "title": "संगठन प्रबंधन",
+      "subtitle": "संगठन संरचना प्रबंधित करें"
+    },
+    "settings": {
+      "title": "सिस्टम सेटिंग्स",
+      "subtitle": "प्लेटफ़ॉर्म सेटिंग्स कॉन्फ़िगर करें"
+    },
+    "auditLogs": {
+      "title": "ऑडिट लॉग",
+      "subtitle": "सिस्टम गतिविधि लॉग देखें"
+    },
+    "profile": {
+      "title": "एडमिन प्रोफ़ाइल",
+      "subtitle": "आपका एडमिन खाता"
+    }
+  },
   "widgets": {
     "adminStats": {
       "title": "प्लेटफ़ॉर्म आँकड़े",
@@ -58,7 +103,29 @@
       "reports": "रिपोर्ट",
       "settings": "सेटिंग्स",
       "audit": "ऑडिट लॉग",
+      "impersonate": "प्रतिरूपण",
       "actionHint": "{{action}} के लिए टैप करें"
+    },
+    "recentActivity": {
+      "title": "हाल की गतिविधि",
+      "viewAll": "सभी देखें",
+      "empty": {
+        "title": "अभी कोई गतिविधि नहीं",
+        "message": "हाल की सिस्टम गतिविधियाँ यहाँ दिखाई देंगी"
+      },
+      "activityHint": "{{actor}}: {{action}}",
+      "types": {
+        "user_created": "उपयोगकर्ता बनाया गया",
+        "user_updated": "उपयोगकर्ता अपडेट किया गया",
+        "user_suspended": "उपयोगकर्ता निलंबित",
+        "user_activated": "उपयोगकर्ता सक्रिय",
+        "payment_received": "भुगतान प्राप्त",
+        "setting_changed": "सेटिंग बदली गई",
+        "login": "लॉगिन",
+        "content_created": "सामग्री बनाई गई",
+        "content_updated": "सामग्री अपडेट की गई",
+        "alert_acknowledged": "अलर्ट स्वीकार किया गया"
+      }
     },
     "adminHero": {
       "title": "एडमिन डैशबोर्ड",
@@ -80,6 +147,854 @@
       "usersStatHint": "{{count}} कुल उप��ोगकर्ता",
       "revenueStatHint": "राजस्व: {{amount}}",
       "alertsStatHint": "{{count}} सक्रिय अलर्ट"
+    },
+    "userStats": {
+      "title": "उपयोगकर्ता आँकड़े",
+      "subtitle": "उपयोगकर्ता मेट्रिक्स का अवलोकन",
+      "total": "कुल उपयोगकर्ता",
+      "active": "सक्रिय उपयोगकर्ता",
+      "pending": "लंबित",
+      "suspended": "निलंबित",
+      "totalUsers": "कुल उपयोगकर्ता",
+      "activeUsers": "सक्रिय उपयोगकर्ता",
+      "pendingApprovals": "लंबित",
+      "suspendedUsers": "निलंबित",
+      "states": {
+        "loading": "आँकड़े लोड हो रहे हैं...",
+        "error": "आँकड़े लोड करने में विफल",
+        "empty": "कोई उपयोगकर्ता डेटा उपलब्ध नहीं"
+      }
+    },
+    "userList": {
+      "title": "उपयोगकर्ता",
+      "subtitle": "सभी उपयोगकर्ताओं को प्रबंधित करें",
+      "searchPlaceholder": "उपयोगकर्ता खोजें...",
+      "allRoles": "सभी",
+      "lastActive": "अंतिम सक्रिय",
+      "noUsers": "कोई उपयोगकर्ता नहीं मिला",
+      "roles": {
+        "student": "छात्र",
+        "teacher": "शिक्षक",
+        "parent": "अभिभावक",
+        "admin": "एडमिन"
+      },
+      "statuses": {
+        "active": "सक्रिय",
+        "pending": "लंबित",
+        "suspended": "निलंबित"
+      },
+      "states": {
+        "loading": "उपयोगकर्ता लोड हो रहे हैं...",
+        "error": "उपयोगकर्ता लोड करने में विफल",
+        "empty": "कोई उपयोगकर्ता नहीं मिला"
+      }
+    },
+    "pendingApprovals": {
+      "title": "लंबित अनुमोदन",
+      "subtitle": "अनुमोदन की प्रतीक्षा में उपयोगकर्ता",
+      "noPending": "कोई लंबित अनुमोदन नहीं",
+      "approveTitle": "उपयोगकर्ता को अनुमोदित करें",
+      "approveMessage": "क्या आप वाकई {{name}} को अनुमोदित करना चाहते हैं?",
+      "rejectTitle": "उपयोगकर्ता को अस्वीकार करें",
+      "rejectMessage": "क्या आप वाकई {{name}} को अस्वीकार करना चाहते हैं?",
+      "states": {
+        "loading": "लंबित अनुमोदन लोड हो रहे हैं...",
+        "error": "लंबित अनुमोदन लोड करने में विफल",
+        "empty": "कोई लंबित अनुमोदन नहीं"
+      },
+      "actions": {
+        "approve": "अनुमोदित करें",
+        "reject": "अस्वीकार करें",
+        "viewAll": "सभी देखें"
+      },
+      "approveSuccess": "उपयोगकर्ता सफलतापूर्वक अनुमोदित",
+      "rejectSuccess": "उपयोगकर्ता अस्वीकृत",
+      "approveError": "उपयोगकर्ता को अनुमोदित करने में विफल",
+      "rejectError": "उपयोगकर्ता को अस्वीकार करने में विफल",
+      "userHint": "{{name}} - {{role}} - {{time}} को अनुरोध किया",
+      "approveHint": "{{name}} को अनुमोदित करें",
+      "rejectHint": "{{name}} को अस्वीकार करें"
+    },
+    "roleDistribution": {
+      "title": "भूमिका के अनुसार उपयोगकर्ता",
+      "subtitle": "भूमिकाओं में उपयोगकर्ताओं का वितरण",
+      "totalUsers": "कुल उपयोगकर्ता",
+      "roles": {
+        "student": "छात्र",
+        "teacher": "शिक्षक",
+        "parent": "अभिभावक",
+        "admin": "एडमिन"
+      },
+      "states": {
+        "loading": "वितरण लोड हो रहा है...",
+        "error": "भूमिका वितरण लोड करने में विफल",
+        "empty": "कोई उपयोगकर्ता डेटा उपलब्ध नहीं"
+      },
+      "roleHint": "{{role}}: {{count}} उपयोगकर्ता ({{percentage}}%)",
+      "viewAllHint": "सभी एनालिटिक्स देखें"
+    },
+    "bulkActions": {
+      "title": "बल्क कार्य",
+      "subtitle": "उपयोगकर्ताओं पर बल्क ऑपरेशन करें",
+      "importUsers": "उपयोगकर्ता आयात करें",
+      "exportUsers": "उपयोगकर्ता निर्यात करें",
+      "bulkApprove": "बल्क अनुमोदन",
+      "sendEmail": "ईमेल भेजें",
+      "bulkSuspend": "बल्क निलंबन",
+      "resetPasswords": "पासवर्ड रीसेट करें",
+      "exportTitle": "उपयोगकर्ता निर्यात करें",
+      "exportMessage": "निर्यात प्रारूप चुनें",
+      "exportStarted": "निर्यात शुरू हो गया। तैयार होने पर आपको सूचित किया जाएगा।",
+      "bulkApproveTitle": "बल्क अनुमोदन",
+      "bulkApproveMessage": "यह सभी लंबित उपयोगकर्ताओं को अनुमोदित करेगा। जारी रखें?",
+      "bulkApproveSuccess": "सभी लंबित उपयोगकर्ताओं को अनुमोदित कर दिया गया है।",
+      "bulkSuspendTitle": "बल्क निलंबन",
+      "bulkSuspendMessage": "उपयोगकर्ता सूची से निलंबित करने के लिए उपयोगकर्ताओं का चयन करें।",
+      "resetPasswordsTitle": "पासवर्ड रीसेट करें",
+      "resetPasswordsMessage": "यह चयनित उपयोगकर्ताओं को पासवर्ड रीसेट ईमेल भेजेगा।"
+    },
+    "recentRegistrations": {
+      "title": "हाल के पंजीकरण",
+      "subtitle": "नए पंजीकृत उपयोगकर्ता",
+      "states": {
+        "loading": "पंजीकरण लोड हो रहे हैं...",
+        "error": "पंजीकरण लोड करने में विफल",
+        "empty": "कोई हाल के पंजीकरण नहीं"
+      },
+      "empty": {
+        "title": "कोई हाल के पंजीकरण नहीं",
+        "message": "नए उपयोगकर्ता पंजीकरण यहाँ दिखाई देंगे"
+      },
+      "actions": {
+        "viewAll": "सभी देखें",
+        "retry": "पुनः प्रयास करें"
+      },
+      "userHint": "{{name}} - {{role}} - {{time}} को पंजीकृत"
+    },
+    "revenueSummary": {
+      "title": "राजस्व",
+      "subtitle": "राजस्व अवलोकन और विवरण",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "राजस्व डेटा लोड हो रहा है...",
+        "error": "राजस्व डेटा लोड करने में विफल",
+        "empty": "कोई राजस्व डेटा नहीं"
+      },
+      "periods": {
+        "today": "आज",
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "vsLast": {
+        "today": "कल की तुलना में",
+        "week": "पिछले सप्ताह की तुलना में",
+        "month": "पिछले महीने की तुलना में",
+        "quarter": "पिछली तिमाही की तुलना में",
+        "year": "पिछले वर्ष की तुलना में"
+      },
+      "breakdown": {
+        "fees": "शुल्क",
+        "subscriptions": "सदस्यता",
+        "other": "अन्य"
+      },
+      "pending": "लंबित",
+      "collectionRate": "संग्रह",
+      "actions": {
+        "viewAll": "सभी देखें",
+        "export": "निर्यात करें"
+      }
+    },
+    "expenseSummary": {
+      "title": "खर्च",
+      "subtitle": "खर्च अवलोकन और विवरण",
+      "viewDetails": "विवरण देखें",
+      "totalExpenses": "कुल खर्च",
+      "states": {
+        "loading": "खर्च डेटा लोड हो रहा है...",
+        "error": "खर्च डेटा लोड करने में विफल",
+        "empty": "कोई खर्च डेटा नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "vsLast": {
+        "week": "पिछले सप्ताह की तुलना में",
+        "month": "पिछले महीने की तुलना में",
+        "quarter": "पिछली तिमाही की तुलना में",
+        "year": "पिछले वर्ष की तुलना में"
+      },
+      "categories": {
+        "salary": "वेतन",
+        "utilities": "उपयोगिताएं",
+        "materials": "सामग्री",
+        "other": "अन्य"
+      },
+      "pending": "लंबित",
+      "transactions": "लेनदेन",
+      "average": "औसत",
+      "actions": {
+        "viewAll": "सभी देखें",
+        "export": "निर्यात करें"
+      }
+    },
+    "netProfit": {
+      "title": "शुद्ध लाभ",
+      "subtitle": "राजस्व माइनस खर्च",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "लाभ डेटा लोड हो रहा है...",
+        "error": "लाभ डेटा लोड करने में विफल",
+        "empty": "कोई वित्तीय डेटा नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "vsLast": {
+        "week": "पिछले सप्ताह की तुलना में",
+        "month": "पिछले महीने की तुलना में",
+        "quarter": "पिछली तिमाही की तुलना में",
+        "year": "पिछले वर्ष की तुलना में"
+      },
+      "labels": {
+        "profit": "लाभ",
+        "loss": "हानि",
+        "revenue": "राजस्व",
+        "expenses": "खर्च",
+        "profitMargin": "लाभ मार्जिन",
+        "transactions": "लेनदेन",
+        "avgTransaction": "औसत लेनदेन"
+      },
+      "actions": {
+        "viewAll": "सभी देखें",
+        "export": "निर्यात करें"
+      }
+    },
+    "transactions": {
+      "title": "हाल के लेनदेन",
+      "subtitle": "वित्तीय लेनदेन सूची",
+      "states": {
+        "loading": "लेनदेन लोड हो रहे हैं...",
+        "error": "लेनदेन लोड करने में विफल",
+        "empty": "कोई लेनदेन नहीं"
+      },
+      "categories": {
+        "fees": "शुल्क",
+        "subscription": "सदस्यता",
+        "salary": "वेतन",
+        "utilities": "उपयोगिताएं",
+        "materials": "सामग्री",
+        "other": "अन्य"
+      },
+      "statuses": {
+        "completed": "पूर्ण",
+        "pending": "लंबित",
+        "failed": "विफल"
+      },
+      "types": {
+        "income": "आय",
+        "expense": "खर्च"
+      },
+      "actions": {
+        "viewAll": "सभी देखें"
+      },
+      "showingOf": "{{total}} में से {{showing}} दिखा रहे हैं",
+      "itemHint": "{{type}}: {{amount}} - {{description}}"
+    },
+    "monthlyChart": {
+      "title": "मासिक रुझान",
+      "subtitle": "समय के साथ राजस्व बनाम खर्च",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "चार्ट लोड हो रहा है...",
+        "error": "चार्ट लोड करने में विफल",
+        "empty": "कोई डेटा उपलब्ध नहीं"
+      },
+      "periods": {
+        "3months": "3M",
+        "6months": "6M",
+        "12months": "12M"
+      },
+      "labels": {
+        "revenue": "राजस्व",
+        "expenses": "खर्च",
+        "totalRevenue": "कुल राजस्व",
+        "totalExpenses": "कुल खर्च",
+        "netProfit": "शुद्ध लाभ"
+      }
+    },
+    "pendingPayments": {
+      "title": "लंबित भुगतान",
+      "subtitle": "बकाया भुगतान सूची",
+      "states": {
+        "loading": "भुगतान लोड हो रहे हैं...",
+        "error": "भुगतान लोड करने में विफल",
+        "empty": "कोई लंबित भुगतान नहीं"
+      },
+      "categories": {
+        "fees": "शुल्क",
+        "subscription": "सदस्यता",
+        "salary": "वेतन",
+        "utilities": "उपयोगिताएं",
+        "materials": "सामग्री",
+        "other": "अन्य"
+      },
+      "statuses": {
+        "pending": "लंबित",
+        "overdue": "अतिदेय"
+      },
+      "labels": {
+        "totalPending": "कुल लंबित",
+        "overdue": "अतिदेय"
+      },
+      "actions": {
+        "viewAll": "सभी देखें"
+      },
+      "showingOf": "{{total}} में से {{showing}} दिखा रहे हैं",
+      "daysOverdue": "{{days}} दिन अतिदेय",
+      "itemHint": "{{amount}} - {{description}} ({{status}})"
+    },
+    "categoryBreakdown": {
+      "title": "श्रेणी विश्लेषण",
+      "subtitle": "श्रेणी के अनुसार राजस्व और खर्च विश्लेषण",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "विश्लेषण लोड हो रहा है...",
+        "error": "डेटा लोड करने में विफल",
+        "empty": "कोई डेटा उपलब्ध नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "types": {
+        "revenue": "राजस्व",
+        "expense": "खर्च",
+        "both": "दोनों"
+      },
+      "labels": {
+        "revenue": "राजस्व",
+        "expenses": "खर्च",
+        "totalRevenue": "कुल राजस्व",
+        "totalExpenses": "कुल खर्च"
+      }
+    },
+    "collectionRate": {
+      "title": "संग्रह दर",
+      "subtitle": "शुल्क संग्रह दक्षता",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "संग्रह डेटा लोड हो रहा है...",
+        "error": "डेटा लोड करने में विफल",
+        "empty": "कोई संग्रह डेटा नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "status": {
+        "excellent": "उत्कृष्ट",
+        "moderate": "मध्यम",
+        "needsAttention": "ध्यान देने की आवश्यकता"
+      },
+      "labels": {
+        "collected": "एकत्रित",
+        "pending": "लंबित",
+        "total": "कुल"
+      },
+      "actions": {
+        "viewAll": "सभी देखें",
+        "export": "निर्यात करें"
+      }
+    },
+    "trends": {
+      "title": "रुझान",
+      "subtitle": "समय के साथ एनालिटिक्स रुझान",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "रुझान लोड हो रहे हैं...",
+        "error": "रुझान लोड करने में विफल",
+        "empty": "कोई रुझान डेटा उपलब्ध नहीं"
+      },
+      "metrics": {
+        "users": "उपयोगकर्ता",
+        "revenue": "राजस्व",
+        "engagement": "सहभागिता",
+        "content": "सामग्री"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही"
+      },
+      "vsLast": {
+        "week": "पिछले सप्ताह की तुलना में",
+        "month": "पिछले महीने की तुलना में",
+        "quarter": "पिछली तिमाही की तुलना में"
+      },
+      "stats": {
+        "average": "औसत",
+        "highest": "उच्चतम",
+        "lowest": "न्यूनतम"
+      }
+    },
+    "engagement": {
+      "title": "सहभागिता",
+      "subtitle": "उपयोगकर्ता सहभागिता मेट्रिक्स और गतिविधि",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "सहभागिता डेटा लोड हो रहा है...",
+        "error": "सहभागिता डेटा लोड करने में विफल",
+        "empty": "कोई सहभागिता डेटा उपलब्ध नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही"
+      },
+      "metrics": {
+        "dau": "दैनिक सक्रिय",
+        "wau": "साप्ताहिक सक्रिय",
+        "engagement": "सहभागिता दर",
+        "retention": "प्रतिधारण दर"
+      },
+      "activityTrend": "गतिविधि रुझान",
+      "byRole": "भूमिका के अनुसार उपयोगकर्ता",
+      "topUsers": "सबसे सक्रिय उपयोगकर्ता",
+      "lastActive": "सक्रिय",
+      "sessions": "सत्र",
+      "avgSession": "औसत सत्र",
+      "totalSessions": "कुल सत्र",
+      "churnRate": "चर्न दर",
+      "roles": {
+        "student": "छात्र",
+        "teacher": "शिक्षक",
+        "parent": "अभिभावक",
+        "admin": "एडमिन"
+      }
+    },
+    "growth": {
+      "title": "विकास मेट्रिक्स",
+      "subtitle": "प्रमुख विकास संकेतक और लक्ष्य",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "विकास डेटा लोड हो रहा है...",
+        "error": "विकास डेटा लोड करने में विफल",
+        "empty": "कोई विकास डेटा उपलब्ध नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही"
+      },
+      "vsLast": {
+        "week": "पिछले सप्ताह की तुलना में",
+        "month": "पिछले महीने की तुलना में",
+        "quarter": "पिछली तिमाही की तुलना में"
+      },
+      "overallGrowth": "समग्र विकास",
+      "metrics": {
+        "users": "नए उपयोगकर्ता",
+        "revenue": "राजस्व",
+        "engagement": "सहभागिता दर",
+        "content": "सामग्री दृश्य"
+      },
+      "ofTarget": "लक्ष्य का",
+      "userGrowthTrend": "उपयोगकर्ता विकास रुझान",
+      "revenueGrowthTrend": "राजस्व विकास रुझान",
+      "bestPerforming": "सर्वश्रेष्ठ प्रदर्शन",
+      "needsAttention": "ध्यान देने की आवश्यकता",
+      "onTrack": "लक्ष्य पर",
+      "belowTarget": "लक्ष्य से नीचे",
+      "metricHint": "{{label}}: {{value}}, {{change}}% परिवर्तन"
+    },
+    "comparisons": {
+      "title": "अवधि तुलना",
+      "subtitle": "समय अवधियों में मेट्रिक्स की तुलना करें",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "तुलना डेटा लोड हो रहा है...",
+        "error": "तुलना डेटा लोड करने में विफल",
+        "empty": "कोई तुलना डेटा उपलब्ध नहीं"
+      },
+      "periods": {
+        "week": "सप्ताह",
+        "month": "महीना",
+        "quarter": "तिमाही",
+        "year": "वर्ष"
+      },
+      "trend": {
+        "positive": "सकारात्मक रुझान",
+        "negative": "नकारात्मक रुझान",
+        "neutral": "स्थिर"
+      },
+      "summaryStats": "{{improved}} सुधार, {{declined}} गिरावट, {{stable}} स्थिर",
+      "current": "वर्तमान",
+      "previous": "पिछला",
+      "metrics": {
+        "users": "नए उपयोगकर्ता",
+        "revenue": "राजस्व",
+        "engagement": "सहभागिता दर",
+        "content": "सामग्री दृश्य",
+        "sessions": "सक्रिय सत्र"
+      },
+      "metricHint": "{{label}}: {{current}} बनाम {{previous}}, {{change}}% परिवर्तन"
+    },
+    "contentStats": {
+      "title": "सामग्री आँकड़े",
+      "subtitle": "सामग्री पुस्तकालय का अवलोकन",
+      "viewDetails": "विवरण देखें",
+      "states": {
+        "loading": "सामग्री आँकड़े लोड हो रहे हैं...",
+        "error": "सामग्री आँकड़े लोड करने में विफल",
+        "empty": "कोई सामग्री उपलब्ध नहीं"
+      },
+      "totalContent": "कुल सामग्री",
+      "views": "दृश्य",
+      "rating": "औसत रेटिंग",
+      "recent": "इस सप्ताह",
+      "byType": "प्रकार के अनुसार",
+      "byStatus": "स्थिति के अनुसार",
+      "types": {
+        "course": "पाठ्यक्रम",
+        "lesson": "पाठ",
+        "resource": "संसाधन",
+        "assessment": "मूल्यांकन",
+        "video": "वीडियो",
+        "document": "दस्तावेज़",
+        "quiz": "प्रश्नोत्तरी"
+      },
+      "statuses": {
+        "draft": "ड्राफ्ट",
+        "published": "प्रकाशित",
+        "archived": "संग्रहीत",
+        "review": "समीक्षा में"
+      },
+      "typeHint": "{{type}}: {{count}} आइटम"
+    },
+    "contentList": {
+      "title": "सामग्री पुस्तकालय",
+      "subtitle": "सभी सामग्री आइटम प्रबंधित करें",
+      "searchPlaceholder": "सामग्री खोजें...",
+      "allTypes": "सभी",
+      "allStatuses": "सभी स्थिति",
+      "noContent": "कोई सामग्री नहीं मिली",
+      "types": {
+        "course": "पाठ्यक्रम",
+        "lesson": "पाठ",
+        "resource": "संसाधन",
+        "assessment": "मूल्यांकन",
+        "video": "वीडियो",
+        "document": "दस्तावेज़",
+        "quiz": "प्रश्नोत्तरी"
+      },
+      "statuses": {
+        "draft": "ड्राफ्ट",
+        "published": "प्रकाशित",
+        "archived": "संग्रहीत",
+        "review": "समीक्षा"
+      },
+      "states": {
+        "loading": "सामग्री लोड हो रही है...",
+        "error": "सामग्री लोड करने में विफल",
+        "empty": "कोई सामग्री उपलब्ध नहीं"
+      },
+      "contentHint": "{{title}} - {{type}} - {{status}}"
+    },
+    "contentCategories": {
+      "title": "सामग्री श्रेणियाँ",
+      "subtitle": "श्रेणी के अनुसार सामग्री ब्राउज़ करें",
+      "summary": "{{categories}} श्रेणियाँ, {{content}} आइटम",
+      "items": "आइटम",
+      "categoryHint": "{{category}}: {{count}} आइटम",
+      "states": {
+        "loading": "श्रेणियाँ लोड हो रही हैं...",
+        "error": "श्रेणियाँ लोड करने में विफल",
+        "empty": "कोई श्रेणी नहीं मिली"
+      }
+    },
+    "orgTree": {
+      "title": "संगठन संरचना",
+      "subtitle": "पदानुक्रमित संगठन दृश्य",
+      "summary": "{{orgs}} संगठन, {{depts}} विभाग, {{classes}} कक्षाएं",
+      "nodeHint": "{{name}} - {{type}} में {{count}} सदस्य",
+      "types": {
+        "organization": "संगठन",
+        "department": "विभाग",
+        "class": "कक्षा",
+        "batch": "बैच"
+      },
+      "states": {
+        "loading": "संगठन लोड हो रहा है...",
+        "error": "संगठन लोड करने में विफल",
+        "empty": "कोई संगठन नहीं मिला"
+      },
+      "actions": {
+        "expand": "विस्तार करें",
+        "collapse": "संक्षिप्त करें",
+        "viewAll": "सभी देखें"
+      }
+    },
+    "classList": {
+      "title": "कक्षाएं",
+      "subtitle": "सभी कक्षाओं को प्रबंधित करें",
+      "summary": "{{total}} कुल, {{active}} सक्रिय",
+      "searchPlaceholder": "कक्षाएं खोजें...",
+      "classHint": "{{name}} - {{members}} सदस्य - {{department}}",
+      "statuses": {
+        "active": "सक्रिय",
+        "inactive": "निष्क्रिय"
+      },
+      "states": {
+        "loading": "कक्षाएं लोड हो रही हैं...",
+        "error": "कक्षाएं लोड करने में विफल",
+        "empty": "कोई कक्षा नहीं मिली"
+      },
+      "actions": {
+        "addClass": "कक्षा जोड़ें",
+        "viewAll": "सभी देखें"
+      }
+    },
+    "profileCard": {
+      "title": "एडमिन प्रोफ़ाइल",
+      "subtitle": "आपकी एडमिन खाता जानकारी",
+      "states": {
+        "loading": "प्रोफ़ाइल लोड हो रही है...",
+        "error": "प्रोफ़ाइल लोड करने में विफल",
+        "empty": "कोई प्रोफ़ाइल डेटा नहीं"
+      },
+      "stats": {
+        "xp": "एक्सपी",
+        "streak": "स्ट्रीक",
+        "badges": "बैज"
+      },
+      "actions": {
+        "edit": "प्रोफ़ाइल संपादित करें",
+        "settings": "सेटिंग्स"
+      },
+      "labels": {
+        "role": "भूमिका",
+        "email": "ईमेल",
+        "lastActive": "अंतिम सक्रिय",
+        "memberSince": "सदस्य बने"
+      }
+    },
+    "quickCreate": {
+      "title": "त्वरित निर्माण",
+      "subtitle": "नई संगठन इकाइयां जोड़ें",
+      "createTitle": "{{type}} बनाएं",
+      "createHint": "नया {{type}} बनाएं",
+      "nameLabel": "नाम",
+      "namePlaceholder": "नाम दर्ज करें...",
+      "descriptionLabel": "विवरण",
+      "descriptionPlaceholder": "विवरण दर्ज करें (वैकल्पिक)...",
+      "parentLabel": "{{type}} चुनें",
+      "noParents": "कोई {{type}} उपलब्ध नहीं। पहले एक बनाएं।",
+      "nameRequired": "कृपया एक नाम दर्ज करें",
+      "parentRequired": "कृपया इस {{type}} के लिए एक पैरेंट चुनें",
+      "success": "सफलता",
+      "error": "त्रुटि",
+      "types": {
+        "organization": "संगठन",
+        "department": "विभाग",
+        "class": "कक्षा",
+        "batch": "बैच"
+      },
+      "typeDescriptions": {
+        "organization": "नया संगठन जोड़ें",
+        "department": "नया विभाग जोड़ें",
+        "class": "नई कक्षा जोड़ें",
+        "batch": "नया बैच जोड़ें"
+      },
+      "states": {
+        "loading": "बना रहा है...",
+        "error": "बनाने में विफल",
+        "success": "सफलतापूर्वक बनाया गया"
+      }
+    },
+    "profileActivity": {
+      "title": "गतिविधि लॉग",
+      "subtitle": "आपकी हाल की एडमिन गतिविधियाँ",
+      "todayProgress": "आज की गतिविधि",
+      "actions": "कार्य",
+      "types": "प्रकार",
+      "viewAll": "सभी गतिविधि देखें",
+      "states": {
+        "loading": "गतिविधि लोड हो रही है...",
+        "error": "गतिविधि लोड करने में विफल",
+        "empty": "अभी कोई गतिविधि नहीं",
+        "emptyMessage": "आपकी एडमिन गतिविधियाँ यहाँ दिखाई देंगी"
+      },
+      "time": {
+        "justNow": "अभी",
+        "minutesAgo": "{{count}} मिनट पहले",
+        "hoursAgo": "{{count}} घंटे पहले",
+        "yesterday": "कल",
+        "daysAgo": "{{count}} दिन पहले"
+      },
+      "activityHint": "{{title}} - {{time}}",
+      "activityTypes": {
+        "user_created": "उपयोगकर्ता बनाया",
+        "user_updated": "उपयोगकर्ता अपडेट किया",
+        "user_suspended": "उपयोगकर्ता निलंबित",
+        "user_activated": "उपयोगकर्ता सक्रिय",
+        "user_deleted": "उपयोगकर्ता हटाया",
+        "payment_received": "भुगतान प्राप्त",
+        "setting_changed": "सेटिंग्स बदली",
+        "login": "लॉग इन किया",
+        "logout": "लॉग आउट किया",
+        "content_created": "सामग्री बनाई",
+        "content_updated": "सामग्री अपडेट की",
+        "content_deleted": "सामग्री हटाई",
+        "alert_acknowledged": "अलर्ट स्वीकृत",
+        "report_generated": "रिपोर्ट बनाई",
+        "bulk_action": "बल्क कार्रवाई",
+        "permission_changed": "अनुमति बदली",
+        "impersonation_started": "प्रतिरूपण शुरू",
+        "impersonation_ended": "प्रतिरूपण समाप्त"
+      },
+      "actions": {
+        "retry": "पुनः प्रयास करें",
+        "viewAll": "सभी देखें"
+      }
+    },
+    "studentFees": {
+      "title": "फीस संग्रह",
+      "collected": "एकत्रित",
+      "pending": "लंबित",
+      "overdue": "अतिदेय",
+      "students": "छात्र",
+      "collectionRate": "संग्रह दर",
+      "today": "आज",
+      "collectedFrom": "से एकत्रित",
+      "sendReminder": "डिफॉल्टर्स को रिमाइंडर भेजें",
+      "states": {
+        "loading": "फीस डेटा लोड हो रहा है...",
+        "error": "फीस डेटा लोड करने में विफल",
+        "empty": "कोई फीस डेटा उपलब्ध नहीं"
+      }
+    },
+    "feeCollectionTrend": {
+      "title": "फीस संग्रह रुझान",
+      "actual": "एकत्रित",
+      "expected": "अपेक्षित",
+      "monthGrowth": "माह-दर-माह",
+      "yearTotal": "वर्ष अब तक",
+      "ofTarget": "लक्ष्य का",
+      "periods": {
+        "sixMonths": "6M",
+        "twelveMonths": "12M"
+      },
+      "states": {
+        "loading": "रुझान डेटा लोड हो रहा है...",
+        "error": "रुझान डेटा लोड करने में विफल",
+        "empty": "कोई संग्रह डेटा उपलब्ध नहीं"
+      }
+    },
+    "teacherPayroll": {
+      "title": "शिक्षक वेतन",
+      "totalPayroll": "कुल वेतन",
+      "paid": "भुगतान किया",
+      "pending": "लंबित",
+      "teachers": "शिक्षक",
+      "progress": "प्रगति",
+      "nextPaymentDue": "अगला भुगतान देय",
+      "overdueAlert": "अतिदेय अलर्ट",
+      "teachersOverdue": "{{days}}+ दिनों से अतिदेय शिक्षक",
+      "processSalaries": "वेतन प्रक्रिया करें",
+      "states": {
+        "loading": "वेतन डेटा लोड हो रहा है...",
+        "error": "वेतन डेटा लोड करने में विफल",
+        "empty": "कोई वेतन डेटा उपलब्ध नहीं"
+      }
+    },
+    "batchPerformance": {
+      "title": "बैच प्रदर्शन",
+      "avg": "औसत",
+      "students": "छात्र",
+      "vsLastTerm": "पिछले सत्र की तुलना में",
+      "overallAverage": "समग्र औसत",
+      "rank": "रैंक",
+      "states": {
+        "loading": "बैच प्रदर्शन लोड हो रहा है...",
+        "error": "बैच प्रदर्शन लोड करने में विफल",
+        "empty": "कोई बैच डेटा उपलब्ध नहीं"
+      }
+    },
+    "attendanceOverview": {
+      "title": "आज की उपस्थिति",
+      "students": "छात्र",
+      "teachers": "शिक्षक",
+      "vsAvg": "औसत की तुलना में",
+      "absentToday": "आज अनुपस्थित",
+      "more": "और...",
+      "weeklyTrend": "साप्ताहिक रुझान",
+      "avg": "औसत",
+      "states": {
+        "loading": "उपस्थिति लोड हो रही है...",
+        "error": "उपस्थिति डेटा लोड करने में विफल",
+        "empty": "कोई उपस्थिति डेटा उपलब्ध नहीं"
+      }
+    },
+    "admissionStats": {
+      "title": "प्रवेश",
+      "inquiries": "पूछताछ",
+      "admitted": "प्रवेशित",
+      "conversion": "रूपांतरण",
+      "byProgram": "कार्यक्रम के अनुसार",
+      "pendingFollowUp": "पूछताछ फॉलो-अप लंबित",
+      "addNewInquiry": "नई पूछताछ जोड़ें",
+      "states": {
+        "loading": "प्रवेश डेटा लोड हो रहा है...",
+        "error": "प्रवेश डेटा लोड करने में विफल",
+        "empty": "कोई प्रवेश डेटा उपलब्ध नहीं"
+      }
+    }
+  },
+  "userDetail": {
+    "title": "उपयोगकर्ता विवरण",
+    "subtitle": "उपयोगकर्ता देखें और प्रबंधित करें",
+    "noUserSelected": "कोई उपयोगकर्ता चयनित नहीं। कृपया सूची से एक उपयोगकर्ता चुनें।",
+    "sections": {
+      "profile": "प्रोफ़ाइल",
+      "activity": "गतिविधि",
+      "actions": "कार्य"
+    },
+    "actions": {
+      "edit": "उपयोगकर्ता संपादित करें",
+      "suspend": "उपयोगकर्ता निलंबित करें",
+      "activate": "उपयोगकर्ता सक्रिय करें",
+      "impersonate": "प्रतिरूपण करें",
+      "resetPassword": "पासवर्ड रीसेट करें",
+      "delete": "उपयोगकर्ता हटाएं"
+    },
+    "confirmSuspend": {
+      "title": "उपयोगकर्ता निलंबित करें",
+      "message": "क्या आप वाकई {{name}} को निलंबित करना चाहते हैं? वे प्लेटफ़ॉर्म तक पहुंच नहीं पाएंगे।",
+      "confirm": "निलंबित करें",
+      "cancel": "रद्द करें"
+    },
+    "confirmDelete": {
+      "title": "उपयोगकर्ता हटाएं",
+      "message": "क्या आप वाकई {{name}} को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+      "confirm": "हटाएं",
+      "cancel": "रद्द करें"
+    },
+    "states": {
+      "loading": "उपयोगकर्ता विवरण लोड हो रहा है...",
+      "error": "उपयोगकर्ता विवरण लोड करने में विफल",
+      "notFound": "उपयोगकर्ता नहीं मिला"
     }
   },
   "login": {
@@ -131,5 +1046,52 @@
       "invalidCode": "अमान्य सत्यापन कोड",
       "codeRequired": "सत्यापन कोड आवश्यक है"
     }
+  },
+  "passwordReset": {
+    "title": "पासवर्ड रीसेट करें",
+    "requestTitle": "पासवर्ड भूल गए?",
+    "requestDescription": "अपना ईमेल पता दर्ज करें और हम आपको पासवर्ड रीसेट करने के लिए एक लिंक भेजेंगे।",
+    "emailLabel": "ईमेल",
+    "emailHint": "अपना ईमेल पता दर्ज करें",
+    "submitButton": "रीसेट लिंक भेजें",
+    "backToLogin": "लॉगिन पर वापस जाएं",
+    "successTitle": "अपना ईमेल जांचें",
+    "successDescription": "हमने {{email}} पर पासवर्ड रीसेट लिंक भेज दिया है। कृपया अपना इनबॉक्स जांचें और निर्देशों का पालन करें।",
+    "tipSpam": "• यदि आपको ईमेल नहीं दिखता है तो अपना स्पैम फ़ोल्डर जांचें",
+    "tipExpiry": "• लिंक 1 घंटे में समाप्त हो जाता है",
+    "resendLink": "ईमेल नहीं मिला? पुनः प्रयास करें",
+    "errors": {
+      "emailRequired": "ईमेल आवश्यक है",
+      "emailInvalid": "कृपया एक वैध ईमेल दर्ज करें",
+      "resetFailed": "रीसेट ईमेल भेजने में विफल। कृपया पुनः प्रयास करें।"
+    }
+  },
+  "impersonation": {
+    "title": "उपयोगकर्ता का प्रतिरूपण करें",
+    "warning": "प्रतिरूपण आपको ऐप को किसी अन्य उपयोगकर्ता के रूप में देखने की अनुमति देता है। सभी क्रियाएं ऑडिट उद्देश्यों के लिए लॉग की जाती हैं।",
+    "searchPlaceholder": "नाम या ईमेल से खोजें...",
+    "selectUser": "उपयोगकर्ता चुनें",
+    "noUsers": "कोई उपयोगकर्ता नहीं मिला",
+    "confirmTitle": "प्रतिरूपण शुरू करें",
+    "confirmMessage": "आप {{name}} के रूप में ऐप देखने वाले हैं। सभी क्रियाएं ऑडिट के लिए लॉग की जाएंगी। जारी रखें?",
+    "start": "शुरू करें",
+    "startButton": "प्रतिरूपण शुरू करें",
+    "startAs": "{{name}} के रूप में शुरू करें",
+    "error": "प्रतिरूपण शुरू करने में विफल। कृपया पुनः प्रयास करें।",
+    "errorLoading": "उपयोगकर्ता लोड करने में विफल",
+    "loading": "उपयोगकर्ता लोड हो रहे हैं...",
+    "active": "प्रतिरूपण सक्रिय",
+    "exit": "प्रतिरूपण से बाहर निकलें",
+    "userCount": "{{count}} उपयोगकर्ता मिले",
+    "selectedUser": "चयनित:",
+    "lastActive": "सक्रिय",
+    "justNow": "अभी",
+    "minutesAgo": "{{count}} मिनट पहले",
+    "hoursAgo": "{{count}} घंटे पहले",
+    "daysAgo": "{{count}} दिन पहले",
+    "neverActive": "कभी नहीं",
+    "emptyTitle": "कोई उपयोगकर्ता नहीं मिला",
+    "emptyMessage": "अपनी खोज या फ़िल्टर मानदंड समायोजित करने का प्रयास करें।",
+    "all": "सभी"
   }
 }

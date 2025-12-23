@@ -94,16 +94,98 @@ export const KpiGridWidget: React.FC<WidgetProps> = ({
     });
   }, []);
 
-  const handleMetricPress = (metricKey: string) => {
-    trackWidgetEvent(WIDGET_ID, 'click', { action: 'metric_press', metricKey });
+  const handleMetricPress = (metricCategory: string, metricKey: string) => {
+    trackWidgetEvent(WIDGET_ID, 'click', { action: 'metric_press', metricKey, category: metricCategory });
     addBreadcrumb({
       category: 'widget',
       message: `${WIDGET_ID}_metric_press`,
       level: 'info',
-      data: { metricKey },
+      data: { metricKey, metricCategory },
     });
-    // Navigate to detailed analytics if route exists
-    onNavigate?.('analytics-detail', { metricKey });
+
+    // First check metric_key for specific routing (more precise than category)
+    const keyLower = metricKey.toLowerCase();
+    const catLower = metricCategory.toLowerCase();
+
+    // Attendance metrics
+    if (keyLower.includes('attendance') || catLower === 'attendance') {
+      onNavigate?.('attendance-analytics');
+      return;
+    }
+    // Grade/Academic metrics (grades, exams, tests, results, homework, assignments)
+    if (keyLower.includes('grade') || keyLower.includes('academic') || keyLower.includes('score') ||
+        keyLower.includes('marks') || keyLower.includes('exam') || keyLower.includes('test') ||
+        keyLower.includes('result') || keyLower.includes('homework') || keyLower.includes('assignment') ||
+        catLower === 'grade' || catLower === 'grades' || catLower === 'academic') {
+      onNavigate?.('grade-analytics');
+      return;
+    }
+    // Pending work metrics (tasks, pending items, work)
+    if (keyLower.includes('pending') && (keyLower.includes('work') || keyLower.includes('task') || keyLower.includes('assignment'))) {
+      onNavigate?.('pending-work-analytics'); // Pending work has its own screen
+      return;
+    }
+    // Standalone "pending" or "work" keywords
+    if (keyLower.includes('pending_work') || keyLower.includes('pendingwork') ||
+        (keyLower.includes('work') && !keyLower.includes('homework'))) {
+      onNavigate?.('pending-work-analytics');
+      return;
+    }
+    // Session metrics
+    if (keyLower.includes('session') || keyLower.includes('duration') || catLower === 'sessions') {
+      onNavigate?.('sessions-analytics');
+      return;
+    }
+    // User metrics
+    if (keyLower.includes('student') || keyLower.includes('teacher') || keyLower.includes('parent') ||
+        keyLower.includes('user') || catLower === 'users') {
+      onNavigate?.('user-analytics');
+      return;
+    }
+    // Revenue/Finance metrics
+    if (keyLower.includes('revenue') || keyLower.includes('fee') || keyLower.includes('payment') ||
+        keyLower.includes('income') || keyLower.includes('expense') || keyLower.includes('pending_fee') ||
+        catLower === 'finance' || catLower === 'revenue') {
+      onNavigate?.('revenue-analytics');
+      return;
+    }
+    // Content metrics
+    if (keyLower.includes('content') || keyLower.includes('view') || keyLower.includes('course') ||
+        catLower === 'content') {
+      onNavigate?.('content-analytics');
+      return;
+    }
+    // Engagement metrics (catch remaining engagement items)
+    if (catLower === 'engagement') {
+      onNavigate?.('engagement-detail');
+      return;
+    }
+
+    // Fallback to category-based routing
+    const screenMap: Record<string, string> = {
+      users: 'user-analytics',           // User Analytics Screen
+      revenue: 'revenue-analytics',      // Revenue Analytics Screen
+      finance: 'revenue-analytics',      // Finance also goes to Revenue Analytics
+      engagement: 'engagement-detail',   // Engagement Analytics Screen
+      growth: 'growth-detail',           // Growth Analytics Screen
+      trends: 'trends-detail',           // Trends Analytics Screen
+      content: 'content-analytics',      // Content Analytics Screen
+      sessions: 'sessions-analytics',    // Sessions Analytics Screen
+      activity: 'sessions-analytics',    // Activity goes to Sessions
+      performance: 'trends-detail',      // Performance goes to Trends
+      attendance: 'attendance-analytics', // Attendance Analytics Screen
+      grade: 'grade-analytics',          // Grade/Academic Analytics Screen
+      grades: 'grade-analytics',         // Alias for grades
+      academic: 'grade-analytics',       // Academic also goes to Grade Analytics
+      work: 'pending-work-analytics',     // Work/tasks goes to Pending Work
+      pending: 'pending-work-analytics', // Pending items goes to Pending Work
+      homework: 'grade-analytics',       // Homework goes to Academic
+      assignments: 'grade-analytics',    // Assignments goes to Academic
+      exams: 'grade-analytics',          // Exams goes to Academic
+      tests: 'grade-analytics',          // Tests goes to Academic
+    };
+    // Use the actual category from the metric
+    onNavigate?.(screenMap[metricCategory] || 'trends-detail');
   };
 
   // Loading state
@@ -178,7 +260,7 @@ export const KpiGridWidget: React.FC<WidgetProps> = ({
                   width: columns === 1 ? '100%' : columns === 2 ? '48%' : '31%',
                 },
               ]}
-              onPress={() => handleMetricPress(metric.metric_key)}
+              onPress={() => handleMetricPress(metric.category, metric.metric_key)}
               accessibilityRole="button"
               accessibilityLabel={`${getLocalizedField(metric, 'label')}: ${formatValue(metric.value, metric.format_type, metric.unit)}`}
             >

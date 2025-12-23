@@ -28,8 +28,8 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen, LiveClassesListScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
-import { 
-  LoginAdminScreen, 
+import {
+  LoginAdminScreen,
   TwoFactorSetupScreen,
   UserDetailScreen,
   UserImpersonationScreen,
@@ -59,6 +59,19 @@ import {
   AdmissionsListScreen,
   AdmissionsDashboardScreen,
 } from "../screens/admin";
+import {
+  TrendsDetailScreen,
+  GrowthDetailScreen,
+  EngagementDetailScreen,
+  ComparisonsDetailScreen,
+  UserAnalyticsScreen,
+  RevenueAnalyticsScreen,
+  SessionsAnalyticsScreen,
+  ContentAnalyticsScreen,
+  AttendanceAnalyticsScreen,
+  GradeAnalyticsScreen,
+  PendingWorkAnalyticsScreen,
+} from "../screens/admin/analytics";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -176,6 +189,19 @@ const COMMON_SCREENS = [
   { screenId: "admission-create", component: AdmissionCreateScreen },
   { screenId: "admissions-list", component: AdmissionsListScreen },
   { screenId: "admissions-dashboard", component: AdmissionsDashboardScreen },
+  // Admin Analytics Detail screens (Sprint 7)
+  { screenId: "trends-detail", component: TrendsDetailScreen },
+  { screenId: "growth-detail", component: GrowthDetailScreen },
+  { screenId: "engagement-detail", component: EngagementDetailScreen },
+  { screenId: "comparisons-detail", component: ComparisonsDetailScreen },
+  // Dedicated metric analytics screens (each metric type has its own screen)
+  { screenId: "user-analytics", component: UserAnalyticsScreen },
+  { screenId: "revenue-analytics", component: RevenueAnalyticsScreen },
+  { screenId: "sessions-analytics", component: SessionsAnalyticsScreen },
+  { screenId: "content-analytics", component: ContentAnalyticsScreen },
+  { screenId: "attendance-analytics", component: AttendanceAnalyticsScreen },
+  { screenId: "grade-analytics", component: GradeAnalyticsScreen },
+  { screenId: "pending-work-analytics", component: PendingWorkAnalyticsScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons

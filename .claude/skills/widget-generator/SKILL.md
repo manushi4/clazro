@@ -1,7 +1,7 @@
 ---
 name: widget-generator
 description: |
-  Generate complete widgets for the CoComplete platform following the 7-phase development workflow.
+  Generate complete widgets for the CoComplete platform following the 9-phase development workflow.
   Use this skill when:
   - User asks to "create a widget", "add a widget", "generate widget", or "build widget"
   - User wants to add a new configurable UI component to the mobile app
@@ -10,12 +10,12 @@ description: |
 
   This skill generates all required files: database migrations, query hooks, widget components,
   translations (English + Hindi), mobile registry entries, Platform Studio registry entries,
-  and database screen layout insertions.
+  database screen layout insertions, app fallback layouts, and Platform Studio screen configurations.
 ---
 
 # Widget Generator
 
-Generate complete, production-ready widgets following all 7 phases.
+Generate complete, production-ready widgets following all 9 phases.
 
 ## 🚨 CRITICAL UPDATES (Dec 2024)
 
@@ -56,10 +56,24 @@ Before generating, collect:
 ## Execution Phases
 
 **CRITICAL RULES:**
-1. **NEVER SKIP ANY PHASE** - Execute all 7 phases even if data exists
+1. **NEVER SKIP ANY PHASE** - Execute all 9 phases even if data exists
 2. **USE SUPABASE MCP ONLY** - Use `mcp__supabase__apply_migration` and `mcp__supabase__execute_sql`
 3. **CORRECT RLS POLICY** - Always use `user_profiles` table (not user_roles)
 4. **VERIFY EACH PHASE** - Confirm completion before moving to next phase
+5. **ALWAYS ADD FALLBACK** - Phase 8 ensures widget works when database is unavailable
+
+**Phase Overview:**
+| Phase | Description | File/Location |
+|-------|-------------|---------------|
+| 1 | Database Setup | Supabase MCP |
+| 2 | Query Hook | `src/hooks/queries/{role}/` |
+| 3 | Widget Component | `src/components/widgets/{category}/` |
+| 4 | Translations | `src/locales/en/` + `src/locales/hi/` |
+| 5 | Mobile App Registry | `src/config/widgetRegistry.ts` |
+| 6 | Platform Studio Registry | `platform-studio/src/config/widgetRegistry.ts` |
+| 7 | Database Screen Layout | Supabase `screen_layouts` table |
+| 8 | App Fallback Layout | `src/services/config/configService.ts` |
+| 9 | Platform Studio Screen | `platform-studio/src/config/screenRegistry.ts` |
 
 ---
 
@@ -472,9 +486,126 @@ mcp__supabase__execute_sql({
 
 ---
 
+### PHASE 8: Mobile App Screen Layout (configService.ts)
+
+**MANDATORY: Add widget to mobile app's DEFAULT_SCREEN_LAYOUTS**
+
+This ensures the widget appears on the screen even when database is unavailable.
+
+**File:** `src/services/config/configService.ts`
+
+**Steps:**
+1. Open `src/services/config/configService.ts`
+2. Find `DEFAULT_SCREEN_LAYOUTS` object
+3. Locate the target screen (e.g., `"teacher-home"`)
+4. Add widget entry with correct position
+
+```typescript
+// Example for teacher-home screen:
+"teacher-home": [
+  { widgetId: "teacher.hero-card", position: 1, size: "expanded", enabled: true, customProps: { ... } },
+  { widgetId: "teacher.stats-grid", position: 2, size: "standard", enabled: true, customProps: { ... } },
+  { widgetId: "teacher.upcoming-classes", position: 3, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+  // ADD NEW WIDGET HERE:
+  { widgetId: "{widget.id}", position: 4, size: "standard", enabled: true, customProps: { maxItems: 5, showProgress: true } },
+],
+```
+
+**Screen ID Mapping:**
+| Role | Screen ID | File Location |
+|------|-----------|---------------|
+| Admin | `admin-home` | Line ~160 |
+| Teacher | `teacher-home` | Line ~182 |
+| Parent | `parent-home` | Line ~200 |
+| Student | `student-home` | Line ~140 |
+| Student | `dashboard` | Line ~150 |
+
+**IMPORTANT Rules:**
+- Position must be sequential (1, 2, 3, 4...)
+- `customProps` must match `defaultConfig` from Phase 5
+- `size` must match `defaultSize` from Phase 5
+- Use `enabled: true` for the widget to appear
+
+**Checklist:**
+- [ ] Opened `src/services/config/configService.ts`
+- [ ] Found correct screen in `DEFAULT_SCREEN_LAYOUTS`
+- [ ] Added widget with correct position number
+- [ ] `customProps` match Phase 5 `defaultConfig`
+
+---
+
+### PHASE 9: Platform Studio Screen Builder
+
+**MANDATORY: Add widget to Platform Studio's configStore defaults**
+
+This makes the widget appear in Platform Studio's screen builder when editing screens.
+
+**File:** `platform-studio/src/stores/configStore.ts`
+
+**Steps:**
+1. Open `platform-studio/src/stores/configStore.ts`
+2. Find `initialScreenLayouts` or `DEFAULT_LAYOUTS` object
+3. Locate the target screen and role
+4. Add widget to the widgets array
+
+```typescript
+// Example structure:
+const initialScreenLayouts = {
+  teacher: {
+    "teacher-home": {
+      widgets: [
+        { widget_id: "teacher.hero-card", position: 1, size: "expanded", config: {} },
+        { widget_id: "teacher.stats-grid", position: 2, size: "standard", config: {} },
+        // ADD NEW WIDGET HERE:
+        { widget_id: "{widget.id}", position: 4, size: "standard", config: { maxItems: 5 } },
+      ],
+    },
+  },
+};
+```
+
+**If configStore doesn't have default layouts**, add to screenRegistry.ts instead:
+
+**File:** `platform-studio/src/config/screenRegistry.ts`
+
+```typescript
+"{screen_id}": {
+  screen_id: "{screen_id}",
+  name: "{Screen Name}",
+  // ... other properties ...
+  defaultWidgets: [
+    { widget_id: "{widget.id}", position: 4, size: "standard", config: { maxItems: 5 } },
+  ],
+},
+```
+
+**Platform Studio Widget Visibility Rules:**
+1. Widget must be registered in `platform-studio/src/config/widgetRegistry.ts` (Phase 6)
+2. Widget `category` should be "schedule" or "study" (expanded by default)
+3. Widget `allowedRoles` must include the selected role
+4. User must select correct role in Platform Studio dropdown
+
+**CRITICAL Category Note:**
+```typescript
+// Use "schedule" category for teacher widgets (expanded by default):
+"teacher.pending-grading": {
+  category: "schedule",  // NOT "assessment" - assessment is collapsed!
+  allowedRoles: ["teacher"],
+  // ...
+}
+```
+
+**Checklist:**
+- [ ] Widget added to configStore or screenRegistry defaults
+- [ ] Widget category is "schedule" or "study" (visible by default)
+- [ ] `allowedRoles` includes target role
+- [ ] Verified by selecting role in Platform Studio and checking widget palette
+
+---
+
 ## Verification Checklist
 
-After all phases, verify:
+After all 9 phases, verify:
 
 ### Mobile App
 - [ ] Widget renders with theme colors
@@ -482,16 +613,23 @@ After all phases, verify:
 - [ ] Hindi translations display
 - [ ] Loading/error/empty states work
 - [ ] Navigation works
+- [ ] Widget appears on target screen (from fallback layout)
 
 ### Platform Studio Sync
-- [ ] Widget appears in palette
-- [ ] Properties panel shows config
+- [ ] Widget appears in widget palette
+- [ ] Properties panel shows config options
 - [ ] Preview updates on config change
-- [ ] Save → Mobile reflects changes
+- [ ] Save changes reflect in mobile app
+- [ ] Widget appears in screen's default widgets (if added)
 
 ### Database
 - [ ] RLS allows correct role access
 - [ ] Localized data returns correctly
+
+### Fallback Behavior
+- [ ] Widget works when database is unavailable
+- [ ] Demo data displays correctly
+- [ ] Fallback layout matches database layout
 
 ---
 

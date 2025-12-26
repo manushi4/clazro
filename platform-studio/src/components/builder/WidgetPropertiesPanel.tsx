@@ -2994,6 +2994,27 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
       },
     ],
   },
+  "analytics.class-performance": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Subjects", type: "number", min: 1, max: 10, default: 6 },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["list", "grid"], default: "list" },
+        ],
+      },
+      {
+        title: "Metrics",
+        icon: "📈",
+        fields: [
+          { key: "showRank", label: "Show Class Rank", type: "boolean", default: true },
+          { key: "showTrend", label: "Show Performance Trend", type: "boolean", default: true },
+          { key: "showClassAverage", label: "Show Class Average", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
   // ============ ADMIN CONTENT WIDGETS ============
   "content.stats": {
     sections: [
@@ -3374,6 +3395,408 @@ const WIDGET_CONFIGS: Record<string, WidgetConfigSchema> = {
           { key: "aspectRatio", label: "Aspect Ratio", type: "select", options: ["4:3", "16:9", "1:1"], default: "4:3" },
           { key: "borderRadius", label: "Border Radius", type: "number", min: 0, max: 16, default: 8 },
           { key: "showOverlay", label: "Show Overlay", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.upcoming-classes": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📅",
+        fields: [
+          { key: "maxItems", label: "Max Classes to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "showRoom", label: "Show Room Number", type: "boolean", default: true },
+          { key: "showTime", label: "Show Class Time", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Current Class",
+        icon: "🔴",
+        fields: [
+          { key: "highlightCurrent", label: "Highlight Current Class", type: "boolean", default: true },
+          { key: "showNowTag", label: "Show NOW Tag", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to Navigate", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.pending-grading": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📋",
+        fields: [
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "showProgress", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showDueDate", label: "Show Due Date", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Priority",
+        icon: "🚨",
+        fields: [
+          { key: "showPriorityIndicator", label: "Show Priority Indicator", type: "boolean", default: true },
+          { key: "sortByPriority", label: "Sort by Priority", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to Grade", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "grading.recent": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Items to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "showScore", label: "Show Score", type: "boolean", default: true },
+          { key: "showPercentage", label: "Show Percentage Badge", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "grading.stats": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "showDistribution", label: "Show Grade Distribution", type: "boolean", default: true },
+          { key: "showAvgScore", label: "Show Average Score", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.grading-stats": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "showDistribution", label: "Show Grade Distribution", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "grading.rubric-templates": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Templates", type: "number", min: 1, max: 10, default: 6 },
+          { key: "layoutStyle", label: "Layout", type: "select", options: ["grid", "list"], default: "grid" },
+          { key: "showCreateButton", label: "Show Create Button", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.at-risk-students": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Students to Show", type: "number", min: 1, max: 10, default: 5 },
+          { key: "showMetrics", label: "Show Performance Metrics", type: "boolean", default: true },
+          { key: "showTrend", label: "Show Trend Indicator", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Filters",
+        icon: "🔍",
+        fields: [
+          { key: "filterRiskLevel", label: "Filter by Risk Level", type: "select", options: ["all", "critical", "high", "medium", "low"], default: "all" },
+        ],
+      },
+      {
+        title: "Actions",
+        icon: "⚡",
+        fields: [
+          { key: "showViewAll", label: "Show View All Link", type: "boolean", default: true },
+          { key: "enableTap", label: "Enable Tap to View Student", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.quick-actions": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Actions to Show", type: "number", min: 4, max: 12, default: 8 },
+          { key: "columns", label: "Grid Columns", type: "number", min: 2, max: 6, default: 4 },
+          { key: "showLabels", label: "Show Action Labels", type: "boolean", default: true },
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["grid", "list"], default: "grid" },
+        ],
+      },
+    ],
+  },
+  "teacher.create-assignment": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "variant", label: "Variant Style", type: "select", options: ["card", "button", "banner"], default: "card" },
+          { key: "showIcon", label: "Show Icon", type: "boolean", default: true },
+          { key: "showDescription", label: "Show Description", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "class.cards": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Classes to Show", type: "number", min: 2, max: 12, default: 6 },
+          { key: "columns", label: "Grid Columns", type: "number", min: 1, max: 3, default: 2 },
+          { key: "showStudentCount", label: "Show Student Count", type: "boolean", default: true },
+          { key: "showSubject", label: "Show Subject", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "class.roster": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Students to Show", type: "number", min: 5, max: 50, default: 10 },
+          { key: "showSearch", label: "Show Search Bar", type: "boolean", default: true },
+          { key: "showAttendance", label: "Show Attendance Rate", type: "boolean", default: true },
+          { key: "showScore", label: "Show Average Score", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "class.stats": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "layoutStyle", label: "Layout Style", type: "select", options: ["grid", "list"], default: "grid" },
+          { key: "columns", label: "Grid Columns", type: "number", min: 2, max: 4, default: 2 },
+          { key: "showTrends", label: "Show Trend Indicators", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "class.activity": {
+    sections: [
+      {
+        title: "Display",
+        icon: "📊",
+        fields: [
+          { key: "maxItems", label: "Max Activities to Show", type: "number", min: 3, max: 10, default: 5 },
+          { key: "showTimestamp", label: "Show Timestamps", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "class.recentActivity": {
+    sections: [
+      {
+        title: "Display",
+        icon: "clock",
+        fields: [
+          { key: "maxItems", label: "Max Activities", type: "number", min: 3, max: 15, default: 7 },
+          { key: "showFilter", label: "Show Activity Filter", type: "boolean", default: true },
+          { key: "showClassName", label: "Show Class Name", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.classOverview": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxStudentsPerClass", label: "At-Risk Students Per Class", type: "number", min: 1, max: 5, default: 3 },
+          { key: "showQuickActions", label: "Show Quick Actions", type: "boolean", default: true },
+          { key: "expandedByDefault", label: "Expanded by Default", type: "boolean", default: false },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "alert-triangle",
+        fields: [
+          { key: "attendanceThreshold", label: "Low Attendance Threshold (%)", type: "number", min: 50, max: 90, default: 75 },
+          { key: "scoreThreshold", label: "Low Score Threshold (%)", type: "number", min: 40, max: 80, default: 60 },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceHero": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "showPendingClasses", label: "Show Pending Classes", type: "boolean", default: true },
+          { key: "showRateBadge", label: "Show Rate Badge", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceQuickActions": {
+    sections: [
+      {
+        title: "Actions",
+        icon: "zap",
+        fields: [
+          { key: "columns", label: "Columns", type: "number", min: 2, max: 4, default: 4 },
+          { key: "showLabels", label: "Show Labels", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceRecent": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxItems", label: "Max Items", type: "number", min: 3, max: 10, default: 5 },
+          { key: "showClassBadge", label: "Show Class Badge", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceTrends": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "defaultRange", label: "Default Range", type: "select", options: ["week", "month", "quarter"], default: "week" },
+          { key: "showAverageLine", label: "Show Average Line", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceClassCompare": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "showTodayRate", label: "Show Today's Rate", type: "boolean", default: true },
+          { key: "sortBy", label: "Sort By", type: "select", options: ["rate", "name", "students"], default: "rate" },
+        ],
+      },
+    ],
+  },
+  "teacher.attendanceLowAlerts": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxStudents", label: "Max Students", type: "number", min: 3, max: 20, default: 10 },
+          { key: "showContactActions", label: "Show Contact Actions", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "alert-triangle",
+        fields: [
+          { key: "attendanceThreshold", label: "Low Attendance Threshold (%)", type: "number", min: 50, max: 90, default: 75 },
+        ],
+      },
+    ],
+  },
+  "attendance.today-summary": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "showChart", label: "Show Progress Bar", type: "boolean", default: true },
+          { key: "showPending", label: "Show Pending Classes", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "attendance.quick-mark": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxItems", label: "Max Classes", type: "number", min: 1, max: 10, default: 5 },
+          { key: "showStudentCount", label: "Show Student Count", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "attendance.trends": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "showComparison", label: "Show Week Comparison", type: "boolean", default: true },
+        ],
+      },
+    ],
+  },
+  "attendance.alerts": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxItems", label: "Max Students", type: "number", min: 3, max: 10, default: 5 },
+          { key: "showActions", label: "Show Contact Actions", type: "boolean", default: true },
+        ],
+      },
+      {
+        title: "Thresholds",
+        icon: "alert-triangle",
+        fields: [
+          { key: "threshold", label: "Low Attendance Threshold (%)", type: "number", min: 50, max: 90, default: 75 },
+        ],
+      },
+    ],
+  },
+  "teacher.ai-insights": {
+    sections: [
+      {
+        title: "Display",
+        icon: "layout",
+        fields: [
+          { key: "maxItems", label: "Max Insights", type: "number", min: 3, max: 15, default: 5 },
+          { key: "showPriorityBadge", label: "Show Priority Badge", type: "boolean", default: true },
+          { key: "showUnreadCount", label: "Show Unread Count", type: "boolean", default: true },
         ],
       },
     ],

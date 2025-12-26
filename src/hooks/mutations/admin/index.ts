@@ -41,8 +41,22 @@ export type {
   ExportProgress,
 } from './useExportReport';
 
-// Sprint 9
-// export { useUpdateSettings } from './useUpdateSettings';
+// Sprint 9: Settings + Audit
+export {
+  useUpdateSettings,
+  useUpdateNotificationSettings,
+  useUpdateAppearanceSettings,
+  useUpdatePrivacySettings
+} from './useUpdateSettings';
+export type {
+  UpdateSettingsInput,
+  UpdateSettingsResult,
+  NotificationSettingsInput,
+  AppearanceSettingsInput,
+  PrivacySettingsInput,
+  NotificationChannel,
+  NotificationCategory,
+} from './useUpdateSettings';
 
 // Organization Management
 export { useCreateOrganization } from './useCreateOrganization';

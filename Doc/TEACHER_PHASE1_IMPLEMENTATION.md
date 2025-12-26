@@ -1,14 +1,14 @@
-# 👩‍🏫 TEACHER PHASE 1 - DEMO-READY IMPLEMENTATION GUIDE
+# TEACHER PHASE 1 - DEMO-READY IMPLEMENTATION GUIDE
 
-> **Version:** 1.0.0
+> **Version:** 2.1.0
 > **Date:** December 2024
-> **Scope:** Teacher Role - Phase 1 (Demo Ready)
-> **Sprints:** 8 Sprints
-> **Total:** 4 Fixed Screens, 13 Dynamic Screens, 24 Widgets
+> **Scope:** Teacher Role - Phase 1 (Demo Ready for Funding Pitch)
+> **Sprints:** 9 Sprints
+> **Total:** 11 Fixed Screens, 13 Dynamic Screens, 32 Widgets
 
 ---
 
-## 📋 TABLE OF CONTENTS
+## TABLE OF CONTENTS
 
 1. [Overview](#1-overview)
 2. [Sprint 1: Foundation + Auth](#2-sprint-1-foundation--auth)
@@ -19,9 +19,10 @@
 7. [Sprint 6: Student Detail + Analytics](#7-sprint-6-student-detail--analytics)
 8. [Sprint 7: Communication](#8-sprint-7-communication)
 9. [Sprint 8: Profile + Polish](#9-sprint-8-profile--polish)
-10. [Database Schema](#10-database-schema)
-11. [Platform Studio Config](#11-platform-studio-config)
-12. [Testing Checklist](#12-testing-checklist)
+10. [Sprint 9: Demo Showcase Features](#10-sprint-9-demo-showcase-features)
+11. [Database Schema](#11-database-schema)
+12. [Platform Studio Config](#12-platform-studio-config)
+13. [Testing Checklist](#13-testing-checklist)
 
 ---
 
@@ -31,35 +32,64 @@
 
 | Component | Count |
 |-----------|-------|
-| Fixed Screens | 4 |
+| Fixed Screens | 11 |
 | Dynamic Screens | 13 |
-| Widgets | 24 |
-| Query Hooks | 12 |
-| Mutation Hooks | 6 |
-| DB Tables | 8 |
+| Widgets | 32 |
+| Query Hooks | 16 |
+| Mutation Hooks | 9 |
+| DB Tables | 12 |
 
-### 1.2 File Structure
+### 1.2 Demo Priority Features
+
+**Target Audience:** Coaching heads, school institutes, and teachers for funding pitch
+
+| Priority | Feature | Wow Factor | Sprint |
+|----------|---------|------------|--------|
+| P0 | Dashboard Home | Hero + Stats + Quick Actions | Sprint 2 |
+| P0 | Today's Schedule | Visual timetable with class details | Sprint 2 |
+| P0 | Take Attendance | Quick mark attendance flow | Sprint 4 |
+| P1 | Grading Hub | Pending assignments + quick review | Sprint 5 |
+| P1 | At-Risk Alerts | AI-flagged students needing attention | Sprint 6 |
+| P1 | Doubts Inbox | Answer student questions with AI suggestions | Sprint 9 |
+| P2 | Teacher Calendar | Monthly view with classes/exams/meetings | Sprint 9 |
+| P2 | Substitute Finder | Mark leave + find replacement teacher | Sprint 9 |
+| P2 | Student Overview | Performance at a glance | Sprint 6 |
+| P2 | My Classes | Class list with student rosters | Sprint 3 |
+
+### 1.3 File Structure
 
 ```
 src/
 ├── screens/teacher/
 │   ├── index.ts
-│   ├── LoginTeacherScreen.tsx        # Sprint 1
-│   ├── OnboardingTeacherScreen.tsx   # Sprint 1
-│   ├── TeacherDashboardScreen.tsx    # Sprint 2
-│   ├── ClassHubScreen.tsx            # Sprint 3
-│   ├── ClassDetailScreen.tsx         # Sprint 3
-│   ├── ClassRosterScreen.tsx         # Sprint 3
-│   ├── AttendanceMarkScreen.tsx      # Sprint 4
-│   ├── AttendanceReportsScreen.tsx   # Sprint 4
-│   ├── GradingHubScreen.tsx          # Sprint 5
-│   ├── AssignmentCreateScreen.tsx    # Sprint 5
-│   ├── GradeSubmissionScreen.tsx     # Sprint 5
-│   ├── StudentDetailTeacherScreen.tsx # Sprint 6
-│   ├── AnalyticsHomeScreen.tsx       # Sprint 6
-│   ├── CommunicationHubScreen.tsx    # Sprint 7
-│   ├── ProfileTeacherScreen.tsx      # Sprint 8
-│   └── NotificationsTeacherScreen.tsx # Sprint 8
+│   │
+│   │   # === FIXED SCREENS (11) ===
+│   ├── LoginTeacherScreen.tsx        # Sprint 1 - Fixed (auth form)
+│   ├── OnboardingTeacherScreen.tsx   # Sprint 1 - Fixed (wizard)
+│   ├── AttendanceMarkScreen.tsx      # Sprint 4 - Fixed (bulk marking form)
+│   ├── AssignmentCreateScreen.tsx    # Sprint 5 - Fixed (complex form)
+│   ├── AssignmentDetailScreen.tsx    # Sprint 5 - Fixed (view/edit)
+│   ├── GradeSubmissionScreen.tsx     # Sprint 5 - Fixed (grading form)
+│   ├── StudentDetailTeacherScreen.tsx # Sprint 6 - Fixed (profile + actions)
+│   ├── DoubtAnswerScreen.tsx         # Sprint 9 - Fixed (AI-assisted form)
+│   ├── LeaveRequestCreateScreen.tsx  # Sprint 9 - Fixed (date picker + form)
+│   ├── CalendarEventCreateScreen.tsx # Sprint 9 - Fixed (event form)
+│   ├── SubstituteFinderScreen.tsx    # Sprint 9 - Fixed (search + request)
+│   │
+│   │   # === DYNAMIC SCREENS (13) ===
+│   ├── TeacherDashboardScreen.tsx    # Sprint 2 - Dynamic (widget-based)
+│   ├── ClassHubScreen.tsx            # Sprint 3 - Dynamic (widget-based)
+│   ├── ClassDetailScreen.tsx         # Sprint 3 - Dynamic (widget-based)
+│   ├── ClassRosterScreen.tsx         # Sprint 3 - Dynamic (widget-based)
+│   ├── AttendanceReportsScreen.tsx   # Sprint 4 - Dynamic (widget-based)
+│   ├── GradingHubScreen.tsx          # Sprint 5 - Dynamic (widget-based)
+│   ├── AnalyticsHomeScreen.tsx       # Sprint 6 - Dynamic (widget-based)
+│   ├── CommunicationHubScreen.tsx    # Sprint 7 - Dynamic (widget-based)
+│   ├── ProfileTeacherScreen.tsx      # Sprint 8 - Dynamic (widget-based)
+│   ├── NotificationsTeacherScreen.tsx # Sprint 8 - Dynamic (widget-based)
+│   ├── DoubtsInboxScreen.tsx         # Sprint 9 - Dynamic (widget-based)
+│   ├── TeacherCalendarScreen.tsx     # Sprint 9 - Dynamic (widget-based)
+│   └── LeaveHistoryScreen.tsx        # Sprint 9 - Dynamic (widget-based)
 ├── components/widgets/teacher/
 │   ├── index.ts
 │   ├── TeacherHeroWidget.tsx         # Sprint 2
@@ -85,7 +115,15 @@ src/
 │   ├── PerformanceTrendsWidget.tsx   # Sprint 6
 │   ├── MessagesInboxWidget.tsx       # Sprint 7
 │   ├── AnnouncementsWidget.tsx       # Sprint 7
-│   └── ParentContactsWidget.tsx      # Sprint 7
+│   ├── ParentContactsWidget.tsx      # Sprint 7
+│   ├── DoubtsInboxWidget.tsx         # Sprint 9 - Demo Showcase
+│   ├── DoubtDetailWidget.tsx         # Sprint 9 - Demo Showcase
+│   ├── TeacherCalendarWidget.tsx     # Sprint 9 - Demo Showcase
+│   ├── CalendarEventsWidget.tsx      # Sprint 9 - Demo Showcase
+│   ├── SubstituteRequestWidget.tsx   # Sprint 9 - Demo Showcase
+│   ├── AvailableSubstitutesWidget.tsx # Sprint 9 - Demo Showcase
+│   ├── LeaveRequestWidget.tsx        # Sprint 9 - Demo Showcase
+│   └── AIInsightsWidget.tsx          # Sprint 9 - Demo Showcase
 ├── hooks/queries/teacher/
 │   ├── index.ts
 │   ├── useTeacherDashboardQuery.ts   # Sprint 2
@@ -99,7 +137,11 @@ src/
 │   ├── useStudentProgressQuery.ts    # Sprint 6
 │   ├── useTeacherAnalyticsQuery.ts   # Sprint 6
 │   ├── useClassAnalyticsQuery.ts     # Sprint 6
-│   └── useTeacherMessagesQuery.ts    # Sprint 7
+│   ├── useTeacherMessagesQuery.ts    # Sprint 7
+│   ├── useDoubtsInboxQuery.ts        # Sprint 9 - Demo Showcase
+│   ├── useTeacherCalendarQuery.ts    # Sprint 9 - Demo Showcase
+│   ├── useAvailableSubstitutesQuery.ts # Sprint 9 - Demo Showcase
+│   └── useLeaveRequestsQuery.ts      # Sprint 9 - Demo Showcase
 └── hooks/mutations/teacher/
     ├── index.ts
     ├── useTeacherAuth.ts             # Sprint 1
@@ -107,7 +149,10 @@ src/
     ├── useBulkMarkAttendance.ts      # Sprint 4
     ├── useCreateAssignment.ts        # Sprint 5
     ├── useGradeSubmission.ts         # Sprint 5
-    └── useSendMessage.ts             # Sprint 7
+    ├── useSendMessage.ts             # Sprint 7
+    ├── useAnswerDoubt.ts             # Sprint 9 - Demo Showcase
+    ├── useRequestSubstitute.ts       # Sprint 9 - Demo Showcase
+    └── useCreateLeaveRequest.ts      # Sprint 9 - Demo Showcase
 ```
 
 ---
@@ -124,109 +169,475 @@ src/
 | DB Table | `teachers` | 🔲 |
 | DB Table | `teacher_classes` | 🔲 |
 
-### 2.2 LoginTeacherScreen.tsx
+### 2.2 LoginTeacherScreen.tsx (Fixed Screen)
 
 ```typescript
 // src/screens/teacher/LoginTeacherScreen.tsx
-import React, { useState } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
-import { Text, TextInput, Button, Surface } from 'react-native-paper';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Surface,
+  Checkbox,
+  Divider,
+  IconButton,
+  Snackbar,
+  HelperText,
+  ActivityIndicator,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
 import { useBranding } from '@/context/BrandingContext';
 import { useTeacherAuth } from '@/hooks/mutations/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 
-export const LoginTeacherScreen: React.FC = ({ navigation }) => {
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+type FormData = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
+
+type FormErrors = {
+  email?: string;
+  password?: string;
+};
+
+export const LoginTeacherScreen: React.FC = () => {
+  const navigation = useNavigation();
   const theme = useAppTheme();
+  const { t } = useTranslation('auth');
   const { branding } = useBranding();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { mutate: login, isPending, error } = useTeacherAuth();
+  const { mutate: login, isPending, error: authError } = useTeacherAuth();
 
-  const handleLogin = () => {
-    login({ email, password }, {
-      onSuccess: (data) => {
-        if (data.isFirstLogin) {
-          navigation.replace('onboarding-teacher');
-        } else {
-          navigation.replace('teacher-home');
-        }
-      },
-    });
+  // === ANIMATION ===
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  // === STATE ===
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+    rememberMe: false,
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+  const [isCheckingBiometric, setIsCheckingBiometric] = useState(true);
+
+  // === REFS ===
+  const passwordRef = useRef<any>(null);
+
+  // === EFFECTS ===
+  useEffect(() => {
+    // Animate on mount
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Check biometric availability
+    checkBiometricAuth();
+
+    // Load saved credentials
+    loadSavedCredentials();
+  }, []);
+
+  const checkBiometricAuth = async () => {
+    try {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      const savedToken = await AsyncStorage.getItem('biometric_token');
+      setBiometricAvailable(compatible && enrolled && !!savedToken);
+    } catch (error) {
+      console.log('Biometric check failed:', error);
+    } finally {
+      setIsCheckingBiometric(false);
+    }
   };
 
+  const loadSavedCredentials = async () => {
+    try {
+      const savedEmail = await AsyncStorage.getItem('saved_email');
+      if (savedEmail) {
+        setFormData(prev => ({ ...prev, email: savedEmail, rememberMe: true }));
+      }
+    } catch (error) {
+      console.log('Failed to load credentials:', error);
+    }
+  };
+
+  // === VALIDATION ===
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = t('validation.emailRequired', { defaultValue: 'Email is required' });
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = t('validation.emailInvalid', { defaultValue: 'Please enter a valid email' });
+    }
+
+    if (!formData.password) {
+      newErrors.password = t('validation.passwordRequired', { defaultValue: 'Password is required' });
+    } else if (formData.password.length < 6) {
+      newErrors.password = t('validation.passwordLength', { defaultValue: 'Password must be at least 6 characters' });
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // === HANDLERS ===
+  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field as keyof FormErrors]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+
+    // Save email if remember me is checked
+    if (formData.rememberMe) {
+      await AsyncStorage.setItem('saved_email', formData.email);
+    } else {
+      await AsyncStorage.removeItem('saved_email');
+    }
+
+    login(
+      { email: formData.email, password: formData.password },
+      {
+        onSuccess: (data) => {
+          if (data.isFirstLogin) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'onboarding-teacher' as never }],
+            });
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'teacher-home' as never }],
+            });
+          }
+        },
+        onError: (error) => {
+          setSnackbar({
+            visible: true,
+            message: error.message || t('errors.loginFailed', { defaultValue: 'Login failed. Please try again.' }),
+          });
+        },
+      }
+    );
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: t('biometric.prompt', { defaultValue: 'Authenticate to login' }),
+        cancelLabel: t('common.cancel', { defaultValue: 'Cancel' }),
+        fallbackLabel: t('biometric.usePassword', { defaultValue: 'Use Password' }),
+      });
+
+      if (result.success) {
+        const savedToken = await AsyncStorage.getItem('biometric_token');
+        if (savedToken) {
+          // Use saved token for authentication
+          login(
+            { biometricToken: savedToken },
+            {
+              onSuccess: () => {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'teacher-home' as never }],
+                });
+              },
+              onError: () => {
+                setSnackbar({
+                  visible: true,
+                  message: t('errors.biometricFailed', { defaultValue: 'Biometric login failed' }),
+                });
+              },
+            }
+          );
+        }
+      }
+    } catch (error) {
+      setSnackbar({
+        visible: true,
+        message: t('errors.biometricError', { defaultValue: 'Biometric authentication error' }),
+      });
+    }
+  };
+
+  // === RENDER ===
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <Surface style={styles.card} elevation={2}>
-        {branding?.logoUrl && (
-          <Image source={{ uri: branding.logoUrl }} style={styles.logo} />
-        )}
-        <Text variant="headlineMedium" style={styles.title}>
-          Teacher Login
-        </Text>
-        <Text variant="bodyMedium" style={styles.subtitle}>
-          {branding?.appName || 'EduPlatform'}
-        </Text>
-
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          mode="outlined"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          mode="outlined"
-          secureTextEntry
-          style={styles.input}
-        />
-
-        {error && (
-          <Text style={[styles.error, { color: theme.colors.error }]}>
-            {error.message}
-          </Text>
-        )}
-
-        <Button
-          mode="contained"
-          onPress={handleLogin}
-          loading={isPending}
-          disabled={isPending || !email || !password}
-          style={styles.button}
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          Sign In
-        </Button>
+          <Animated.View
+            style={[
+              styles.content,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            {/* Logo & Title */}
+            <View style={styles.headerSection}>
+              {branding?.logoUrl ? (
+                <Image source={{ uri: branding.logoUrl }} style={styles.logo} resizeMode="contain" />
+              ) : (
+                <View style={[styles.logoPlaceholder, { backgroundColor: theme.colors.primary }]}>
+                  <Icon name="school" size={48} color="white" />
+                </View>
+              )}
+              <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>
+                {t('login.teacherTitle', { defaultValue: 'Teacher Login' })}
+              </Text>
+              <Text variant="bodyMedium" style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+                {branding?.appName || 'EduPlatform'}
+              </Text>
+            </View>
 
-        <Button
-          mode="text"
-          onPress={() => navigation.navigate('forgot-password')}
-          style={styles.forgotButton}
+            {/* Login Form */}
+            <Surface style={[styles.formCard, { backgroundColor: theme.colors.surface }]}>
+              {/* Email Input */}
+              <TextInput
+                mode="outlined"
+                label={t('login.email', { defaultValue: 'Email' })}
+                value={formData.email}
+                onChangeText={(v) => updateField('email', v)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                error={!!errors.email}
+                left={<TextInput.Icon icon="email-outline" />}
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                returnKeyType="next"
+                style={styles.input}
+              />
+              {errors.email && <HelperText type="error">{errors.email}</HelperText>}
+
+              {/* Password Input */}
+              <TextInput
+                ref={passwordRef}
+                mode="outlined"
+                label={t('login.password', { defaultValue: 'Password' })}
+                value={formData.password}
+                onChangeText={(v) => updateField('password', v)}
+                secureTextEntry={!showPassword}
+                error={!!errors.password}
+                left={<TextInput.Icon icon="lock-outline" />}
+                right={
+                  <TextInput.Icon
+                    icon={showPassword ? 'eye-off' : 'eye'}
+                    onPress={() => setShowPassword(!showPassword)}
+                  />
+                }
+                onSubmitEditing={handleLogin}
+                returnKeyType="done"
+                style={styles.input}
+              />
+              {errors.password && <HelperText type="error">{errors.password}</HelperText>}
+
+              {/* Remember Me & Forgot Password */}
+              <View style={styles.optionsRow}>
+                <TouchableOpacity
+                  style={styles.rememberRow}
+                  onPress={() => updateField('rememberMe', !formData.rememberMe)}
+                >
+                  <Checkbox
+                    status={formData.rememberMe ? 'checked' : 'unchecked'}
+                    onPress={() => updateField('rememberMe', !formData.rememberMe)}
+                  />
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurface }}>
+                    {t('login.rememberMe', { defaultValue: 'Remember me' })}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate('forgot-password' as never)}>
+                  <Text variant="bodySmall" style={{ color: theme.colors.primary }}>
+                    {t('login.forgotPassword', { defaultValue: 'Forgot Password?' })}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Error Message */}
+              {authError && (
+                <View style={[styles.errorBox, { backgroundColor: theme.colors.errorContainer }]}>
+                  <Icon name="alert-circle" size={20} color={theme.colors.error} />
+                  <Text variant="bodySmall" style={{ color: theme.colors.error, flex: 1 }}>
+                    {authError.message || t('errors.invalidCredentials', { defaultValue: 'Invalid email or password' })}
+                  </Text>
+                </View>
+              )}
+
+              {/* Login Button */}
+              <Button
+                mode="contained"
+                onPress={handleLogin}
+                loading={isPending}
+                disabled={isPending}
+                style={styles.loginButton}
+                contentStyle={styles.loginButtonContent}
+              >
+                {t('login.signIn', { defaultValue: 'Sign In' })}
+              </Button>
+
+              {/* Biometric Login */}
+              {biometricAvailable && !isCheckingBiometric && (
+                <>
+                  <Divider style={styles.divider} />
+                  <TouchableOpacity
+                    style={[styles.biometricButton, { borderColor: theme.colors.outline }]}
+                    onPress={handleBiometricLogin}
+                  >
+                    <Icon name="fingerprint" size={28} color={theme.colors.primary} />
+                    <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
+                      {t('login.useBiometric', { defaultValue: 'Login with Fingerprint' })}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </Surface>
+
+            {/* Help Section */}
+            <View style={styles.helpSection}>
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                {t('login.needHelp', { defaultValue: 'Need help?' })}
+              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('support' as never)}>
+                <Text variant="bodySmall" style={{ color: theme.colors.primary, marginLeft: 4 }}>
+                  {t('login.contactSupport', { defaultValue: 'Contact Support' })}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Version Info */}
+            <Text variant="labelSmall" style={[styles.version, { color: theme.colors.onSurfaceVariant }]}>
+              v1.0.0
+            </Text>
+          </Animated.View>
+        </ScrollView>
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={3000}
+          action={{
+            label: t('common.dismiss', { defaultValue: 'Dismiss' }),
+            onPress: () => setSnackbar({ ...snackbar, visible: false }),
+          }}
         >
-          Forgot Password?
-        </Button>
-      </Surface>
-    </KeyboardAvoidingView>
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
-  card: { padding: 24, borderRadius: 12 },
-  logo: { width: 80, height: 80, alignSelf: 'center', marginBottom: 16 },
-  title: { textAlign: 'center', marginBottom: 4 },
-  subtitle: { textAlign: 'center', marginBottom: 24, opacity: 0.7 },
-  input: { marginBottom: 16 },
-  error: { marginBottom: 16, textAlign: 'center' },
-  button: { marginTop: 8 },
-  forgotButton: { marginTop: 16 },
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  content: { width: '100%', maxWidth: 400, alignSelf: 'center' },
+  headerSection: { alignItems: 'center', marginBottom: 32 },
+  logo: { width: 100, height: 100, marginBottom: 16 },
+  logoPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  title: { fontWeight: 'bold', textAlign: 'center' },
+  subtitle: { marginTop: 4, textAlign: 'center' },
+  formCard: { borderRadius: 16, padding: 24 },
+  input: { marginBottom: 4 },
+  optionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  rememberRow: { flexDirection: 'row', alignItems: 'center', marginLeft: -8 },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+    marginBottom: 16,
+  },
+  loginButton: { borderRadius: 8 },
+  loginButtonContent: { paddingVertical: 8 },
+  divider: { marginVertical: 20 },
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 12,
+  },
+  helpSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
+  },
+  version: {
+    textAlign: 'center',
+    marginTop: 16,
+    opacity: 0.5,
+  },
 });
 ```
 
@@ -234,131 +645,825 @@ const styles = StyleSheet.create({
 
 ```typescript
 // src/screens/teacher/OnboardingTeacherScreen.tsx
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Button, ProgressBar, Surface, Chip } from 'react-native-paper';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Animated,
+  Dimensions,
+  Platform,
+  Vibration,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Text,
+  Button,
+  ProgressBar,
+  Surface,
+  Chip,
+  Switch,
+  IconButton,
+  ActivityIndicator,
+} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useTeacherClassesQuery } from '@/hooks/queries/teacher/useTeacherClassesQuery';
+import { useAuthStore } from '@/stores/authStore';
 
-type OnboardingStep = 'welcome' | 'classes' | 'features' | 'complete';
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const ONBOARDING_COMPLETE_KEY = '@teacher_onboarding_complete';
 
-export const OnboardingTeacherScreen: React.FC = ({ navigation }) => {
-  const theme = useAppTheme();
+type OnboardingStep = 'welcome' | 'classes' | 'notifications' | 'features' | 'preferences' | 'complete';
+
+type NotificationPreferences = {
+  assignments: boolean;
+  attendance: boolean;
+  messages: boolean;
+  announcements: boolean;
+};
+
+type TeachingPreferences = {
+  defaultGradingScale: '100' | 'letter' | 'percentage';
+  showStudentPhotos: boolean;
+  enableQuickAttendance: boolean;
+  dailyDigest: boolean;
+};
+
+export const OnboardingTeacherScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors, borderRadius } = useAppTheme();
+  const { t } = useTranslation('teacher');
+  const { user } = useAuthStore();
+
+  // === STATE ===
   const [step, setStep] = useState<OnboardingStep>('welcome');
+  const [notificationPermission, setNotificationPermission] = useState<boolean>(false);
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
+    assignments: true,
+    attendance: true,
+    messages: true,
+    announcements: true,
+  });
+  const [teachingPrefs, setTeachingPrefs] = useState<TeachingPreferences>({
+    defaultGradingScale: '100',
+    showStudentPhotos: true,
+    enableQuickAttendance: true,
+    dailyDigest: false,
+  });
+  const [isCompleting, setIsCompleting] = useState(false);
 
-  const steps: OnboardingStep[] = ['welcome', 'classes', 'features', 'complete'];
+  // === ANIMATION ===
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const celebrationAnim = useRef(new Animated.Value(0)).current;
+
+  // === DATA ===
+  const { data: classes, isLoading: classesLoading } = useTeacherClassesQuery();
+
+  // === STEPS CONFIG ===
+  const steps: OnboardingStep[] = ['welcome', 'classes', 'notifications', 'features', 'preferences', 'complete'];
   const currentIndex = steps.indexOf(step);
   const progress = (currentIndex + 1) / steps.length;
 
-  const handleNext = () => {
+  // === CHECK IF ALREADY COMPLETED ===
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const completed = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
+      if (completed === 'true') {
+        navigation.replace('teacher-home');
+      }
+    };
+    checkOnboarding();
+  }, [navigation]);
+
+  // === REQUEST NOTIFICATION PERMISSION ===
+  const requestNotificationPermission = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    setNotificationPermission(status === 'granted');
+    return status === 'granted';
+  };
+
+  // === ANIMATION HELPERS ===
+  const animateTransition = useCallback((direction: 'next' | 'back') => {
+    const multiplier = direction === 'next' ? -1 : 1;
+
+    // Fade out and slide
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: multiplier * 50,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Reset position for incoming content
+      slideAnim.setValue(-multiplier * 50);
+
+      // Fade in and slide to center
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+  }, [fadeAnim, slideAnim]);
+
+  // === CELEBRATION ANIMATION ===
+  const playCelebration = useCallback(() => {
+    // Haptic feedback
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate([0, 50, 100, 50]);
+    }
+
+    // Scale bounce
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.2,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Celebration particles
+    Animated.timing(celebrationAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim, celebrationAnim]);
+
+  // === NAVIGATION HANDLERS ===
+  const handleNext = async () => {
     const nextIndex = currentIndex + 1;
+
+    if (step === 'notifications') {
+      await requestNotificationPermission();
+    }
+
     if (nextIndex < steps.length) {
-      setStep(steps[nextIndex]);
-    } else {
+      animateTransition('next');
+      setTimeout(() => {
+        setStep(steps[nextIndex]);
+        if (steps[nextIndex] === 'complete') {
+          playCelebration();
+        }
+      }, 150);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      animateTransition('back');
+      setTimeout(() => {
+        setStep(steps[currentIndex - 1]);
+      }, 150);
+    }
+  };
+
+  const handleSkip = () => {
+    animateTransition('next');
+    setTimeout(() => {
+      setStep('complete');
+      playCelebration();
+    }, 150);
+  };
+
+  const handleComplete = async () => {
+    setIsCompleting(true);
+    try {
+      // Save preferences
+      await AsyncStorage.setItem('@teacher_notification_prefs', JSON.stringify(notificationPrefs));
+      await AsyncStorage.setItem('@teacher_teaching_prefs', JSON.stringify(teachingPrefs));
+      await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, 'true');
+
+      // Navigate to home
       navigation.replace('teacher-home');
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      setIsCompleting(false);
     }
   };
 
-  const renderStep = () => {
-    switch (step) {
-      case 'welcome':
-        return (
-          <View style={styles.stepContent}>
-            <Icon name="hand-wave" size={80} color={theme.colors.primary} />
-            <Text variant="headlineMedium" style={styles.stepTitle}>
-              Welcome, Teacher!
-            </Text>
-            <Text variant="bodyLarge" style={styles.stepDescription}>
-              Let's get you set up to manage your classes effectively.
-            </Text>
-          </View>
-        );
-      case 'classes':
-        return (
-          <View style={styles.stepContent}>
-            <Icon name="google-classroom" size={80} color={theme.colors.primary} />
-            <Text variant="headlineMedium" style={styles.stepTitle}>
-              Your Classes
-            </Text>
-            <Text variant="bodyLarge" style={styles.stepDescription}>
-              You've been assigned to the following classes. You can manage attendance, assignments, and grades for each.
-            </Text>
-            <View style={styles.classChips}>
-              <Chip style={styles.chip}>Class 10-A</Chip>
-              <Chip style={styles.chip}>Class 10-B</Chip>
-              <Chip style={styles.chip}>Class 9-A</Chip>
-            </View>
-          </View>
-        );
-      case 'features':
-        return (
-          <View style={styles.stepContent}>
-            <Icon name="star-four-points" size={80} color={theme.colors.primary} />
-            <Text variant="headlineMedium" style={styles.stepTitle}>
-              Key Features
-            </Text>
-            <View style={styles.featureList}>
-              <FeatureItem icon="clipboard-check" text="Mark attendance quickly" />
-              <FeatureItem icon="file-document-edit" text="Create assignments & tests" />
-              <FeatureItem icon="chart-line" text="Track student progress" />
-              <FeatureItem icon="message" text="Communicate with parents" />
-            </View>
-          </View>
-        );
-      case 'complete':
-        return (
-          <View style={styles.stepContent}>
-            <Icon name="check-circle" size={80} color="#4CAF50" />
-            <Text variant="headlineMedium" style={styles.stepTitle}>
-              You're All Set!
-            </Text>
-            <Text variant="bodyLarge" style={styles.stepDescription}>
-              Start managing your classes and helping students succeed.
-            </Text>
-          </View>
-        );
-    }
-  };
+  // === STEP RENDERERS ===
+  const renderWelcomeStep = () => (
+    <View style={styles.stepContent}>
+      <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}15` }]}>
+        <Icon name="hand-wave" size={60} color={colors.primary} />
+      </View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.welcome.title', { defaultValue: 'Welcome, Teacher!' })}
+      </Text>
+      <Text variant="bodyLarge" style={[styles.stepDescription, { color: colors.onSurfaceVariant }]}>
+        {t('onboarding.welcome.description', {
+          defaultValue: "Let's get you set up to manage your classes effectively. This will only take a minute."
+        })}
+      </Text>
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ProgressBar progress={progress} style={styles.progressBar} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {renderStep()}
-      </ScrollView>
-      <View style={styles.footer}>
-        <Button mode="contained" onPress={handleNext} style={styles.nextButton}>
-          {step === 'complete' ? 'Get Started' : 'Next'}
-        </Button>
+      {/* Quick stats preview */}
+      <Surface style={[styles.statsPreview, { backgroundColor: colors.surfaceVariant }]} elevation={0}>
+        <View style={styles.statItem}>
+          <Icon name="google-classroom" size={24} color={colors.primary} />
+          <Text variant="titleMedium" style={{ color: colors.onSurface }}>
+            {classes?.length || 0}
+          </Text>
+          <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+            {t('onboarding.welcome.classes', { defaultValue: 'Classes' })}
+          </Text>
+        </View>
+        <View style={[styles.statDivider, { backgroundColor: colors.outlineVariant }]} />
+        <View style={styles.statItem}>
+          <Icon name="account-group" size={24} color={colors.secondary} />
+          <Text variant="titleMedium" style={{ color: colors.onSurface }}>
+            {classes?.reduce((sum, c) => sum + (c.student_count || 0), 0) || 0}
+          </Text>
+          <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+            {t('onboarding.welcome.students', { defaultValue: 'Students' })}
+          </Text>
+        </View>
+      </Surface>
+    </View>
+  );
+
+  const renderClassesStep = () => (
+    <View style={styles.stepContent}>
+      <View style={[styles.iconCircle, { backgroundColor: `${colors.secondary}15` }]}>
+        <Icon name="google-classroom" size={60} color={colors.secondary} />
+      </View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.classes.title', { defaultValue: 'Your Classes' })}
+      </Text>
+      <Text variant="bodyLarge" style={[styles.stepDescription, { color: colors.onSurfaceVariant }]}>
+        {t('onboarding.classes.description', {
+          defaultValue: "You've been assigned to the following classes. You can manage attendance, assignments, and grades for each."
+        })}
+      </Text>
+
+      {classesLoading ? (
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
+      ) : (
+        <View style={styles.classChips}>
+          {classes?.map((cls) => (
+            <Chip
+              key={cls.id}
+              style={[styles.chip, { backgroundColor: colors.surfaceVariant }]}
+              textStyle={{ color: colors.onSurfaceVariant }}
+              icon={() => <Icon name="school" size={16} color={colors.primary} />}
+            >
+              {cls.name} - {cls.subject}
+            </Chip>
+          ))}
+          {(!classes || classes.length === 0) && (
+            <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
+              {t('onboarding.classes.noClasses', { defaultValue: 'No classes assigned yet. Contact admin.' })}
+            </Text>
+          )}
+        </View>
+      )}
+    </View>
+  );
+
+  const renderNotificationsStep = () => (
+    <View style={styles.stepContent}>
+      <View style={[styles.iconCircle, { backgroundColor: `${colors.tertiary}15` }]}>
+        <Icon name="bell-ring" size={60} color={colors.tertiary} />
+      </View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.notifications.title', { defaultValue: 'Stay Updated' })}
+      </Text>
+      <Text variant="bodyLarge" style={[styles.stepDescription, { color: colors.onSurfaceVariant }]}>
+        {t('onboarding.notifications.description', {
+          defaultValue: 'Choose which notifications you want to receive.'
+        })}
+      </Text>
+
+      <Surface style={[styles.prefsCard, { backgroundColor: colors.surface }]} elevation={1}>
+        <NotificationToggle
+          icon="file-document-edit"
+          label={t('onboarding.notifications.assignments', { defaultValue: 'Assignment Updates' })}
+          sublabel={t('onboarding.notifications.assignmentsSub', { defaultValue: 'Submissions and deadlines' })}
+          value={notificationPrefs.assignments}
+          onToggle={(v) => setNotificationPrefs(p => ({ ...p, assignments: v }))}
+          colors={colors}
+        />
+        <NotificationToggle
+          icon="clipboard-check"
+          label={t('onboarding.notifications.attendance', { defaultValue: 'Attendance Reminders' })}
+          sublabel={t('onboarding.notifications.attendanceSub', { defaultValue: 'Daily attendance prompts' })}
+          value={notificationPrefs.attendance}
+          onToggle={(v) => setNotificationPrefs(p => ({ ...p, attendance: v }))}
+          colors={colors}
+        />
+        <NotificationToggle
+          icon="message-text"
+          label={t('onboarding.notifications.messages', { defaultValue: 'Parent Messages' })}
+          sublabel={t('onboarding.notifications.messagesSub', { defaultValue: 'New messages from parents' })}
+          value={notificationPrefs.messages}
+          onToggle={(v) => setNotificationPrefs(p => ({ ...p, messages: v }))}
+          colors={colors}
+        />
+        <NotificationToggle
+          icon="bullhorn"
+          label={t('onboarding.notifications.announcements', { defaultValue: 'School Announcements' })}
+          sublabel={t('onboarding.notifications.announcementsSub', { defaultValue: 'Important updates' })}
+          value={notificationPrefs.announcements}
+          onToggle={(v) => setNotificationPrefs(p => ({ ...p, announcements: v }))}
+          colors={colors}
+          isLast
+        />
+      </Surface>
+    </View>
+  );
+
+  const renderFeaturesStep = () => (
+    <View style={styles.stepContent}>
+      <View style={[styles.iconCircle, { backgroundColor: `${colors.primary}15` }]}>
+        <Icon name="star-four-points" size={60} color={colors.primary} />
+      </View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.features.title', { defaultValue: 'Key Features' })}
+      </Text>
+
+      <View style={styles.featureList}>
+        <FeatureItem
+          icon="clipboard-check"
+          title={t('onboarding.features.attendance', { defaultValue: 'Quick Attendance' })}
+          description={t('onboarding.features.attendanceDesc', { defaultValue: 'Mark attendance in seconds with smart defaults' })}
+          colors={colors}
+        />
+        <FeatureItem
+          icon="file-document-edit"
+          title={t('onboarding.features.assignments', { defaultValue: 'Assignments & Tests' })}
+          description={t('onboarding.features.assignmentsDesc', { defaultValue: 'Create, grade, and track submissions easily' })}
+          colors={colors}
+        />
+        <FeatureItem
+          icon="chart-line"
+          title={t('onboarding.features.progress', { defaultValue: 'Student Progress' })}
+          description={t('onboarding.features.progressDesc', { defaultValue: 'Real-time analytics and performance insights' })}
+          colors={colors}
+        />
+        <FeatureItem
+          icon="robot"
+          title={t('onboarding.features.ai', { defaultValue: 'AI Assistant' })}
+          description={t('onboarding.features.aiDesc', { defaultValue: 'Get help answering doubts and creating content' })}
+          colors={colors}
+        />
       </View>
     </View>
   );
-};
 
-const FeatureItem = ({ icon, text }: { icon: string; text: string }) => {
-  const theme = useAppTheme();
-  return (
-    <View style={styles.featureItem}>
-      <Icon name={icon} size={24} color={theme.colors.primary} />
-      <Text variant="bodyMedium" style={styles.featureText}>{text}</Text>
+  const renderPreferencesStep = () => (
+    <View style={styles.stepContent}>
+      <View style={[styles.iconCircle, { backgroundColor: `${colors.secondary}15` }]}>
+        <Icon name="cog" size={60} color={colors.secondary} />
+      </View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.preferences.title', { defaultValue: 'Your Preferences' })}
+      </Text>
+      <Text variant="bodyLarge" style={[styles.stepDescription, { color: colors.onSurfaceVariant }]}>
+        {t('onboarding.preferences.description', {
+          defaultValue: 'Customize your teaching experience. You can change these anytime in Settings.'
+        })}
+      </Text>
+
+      <Surface style={[styles.prefsCard, { backgroundColor: colors.surface }]} elevation={1}>
+        {/* Grading Scale */}
+        <View style={styles.prefSection}>
+          <View style={styles.prefHeader}>
+            <Icon name="numeric" size={20} color={colors.primary} />
+            <Text variant="titleSmall" style={{ color: colors.onSurface, marginLeft: 8 }}>
+              {t('onboarding.preferences.gradingScale', { defaultValue: 'Default Grading Scale' })}
+            </Text>
+          </View>
+          <View style={styles.gradingChips}>
+            {(['100', 'letter', 'percentage'] as const).map((scale) => (
+              <Chip
+                key={scale}
+                selected={teachingPrefs.defaultGradingScale === scale}
+                onPress={() => setTeachingPrefs(p => ({ ...p, defaultGradingScale: scale }))}
+                style={[
+                  styles.gradingChip,
+                  { backgroundColor: teachingPrefs.defaultGradingScale === scale ? colors.primaryContainer : colors.surfaceVariant }
+                ]}
+                textStyle={{
+                  color: teachingPrefs.defaultGradingScale === scale ? colors.onPrimaryContainer : colors.onSurfaceVariant
+                }}
+              >
+                {scale === '100' ? '0-100' : scale === 'letter' ? 'A-F' : '%'}
+              </Chip>
+            ))}
+          </View>
+        </View>
+
+        <View style={[styles.prefDivider, { backgroundColor: colors.outlineVariant }]} />
+
+        <NotificationToggle
+          icon="account-box-multiple"
+          label={t('onboarding.preferences.studentPhotos', { defaultValue: 'Show Student Photos' })}
+          sublabel={t('onboarding.preferences.studentPhotosSub', { defaultValue: 'Display photos in attendance and grades' })}
+          value={teachingPrefs.showStudentPhotos}
+          onToggle={(v) => setTeachingPrefs(p => ({ ...p, showStudentPhotos: v }))}
+          colors={colors}
+        />
+        <NotificationToggle
+          icon="lightning-bolt"
+          label={t('onboarding.preferences.quickAttendance', { defaultValue: 'Quick Attendance Mode' })}
+          sublabel={t('onboarding.preferences.quickAttendanceSub', { defaultValue: 'One-tap to mark present' })}
+          value={teachingPrefs.enableQuickAttendance}
+          onToggle={(v) => setTeachingPrefs(p => ({ ...p, enableQuickAttendance: v }))}
+          colors={colors}
+        />
+        <NotificationToggle
+          icon="email-newsletter"
+          label={t('onboarding.preferences.dailyDigest', { defaultValue: 'Daily Digest Email' })}
+          sublabel={t('onboarding.preferences.dailyDigestSub', { defaultValue: 'Summary of pending tasks each morning' })}
+          value={teachingPrefs.dailyDigest}
+          onToggle={(v) => setTeachingPrefs(p => ({ ...p, dailyDigest: v }))}
+          colors={colors}
+          isLast
+        />
+      </Surface>
     </View>
+  );
+
+  const renderCompleteStep = () => (
+    <View style={styles.stepContent}>
+      <Animated.View
+        style={[
+          styles.iconCircle,
+          { backgroundColor: `${colors.success}15`, transform: [{ scale: scaleAnim }] }
+        ]}
+      >
+        <Icon name="check-circle" size={60} color={colors.success} />
+      </Animated.View>
+      <Text variant="headlineMedium" style={[styles.stepTitle, { color: colors.onSurface }]}>
+        {t('onboarding.complete.title', { defaultValue: "You're All Set!" })}
+      </Text>
+      <Text variant="bodyLarge" style={[styles.stepDescription, { color: colors.onSurfaceVariant }]}>
+        {t('onboarding.complete.description', {
+          defaultValue: 'Start managing your classes and helping students succeed.'
+        })}
+      </Text>
+
+      {/* Quick start tips */}
+      <Surface style={[styles.tipsCard, { backgroundColor: colors.surfaceVariant }]} elevation={0}>
+        <Text variant="titleSmall" style={{ color: colors.onSurfaceVariant, marginBottom: 12 }}>
+          {t('onboarding.complete.quickStart', { defaultValue: 'Quick Start Tips' })}
+        </Text>
+        <TipItem
+          number="1"
+          text={t('onboarding.complete.tip1', { defaultValue: 'Mark attendance for your first class' })}
+          colors={colors}
+        />
+        <TipItem
+          number="2"
+          text={t('onboarding.complete.tip2', { defaultValue: 'Create your first assignment' })}
+          colors={colors}
+        />
+        <TipItem
+          number="3"
+          text={t('onboarding.complete.tip3', { defaultValue: 'Check student progress analytics' })}
+          colors={colors}
+        />
+      </Surface>
+    </View>
+  );
+
+  const renderStep = () => {
+    switch (step) {
+      case 'welcome': return renderWelcomeStep();
+      case 'classes': return renderClassesStep();
+      case 'notifications': return renderNotificationsStep();
+      case 'features': return renderFeaturesStep();
+      case 'preferences': return renderPreferencesStep();
+      case 'complete': return renderCompleteStep();
+    }
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+      {/* Header with progress and skip */}
+      <View style={styles.header}>
+        {currentIndex > 0 && step !== 'complete' ? (
+          <IconButton
+            icon="arrow-left"
+            size={24}
+            iconColor={colors.onSurface}
+            onPress={handleBack}
+          />
+        ) : (
+          <View style={{ width: 48 }} />
+        )}
+
+        <View style={styles.progressContainer}>
+          <ProgressBar
+            progress={progress}
+            style={[styles.progressBar, { backgroundColor: colors.surfaceVariant }]}
+            color={colors.primary}
+          />
+          <Text variant="labelSmall" style={{ color: colors.onSurfaceVariant, marginTop: 4 }}>
+            {currentIndex + 1} / {steps.length}
+          </Text>
+        </View>
+
+        {step !== 'complete' && step !== 'welcome' ? (
+          <Button
+            mode="text"
+            onPress={handleSkip}
+            textColor={colors.onSurfaceVariant}
+            compact
+          >
+            {t('onboarding.skip', { defaultValue: 'Skip' })}
+          </Button>
+        ) : (
+          <View style={{ width: 48 }} />
+        )}
+      </View>
+
+      {/* Animated content */}
+      <Animated.View
+        style={[
+          styles.contentWrapper,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateX: slideAnim }],
+          }
+        ]}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {renderStep()}
+        </ScrollView>
+      </Animated.View>
+
+      {/* Footer with action button */}
+      <View style={[styles.footer, { borderTopColor: colors.outlineVariant }]}>
+        <Button
+          mode="contained"
+          onPress={step === 'complete' ? handleComplete : handleNext}
+          style={styles.nextButton}
+          contentStyle={styles.nextButtonContent}
+          loading={isCompleting}
+          disabled={isCompleting}
+        >
+          {step === 'complete'
+            ? t('onboarding.getStarted', { defaultValue: 'Get Started' })
+            : t('onboarding.next', { defaultValue: 'Continue' })
+          }
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 };
 
+// === SUBCOMPONENTS ===
+
+type NotificationToggleProps = {
+  icon: string;
+  label: string;
+  sublabel: string;
+  value: boolean;
+  onToggle: (value: boolean) => void;
+  colors: any;
+  isLast?: boolean;
+};
+
+const NotificationToggle: React.FC<NotificationToggleProps> = ({
+  icon, label, sublabel, value, onToggle, colors, isLast
+}) => (
+  <View style={[styles.toggleRow, !isLast && { borderBottomWidth: 1, borderBottomColor: colors.outlineVariant }]}>
+    <Icon name={icon} size={22} color={colors.primary} style={{ marginRight: 12 }} />
+    <View style={styles.toggleTextContainer}>
+      <Text variant="bodyMedium" style={{ color: colors.onSurface }}>{label}</Text>
+      <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>{sublabel}</Text>
+    </View>
+    <Switch
+      value={value}
+      onValueChange={onToggle}
+      color={colors.primary}
+    />
+  </View>
+);
+
+type FeatureItemProps = {
+  icon: string;
+  title: string;
+  description: string;
+  colors: any;
+};
+
+const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, description, colors }) => (
+  <View style={styles.featureItem}>
+    <View style={[styles.featureIcon, { backgroundColor: `${colors.primary}15` }]}>
+      <Icon name={icon} size={22} color={colors.primary} />
+    </View>
+    <View style={styles.featureTextContainer}>
+      <Text variant="titleSmall" style={{ color: colors.onSurface }}>{title}</Text>
+      <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>{description}</Text>
+    </View>
+  </View>
+);
+
+type TipItemProps = {
+  number: string;
+  text: string;
+  colors: any;
+};
+
+const TipItem: React.FC<TipItemProps> = ({ number, text, colors }) => (
+  <View style={styles.tipItem}>
+    <View style={[styles.tipNumber, { backgroundColor: colors.primary }]}>
+      <Text variant="labelSmall" style={{ color: colors.onPrimary }}>{number}</Text>
+    </View>
+    <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant, flex: 1 }}>{text}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  progressBar: { margin: 16 },
-  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  stepContent: { alignItems: 'center' },
-  stepTitle: { marginTop: 24, marginBottom: 12, textAlign: 'center' },
-  stepDescription: { textAlign: 'center', opacity: 0.7, paddingHorizontal: 16 },
-  classChips: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 24, gap: 8 },
-  chip: { marginBottom: 8 },
-  featureList: { marginTop: 24, width: '100%' },
-  featureItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 12 },
-  featureText: { flex: 1 },
-  footer: { padding: 16 },
-  nextButton: { width: '100%' },
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+  },
+  progressContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  progressBar: {
+    width: '100%',
+    height: 6,
+    borderRadius: 3,
+  },
+  contentWrapper: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  stepContent: {
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  stepTitle: {
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  stepDescription: {
+    textAlign: 'center',
+    paddingHorizontal: 16,
+    lineHeight: 24,
+  },
+  statsPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 32,
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+  },
+  statItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    marginHorizontal: 32,
+  },
+  classChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 24,
+    gap: 8,
+  },
+  chip: {
+    marginBottom: 4,
+  },
+  prefsCard: {
+    width: '100%',
+    marginTop: 24,
+    borderRadius: 16,
+    padding: 4,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  toggleTextContainer: {
+    flex: 1,
+  },
+  featureList: {
+    marginTop: 24,
+    width: '100%',
+    gap: 16,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  featureIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featureTextContainer: {
+    flex: 1,
+    gap: 2,
+  },
+  prefSection: {
+    padding: 16,
+  },
+  prefHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  prefDivider: {
+    height: 1,
+    marginHorizontal: 16,
+  },
+  gradingChips: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  gradingChip: {
+    borderRadius: 8,
+  },
+  tipsCard: {
+    width: '100%',
+    marginTop: 32,
+    padding: 16,
+    borderRadius: 16,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  tipNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+  },
+  nextButton: {
+    width: '100%',
+    borderRadius: 12,
+  },
+  nextButtonContent: {
+    paddingVertical: 6,
+  },
 });
 ```
 
@@ -1165,16 +2270,16 @@ export const useTeacherDashboardQuery = () => {
 
 | Type | Item | Status |
 |------|------|--------|
-| Dynamic Screen | `class-hub` | 🔲 |
+| Dynamic Screen | `class-hub` | Done |
 | Dynamic Screen | `class-detail` | 🔲 |
 | Dynamic Screen | `class-roster` | 🔲 |
-| Widget | `class.cards` | 🔲 |
-| Widget | `class.roster` | 🔲 |
-| Widget | `class.stats` | 🔲 |
-| Widget | `class.recent-activity` | 🔲 |
-| Hook | `useTeacherClassesQuery` | 🔲 |
-| Hook | `useClassRosterQuery` | 🔲 |
-| Hook | `useClassStatsQuery` | 🔲 |
+| Widget | `class.cards` | Done |
+| Widget | `class.roster` | Done |
+| Widget | `class.stats` | Done |
+| Widget | `class.recentActivity` | Done |
+| Hook | `useTeacherClassesQuery` | Done |
+| Hook | `useClassRosterQuery` | Done |
+| Hook | `useClassStatsQuery` | Done |
 
 ### 4.2 ClassCardsWidget.tsx
 
@@ -1722,20 +2827,306 @@ export const useClassRosterQuery = (classId: string) => {
 
 | Type | Item | Status |
 |------|------|--------|
-| Dynamic Screen | `attendance-mark` | 🔲 |
-| Dynamic Screen | `attendance-reports` | 🔲 |
-| Widget | `attendance.today-summary` | 🔲 |
-| Widget | `attendance.quick-mark` | 🔲 |
-| Widget | `attendance.alerts` | 🔲 |
-| Widget | `attendance.trends` | 🔲 |
-| Hook | `useAttendanceRecordsQuery` | 🔲 |
-| Hook | `useMarkAttendance` | 🔲 |
-| Hook | `useBulkMarkAttendance` | 🔲 |
-| DB Table | `attendance_records` | 🔲 |
-| DB Table | `attendance_alerts` | 🔲 |
+| Fixed Screen | `attendance-mark` | |
+| Dynamic Screen | `attendance-reports` | |
+| Widget | `attendance.today-summary` | |
+| Widget | `attendance.quick-mark` | |
+| Widget | `attendance.alerts` | |
+| Widget | `attendance.trends` | |
+| Hook | `useAttendanceRecordsQuery` | |
+| Hook | `useMarkAttendance` | |
+| Hook | `useBulkMarkAttendance` | |
+| DB Table | `attendance_records` | |
+| DB Table | `attendance_alerts` | |
 
 
-### 5.2 TodayAttendanceWidget.tsx
+### 5.2 AttendanceMarkScreen.tsx (Fixed Screen)
+
+```typescript
+// src/screens/teacher/AttendanceMarkScreen.tsx
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Avatar, Chip, Button, Searchbar, SegmentedButtons, Surface, Divider, Snackbar } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTeacherClassesQuery, useClassRosterQuery } from '@/hooks/queries/teacher';
+import { useBulkMarkAttendance } from '@/hooks/mutations/teacher';
+import { useTranslation } from 'react-i18next';
+
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+type StudentAttendance = {
+  studentId: string;
+  status: AttendanceStatus;
+};
+
+export const AttendanceMarkScreen: React.FC = ({ navigation, route }) => {
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+  const preselectedClassId = route?.params?.classId;
+
+  // State
+  const [selectedClassId, setSelectedClassId] = useState<string>(preselectedClassId || '');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({});
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  // Queries
+  const { data: classes } = useTeacherClassesQuery();
+  const { data: students, isLoading: loadingStudents } = useClassRosterQuery(selectedClassId);
+  const { mutate: submitAttendance, isPending: submitting } = useBulkMarkAttendance();
+
+  // Filter students by search
+  const filteredStudents = useMemo(() => {
+    if (!students) return [];
+    if (!searchQuery) return students;
+    return students.filter(s =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.rollNumber.includes(searchQuery)
+    );
+  }, [students, searchQuery]);
+
+  // Status colors and icons
+  const statusConfig = {
+    present: { icon: 'check-circle', color: '#4CAF50', label: 'P' },
+    absent: { icon: 'close-circle', color: theme.colors.error, label: 'A' },
+    late: { icon: 'clock-alert', color: '#FF9800', label: 'L' },
+    excused: { icon: 'account-check', color: '#9C27B0', label: 'E' },
+  };
+
+  // Mark individual student
+  const markStudent = (studentId: string, status: AttendanceStatus) => {
+    setAttendance(prev => ({ ...prev, [studentId]: status }));
+  };
+
+  // Bulk actions
+  const markAllAs = (status: AttendanceStatus) => {
+    const newAttendance: Record<string, AttendanceStatus> = {};
+    students?.forEach(s => { newAttendance[s.id] = status; });
+    setAttendance(newAttendance);
+  };
+
+  // Submit attendance
+  const handleSubmit = () => {
+    if (!selectedClassId) return;
+
+    const records = Object.entries(attendance).map(([studentId, status]) => ({
+      studentId,
+      status,
+      classId: selectedClassId,
+      date: new Date().toISOString().split('T')[0],
+    }));
+
+    submitAttendance(records, {
+      onSuccess: () => {
+        setSnackbarMessage('Attendance saved successfully');
+        setSnackbarVisible(true);
+        setTimeout(() => navigation.goBack(), 1500);
+      },
+      onError: (error) => {
+        setSnackbarMessage('Failed to save attendance');
+        setSnackbarVisible(true);
+      },
+    });
+  };
+
+  // Calculate summary
+  const summary = useMemo(() => {
+    const values = Object.values(attendance);
+    return {
+      present: values.filter(v => v === 'present').length,
+      absent: values.filter(v => v === 'absent').length,
+      late: values.filter(v => v === 'late').length,
+      excused: values.filter(v => v === 'excused').length,
+      total: students?.length || 0,
+      marked: values.length,
+    };
+  }, [attendance, students]);
+
+  // Render student row
+  const renderStudent = ({ item, index }: { item: any; index: number }) => {
+    const status = attendance[item.id];
+    return (
+      <View style={styles.studentRow}>
+        <Text variant="bodyMedium" style={styles.rollNumber}>{item.rollNumber || index + 1}</Text>
+        <Avatar.Text
+          size={40}
+          label={item.name.substring(0, 2).toUpperCase()}
+          style={{ backgroundColor: status ? statusConfig[status].color + '30' : theme.colors.surfaceVariant }}
+        />
+        <View style={styles.studentInfo}>
+          <Text variant="titleSmall" numberOfLines={1}>{item.name}</Text>
+          {item.isAtRisk && (
+            <Chip compact icon="alert" style={styles.atRiskChip}>At Risk</Chip>
+          )}
+        </View>
+        <View style={styles.statusButtons}>
+          {(['present', 'absent', 'late', 'excused'] as AttendanceStatus[]).map(s => (
+            <TouchableOpacity
+              key={s}
+              style={[
+                styles.statusBtn,
+                status === s && { backgroundColor: statusConfig[s].color },
+              ]}
+              onPress={() => markStudent(item.id, s)}
+            >
+              <Text
+                style={[
+                  styles.statusLabel,
+                  { color: status === s ? 'white' : statusConfig[s].color },
+                ]}
+              >
+                {statusConfig[s].label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Class Selector */}
+      <Surface style={styles.classSelector} elevation={1}>
+        <Text variant="labelMedium" style={styles.sectionLabel}>Select Class</Text>
+        <FlatList
+          data={classes || []}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Chip
+              selected={selectedClassId === item.id}
+              onPress={() => setSelectedClassId(item.id)}
+              style={styles.classChip}
+            >
+              {item.name}
+            </Chip>
+          )}
+          contentContainerStyle={styles.classChipList}
+        />
+      </Surface>
+
+      {selectedClassId && (
+        <>
+          {/* Search and Bulk Actions */}
+          <View style={styles.toolbarRow}>
+            <Searchbar
+              placeholder="Search students..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={styles.searchBar}
+            />
+          </View>
+
+          <View style={styles.bulkActionsRow}>
+            <Text variant="labelMedium">Quick Mark:</Text>
+            <Button mode="contained-tonal" compact onPress={() => markAllAs('present')} style={styles.bulkBtn}>
+              All Present
+            </Button>
+            <Button mode="outlined" compact onPress={() => markAllAs('absent')} style={styles.bulkBtn}>
+              All Absent
+            </Button>
+          </View>
+
+          {/* Summary Bar */}
+          <Surface style={styles.summaryBar} elevation={0}>
+            <View style={styles.summaryItem}>
+              <Text variant="titleMedium" style={{ color: '#4CAF50' }}>{summary.present}</Text>
+              <Text variant="labelSmall">Present</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text variant="titleMedium" style={{ color: theme.colors.error }}>{summary.absent}</Text>
+              <Text variant="labelSmall">Absent</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text variant="titleMedium" style={{ color: '#FF9800' }}>{summary.late}</Text>
+              <Text variant="labelSmall">Late</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text variant="titleMedium" style={{ color: '#9C27B0' }}>{summary.excused}</Text>
+              <Text variant="labelSmall">Excused</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text variant="titleMedium">{summary.marked}/{summary.total}</Text>
+              <Text variant="labelSmall">Marked</Text>
+            </View>
+          </Surface>
+
+          {/* Student List */}
+          <FlatList
+            data={filteredStudents}
+            renderItem={renderStudent}
+            keyExtractor={(item) => item.id}
+            ItemSeparatorComponent={() => <Divider />}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Icon name="account-group-outline" size={48} color={theme.colors.outline} />
+                <Text variant="bodyMedium" style={styles.emptyText}>
+                  {loadingStudents ? 'Loading students...' : 'No students found'}
+                </Text>
+              </View>
+            }
+          />
+
+          {/* Submit Button */}
+          <Surface style={styles.submitBar} elevation={2}>
+            <Button
+              mode="contained"
+              onPress={handleSubmit}
+              loading={submitting}
+              disabled={summary.marked === 0 || submitting}
+              style={styles.submitButton}
+              icon="check"
+            >
+              Save Attendance ({summary.marked}/{summary.total})
+            </Button>
+          </Surface>
+        </>
+      )}
+
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={2000}
+      >
+        {snackbarMessage}
+      </Snackbar>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  classSelector: { padding: 16 },
+  sectionLabel: { marginBottom: 8, opacity: 0.7 },
+  classChipList: { gap: 8 },
+  classChip: { marginRight: 8 },
+  toolbarRow: { paddingHorizontal: 16, paddingTop: 12 },
+  searchBar: { marginBottom: 8 },
+  bulkActionsRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8, marginBottom: 8 },
+  bulkBtn: { marginLeft: 4 },
+  summaryBar: { flexDirection: 'row', justifyContent: 'space-around', padding: 12, marginHorizontal: 16, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.03)' },
+  summaryItem: { alignItems: 'center' },
+  listContent: { paddingBottom: 100 },
+  studentRow: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 12 },
+  rollNumber: { width: 28, textAlign: 'center', opacity: 0.6 },
+  studentInfo: { flex: 1 },
+  atRiskChip: { alignSelf: 'flex-start', marginTop: 4, height: 20, backgroundColor: '#FF980020' },
+  statusButtons: { flexDirection: 'row', gap: 6 },
+  statusBtn: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#ddd' },
+  statusLabel: { fontSize: 12, fontWeight: 'bold' },
+  emptyContainer: { alignItems: 'center', padding: 48 },
+  emptyText: { marginTop: 12, opacity: 0.6 },
+  submitBar: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16 },
+  submitButton: { width: '100%' },
+});
+```
+
+### 5.3 TodayAttendanceWidget.tsx
 
 ```typescript
 // src/components/widgets/teacher/TodayAttendanceWidget.tsx
@@ -2084,7 +3475,8 @@ export const useBulkMarkAttendance = () => {
 | Type | Item | Status |
 |------|------|--------|
 | Dynamic Screen | `grading-hub` | 🔲 |
-| Dynamic Screen | `assignment-create` | 🔲 |
+| Fixed Screen | `assignment-create` | 🔲 |
+| Fixed Screen | `assignment-detail` | 🔲 |
 | Fixed Screen | `grade-submission` | 🔲 |
 | Widget | `grading.pending-list` | 🔲 |
 | Widget | `grading.recent` | 🔲 |
@@ -2472,13 +3864,1022 @@ export const useGradeSubmission = () => {
 };
 ```
 
-### 6.7 Sprint 5 Checkpoint
+### 6.7 AssignmentCreateScreen.tsx (Fixed Screen)
 
-✅ **Test Criteria:**
+```typescript
+// src/screens/teacher/AssignmentCreateScreen.tsx
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Chip,
+  Surface,
+  Divider,
+  SegmentedButtons,
+  Switch,
+  HelperText,
+  Snackbar,
+  Portal,
+  Modal,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useTeacherClassesQuery } from '@/hooks/queries/teacher';
+import { useCreateAssignment } from '@/hooks/mutations/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type AssignmentType = 'homework' | 'quiz' | 'project' | 'exam';
+
+type FormData = {
+  title: string;
+  description: string;
+  classId: string;
+  subjectId: string;
+  type: AssignmentType;
+  totalPoints: number;
+  dueDate: Date;
+  dueTime: Date;
+  allowLateSubmission: boolean;
+  latePenaltyPercent: number;
+  instructions: string;
+  attachments: string[];
+  rubricEnabled: boolean;
+  rubricItems: { criteria: string; points: number }[];
+};
+
+export const AssignmentCreateScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  // Pre-selected class from route params
+  const preSelectedClassId = (route.params as any)?.classId;
+
+  // === DATA HOOKS ===
+  const { data: classes = [] } = useTeacherClassesQuery();
+  const createMutation = useCreateAssignment();
+
+  // === FORM STATE ===
+  const [formData, setFormData] = useState<FormData>({
+    title: '',
+    description: '',
+    classId: preSelectedClassId || '',
+    subjectId: '',
+    type: 'homework',
+    totalPoints: 100,
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+    dueTime: new Date(),
+    allowLateSubmission: true,
+    latePenaltyPercent: 10,
+    instructions: '',
+    attachments: [],
+    rubricEnabled: false,
+    rubricItems: [{ criteria: '', points: 0 }],
+  });
+
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showClassPicker, setShowClassPicker] = useState(false);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+
+  // === ASSIGNMENT TYPES ===
+  const assignmentTypes: { value: AssignmentType; label: string; icon: string }[] = [
+    { value: 'homework', label: 'Homework', icon: 'book-open-variant' },
+    { value: 'quiz', label: 'Quiz', icon: 'head-question' },
+    { value: 'project', label: 'Project', icon: 'folder-star' },
+    { value: 'exam', label: 'Exam', icon: 'file-document-edit' },
+  ];
+
+  // === HANDLERS ===
+  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.classId) newErrors.classId = 'Please select a class';
+    if (formData.totalPoints < 1) newErrors.totalPoints = 'Points must be at least 1';
+    if (formData.dueDate < new Date()) newErrors.dueDate = 'Due date must be in the future';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await createMutation.mutateAsync({
+        title: formData.title,
+        description: formData.description,
+        classId: formData.classId,
+        type: formData.type,
+        totalPoints: formData.totalPoints,
+        dueDate: formData.dueDate.toISOString(),
+        allowLateSubmission: formData.allowLateSubmission,
+        latePenaltyPercent: formData.latePenaltyPercent,
+        instructions: formData.instructions,
+        rubric: formData.rubricEnabled ? formData.rubricItems : undefined,
+      });
+
+      setSnackbar({ visible: true, message: 'Assignment created successfully!' });
+      setTimeout(() => navigation.goBack(), 1500);
+    } catch (error) {
+      setSnackbar({ visible: true, message: 'Failed to create assignment' });
+    }
+  };
+
+  const addRubricItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      rubricItems: [...prev.rubricItems, { criteria: '', points: 0 }],
+    }));
+  };
+
+  const updateRubricItem = (index: number, field: 'criteria' | 'points', value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      rubricItems: prev.rubricItems.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const removeRubricItem = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      rubricItems: prev.rubricItems.filter((_, i) => i !== index),
+    }));
+  };
+
+  // === RENDER ===
+  const selectedClass = classes.find(c => c.id === formData.classId);
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrow-left" size={24} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+          <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>
+            Create Assignment
+          </Text>
+          <View style={styles.headerSpacer} />
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Basic Info Section */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Basic Information</Text>
+
+            <TextInput
+              mode="outlined"
+              label="Assignment Title *"
+              value={formData.title}
+              onChangeText={(v) => updateField('title', v)}
+              error={!!errors.title}
+              style={styles.input}
+            />
+            {errors.title && <HelperText type="error">{errors.title}</HelperText>}
+
+            <TextInput
+              mode="outlined"
+              label="Description"
+              value={formData.description}
+              onChangeText={(v) => updateField('description', v)}
+              multiline
+              numberOfLines={3}
+              style={styles.input}
+            />
+
+            {/* Class Selector */}
+            <Text variant="labelMedium" style={styles.fieldLabel}>Class *</Text>
+            <TouchableOpacity
+              style={[styles.selector, { borderColor: errors.classId ? theme.colors.error : theme.colors.outline }]}
+              onPress={() => setShowClassPicker(true)}
+            >
+              <Icon name="school" size={20} color={theme.colors.onSurfaceVariant} />
+              <Text style={{ flex: 1, color: selectedClass ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}>
+                {selectedClass ? `${selectedClass.name} - ${selectedClass.section}` : 'Select a class'}
+              </Text>
+              <Icon name="chevron-down" size={20} color={theme.colors.onSurfaceVariant} />
+            </TouchableOpacity>
+            {errors.classId && <HelperText type="error">{errors.classId}</HelperText>}
+          </Surface>
+
+          {/* Assignment Type */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Assignment Type</Text>
+            <View style={styles.typeGrid}>
+              {assignmentTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.value}
+                  style={[
+                    styles.typeCard,
+                    {
+                      borderColor: formData.type === type.value ? theme.colors.primary : theme.colors.outline,
+                      backgroundColor: formData.type === type.value ? `${theme.colors.primary}15` : 'transparent',
+                    },
+                  ]}
+                  onPress={() => updateField('type', type.value)}
+                >
+                  <Icon
+                    name={type.icon}
+                    size={28}
+                    color={formData.type === type.value ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                  />
+                  <Text
+                    variant="labelMedium"
+                    style={{ color: formData.type === type.value ? theme.colors.primary : theme.colors.onSurface }}
+                  >
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Points & Due Date */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Scoring & Deadline</Text>
+
+            <View style={styles.row}>
+              <View style={styles.halfWidth}>
+                <TextInput
+                  mode="outlined"
+                  label="Total Points *"
+                  value={String(formData.totalPoints)}
+                  onChangeText={(v) => updateField('totalPoints', parseInt(v) || 0)}
+                  keyboardType="numeric"
+                  error={!!errors.totalPoints}
+                />
+              </View>
+              <View style={styles.halfWidth}>
+                <TouchableOpacity
+                  style={[styles.selector, { borderColor: theme.colors.outline }]}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Icon name="calendar" size={20} color={theme.colors.primary} />
+                  <Text style={{ color: theme.colors.onSurface }}>
+                    {formData.dueDate.toLocaleDateString()}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <Divider style={styles.divider} />
+
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Icon name="clock-alert" size={20} color={theme.colors.onSurfaceVariant} />
+                <Text variant="bodyMedium">Allow Late Submission</Text>
+              </View>
+              <Switch
+                value={formData.allowLateSubmission}
+                onValueChange={(v) => updateField('allowLateSubmission', v)}
+              />
+            </View>
+
+            {formData.allowLateSubmission && (
+              <View style={styles.penaltyRow}>
+                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                  Penalty per day late:
+                </Text>
+                <TextInput
+                  mode="outlined"
+                  dense
+                  value={String(formData.latePenaltyPercent)}
+                  onChangeText={(v) => updateField('latePenaltyPercent', parseInt(v) || 0)}
+                  keyboardType="numeric"
+                  style={styles.penaltyInput}
+                  right={<TextInput.Affix text="%" />}
+                />
+              </View>
+            )}
+          </Surface>
+
+          {/* Instructions */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Instructions</Text>
+            <TextInput
+              mode="outlined"
+              label="Detailed Instructions"
+              value={formData.instructions}
+              onChangeText={(v) => updateField('instructions', v)}
+              multiline
+              numberOfLines={5}
+              placeholder="Enter step-by-step instructions for students..."
+            />
+          </Surface>
+
+          {/* Rubric Section */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Icon name="format-list-checks" size={20} color={theme.colors.onSurfaceVariant} />
+                <Text variant="titleMedium">Grading Rubric</Text>
+              </View>
+              <Switch
+                value={formData.rubricEnabled}
+                onValueChange={(v) => updateField('rubricEnabled', v)}
+              />
+            </View>
+
+            {formData.rubricEnabled && (
+              <View style={styles.rubricContainer}>
+                {formData.rubricItems.map((item, index) => (
+                  <View key={index} style={styles.rubricItem}>
+                    <View style={styles.rubricCriteria}>
+                      <TextInput
+                        mode="outlined"
+                        dense
+                        label="Criteria"
+                        value={item.criteria}
+                        onChangeText={(v) => updateRubricItem(index, 'criteria', v)}
+                        style={styles.flex}
+                      />
+                      <TextInput
+                        mode="outlined"
+                        dense
+                        label="Points"
+                        value={String(item.points)}
+                        onChangeText={(v) => updateRubricItem(index, 'points', parseInt(v) || 0)}
+                        keyboardType="numeric"
+                        style={styles.rubricPoints}
+                      />
+                      {formData.rubricItems.length > 1 && (
+                        <TouchableOpacity
+                          onPress={() => removeRubricItem(index)}
+                          style={styles.removeButton}
+                        >
+                          <Icon name="close-circle" size={24} color={theme.colors.error} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                ))}
+                <Button
+                  mode="outlined"
+                  icon="plus"
+                  onPress={addRubricItem}
+                  style={styles.addRubricButton}
+                >
+                  Add Criteria
+                </Button>
+              </View>
+            )}
+          </Surface>
+
+          {/* Spacer for bottom button */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Submit Button */}
+        <View style={[styles.bottomBar, { backgroundColor: theme.colors.surface }]}>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={createMutation.isPending}
+            disabled={createMutation.isPending}
+            style={styles.submitButton}
+            contentStyle={styles.submitButtonContent}
+          >
+            Create Assignment
+          </Button>
+        </View>
+
+        {/* Date Picker Modal */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={formData.dueDate}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) updateField('dueDate', date);
+            }}
+          />
+        )}
+
+        {/* Class Picker Modal */}
+        <Portal>
+          <Modal
+            visible={showClassPicker}
+            onDismiss={() => setShowClassPicker(false)}
+            contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.surface }]}
+          >
+            <Text variant="titleMedium" style={styles.modalTitle}>Select Class</Text>
+            <ScrollView style={styles.classList}>
+              {classes.map((cls) => (
+                <TouchableOpacity
+                  key={cls.id}
+                  style={[
+                    styles.classItem,
+                    formData.classId === cls.id && { backgroundColor: `${theme.colors.primary}15` },
+                  ]}
+                  onPress={() => {
+                    updateField('classId', cls.id);
+                    setShowClassPicker(false);
+                  }}
+                >
+                  <Icon
+                    name="school"
+                    size={24}
+                    color={formData.classId === cls.id ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                  />
+                  <View style={styles.classInfo}>
+                    <Text variant="bodyLarge">{cls.name}</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                      Section {cls.section} - {cls.studentCount} students
+                    </Text>
+                  </View>
+                  {formData.classId === cls.id && (
+                    <Icon name="check" size={24} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Modal>
+        </Portal>
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={2000}
+        >
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1
+  },
+  backButton: { marginRight: 16 },
+  headerSpacer: { width: 40 },
+  content: { flex: 1, padding: 16 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 16 },
+  input: { marginBottom: 12 },
+  fieldLabel: { marginBottom: 8, marginTop: 4 },
+  selector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 12,
+  },
+  typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  typeCard: {
+    width: '47%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    gap: 8,
+  },
+  row: { flexDirection: 'row', gap: 12 },
+  halfWidth: { flex: 1 },
+  divider: { marginVertical: 16 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  switchLabel: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  penaltyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 12,
+  },
+  penaltyInput: { width: 80 },
+  rubricContainer: { marginTop: 16 },
+  rubricItem: { marginBottom: 12 },
+  rubricCriteria: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  rubricPoints: { width: 80 },
+  removeButton: { padding: 4 },
+  addRubricButton: { marginTop: 8 },
+  bottomBar: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  submitButton: { borderRadius: 8 },
+  submitButtonContent: { paddingVertical: 8 },
+  modal: { margin: 20, borderRadius: 12, padding: 16, maxHeight: '70%' },
+  modalTitle: { marginBottom: 16 },
+  classList: { maxHeight: 400 },
+  classItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    gap: 12,
+  },
+  classInfo: { flex: 1 },
+});
+```
+
+
+### 6.8 GradeSubmissionScreen.tsx (Fixed Screen)
+
+```typescript
+// src/screens/teacher/GradeSubmissionScreen.tsx
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Avatar,
+  Surface,
+  Chip,
+  Divider,
+  ProgressBar,
+  Snackbar,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useSubmissionDetailQuery } from '@/hooks/queries/teacher';
+import { useGradeSubmission } from '@/hooks/mutations/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type RubricScore = {
+  criteriaId: string;
+  criteriaName: string;
+  maxPoints: number;
+  awardedPoints: number;
+};
+
+export const GradeSubmissionScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  const { submissionId } = route.params as { submissionId: string };
+
+  // === DATA ===
+  const { data: submission, isLoading } = useSubmissionDetailQuery(submissionId);
+  const gradeMutation = useGradeSubmission();
+
+  // === FORM STATE ===
+  const [score, setScore] = useState<string>('');
+  const [feedback, setFeedback] = useState<string>('');
+  const [rubricScores, setRubricScores] = useState<RubricScore[]>([]);
+  const [showRubric, setShowRubric] = useState(false);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+
+  // Initialize form with existing data
+  useEffect(() => {
+    if (submission) {
+      if (submission.score) setScore(String(submission.score));
+      if (submission.feedback) setFeedback(submission.feedback);
+      if (submission.assignment?.rubric) {
+        setRubricScores(
+          submission.assignment.rubric.map((r: any) => ({
+            criteriaId: r.id,
+            criteriaName: r.criteria,
+            maxPoints: r.points,
+            awardedPoints: submission.rubricScores?.[r.id] || 0,
+          }))
+        );
+        setShowRubric(true);
+      }
+    }
+  }, [submission]);
+
+  // === SCORE CALCULATIONS ===
+  const totalPoints = submission?.assignment?.totalPoints || 100;
+  const scoreNum = parseInt(score) || 0;
+  const percentage = Math.round((scoreNum / totalPoints) * 100);
+
+  const rubricTotal = rubricScores.reduce((sum, r) => sum + r.awardedPoints, 0);
+  const rubricMax = rubricScores.reduce((sum, r) => sum + r.maxPoints, 0);
+
+  // === GRADE COLOR ===
+  const getGradeColor = (pct: number) => {
+    if (pct >= 90) return '#4CAF50';
+    if (pct >= 75) return '#2196F3';
+    if (pct >= 60) return '#FF9800';
+    return theme.colors.error;
+  };
+
+  // === HANDLERS ===
+  const updateRubricScore = (criteriaId: string, points: number) => {
+    setRubricScores(prev =>
+      prev.map(r => r.criteriaId === criteriaId ? { ...r, awardedPoints: points } : r)
+    );
+  };
+
+  const applyRubricToScore = () => {
+    setScore(String(rubricTotal));
+  };
+
+  const handleSubmit = async () => {
+    if (!score || scoreNum < 0 || scoreNum > totalPoints) {
+      setSnackbar({ visible: true, message: `Score must be between 0 and ${totalPoints}` });
+      return;
+    }
+
+    try {
+      const rubricData = showRubric
+        ? rubricScores.reduce((acc, r) => ({ ...acc, [r.criteriaId]: r.awardedPoints }), {})
+        : undefined;
+
+      await gradeMutation.mutateAsync({
+        submissionId,
+        score: scoreNum,
+        feedback: feedback.trim() || undefined,
+        rubricScores: rubricData,
+      });
+
+      setSnackbar({ visible: true, message: 'Grade saved successfully!' });
+      setTimeout(() => navigation.goBack(), 1500);
+    } catch (error) {
+      setSnackbar({ visible: true, message: 'Failed to save grade' });
+    }
+  };
+
+  // === LOADING ===
+  if (isLoading || !submission) {
+    return (
+      <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <Text>Loading submission...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrow-left" size={24} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+          <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>
+            Grade Submission
+          </Text>
+          <View style={styles.headerSpacer} />
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Student Info Card */}
+          <Surface style={[styles.studentCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.studentRow}>
+              <Avatar.Text
+                size={48}
+                label={submission.student.name.substring(0, 2).toUpperCase()}
+              />
+              <View style={styles.studentInfo}>
+                <Text variant="titleMedium">{submission.student.name}</Text>
+                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                  {submission.student.rollNumber} - {submission.class.name}
+                </Text>
+              </View>
+              <Chip
+                compact
+                mode="outlined"
+                style={{ borderColor: submission.isLate ? theme.colors.error : '#4CAF50' }}
+              >
+                {submission.isLate ? 'Late' : 'On Time'}
+              </Chip>
+            </View>
+            <Divider style={styles.divider} />
+            <View style={styles.assignmentInfo}>
+              <Icon name="file-document" size={20} color={theme.colors.primary} />
+              <View style={styles.assignmentText}>
+                <Text variant="titleSmall">{submission.assignment.title}</Text>
+                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                  Submitted: {new Date(submission.submittedAt).toLocaleDateString()}
+                </Text>
+              </View>
+            </View>
+          </Surface>
+
+          {/* Submission Content */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Submission</Text>
+            {submission.content && (
+              <View style={[styles.contentBox, { backgroundColor: theme.colors.surfaceVariant }]}>
+                <Text variant="bodyMedium">{submission.content}</Text>
+              </View>
+            )}
+            {submission.attachments?.length > 0 && (
+              <View style={styles.attachments}>
+                {submission.attachments.map((att: any, idx: number) => (
+                  <TouchableOpacity key={idx} style={styles.attachmentItem}>
+                    <Icon name="file" size={20} color={theme.colors.primary} />
+                    <Text variant="bodySmall" numberOfLines={1}>{att.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </Surface>
+
+          {/* Rubric Grading (if enabled) */}
+          {showRubric && rubricScores.length > 0 && (
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <View style={styles.rubricHeader}>
+                <Text variant="titleMedium">Rubric</Text>
+                <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
+                  {rubricTotal} / {rubricMax} pts
+                </Text>
+              </View>
+
+              {rubricScores.map((rubric) => (
+                <View key={rubric.criteriaId} style={styles.rubricItem}>
+                  <View style={styles.rubricRow}>
+                    <Text variant="bodyMedium" style={styles.flex}>{rubric.criteriaName}</Text>
+                    <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                      / {rubric.maxPoints}
+                    </Text>
+                  </View>
+                  <View style={styles.pointsRow}>
+                    {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
+                      const points = Math.round(rubric.maxPoints * fraction);
+                      const isSelected = rubric.awardedPoints === points;
+                      return (
+                        <TouchableOpacity
+                          key={fraction}
+                          style={[
+                            styles.pointButton,
+                            {
+                              backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                              borderColor: theme.colors.outline,
+                            },
+                          ]}
+                          onPress={() => updateRubricScore(rubric.criteriaId, points)}
+                        >
+                          <Text
+                            variant="labelMedium"
+                            style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.onSurface }}
+                          >
+                            {points}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              ))}
+
+              <Button
+                mode="outlined"
+                onPress={applyRubricToScore}
+                style={styles.applyButton}
+              >
+                Apply Rubric Score ({rubricTotal} pts)
+              </Button>
+            </Surface>
+          )}
+
+          {/* Score Input */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Final Score</Text>
+
+            <View style={styles.scoreRow}>
+              <TextInput
+                mode="outlined"
+                label="Score"
+                value={score}
+                onChangeText={setScore}
+                keyboardType="numeric"
+                style={styles.scoreInput}
+                right={<TextInput.Affix text={`/ ${totalPoints}`} />}
+              />
+              <View style={[styles.percentageBox, { backgroundColor: getGradeColor(percentage) }]}>
+                <Text variant="headlineSmall" style={{ color: 'white', fontWeight: 'bold' }}>
+                  {percentage}%
+                </Text>
+              </View>
+            </View>
+
+            <ProgressBar
+              progress={percentage / 100}
+              color={getGradeColor(percentage)}
+              style={styles.progressBar}
+            />
+
+            {/* Quick Score Buttons */}
+            <View style={styles.quickScores}>
+              {[100, 90, 80, 70, 60, 50].map((pct) => (
+                <TouchableOpacity
+                  key={pct}
+                  style={[styles.quickButton, { borderColor: theme.colors.outline }]}
+                  onPress={() => setScore(String(Math.round(totalPoints * pct / 100)))}
+                >
+                  <Text variant="labelSmall">{pct}%</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Feedback */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Feedback</Text>
+            <TextInput
+              mode="outlined"
+              label="Written Feedback (Optional)"
+              value={feedback}
+              onChangeText={setFeedback}
+              multiline
+              numberOfLines={4}
+              placeholder="Provide constructive feedback for the student..."
+            />
+
+            {/* Quick Feedback Chips */}
+            <View style={styles.quickFeedback}>
+              {['Great work!', 'Needs improvement', 'Review instructions', 'See me after class'].map((text) => (
+                <Chip
+                  key={text}
+                  compact
+                  onPress={() => setFeedback(prev => prev ? `${prev} ${text}` : text)}
+                  style={styles.feedbackChip}
+                >
+                  {text}
+                </Chip>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Spacer */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Bottom Submit Bar */}
+        <View style={[styles.bottomBar, { backgroundColor: theme.colors.surface }]}>
+          <View style={styles.bottomSummary}>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+              {submission.student.name}
+            </Text>
+            <Text variant="titleMedium" style={{ color: getGradeColor(percentage) }}>
+              {score || '0'} / {totalPoints} ({percentage}%)
+            </Text>
+          </View>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={gradeMutation.isPending}
+            disabled={gradeMutation.isPending || !score}
+            style={styles.submitButton}
+          >
+            Save Grade
+          </Button>
+        </View>
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={2000}
+        >
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1
+  },
+  backButton: { marginRight: 16 },
+  headerSpacer: { width: 40 },
+  content: { flex: 1, padding: 16 },
+  studentCard: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  studentRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  studentInfo: { flex: 1 },
+  divider: { marginVertical: 12 },
+  assignmentInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  assignmentText: { flex: 1 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 12 },
+  contentBox: { padding: 12, borderRadius: 8 },
+  attachments: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  attachmentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+  rubricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  rubricItem: { marginBottom: 16 },
+  rubricRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  pointsRow: { flexDirection: 'row', gap: 8 },
+  pointButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    minWidth: 48,
+    alignItems: 'center',
+  },
+  applyButton: { marginTop: 16 },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  scoreInput: { flex: 1 },
+  percentageBox: {
+    width: 80,
+    height: 56,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  progressBar: { height: 8, borderRadius: 4, marginTop: 16 },
+  quickScores: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 },
+  quickButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1
+  },
+  quickFeedback: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  feedbackChip: { marginBottom: 4 },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    gap: 16,
+  },
+  bottomSummary: { flex: 1 },
+  submitButton: { borderRadius: 8 },
+});
+```
+
+
+### 6.9 Sprint 5 Checkpoint
+
+**Test Criteria:**
 - [ ] Grading hub shows pending submissions
 - [ ] Can create new assignment with all fields
-- [ ] Assignment appears in class after creation
+- [ ] Assignment type selection works correctly
+- [ ] Class selector populates with teacher's classes
+- [ ] Due date picker works correctly
+- [ ] Rubric builder adds/removes criteria
 - [ ] Can grade individual submission
+- [ ] Rubric scoring calculates correctly
+- [ ] Quick score buttons work
 - [ ] Score and feedback save correctly
 - [ ] Grading stats update after grading
 - [ ] Recently graded shows latest grades
@@ -2492,7 +4893,7 @@ export const useGradeSubmission = () => {
 
 | Type | Item | Status |
 |------|------|--------|
-| Dynamic Screen | `student-detail-teacher` | 🔲 |
+| Fixed Screen | `student-detail-teacher` | 🔲 |
 | Dynamic Screen | `analytics-home` | 🔲 |
 | Widget | `analytics.class-performance` | 🔲 |
 | Widget | `analytics.student-comparison` | 🔲 |
@@ -2791,10 +5192,462 @@ export const useClassAnalyticsQuery = (classId: string, period: string = 'month'
 };
 ```
 
-### 7.6 Sprint 6 Checkpoint
+### 7.6 StudentDetailTeacherScreen.tsx (Fixed Screen)
 
-✅ **Test Criteria:**
+```typescript
+// src/screens/teacher/StudentDetailTeacherScreen.tsx
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  Dimensions,
+} from 'react-native';
+import {
+  Text,
+  Avatar,
+  Surface,
+  Chip,
+  Button,
+  Divider,
+  ProgressBar,
+  FAB,
+  Portal,
+  Modal,
+  List,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LineChart } from 'react-native-chart-kit';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useStudentDetailQuery, useStudentProgressQuery } from '@/hooks/queries/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type QuickAction = {
+  id: string;
+  icon: string;
+  label: string;
+  color: string;
+  action: () => void;
+};
+
+export const StudentDetailTeacherScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  const { studentId } = route.params as { studentId: string };
+
+  // === DATA ===
+  const { data: student, isLoading } = useStudentDetailQuery(studentId);
+  const { data: progress } = useStudentProgressQuery(studentId);
+
+  // === STATE ===
+  const [showActions, setShowActions] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'grades' | 'attendance'>('overview');
+
+  // === QUICK ACTIONS ===
+  const quickActions: QuickAction[] = [
+    {
+      id: 'message',
+      icon: 'message-text',
+      label: 'Send Message',
+      color: theme.colors.primary,
+      action: () => navigation.navigate('compose-message' as never, { recipientId: studentId } as never),
+    },
+    {
+      id: 'call-parent',
+      icon: 'phone',
+      label: 'Call Parent',
+      color: '#4CAF50',
+      action: () => student?.parentPhone && Linking.openURL(`tel:${student.parentPhone}`),
+    },
+    {
+      id: 'add-note',
+      icon: 'note-plus',
+      label: 'Add Note',
+      color: '#FF9800',
+      action: () => navigation.navigate('add-student-note' as never, { studentId } as never),
+    },
+    {
+      id: 'flag-risk',
+      icon: 'flag',
+      label: 'Flag At-Risk',
+      color: theme.colors.error,
+      action: () => navigation.navigate('flag-student' as never, { studentId } as never),
+    },
+  ];
+
+  // === CHART CONFIG ===
+  const screenWidth = Dimensions.get('window').width - 48;
+  const chartConfig = {
+    backgroundColor: theme.colors.surface,
+    backgroundGradientFrom: theme.colors.surface,
+    backgroundGradientTo: theme.colors.surface,
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+    labelColor: () => theme.colors.onSurface,
+    style: { borderRadius: 16 },
+  };
+
+  // === STATUS HELPERS ===
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'excellent': return '#4CAF50';
+      case 'good': return '#2196F3';
+      case 'needs-attention': return '#FF9800';
+      case 'at-risk': return theme.colors.error;
+      default: return theme.colors.onSurfaceVariant;
+    }
+  };
+
+  const getAttendanceColor = (rate: number) => {
+    if (rate >= 90) return '#4CAF50';
+    if (rate >= 75) return '#FF9800';
+    return theme.colors.error;
+  };
+
+  // === LOADING ===
+  if (isLoading || !student) {
+    return (
+      <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <Text>Loading student details...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Icon name="arrow-left" size={24} color="white" />
+        </TouchableOpacity>
+
+        <View style={styles.headerContent}>
+          <Avatar.Image
+            size={80}
+            source={{ uri: student.avatarUrl }}
+            style={styles.avatar}
+          />
+          <Text variant="headlineSmall" style={styles.studentName}>{student.name}</Text>
+          <View style={styles.badgeRow}>
+            <Chip
+              compact
+              style={[styles.statusChip, { backgroundColor: getStatusColor(student.status) }]}
+              textStyle={styles.statusText}
+            >
+              {student.status.replace('-', ' ').toUpperCase()}
+            </Chip>
+            <Text style={styles.classText}>Class {student.class} - Roll #{student.rollNumber}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Stats Row */}
+      <View style={styles.statsRow}>
+        <Surface style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
+          <Icon name="percent" size={24} color={theme.colors.primary} />
+          <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
+            {student.avgScore}%
+          </Text>
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            Avg Score
+          </Text>
+        </Surface>
+        <Surface style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
+          <Icon name="calendar-check" size={24} color={getAttendanceColor(student.attendanceRate)} />
+          <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
+            {student.attendanceRate}%
+          </Text>
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            Attendance
+          </Text>
+        </Surface>
+        <Surface style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
+          <Icon name="trophy" size={24} color="#FF9800" />
+          <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
+            #{student.rank}
+          </Text>
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            Class Rank
+          </Text>
+        </Surface>
+      </View>
+
+      {/* Tab Selector */}
+      <View style={styles.tabRow}>
+        {(['overview', 'grades', 'attendance'] as const).map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[
+              styles.tab,
+              activeTab === tab && { borderBottomColor: theme.colors.primary, borderBottomWidth: 2 }
+            ]}
+            onPress={() => setActiveTab(tab)}
+          >
+            <Text
+              variant="labelLarge"
+              style={{ color: activeTab === tab ? theme.colors.primary : theme.colors.onSurfaceVariant }}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === 'overview' && (
+          <>
+            {/* Performance Trend */}
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Performance Trend</Text>
+              {progress?.trendData && (
+                <LineChart
+                  data={{
+                    labels: progress.trendData.labels,
+                    datasets: [{ data: progress.trendData.values }],
+                  }}
+                  width={screenWidth}
+                  height={160}
+                  chartConfig={chartConfig}
+                  bezier
+                  style={styles.chart}
+                />
+              )}
+            </Surface>
+
+            {/* Subject Breakdown */}
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Subject Performance</Text>
+              {student.subjects?.map((subject: any) => (
+                <View key={subject.id} style={styles.subjectRow}>
+                  <View style={styles.subjectInfo}>
+                    <Text variant="bodyMedium">{subject.name}</Text>
+                    <ProgressBar
+                      progress={subject.score / 100}
+                      color={getStatusColor(subject.score >= 75 ? 'good' : 'needs-attention')}
+                      style={styles.subjectProgress}
+                    />
+                  </View>
+                  <Text variant="titleSmall" style={{ color: theme.colors.onSurface }}>
+                    {subject.score}%
+                  </Text>
+                </View>
+              ))}
+            </Surface>
+
+            {/* Recent Activity */}
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Recent Activity</Text>
+              {student.recentActivity?.map((activity: any, idx: number) => (
+                <View key={idx} style={styles.activityItem}>
+                  <View style={[styles.activityIcon, { backgroundColor: `${theme.colors.primary}15` }]}>
+                    <Icon name={activity.icon} size={20} color={theme.colors.primary} />
+                  </View>
+                  <View style={styles.activityInfo}>
+                    <Text variant="bodyMedium">{activity.description}</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                      {activity.date}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </Surface>
+
+            {/* Parent Info */}
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Parent/Guardian</Text>
+              <View style={styles.parentRow}>
+                <Avatar.Icon size={48} icon="account" />
+                <View style={styles.parentInfo}>
+                  <Text variant="titleSmall">{student.parentName}</Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {student.parentRelation}
+                  </Text>
+                </View>
+                <View style={styles.parentActions}>
+                  <TouchableOpacity
+                    style={[styles.iconButton, { backgroundColor: `${theme.colors.primary}15` }]}
+                    onPress={() => Linking.openURL(`tel:${student.parentPhone}`)}
+                  >
+                    <Icon name="phone" size={20} color={theme.colors.primary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.iconButton, { backgroundColor: `${theme.colors.primary}15` }]}
+                    onPress={() => Linking.openURL(`mailto:${student.parentEmail}`)}
+                  >
+                    <Icon name="email" size={20} color={theme.colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Surface>
+          </>
+        )}
+
+        {activeTab === 'grades' && (
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Assignment Grades</Text>
+            {student.grades?.map((grade: any) => (
+              <TouchableOpacity
+                key={grade.id}
+                style={styles.gradeItem}
+                onPress={() => navigation.navigate('submission-detail' as never, { submissionId: grade.submissionId } as never)}
+              >
+                <View style={styles.gradeInfo}>
+                  <Text variant="bodyMedium">{grade.assignmentTitle}</Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {grade.subject} - {grade.date}
+                  </Text>
+                </View>
+                <View style={styles.gradeScore}>
+                  <Text
+                    variant="titleMedium"
+                    style={{ color: getStatusColor(grade.score >= 75 ? 'good' : 'needs-attention') }}
+                  >
+                    {grade.score}%
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </Surface>
+        )}
+
+        {activeTab === 'attendance' && (
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.attendanceSummary}>
+              <View style={styles.attendanceStat}>
+                <Text variant="headlineMedium" style={{ color: '#4CAF50' }}>{student.presentDays}</Text>
+                <Text variant="labelSmall">Present</Text>
+              </View>
+              <View style={styles.attendanceStat}>
+                <Text variant="headlineMedium" style={{ color: theme.colors.error }}>{student.absentDays}</Text>
+                <Text variant="labelSmall">Absent</Text>
+              </View>
+              <View style={styles.attendanceStat}>
+                <Text variant="headlineMedium" style={{ color: '#FF9800' }}>{student.lateDays}</Text>
+                <Text variant="labelSmall">Late</Text>
+              </View>
+            </View>
+            <Divider style={styles.divider} />
+            <Text variant="titleMedium" style={styles.sectionTitle}>Recent Absences</Text>
+            {student.absences?.map((absence: any, idx: number) => (
+              <View key={idx} style={styles.absenceItem}>
+                <Icon name="calendar-remove" size={20} color={theme.colors.error} />
+                <View style={styles.absenceInfo}>
+                  <Text variant="bodyMedium">{absence.date}</Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {absence.reason || 'No reason provided'}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </Surface>
+        )}
+
+        {/* Spacer */}
+        <View style={{ height: 80 }} />
+      </ScrollView>
+
+      {/* FAB for Quick Actions */}
+      <FAB
+        icon="plus"
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        onPress={() => setShowActions(true)}
+      />
+
+      {/* Quick Actions Modal */}
+      <Portal>
+        <Modal
+          visible={showActions}
+          onDismiss={() => setShowActions(false)}
+          contentContainerStyle={[styles.actionsModal, { backgroundColor: theme.colors.surface }]}
+        >
+          <Text variant="titleMedium" style={styles.modalTitle}>Quick Actions</Text>
+          {quickActions.map((action) => (
+            <TouchableOpacity
+              key={action.id}
+              style={styles.actionItem}
+              onPress={() => {
+                setShowActions(false);
+                action.action();
+              }}
+            >
+              <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
+                <Icon name={action.icon} size={24} color={action.color} />
+              </View>
+              <Text variant="bodyLarge">{action.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </Modal>
+      </Portal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: { padding: 20, paddingTop: 10, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  backButton: { marginBottom: 16 },
+  headerContent: { alignItems: 'center' },
+  avatar: { marginBottom: 12, borderWidth: 3, borderColor: 'rgba(255,255,255,0.3)' },
+  studentName: { color: 'white', fontWeight: 'bold' },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
+  statusChip: { borderRadius: 4 },
+  statusText: { color: 'white', fontSize: 10, fontWeight: 'bold' },
+  classText: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
+  statsRow: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, marginTop: -40 },
+  statCard: { flex: 1, marginHorizontal: 4, padding: 12, borderRadius: 12, alignItems: 'center', gap: 4 },
+  tabRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.1)' },
+  tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+  content: { flex: 1, padding: 16 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 16 },
+  chart: { borderRadius: 12, marginHorizontal: -8 },
+  subjectRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  subjectInfo: { flex: 1, marginRight: 16 },
+  subjectProgress: { height: 6, borderRadius: 3, marginTop: 4 },
+  activityItem: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  activityIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  activityInfo: { flex: 1 },
+  parentRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  parentInfo: { flex: 1 },
+  parentActions: { flexDirection: 'row', gap: 8 },
+  iconButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  gradeItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' },
+  gradeInfo: { flex: 1 },
+  gradeScore: { marginLeft: 16 },
+  attendanceSummary: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 16 },
+  attendanceStat: { alignItems: 'center' },
+  divider: { marginVertical: 16 },
+  absenceItem: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  absenceInfo: { flex: 1 },
+  fab: { position: 'absolute', right: 16, bottom: 16 },
+  actionsModal: { margin: 20, borderRadius: 12, padding: 16 },
+  modalTitle: { marginBottom: 16 },
+  actionItem: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 12 },
+  actionIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+});
+```
+
+
+### 7.7 Sprint 6 Checkpoint
+
+**Test Criteria:**
 - [ ] Student detail shows complete profile
+- [ ] Student avatar and name display correctly
+- [ ] Status chip shows correct status color
+- [ ] Stats row shows avg score, attendance, rank
+- [ ] Tab switching works (Overview/Grades/Attendance)
+- [ ] Performance trend chart renders
+- [ ] Subject breakdown shows progress bars
+- [ ] Parent contact buttons work (call/email)
+- [ ] Quick actions FAB opens modal
 - [ ] Analytics home loads with all widgets
 - [ ] Class performance chart renders correctly
 - [ ] Period selector changes data
@@ -3426,9 +6279,2585 @@ const styles = StyleSheet.create({
 
 ---
 
-## 10. DATABASE SCHEMA
+## 10. SPRINT 9: DEMO SHOWCASE FEATURES
 
-### 10.1 Core Tables for Phase 1
+> **Purpose:** High-impact features for demo to coaching heads, school institutes, and teachers for funding pitch. These features showcase AI capabilities and modern teaching workflow innovation.
+
+### 10.1 Deliverables
+
+| Type | Item | Status |
+|------|------|--------|
+| Dynamic Screen | `doubts-inbox` | 🔲 |
+| Dynamic Screen | `teacher-calendar` | 🔲 |
+| Dynamic Screen | `leave-history` | 🔲 |
+| Fixed Screen | `doubt-answer` | 🔲 |
+| Fixed Screen | `leave-request-create` | 🔲 |
+| Fixed Screen | `calendar-event-create` | 🔲 |
+| Fixed Screen | `substitute-finder` | 🔲 |
+| Widget | `teacher.doubts-inbox` | 🔲 |
+| Widget | `teacher.doubt-detail` | 🔲 |
+| Widget | `teacher.calendar` | 🔲 |
+| Widget | `teacher.calendar-events` | 🔲 |
+| Widget | `teacher.substitute-manager` | DONE (combined substitute-request + available-substitutes) |
+| Widget | `teacher.leave-request` | DONE |
+| Widget | `teacher.ai-insights` | DONE |
+| Hook | `useDoubtsInboxQuery` | DONE (as `useTeacherDoubtsQuery`) |
+| Hook | `useTeacherCalendarQuery` | DONE |
+| Hook | `useAvailableSubstitutesQuery` | DONE (as `useSubstituteQuery`) |
+| Hook | `useLeaveRequestsQuery` | DONE (as `useLeaveRequestQuery`) |
+| Hook | `useAnswerDoubt` | DONE |
+| Hook | `useRequestSubstitute` | DONE |
+| Hook | `useCreateLeaveRequest` | DONE |
+| DB Table | `teacher_doubts` | DONE (renamed from student_doubts) |
+| DB Table | `teacher_leave_requests` | DONE (renamed from teacher_leaves) |
+| DB Table | `substitute_requests` | DONE |
+| DB Table | `teacher_calendar_events` | DONE (renamed from calendar_events) |
+| DB Table | `teacher_ai_insights` | DONE |
+
+---
+
+### 10.2 DoubtsInboxWidget.tsx
+
+```typescript
+// src/components/widgets/teacher/DoubtsInboxWidget.tsx
+import React from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Avatar, Chip, Badge, Divider, Surface } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useDoubtsInboxQuery } from '@/hooks/queries/teacher';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { TeacherWidgetProps } from '@/types/widget.types';
+import { formatDistanceToNow } from 'date-fns';
+
+type Doubt = {
+  id: string;
+  studentName: string;
+  studentAvatar?: string;
+  className: string;
+  subject: string;
+  question: string;
+  attachmentUrl?: string;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  status: 'pending' | 'in_progress' | 'answered';
+  createdAt: string;
+  aiSuggestion?: string;
+};
+
+export const DoubtsInboxWidget: React.FC<TeacherWidgetProps> = ({ config, onNavigate }) => {
+  const theme = useAppTheme();
+  const { data: doubts, isLoading } = useDoubtsInboxQuery({ limit: config?.maxItems || 5 });
+
+  const priorityColors = {
+    low: theme.colors.outline,
+    normal: theme.colors.primary,
+    high: '#FF9800',
+    urgent: theme.colors.error,
+  };
+
+  const statusIcons = {
+    pending: 'clock-outline',
+    in_progress: 'progress-clock',
+    answered: 'check-circle',
+  };
+
+  const renderDoubt = ({ item }: { item: Doubt }) => (
+    <TouchableOpacity
+      style={styles.doubtItem}
+      onPress={() => onNavigate?.('doubt-detail', { doubtId: item.id })}
+    >
+      <View style={[styles.priorityBar, { backgroundColor: priorityColors[item.priority] }]} />
+      <Avatar.Text
+        size={40}
+        label={item.studentName.substring(0, 2).toUpperCase()}
+        style={{ backgroundColor: theme.colors.primaryContainer }}
+      />
+      <View style={styles.doubtContent}>
+        <View style={styles.headerRow}>
+          <Text variant="titleSmall" numberOfLines={1}>{item.studentName}</Text>
+          <Chip compact style={styles.subjectChip}>{item.subject}</Chip>
+        </View>
+        <Text variant="bodySmall" style={styles.question} numberOfLines={2}>
+          {item.question}
+        </Text>
+        <View style={styles.metaRow}>
+          <Text variant="labelSmall" style={styles.className}>{item.className}</Text>
+          <Text variant="labelSmall" style={styles.timestamp}>
+            {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+          </Text>
+        </View>
+        {item.aiSuggestion && (
+          <View style={[styles.aiSuggestionBadge, { backgroundColor: `${theme.colors.primary}15` }]}>
+            <Icon name="robot" size={12} color={theme.colors.primary} />
+            <Text variant="labelSmall" style={{ color: theme.colors.primary }}>AI suggestion available</Text>
+          </View>
+        )}
+      </View>
+      <Icon name={statusIcons[item.status]} size={20} color={priorityColors[item.priority]} />
+    </TouchableOpacity>
+  );
+
+  const pendingCount = doubts?.filter(d => d.status === 'pending').length || 0;
+
+  return (
+    <WidgetContainer
+      title="Student Doubts"
+      isLoading={isLoading}
+      action={pendingCount > 0 && <Badge style={{ backgroundColor: theme.colors.error }}>{pendingCount}</Badge>}
+    >
+      <FlatList
+        data={doubts || []}
+        renderItem={renderDoubt}
+        keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={() => <Divider />}
+        scrollEnabled={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Icon name="chat-question-outline" size={48} color={theme.colors.outline} />
+            <Text variant="bodyMedium" style={styles.emptyText}>No pending doubts</Text>
+          </View>
+        }
+      />
+    </WidgetContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  doubtItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 12, gap: 12 },
+  priorityBar: { width: 4, height: '100%', borderRadius: 2, minHeight: 60 },
+  doubtContent: { flex: 1 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  subjectChip: { height: 22 },
+  question: { opacity: 0.8, marginTop: 4 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
+  className: { opacity: 0.6 },
+  timestamp: { opacity: 0.5 },
+  aiSuggestionBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginTop: 6, alignSelf: 'flex-start' },
+  emptyContainer: { alignItems: 'center', padding: 24 },
+  emptyText: { marginTop: 8, opacity: 0.6 },
+});
+```
+
+
+### 10.3 DoubtDetailWidget.tsx
+
+```typescript
+// src/components/widgets/teacher/DoubtDetailWidget.tsx
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Image } from 'react-native';
+import { Text, Avatar, Surface, TextInput, Button, Chip, Divider } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useAnswerDoubt } from '@/hooks/mutations/teacher';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { TeacherWidgetProps } from '@/types/widget.types';
+
+type DoubtDetail = {
+  id: string;
+  studentName: string;
+  className: string;
+  subject: string;
+  topic: string;
+  question: string;
+  attachmentUrl?: string;
+  createdAt: string;
+  aiSuggestion?: {
+    answer: string;
+    confidence: number;
+    sources: string[];
+  };
+};
+
+export const DoubtDetailWidget: React.FC<TeacherWidgetProps & { doubt: DoubtDetail }> = ({ doubt, onNavigate }) => {
+  const theme = useAppTheme();
+  const [answer, setAnswer] = useState('');
+  const [useAiSuggestion, setUseAiSuggestion] = useState(false);
+  const { mutate: submitAnswer, isPending } = useAnswerDoubt();
+
+  const handleUseAiSuggestion = () => {
+    if (doubt.aiSuggestion) {
+      setAnswer(doubt.aiSuggestion.answer);
+      setUseAiSuggestion(true);
+    }
+  };
+
+  const handleSubmit = () => {
+    submitAnswer({
+      doubtId: doubt.id,
+      answer,
+      usedAiSuggestion: useAiSuggestion,
+    }, {
+      onSuccess: () => onNavigate?.('doubts-inbox'),
+    });
+  };
+
+  return (
+    <WidgetContainer title="Answer Doubt">
+      <ScrollView style={styles.container}>
+        {/* Student Info */}
+        <View style={styles.studentRow}>
+          <Avatar.Text size={48} label={doubt.studentName.substring(0, 2).toUpperCase()} />
+          <View style={styles.studentInfo}>
+            <Text variant="titleMedium">{doubt.studentName}</Text>
+            <View style={styles.metaRow}>
+              <Chip compact icon="school">{doubt.className}</Chip>
+              <Chip compact icon="book">{doubt.subject}</Chip>
+            </View>
+          </View>
+        </View>
+
+        <Divider style={styles.divider} />
+
+        {/* Question */}
+        <View style={styles.questionSection}>
+          <Text variant="labelMedium" style={styles.sectionLabel}>Question</Text>
+          <Surface style={styles.questionCard} elevation={0}>
+            <Text variant="titleSmall">{doubt.topic}</Text>
+            <Text variant="bodyMedium" style={styles.questionText}>{doubt.question}</Text>
+            {doubt.attachmentUrl && (
+              <Image source={{ uri: doubt.attachmentUrl }} style={styles.attachment} />
+            )}
+          </Surface>
+        </View>
+
+        {/* AI Suggestion */}
+        {doubt.aiSuggestion && (
+          <View style={styles.aiSection}>
+            <View style={styles.aiHeader}>
+              <View style={styles.aiTitleRow}>
+                <Icon name="robot" size={20} color={theme.colors.primary} />
+                <Text variant="labelMedium" style={{ color: theme.colors.primary }}>AI Suggested Answer</Text>
+              </View>
+              <Chip compact style={[styles.confidenceChip, { backgroundColor: `${theme.colors.primary}15` }]}>
+                {Math.round(doubt.aiSuggestion.confidence * 100)}% confident
+              </Chip>
+            </View>
+            <Surface style={[styles.aiCard, { backgroundColor: `${theme.colors.primary}08` }]} elevation={0}>
+              <Text variant="bodyMedium">{doubt.aiSuggestion.answer}</Text>
+              <View style={styles.sourcesRow}>
+                <Text variant="labelSmall" style={styles.sourcesLabel}>Sources:</Text>
+                {doubt.aiSuggestion.sources.map((source, idx) => (
+                  <Chip key={idx} compact style={styles.sourceChip}>{source}</Chip>
+                ))}
+              </View>
+            </Surface>
+            <Button
+              mode="outlined"
+              icon="content-copy"
+              onPress={handleUseAiSuggestion}
+              style={styles.useAiButton}
+            >
+              Use AI Suggestion
+            </Button>
+          </View>
+        )}
+
+        {/* Answer Input */}
+        <View style={styles.answerSection}>
+          <Text variant="labelMedium" style={styles.sectionLabel}>Your Answer</Text>
+          <TextInput
+            mode="outlined"
+            multiline
+            numberOfLines={6}
+            value={answer}
+            onChangeText={setAnswer}
+            placeholder="Type your answer here..."
+            style={styles.answerInput}
+          />
+          {useAiSuggestion && (
+            <View style={styles.aiUsedBadge}>
+              <Icon name="robot" size={14} color={theme.colors.primary} />
+              <Text variant="labelSmall" style={{ color: theme.colors.primary }}>Based on AI suggestion</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Submit Button */}
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          loading={isPending}
+          disabled={!answer.trim() || isPending}
+          style={styles.submitButton}
+        >
+          Send Answer
+        </Button>
+      </ScrollView>
+    </WidgetContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  studentRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  studentInfo: { flex: 1 },
+  metaRow: { flexDirection: 'row', gap: 8, marginTop: 6 },
+  divider: { marginVertical: 16 },
+  questionSection: { marginBottom: 16 },
+  sectionLabel: { marginBottom: 8, opacity: 0.7 },
+  questionCard: { padding: 16, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.03)' },
+  questionText: { marginTop: 8, lineHeight: 22 },
+  attachment: { width: '100%', height: 200, borderRadius: 8, marginTop: 12 },
+  aiSection: { marginBottom: 16 },
+  aiHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  aiTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  confidenceChip: { height: 24 },
+  aiCard: { padding: 16, borderRadius: 12 },
+  sourcesRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 12 },
+  sourcesLabel: { opacity: 0.6 },
+  sourceChip: { height: 22 },
+  useAiButton: { marginTop: 12 },
+  answerSection: { marginBottom: 16 },
+  answerInput: { minHeight: 120 },
+  aiUsedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
+  submitButton: { marginBottom: 24 },
+});
+```
+
+
+### 10.4 TeacherCalendarWidget.tsx
+
+```typescript
+// src/components/widgets/teacher/TeacherCalendarWidget.tsx
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Surface, Chip, Badge } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTeacherCalendarQuery } from '@/hooks/queries/teacher';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { TeacherWidgetProps } from '@/types/widget.types';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
+
+type CalendarEvent = {
+  id: string;
+  date: string;
+  type: 'class' | 'exam' | 'meeting' | 'holiday' | 'deadline';
+  title: string;
+  time?: string;
+  className?: string;
+};
+
+export const TeacherCalendarWidget: React.FC<TeacherWidgetProps> = ({ config, onNavigate }) => {
+  const theme = useAppTheme();
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const { data: events, isLoading } = useTeacherCalendarQuery({
+    startDate: format(startOfMonth(currentMonth), 'yyyy-MM-dd'),
+    endDate: format(endOfMonth(currentMonth), 'yyyy-MM-dd'),
+  });
+
+  const eventColors = {
+    class: theme.colors.primary,
+    exam: '#FF9800',
+    meeting: '#9C27B0',
+    holiday: '#4CAF50',
+    deadline: theme.colors.error,
+  };
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  const getEventsForDate = (date: Date) => {
+    return events?.filter(e => isSameDay(new Date(e.date), date)) || [];
+  };
+
+  const navigateMonth = (direction: number) => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + direction, 1));
+  };
+
+  const renderDay = (date: Date) => {
+    const dayEvents = getEventsForDate(date);
+    const isSelected = selectedDate && isSameDay(date, selectedDate);
+    const dayIsToday = isToday(date);
+
+    return (
+      <TouchableOpacity
+        key={date.toISOString()}
+        style={[
+          styles.dayCell,
+          isSelected && { backgroundColor: theme.colors.primaryContainer },
+          dayIsToday && styles.todayCell,
+        ]}
+        onPress={() => setSelectedDate(date)}
+      >
+        <Text
+          variant="bodyMedium"
+          style={[
+            styles.dayText,
+            dayIsToday && { color: theme.colors.primary, fontWeight: 'bold' },
+            isSelected && { color: theme.colors.onPrimaryContainer },
+          ]}
+        >
+          {format(date, 'd')}
+        </Text>
+        {dayEvents.length > 0 && (
+          <View style={styles.eventDots}>
+            {dayEvents.slice(0, 3).map((event, idx) => (
+              <View
+                key={idx}
+                style={[styles.eventDot, { backgroundColor: eventColors[event.type] }]}
+              />
+            ))}
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
+
+  return (
+    <WidgetContainer
+      title="Calendar"
+      isLoading={isLoading}
+      action={
+        <TouchableOpacity onPress={() => onNavigate?.('teacher-calendar')}>
+          <Icon name="arrow-expand" size={20} color={theme.colors.primary} />
+        </TouchableOpacity>
+      }
+    >
+      {/* Month Navigation */}
+      <View style={styles.monthNav}>
+        <TouchableOpacity onPress={() => navigateMonth(-1)}>
+          <Icon name="chevron-left" size={28} color={theme.colors.onSurface} />
+        </TouchableOpacity>
+        <Text variant="titleMedium">{format(currentMonth, 'MMMM yyyy')}</Text>
+        <TouchableOpacity onPress={() => navigateMonth(1)}>
+          <Icon name="chevron-right" size={28} color={theme.colors.onSurface} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Weekday Headers */}
+      <View style={styles.weekdayRow}>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <Text key={day} variant="labelSmall" style={styles.weekdayText}>{day}</Text>
+        ))}
+      </View>
+
+      {/* Calendar Grid */}
+      <View style={styles.calendarGrid}>
+        {/* Empty cells for days before month start */}
+        {Array.from({ length: monthStart.getDay() }).map((_, idx) => (
+          <View key={`empty-${idx}`} style={styles.dayCell} />
+        ))}
+        {days.map(renderDay)}
+      </View>
+
+      {/* Selected Date Events */}
+      {selectedDate && selectedDateEvents.length > 0 && (
+        <View style={styles.eventsSection}>
+          <Text variant="labelMedium" style={styles.eventsLabel}>
+            {format(selectedDate, 'EEEE, MMMM d')}
+          </Text>
+          {selectedDateEvents.map(event => (
+            <Surface key={event.id} style={styles.eventCard} elevation={0}>
+              <View style={[styles.eventIndicator, { backgroundColor: eventColors[event.type] }]} />
+              <View style={styles.eventInfo}>
+                <Text variant="titleSmall">{event.title}</Text>
+                {event.time && <Text variant="bodySmall" style={styles.eventTime}>{event.time}</Text>}
+                {event.className && <Chip compact style={styles.classChip}>{event.className}</Chip>}
+              </View>
+            </Surface>
+          ))}
+        </View>
+      )}
+
+      {/* Legend */}
+      <View style={styles.legend}>
+        {Object.entries(eventColors).map(([type, color]) => (
+          <View key={type} style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: color }]} />
+            <Text variant="labelSmall" style={styles.legendText}>{type}</Text>
+          </View>
+        ))}
+      </View>
+    </WidgetContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  monthNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  weekdayRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 8 },
+  weekdayText: { width: 40, textAlign: 'center', opacity: 0.6 },
+  calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  dayCell: { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 4 },
+  todayCell: { borderWidth: 2, borderColor: '#2196F3', borderRadius: 8 },
+  dayText: { fontSize: 14 },
+  eventDots: { flexDirection: 'row', gap: 2, marginTop: 2 },
+  eventDot: { width: 4, height: 4, borderRadius: 2 },
+  eventsSection: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' },
+  eventsLabel: { marginBottom: 8, opacity: 0.7 },
+  eventCard: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 8, marginBottom: 8, backgroundColor: 'rgba(0,0,0,0.03)' },
+  eventIndicator: { width: 4, height: '100%', borderRadius: 2, marginRight: 12 },
+  eventInfo: { flex: 1 },
+  eventTime: { opacity: 0.6, marginTop: 2 },
+  classChip: { alignSelf: 'flex-start', marginTop: 6, height: 22 },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { opacity: 0.7, textTransform: 'capitalize' },
+});
+```
+
+
+### 10.5 SubstituteRequestWidget.tsx
+
+```typescript
+// src/components/widgets/teacher/SubstituteRequestWidget.tsx
+import React, { useState } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Avatar, Surface, Button, Chip, Divider, SegmentedButtons, RadioButton } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useAvailableSubstitutesQuery, useLeaveRequestsQuery } from '@/hooks/queries/teacher';
+import { useRequestSubstitute, useCreateLeaveRequest } from '@/hooks/mutations/teacher';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { TeacherWidgetProps } from '@/types/widget.types';
+import { format } from 'date-fns';
+
+type SubstituteTeacher = {
+  id: string;
+  name: string;
+  department: string;
+  subjects: string[];
+  availableSlots: string[];
+  rating: number;
+  distance?: number;
+};
+
+type LeaveRequest = {
+  id: string;
+  date: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  substituteId?: string;
+  substituteName?: string;
+};
+
+export const SubstituteRequestWidget: React.FC<TeacherWidgetProps> = ({ config, onNavigate }) => {
+  const theme = useAppTheme();
+  const [view, setView] = useState<'request' | 'history'>('request');
+  const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  const [selectedClass, setSelectedClass] = useState<string>('');
+  const [selectedSubstitute, setSelectedSubstitute] = useState<string>('');
+  const [reason, setReason] = useState<string>('');
+
+  const { data: substitutes, isLoading: loadingSubstitutes } = useAvailableSubstitutesQuery({
+    date: selectedDate,
+    subject: selectedClass,
+  });
+
+  const { data: leaveRequests, isLoading: loadingRequests } = useLeaveRequestsQuery();
+  const { mutate: requestSubstitute, isPending: requesting } = useRequestSubstitute();
+  const { mutate: createLeave, isPending: creatingLeave } = useCreateLeaveRequest();
+
+  const statusColors = {
+    pending: '#FF9800',
+    approved: '#4CAF50',
+    rejected: theme.colors.error,
+  };
+
+  const handleSubmitRequest = () => {
+    if (!selectedDate || !selectedSubstitute) return;
+    requestSubstitute({
+      date: selectedDate,
+      substituteId: selectedSubstitute,
+      reason,
+    });
+  };
+
+  const renderSubstitute = ({ item }: { item: SubstituteTeacher }) => (
+    <TouchableOpacity
+      style={[
+        styles.substituteCard,
+        selectedSubstitute === item.id && { borderColor: theme.colors.primary, borderWidth: 2 },
+      ]}
+      onPress={() => setSelectedSubstitute(item.id)}
+    >
+      <RadioButton
+        value={item.id}
+        status={selectedSubstitute === item.id ? 'checked' : 'unchecked'}
+        onPress={() => setSelectedSubstitute(item.id)}
+      />
+      <Avatar.Text size={44} label={item.name.substring(0, 2).toUpperCase()} />
+      <View style={styles.substituteInfo}>
+        <Text variant="titleSmall">{item.name}</Text>
+        <Text variant="bodySmall" style={styles.department}>{item.department}</Text>
+        <View style={styles.subjectsRow}>
+          {item.subjects.slice(0, 2).map((subject, idx) => (
+            <Chip key={idx} compact style={styles.subjectChip}>{subject}</Chip>
+          ))}
+        </View>
+      </View>
+      <View style={styles.ratingSection}>
+        <View style={styles.ratingRow}>
+          <Icon name="star" size={16} color="#FFB300" />
+          <Text variant="labelMedium">{item.rating.toFixed(1)}</Text>
+        </View>
+        <Text variant="labelSmall" style={styles.slotsText}>
+          {item.availableSlots.length} slots free
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderLeaveRequest = ({ item }: { item: LeaveRequest }) => (
+    <Surface style={styles.requestCard} elevation={0}>
+      <View style={styles.requestHeader}>
+        <Text variant="titleSmall">{format(new Date(item.date), 'EEE, MMM d')}</Text>
+        <Chip
+          compact
+          style={{ backgroundColor: `${statusColors[item.status]}20` }}
+          textStyle={{ color: statusColors[item.status] }}
+        >
+          {item.status}
+        </Chip>
+      </View>
+      <Text variant="bodySmall" style={styles.reason}>{item.reason}</Text>
+      {item.substituteName && (
+        <View style={styles.substituteRow}>
+          <Icon name="account-switch" size={16} color={theme.colors.outline} />
+          <Text variant="labelSmall" style={styles.substituteText}>
+            Substitute: {item.substituteName}
+          </Text>
+        </View>
+      )}
+    </Surface>
+  );
+
+  return (
+    <WidgetContainer title="Substitute Finder" isLoading={loadingSubstitutes || loadingRequests}>
+      <SegmentedButtons
+        value={view}
+        onValueChange={(v) => setView(v as 'request' | 'history')}
+        buttons={[
+          { value: 'request', label: 'Request Leave' },
+          { value: 'history', label: 'My Requests' },
+        ]}
+        style={styles.segmentedButtons}
+      />
+
+      {view === 'request' ? (
+        <View style={styles.requestForm}>
+          {/* Date Selection */}
+          <View style={styles.formSection}>
+            <Text variant="labelMedium" style={styles.formLabel}>Select Date</Text>
+            {/* Date picker would go here - simplified for demo */}
+            <Surface style={styles.dateCard} elevation={0}>
+              <Icon name="calendar" size={20} color={theme.colors.primary} />
+              <Text variant="bodyMedium">{format(new Date(selectedDate), 'EEEE, MMMM d, yyyy')}</Text>
+            </Surface>
+          </View>
+
+          {/* Available Substitutes */}
+          <View style={styles.formSection}>
+            <Text variant="labelMedium" style={styles.formLabel}>Available Substitutes</Text>
+            <FlatList
+              data={substitutes || []}
+              renderItem={renderSubstitute}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Icon name="account-search" size={40} color={theme.colors.outline} />
+                  <Text variant="bodySmall" style={styles.emptyText}>No substitutes available</Text>
+                </View>
+              }
+            />
+          </View>
+
+          {/* Submit Button */}
+          <Button
+            mode="contained"
+            onPress={handleSubmitRequest}
+            loading={requesting}
+            disabled={!selectedSubstitute || requesting}
+            style={styles.submitButton}
+            icon="send"
+          >
+            Request Substitute
+          </Button>
+        </View>
+      ) : (
+        <FlatList
+          data={leaveRequests || []}
+          renderItem={renderLeaveRequest}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          scrollEnabled={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Icon name="calendar-check" size={48} color={theme.colors.outline} />
+              <Text variant="bodyMedium" style={styles.emptyText}>No leave requests yet</Text>
+            </View>
+          }
+        />
+      )}
+    </WidgetContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  segmentedButtons: { marginBottom: 16 },
+  requestForm: {},
+  formSection: { marginBottom: 16 },
+  formLabel: { marginBottom: 8, opacity: 0.7 },
+  dateCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.03)' },
+  substituteCard: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, marginBottom: 8, backgroundColor: 'rgba(0,0,0,0.03)', gap: 8 },
+  substituteInfo: { flex: 1 },
+  department: { opacity: 0.6, marginTop: 2 },
+  subjectsRow: { flexDirection: 'row', gap: 4, marginTop: 6 },
+  subjectChip: { height: 22 },
+  ratingSection: { alignItems: 'flex-end' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  slotsText: { opacity: 0.6, marginTop: 4 },
+  submitButton: { marginTop: 8 },
+  requestCard: { padding: 16, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.03)' },
+  requestHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  reason: { opacity: 0.7, marginTop: 8 },
+  substituteRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
+  substituteText: { opacity: 0.6 },
+  separator: { height: 8 },
+  emptyContainer: { alignItems: 'center', padding: 24 },
+  emptyText: { marginTop: 8, opacity: 0.6 },
+});
+```
+
+
+### 10.6 AIInsightsWidget.tsx
+
+```typescript
+// src/components/widgets/teacher/AIInsightsWidget.tsx
+import React from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Surface, Chip, Button, ProgressBar } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { WidgetContainer } from '@/components/widgets/base/WidgetContainer';
+import { TeacherWidgetProps } from '@/types/widget.types';
+
+type AIInsight = {
+  id: string;
+  type: 'at_risk' | 'performance_drop' | 'attendance_pattern' | 'improvement' | 'recommendation';
+  title: string;
+  description: string;
+  severity: 'info' | 'warning' | 'critical' | 'success';
+  affectedStudents?: number;
+  confidence: number;
+  actionable: boolean;
+  suggestedAction?: string;
+};
+
+export const AIInsightsWidget: React.FC<TeacherWidgetProps> = ({ config, onNavigate }) => {
+  const theme = useAppTheme();
+
+  // Mock AI insights - would come from backend AI analysis
+  const insights: AIInsight[] = [
+    {
+      id: '1',
+      type: 'at_risk',
+      title: '3 Students Need Attention',
+      description: 'Based on attendance and performance patterns, 3 students in Class 10-A may be at risk of falling behind.',
+      severity: 'critical',
+      affectedStudents: 3,
+      confidence: 0.89,
+      actionable: true,
+      suggestedAction: 'Schedule parent meetings for these students',
+    },
+    {
+      id: '2',
+      type: 'attendance_pattern',
+      title: 'Monday Absence Pattern Detected',
+      description: '5 students show consistent Monday absences over the past month. This may indicate scheduling conflicts.',
+      severity: 'warning',
+      affectedStudents: 5,
+      confidence: 0.82,
+      actionable: true,
+      suggestedAction: 'Review Monday schedules with affected students',
+    },
+    {
+      id: '3',
+      type: 'improvement',
+      title: 'Class 10-B Performance Up 12%',
+      description: 'Overall class performance has improved significantly since implementing the new teaching strategy.',
+      severity: 'success',
+      confidence: 0.95,
+      actionable: false,
+    },
+    {
+      id: '4',
+      type: 'recommendation',
+      title: 'Consider Topic Review',
+      description: '68% of students struggled with Chapter 5 concepts. A review session could help reinforce understanding.',
+      severity: 'info',
+      confidence: 0.78,
+      actionable: true,
+      suggestedAction: 'Schedule a review session for Chapter 5',
+    },
+  ];
+
+  const severityConfig = {
+    info: { icon: 'information', color: theme.colors.primary, bg: `${theme.colors.primary}15` },
+    warning: { icon: 'alert', color: '#FF9800', bg: '#FF980015' },
+    critical: { icon: 'alert-circle', color: theme.colors.error, bg: `${theme.colors.error}15` },
+    success: { icon: 'check-circle', color: '#4CAF50', bg: '#4CAF5015' },
+  };
+
+  const renderInsight = ({ item }: { item: AIInsight }) => {
+    const config = severityConfig[item.severity];
+    return (
+      <Surface style={[styles.insightCard, { backgroundColor: config.bg }]} elevation={0}>
+        <View style={styles.insightHeader}>
+          <View style={[styles.iconContainer, { backgroundColor: config.color + '20' }]}>
+            <Icon name={config.icon} size={24} color={config.color} />
+          </View>
+          <View style={styles.insightTitleSection}>
+            <Text variant="titleSmall">{item.title}</Text>
+            <View style={styles.confidenceRow}>
+              <Icon name="robot" size={12} color={theme.colors.outline} />
+              <Text variant="labelSmall" style={styles.confidenceText}>
+                {Math.round(item.confidence * 100)}% confidence
+              </Text>
+            </View>
+          </View>
+          {item.affectedStudents && (
+            <Chip compact icon="account-group">{item.affectedStudents}</Chip>
+          )}
+        </View>
+
+        <Text variant="bodySmall" style={styles.description}>{item.description}</Text>
+
+        {item.actionable && item.suggestedAction && (
+          <View style={styles.actionSection}>
+            <View style={styles.suggestedAction}>
+              <Icon name="lightbulb-outline" size={16} color={theme.colors.primary} />
+              <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
+                {item.suggestedAction}
+              </Text>
+            </View>
+            <Button
+              mode="contained-tonal"
+              compact
+              onPress={() => onNavigate?.('insight-action', { insightId: item.id })}
+            >
+              Take Action
+            </Button>
+          </View>
+        )}
+      </Surface>
+    );
+  };
+
+  return (
+    <WidgetContainer
+      title="AI Insights"
+      action={
+        <View style={styles.headerAction}>
+          <Icon name="robot" size={18} color={theme.colors.primary} />
+          <Text variant="labelMedium" style={{ color: theme.colors.primary }}>Powered by AI</Text>
+        </View>
+      }
+    >
+      <FlatList
+        data={insights.slice(0, config?.maxItems || 4)}
+        renderItem={renderInsight}
+        keyExtractor={(item) => item.id}
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+
+      <TouchableOpacity
+        style={styles.viewAllButton}
+        onPress={() => onNavigate?.('ai-insights-all')}
+      >
+        <Text variant="labelMedium" style={{ color: theme.colors.primary }}>View All Insights</Text>
+        <Icon name="arrow-right" size={18} color={theme.colors.primary} />
+      </TouchableOpacity>
+    </WidgetContainer>
+  );
+};
+
+const styles = StyleSheet.create({
+  headerAction: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  insightCard: { padding: 16, borderRadius: 12 },
+  insightHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  iconContainer: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  insightTitleSection: { flex: 1 },
+  confidenceRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  confidenceText: { opacity: 0.6 },
+  description: { marginTop: 12, lineHeight: 20, opacity: 0.8 },
+  actionSection: { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' },
+  suggestedAction: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  separator: { height: 12 },
+  viewAllButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' },
+});
+```
+
+
+### 10.7 useDoubtsInboxQuery Hook
+
+```typescript
+// src/hooks/queries/teacher/useDoubtsInboxQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuthStore } from '@/stores/authStore';
+
+export const useDoubtsInboxQuery = (options?: { limit?: number; status?: string }) => {
+  const { user } = useAuthStore();
+  const limit = options?.limit || 10;
+
+  return useQuery({
+    queryKey: ['teacher', 'doubts', user?.id, { limit, status: options?.status }],
+    queryFn: async () => {
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id, customer_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!teacher) throw new Error('Teacher not found');
+
+      // Get doubts from classes this teacher teaches
+      const { data: teacherClasses } = await supabase
+        .from('teacher_classes')
+        .select('class_id, subject_id')
+        .eq('teacher_id', teacher.id)
+        .eq('status', 'active');
+
+      const classIds = teacherClasses?.map(tc => tc.class_id) || [];
+
+      let query = supabase
+        .from('student_doubts')
+        .select(`
+          id,
+          question,
+          attachment_url,
+          priority,
+          status,
+          ai_suggestion,
+          created_at,
+          student:user_profiles!student_id(full_name, avatar_url),
+          class:classes!class_id(name),
+          subject:subjects!subject_id(name_en)
+        `)
+        .eq('customer_id', teacher.customer_id)
+        .in('class_id', classIds)
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (options?.status) {
+        query = query.eq('status', options.status);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return data?.map(d => ({
+        id: d.id,
+        studentName: d.student?.full_name || 'Unknown',
+        studentAvatar: d.student?.avatar_url,
+        className: d.class?.name || '',
+        subject: d.subject?.name_en || '',
+        question: d.question,
+        attachmentUrl: d.attachment_url,
+        priority: d.priority,
+        status: d.status,
+        createdAt: d.created_at,
+        aiSuggestion: d.ai_suggestion,
+      })) || [];
+    },
+    staleTime: 2 * 60 * 1000,
+    enabled: !!user?.id,
+  });
+};
+```
+
+
+### 10.8 useTeacherCalendarQuery Hook
+
+```typescript
+// src/hooks/queries/teacher/useTeacherCalendarQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuthStore } from '@/stores/authStore';
+
+export const useTeacherCalendarQuery = (options?: { startDate?: string; endDate?: string }) => {
+  const { user } = useAuthStore();
+
+  return useQuery({
+    queryKey: ['teacher', 'calendar', user?.id, options?.startDate, options?.endDate],
+    queryFn: async () => {
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id, customer_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!teacher) throw new Error('Teacher not found');
+
+      // Get calendar events (classes, exams, meetings, holidays)
+      const { data: events, error } = await supabase
+        .from('calendar_events')
+        .select(`
+          id,
+          event_date,
+          event_type,
+          title_en,
+          start_time,
+          end_time,
+          class:classes!class_id(name)
+        `)
+        .eq('customer_id', teacher.customer_id)
+        .or(`teacher_id.eq.${teacher.id},teacher_id.is.null`)
+        .gte('event_date', options?.startDate || new Date().toISOString().split('T')[0])
+        .lte('event_date', options?.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('event_date', { ascending: true });
+
+      if (error) throw error;
+
+      return events?.map(e => ({
+        id: e.id,
+        date: e.event_date,
+        type: e.event_type,
+        title: e.title_en,
+        time: e.start_time ? `${e.start_time} - ${e.end_time}` : undefined,
+        className: e.class?.name,
+      })) || [];
+    },
+    staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
+  });
+};
+```
+
+
+### 10.9 useAvailableSubstitutesQuery Hook
+
+```typescript
+// src/hooks/queries/teacher/useAvailableSubstitutesQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuthStore } from '@/stores/authStore';
+
+export const useAvailableSubstitutesQuery = (options?: { date?: string; subject?: string }) => {
+  const { user } = useAuthStore();
+
+  return useQuery({
+    queryKey: ['teacher', 'substitutes', options?.date, options?.subject],
+    queryFn: async () => {
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id, customer_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!teacher) throw new Error('Teacher not found');
+
+      // Get other teachers who are available on the given date
+      const { data: availableTeachers, error } = await supabase
+        .from('teachers')
+        .select(`
+          id,
+          full_name,
+          department,
+          subject_specialization,
+          substitute_rating
+        `)
+        .eq('customer_id', teacher.customer_id)
+        .eq('status', 'active')
+        .neq('id', teacher.id);
+
+      if (error) throw error;
+
+      // Check for conflicts with leave requests for each teacher
+      const teachersWithAvailability = await Promise.all(
+        (availableTeachers || []).map(async (t) => {
+          const { count: leaveCount } = await supabase
+            .from('teacher_leaves')
+            .select('id', { count: 'exact' })
+            .eq('teacher_id', t.id)
+            .eq('leave_date', options?.date || new Date().toISOString().split('T')[0])
+            .eq('status', 'approved');
+
+          // If teacher has approved leave, they're not available
+          if (leaveCount && leaveCount > 0) return null;
+
+          return {
+            id: t.id,
+            name: t.full_name,
+            department: t.department || 'General',
+            subjects: t.subject_specialization ? [t.subject_specialization] : [],
+            availableSlots: ['Period 1', 'Period 3', 'Period 5'], // Would come from schedule
+            rating: t.substitute_rating || 4.0,
+          };
+        })
+      );
+
+      return teachersWithAvailability.filter(Boolean);
+    },
+    staleTime: 2 * 60 * 1000,
+    enabled: !!user?.id,
+  });
+};
+```
+
+
+### 10.10 useAnswerDoubt Hook
+
+```typescript
+// src/hooks/mutations/teacher/useAnswerDoubt.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuthStore } from '@/stores/authStore';
+
+type AnswerData = {
+  doubtId: string;
+  answer: string;
+  usedAiSuggestion?: boolean;
+};
+
+export const useAnswerDoubt = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: async (data: AnswerData) => {
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!teacher) throw new Error('Teacher not found');
+
+      const { data: updated, error } = await supabase
+        .from('student_doubts')
+        .update({
+          answer: data.answer,
+          answered_by: teacher.id,
+          answered_at: new Date().toISOString(),
+          used_ai_suggestion: data.usedAiSuggestion || false,
+          status: 'answered',
+        })
+        .eq('id', data.doubtId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updated;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'doubts'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'dashboard'] });
+    },
+  });
+};
+```
+
+
+### 10.11 useRequestSubstitute Hook
+
+```typescript
+// src/hooks/mutations/teacher/useRequestSubstitute.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuthStore } from '@/stores/authStore';
+
+type SubstituteRequest = {
+  date: string;
+  substituteId: string;
+  reason?: string;
+  classIds?: string[];
+};
+
+export const useRequestSubstitute = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: async (data: SubstituteRequest) => {
+      const { data: teacher } = await supabase
+        .from('teachers')
+        .select('id, customer_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!teacher) throw new Error('Teacher not found');
+
+      // Create leave request
+      const { data: leaveRequest, error: leaveError } = await supabase
+        .from('teacher_leaves')
+        .insert({
+          customer_id: teacher.customer_id,
+          teacher_id: teacher.id,
+          leave_date: data.date,
+          reason: data.reason || 'Personal',
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (leaveError) throw leaveError;
+
+      // Create substitute request
+      const { data: subRequest, error: subError } = await supabase
+        .from('substitute_requests')
+        .insert({
+          customer_id: teacher.customer_id,
+          requesting_teacher_id: teacher.id,
+          substitute_teacher_id: data.substituteId,
+          leave_id: leaveRequest.id,
+          request_date: data.date,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (subError) throw subError;
+      return { leaveRequest, subRequest };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'leaves'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'substitutes'] });
+    },
+  });
+};
+```
+
+
+### 10.12 DoubtAnswerScreen.tsx (Fixed Screen)
+
+```typescript
+// src/screens/teacher/DoubtAnswerScreen.tsx
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Avatar,
+  Surface,
+  Chip,
+  Divider,
+  IconButton,
+  Snackbar,
+  ActivityIndicator,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useDoubtDetailQuery } from '@/hooks/queries/teacher';
+import { useAnswerDoubt } from '@/hooks/mutations/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { formatDistanceToNow } from 'date-fns';
+
+export const DoubtAnswerScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  const { doubtId } = route.params as { doubtId: string };
+
+  // === DATA ===
+  const { data: doubt, isLoading } = useDoubtDetailQuery(doubtId);
+  const answerMutation = useAnswerDoubt();
+
+  // === STATE ===
+  const [answer, setAnswer] = useState('');
+  const [useAiSuggestion, setUseAiSuggestion] = useState(false);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+
+  // === HANDLERS ===
+  const applyAiSuggestion = () => {
+    if (doubt?.aiSuggestion?.text) {
+      setAnswer(doubt.aiSuggestion.text);
+      setUseAiSuggestion(true);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!answer.trim()) {
+      setSnackbar({ visible: true, message: 'Please enter an answer' });
+      return;
+    }
+
+    try {
+      await answerMutation.mutateAsync({
+        doubtId,
+        answer: answer.trim(),
+        usedAiSuggestion: useAiSuggestion,
+      });
+
+      setSnackbar({ visible: true, message: 'Answer submitted successfully!' });
+      setTimeout(() => navigation.goBack(), 1500);
+    } catch (error) {
+      setSnackbar({ visible: true, message: 'Failed to submit answer' });
+    }
+  };
+
+  // === CONFIDENCE COLOR ===
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 90) return '#4CAF50';
+    if (confidence >= 70) return '#2196F3';
+    if (confidence >= 50) return '#FF9800';
+    return theme.colors.error;
+  };
+
+  // === LOADING ===
+  if (isLoading || !doubt) {
+    return (
+      <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={{ marginTop: 16 }}>Loading doubt...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrow-left" size={24} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+          <Text variant="titleLarge" style={{ color: theme.colors.onBackground, flex: 1 }}>
+            Answer Doubt
+          </Text>
+          <Chip compact mode="outlined" style={{ borderColor: theme.colors.primary }}>
+            {doubt.subject}
+          </Chip>
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Student Info */}
+          <Surface style={[styles.studentCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.studentRow}>
+              <Avatar.Text
+                size={48}
+                label={doubt.studentName.substring(0, 2).toUpperCase()}
+              />
+              <View style={styles.studentInfo}>
+                <Text variant="titleMedium">{doubt.studentName}</Text>
+                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                  {doubt.className} - Asked {formatDistanceToNow(new Date(doubt.createdAt), { addSuffix: true })}
+                </Text>
+              </View>
+              <Chip
+                compact
+                style={{
+                  backgroundColor: doubt.priority === 'high'
+                    ? theme.colors.errorContainer
+                    : doubt.priority === 'medium'
+                    ? '#FFF3E0'
+                    : theme.colors.surfaceVariant
+                }}
+              >
+                {doubt.priority}
+              </Chip>
+            </View>
+          </Surface>
+
+          {/* Question */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Question</Text>
+            <View style={[styles.questionBox, { backgroundColor: theme.colors.surfaceVariant }]}>
+              <Icon name="help-circle" size={20} color={theme.colors.primary} style={styles.questionIcon} />
+              <Text variant="bodyLarge" style={{ flex: 1 }}>{doubt.question}</Text>
+            </View>
+            {doubt.attachmentUrl && (
+              <TouchableOpacity style={styles.attachmentRow}>
+                <Icon name="image" size={20} color={theme.colors.primary} />
+                <Text variant="bodySmall" style={{ color: theme.colors.primary }}>View Attachment</Text>
+              </TouchableOpacity>
+            )}
+          </Surface>
+
+          {/* AI Suggestion */}
+          {doubt.aiSuggestion && (
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <View style={styles.aiHeader}>
+                <View style={styles.aiTitleRow}>
+                  <Icon name="robot" size={20} color={theme.colors.primary} />
+                  <Text variant="titleMedium">AI Suggestion</Text>
+                </View>
+                <Chip
+                  compact
+                  style={{ backgroundColor: getConfidenceColor(doubt.aiSuggestion.confidence) }}
+                  textStyle={{ color: 'white', fontSize: 10 }}
+                >
+                  {doubt.aiSuggestion.confidence}% confident
+                </Chip>
+              </View>
+
+              <View style={[styles.aiBox, { borderColor: theme.colors.primary }]}>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
+                  {doubt.aiSuggestion.text}
+                </Text>
+              </View>
+
+              <Button
+                mode="outlined"
+                icon="content-copy"
+                onPress={applyAiSuggestion}
+                style={styles.useAiButton}
+              >
+                Use This Suggestion
+              </Button>
+
+              {doubt.aiSuggestion.sources && (
+                <View style={styles.sourcesRow}>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    Sources:
+                  </Text>
+                  {doubt.aiSuggestion.sources.map((source: string, idx: number) => (
+                    <Chip key={idx} compact style={styles.sourceChip}>
+                      {source}
+                    </Chip>
+                  ))}
+                </View>
+              )}
+            </Surface>
+          )}
+
+          {/* Your Answer */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Your Answer</Text>
+            <TextInput
+              mode="outlined"
+              multiline
+              numberOfLines={6}
+              value={answer}
+              onChangeText={(text) => {
+                setAnswer(text);
+                setUseAiSuggestion(false);
+              }}
+              placeholder="Type your answer here..."
+              style={styles.answerInput}
+            />
+
+            {/* Quick Response Chips */}
+            <Text variant="labelMedium" style={styles.quickLabel}>Quick Responses:</Text>
+            <View style={styles.quickResponses}>
+              {[
+                'Good question! Let me explain...',
+                'This is a common confusion. The key point is...',
+                'Please refer to Chapter X for more details.',
+                'Let\'s solve this step by step:',
+              ].map((text, idx) => (
+                <Chip
+                  key={idx}
+                  compact
+                  onPress={() => setAnswer(prev => prev ? `${prev}\n\n${text}` : text)}
+                  style={styles.quickChip}
+                >
+                  {text.substring(0, 30)}...
+                </Chip>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Spacer */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Bottom Bar */}
+        <View style={[styles.bottomBar, { backgroundColor: theme.colors.surface }]}>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.goBack()}
+            style={styles.cancelButton}
+          >
+            Cancel
+          </Button>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={answerMutation.isPending}
+            disabled={answerMutation.isPending || !answer.trim()}
+            style={styles.submitButton}
+            icon="send"
+          >
+            Submit Answer
+          </Button>
+        </View>
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={2000}
+        >
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  backButton: { marginRight: 8 },
+  content: { flex: 1, padding: 16 },
+  studentCard: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  studentRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  studentInfo: { flex: 1 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 12 },
+  questionBox: {
+    flexDirection: 'row',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  questionIcon: { marginTop: 2 },
+  attachmentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  aiHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  aiTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  aiBox: {
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  useAiButton: { marginTop: 12 },
+  sourcesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  sourceChip: { height: 24 },
+  answerInput: { minHeight: 120 },
+  quickLabel: { marginTop: 12, marginBottom: 8 },
+  quickResponses: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  quickChip: { marginBottom: 4 },
+  bottomBar: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  cancelButton: { flex: 1 },
+  submitButton: { flex: 2 },
+});
+```
+
+
+### 10.13 LeaveRequestCreateScreen.tsx (Fixed Screen)
+
+```typescript
+// src/screens/teacher/LeaveRequestCreateScreen.tsx
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Surface,
+  Chip,
+  RadioButton,
+  Switch,
+  Snackbar,
+  HelperText,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useCreateLeaveRequest } from '@/hooks/mutations/teacher';
+import { useTeacherClassesQuery } from '@/hooks/queries/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type LeaveType = 'sick' | 'personal' | 'emergency' | 'planned';
+
+type FormData = {
+  leaveType: LeaveType;
+  startDate: Date;
+  endDate: Date;
+  isHalfDay: boolean;
+  reason: string;
+  needSubstitute: boolean;
+  selectedClasses: string[];
+  notes: string;
+};
+
+export const LeaveRequestCreateScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  // === DATA ===
+  const { data: classes = [] } = useTeacherClassesQuery();
+  const createMutation = useCreateLeaveRequest();
+
+  // === FORM STATE ===
+  const [formData, setFormData] = useState<FormData>({
+    leaveType: 'planned',
+    startDate: new Date(),
+    endDate: new Date(),
+    isHalfDay: false,
+    reason: '',
+    needSubstitute: true,
+    selectedClasses: [],
+    notes: '',
+  });
+
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+
+  // === LEAVE TYPES ===
+  const leaveTypes: { value: LeaveType; label: string; icon: string; color: string }[] = [
+    { value: 'sick', label: 'Sick Leave', icon: 'hospital-box', color: theme.colors.error },
+    { value: 'personal', label: 'Personal', icon: 'account', color: theme.colors.primary },
+    { value: 'emergency', label: 'Emergency', icon: 'alert-circle', color: '#FF9800' },
+    { value: 'planned', label: 'Planned', icon: 'calendar-check', color: '#4CAF50' },
+  ];
+
+  // === HANDLERS ===
+  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const toggleClass = (classId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedClasses: prev.selectedClasses.includes(classId)
+        ? prev.selectedClasses.filter(id => id !== classId)
+        : [...prev.selectedClasses, classId],
+    }));
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+
+    if (!formData.reason.trim()) newErrors.reason = 'Reason is required';
+    if (formData.endDate < formData.startDate) newErrors.endDate = 'End date must be after start date';
+    if (formData.needSubstitute && formData.selectedClasses.length === 0) {
+      newErrors.selectedClasses = 'Select at least one class for substitute';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await createMutation.mutateAsync({
+        leaveType: formData.leaveType,
+        startDate: formData.startDate.toISOString(),
+        endDate: formData.endDate.toISOString(),
+        isHalfDay: formData.isHalfDay,
+        reason: formData.reason,
+        needSubstitute: formData.needSubstitute,
+        classIds: formData.selectedClasses,
+        notes: formData.notes,
+      });
+
+      setSnackbar({ visible: true, message: 'Leave request submitted!' });
+      setTimeout(() => {
+        if (formData.needSubstitute) {
+          navigation.navigate('substitute-finder' as never, {
+            startDate: formData.startDate.toISOString(),
+            classIds: formData.selectedClasses,
+          } as never);
+        } else {
+          navigation.goBack();
+        }
+      }, 1500);
+    } catch (error) {
+      setSnackbar({ visible: true, message: 'Failed to submit request' });
+    }
+  };
+
+  // === CALCULATIONS ===
+  const dayCount = Math.ceil((formData.endDate.getTime() - formData.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const selectedLeaveType = leaveTypes.find(t => t.value === formData.leaveType);
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrow-left" size={24} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+          <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>
+            Request Leave
+          </Text>
+          <View style={styles.headerSpacer} />
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Leave Type */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Leave Type</Text>
+            <View style={styles.typeGrid}>
+              {leaveTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.value}
+                  style={[
+                    styles.typeCard,
+                    {
+                      borderColor: formData.leaveType === type.value ? type.color : theme.colors.outline,
+                      backgroundColor: formData.leaveType === type.value ? `${type.color}15` : 'transparent',
+                    },
+                  ]}
+                  onPress={() => updateField('leaveType', type.value)}
+                >
+                  <Icon
+                    name={type.icon}
+                    size={28}
+                    color={formData.leaveType === type.value ? type.color : theme.colors.onSurfaceVariant}
+                  />
+                  <Text
+                    variant="labelMedium"
+                    style={{ color: formData.leaveType === type.value ? type.color : theme.colors.onSurface }}
+                  >
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Date Selection */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Duration</Text>
+
+            <View style={styles.dateRow}>
+              <View style={styles.dateColumn}>
+                <Text variant="labelMedium" style={styles.dateLabel}>Start Date</Text>
+                <TouchableOpacity
+                  style={[styles.dateSelector, { borderColor: theme.colors.outline }]}
+                  onPress={() => setShowStartPicker(true)}
+                >
+                  <Icon name="calendar" size={20} color={theme.colors.primary} />
+                  <Text variant="bodyMedium">{formData.startDate.toLocaleDateString()}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.dateColumn}>
+                <Text variant="labelMedium" style={styles.dateLabel}>End Date</Text>
+                <TouchableOpacity
+                  style={[styles.dateSelector, { borderColor: errors.endDate ? theme.colors.error : theme.colors.outline }]}
+                  onPress={() => setShowEndPicker(true)}
+                >
+                  <Icon name="calendar" size={20} color={theme.colors.primary} />
+                  <Text variant="bodyMedium">{formData.endDate.toLocaleDateString()}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            {errors.endDate && <HelperText type="error">{errors.endDate}</HelperText>}
+
+            <View style={styles.summaryRow}>
+              <View style={[styles.summaryBadge, { backgroundColor: selectedLeaveType?.color }]}>
+                <Text variant="headlineSmall" style={{ color: 'white', fontWeight: 'bold' }}>
+                  {formData.isHalfDay ? '0.5' : dayCount}
+                </Text>
+                <Text variant="labelSmall" style={{ color: 'white' }}>
+                  {dayCount === 1 ? 'day' : 'days'}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.switchRow}>
+              <Text variant="bodyMedium">Half Day</Text>
+              <Switch
+                value={formData.isHalfDay}
+                onValueChange={(v) => updateField('isHalfDay', v)}
+                disabled={dayCount > 1}
+              />
+            </View>
+          </Surface>
+
+          {/* Reason */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Reason</Text>
+            <TextInput
+              mode="outlined"
+              label="Reason for leave *"
+              value={formData.reason}
+              onChangeText={(v) => updateField('reason', v)}
+              multiline
+              numberOfLines={3}
+              error={!!errors.reason}
+            />
+            {errors.reason && <HelperText type="error">{errors.reason}</HelperText>}
+
+            {/* Quick Reasons */}
+            <View style={styles.quickReasons}>
+              {['Medical appointment', 'Family event', 'Personal work', 'Not feeling well'].map((text) => (
+                <Chip
+                  key={text}
+                  compact
+                  onPress={() => updateField('reason', text)}
+                  style={styles.reasonChip}
+                >
+                  {text}
+                </Chip>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Substitute Request */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Icon name="account-switch" size={20} color={theme.colors.onSurfaceVariant} />
+                <Text variant="titleMedium">Need Substitute?</Text>
+              </View>
+              <Switch
+                value={formData.needSubstitute}
+                onValueChange={(v) => updateField('needSubstitute', v)}
+              />
+            </View>
+
+            {formData.needSubstitute && (
+              <>
+                <Text variant="labelMedium" style={styles.classLabel}>
+                  Select classes needing coverage: *
+                </Text>
+                <View style={styles.classGrid}>
+                  {classes.map((cls) => (
+                    <Chip
+                      key={cls.id}
+                      selected={formData.selectedClasses.includes(cls.id)}
+                      onPress={() => toggleClass(cls.id)}
+                      style={styles.classChip}
+                      showSelectedCheck
+                    >
+                      {cls.name} - {cls.section}
+                    </Chip>
+                  ))}
+                </View>
+                {errors.selectedClasses && (
+                  <HelperText type="error">{errors.selectedClasses}</HelperText>
+                )}
+              </>
+            )}
+          </Surface>
+
+          {/* Additional Notes */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Additional Notes</Text>
+            <TextInput
+              mode="outlined"
+              label="Notes (Optional)"
+              value={formData.notes}
+              onChangeText={(v) => updateField('notes', v)}
+              multiline
+              numberOfLines={2}
+              placeholder="Any additional information for admin..."
+            />
+          </Surface>
+
+          {/* Spacer */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Submit Button */}
+        <View style={[styles.bottomBar, { backgroundColor: theme.colors.surface }]}>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={createMutation.isPending}
+            disabled={createMutation.isPending}
+            style={styles.submitButton}
+            contentStyle={styles.submitButtonContent}
+            icon={formData.needSubstitute ? 'arrow-right' : 'check'}
+          >
+            {formData.needSubstitute ? 'Continue to Find Substitute' : 'Submit Request'}
+          </Button>
+        </View>
+
+        {/* Date Pickers */}
+        {showStartPicker && (
+          <DateTimePicker
+            value={formData.startDate}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={(event, date) => {
+              setShowStartPicker(false);
+              if (date) {
+                updateField('startDate', date);
+                if (date > formData.endDate) updateField('endDate', date);
+              }
+            }}
+          />
+        )}
+        {showEndPicker && (
+          <DateTimePicker
+            value={formData.endDate}
+            mode="date"
+            display="default"
+            minimumDate={formData.startDate}
+            onChange={(event, date) => {
+              setShowEndPicker(false);
+              if (date) updateField('endDate', date);
+            }}
+          />
+        )}
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={2000}
+        >
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  backButton: { marginRight: 16 },
+  headerSpacer: { width: 40 },
+  content: { flex: 1, padding: 16 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 16 },
+  typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  typeCard: {
+    width: '47%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    gap: 8,
+  },
+  dateRow: { flexDirection: 'row', gap: 16 },
+  dateColumn: { flex: 1 },
+  dateLabel: { marginBottom: 8 },
+  dateSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 8,
+  },
+  summaryRow: { alignItems: 'center', marginTop: 16 },
+  summaryBadge: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  switchLabel: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  quickReasons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  reasonChip: { marginBottom: 4 },
+  classLabel: { marginTop: 16, marginBottom: 8 },
+  classGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  classChip: { marginBottom: 4 },
+  bottomBar: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  submitButton: { borderRadius: 8 },
+  submitButtonContent: { paddingVertical: 8 },
+});
+```
+
+
+### 10.14 CalendarEventCreateScreen.tsx (Fixed Screen)
+
+```typescript
+// src/screens/teacher/CalendarEventCreateScreen.tsx
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  Surface,
+  Chip,
+  Switch,
+  Snackbar,
+  HelperText,
+  SegmentedButtons,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAppTheme } from '@/theme/useAppTheme';
+import { useTranslation } from 'react-i18next';
+import { useCreateCalendarEvent } from '@/hooks/mutations/teacher';
+import { useTeacherClassesQuery } from '@/hooks/queries/teacher';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type EventType = 'class' | 'exam' | 'meeting' | 'deadline' | 'other';
+
+type FormData = {
+  title: string;
+  eventType: EventType;
+  date: Date;
+  startTime: Date;
+  endTime: Date;
+  isAllDay: boolean;
+  description: string;
+  classId: string;
+  isRecurring: boolean;
+  recurringPattern: 'daily' | 'weekly' | 'monthly';
+  reminder: number; // minutes before
+  color: string;
+};
+
+export const CalendarEventCreateScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const theme = useAppTheme();
+  const { t } = useTranslation('teacher');
+
+  // Pre-selected date from route
+  const preSelectedDate = (route.params as any)?.date
+    ? new Date((route.params as any).date)
+    : new Date();
+
+  // === DATA ===
+  const { data: classes = [] } = useTeacherClassesQuery();
+  const createMutation = useCreateCalendarEvent();
+
+  // === EVENT TYPES ===
+  const eventTypes: { value: EventType; label: string; icon: string; color: string }[] = [
+    { value: 'class', label: 'Class', icon: 'school', color: '#2196F3' },
+    { value: 'exam', label: 'Exam', icon: 'file-document-edit', color: '#F44336' },
+    { value: 'meeting', label: 'Meeting', icon: 'account-group', color: '#9C27B0' },
+    { value: 'deadline', label: 'Deadline', icon: 'clock-alert', color: '#FF9800' },
+    { value: 'other', label: 'Other', icon: 'calendar', color: '#607D8B' },
+  ];
+
+  const reminderOptions = [
+    { value: 0, label: 'None' },
+    { value: 15, label: '15 min' },
+    { value: 30, label: '30 min' },
+    { value: 60, label: '1 hour' },
+    { value: 1440, label: '1 day' },
+  ];
+
+  // === FORM STATE ===
+  const [formData, setFormData] = useState<FormData>({
+    title: '',
+    eventType: 'class',
+    date: preSelectedDate,
+    startTime: new Date(),
+    endTime: new Date(Date.now() + 60 * 60 * 1000), // 1 hour later
+    isAllDay: false,
+    description: '',
+    classId: '',
+    isRecurring: false,
+    recurringPattern: 'weekly',
+    reminder: 15,
+    color: '#2196F3',
+  });
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+
+  // === HANDLERS ===
+  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+
+    // Update color based on event type
+    if (field === 'eventType') {
+      const type = eventTypes.find(t => t.value === value);
+      if (type) setFormData(prev => ({ ...prev, color: type.color }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.isAllDay && formData.endTime <= formData.startTime) {
+      newErrors.endTime = 'End time must be after start time';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await createMutation.mutateAsync({
+        title: formData.title,
+        eventType: formData.eventType,
+        date: formData.date.toISOString(),
+        startTime: formData.isAllDay ? null : formData.startTime.toISOString(),
+        endTime: formData.isAllDay ? null : formData.endTime.toISOString(),
+        isAllDay: formData.isAllDay,
+        description: formData.description,
+        classId: formData.classId || null,
+        isRecurring: formData.isRecurring,
+        recurringPattern: formData.isRecurring ? formData.recurringPattern : null,
+        reminder: formData.reminder,
+        color: formData.color,
+      });
+
+      setSnackbar({ visible: true, message: 'Event created successfully!' });
+      setTimeout(() => navigation.goBack(), 1500);
+    } catch (error) {
+      setSnackbar({ visible: true, message: 'Failed to create event' });
+    }
+  };
+
+  // === HELPERS ===
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const selectedEventType = eventTypes.find(t => t.value === formData.eventType);
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrow-left" size={24} color={theme.colors.onBackground} />
+          </TouchableOpacity>
+          <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>
+            New Event
+          </Text>
+          <View style={[styles.colorIndicator, { backgroundColor: formData.color }]} />
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Title */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <TextInput
+              mode="outlined"
+              label="Event Title *"
+              value={formData.title}
+              onChangeText={(v) => updateField('title', v)}
+              error={!!errors.title}
+              left={<TextInput.Icon icon={selectedEventType?.icon || 'calendar'} />}
+            />
+            {errors.title && <HelperText type="error">{errors.title}</HelperText>}
+          </Surface>
+
+          {/* Event Type */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Event Type</Text>
+            <View style={styles.typeRow}>
+              {eventTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.value}
+                  style={[
+                    styles.typeChip,
+                    {
+                      backgroundColor: formData.eventType === type.value ? type.color : 'transparent',
+                      borderColor: type.color,
+                    },
+                  ]}
+                  onPress={() => updateField('eventType', type.value)}
+                >
+                  <Icon
+                    name={type.icon}
+                    size={16}
+                    color={formData.eventType === type.value ? 'white' : type.color}
+                  />
+                  <Text
+                    variant="labelSmall"
+                    style={{ color: formData.eventType === type.value ? 'white' : type.color }}
+                  >
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Date & Time */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Date & Time</Text>
+
+            {/* Date Picker */}
+            <TouchableOpacity
+              style={[styles.dateSelector, { borderColor: theme.colors.outline }]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Icon name="calendar" size={20} color={theme.colors.primary} />
+              <Text variant="bodyLarge" style={{ flex: 1 }}>
+                {formData.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </Text>
+              <Icon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
+            </TouchableOpacity>
+
+            {/* All Day Toggle */}
+            <View style={styles.switchRow}>
+              <Text variant="bodyMedium">All Day</Text>
+              <Switch
+                value={formData.isAllDay}
+                onValueChange={(v) => updateField('isAllDay', v)}
+              />
+            </View>
+
+            {/* Time Pickers */}
+            {!formData.isAllDay && (
+              <View style={styles.timeRow}>
+                <TouchableOpacity
+                  style={[styles.timeSelector, { borderColor: theme.colors.outline }]}
+                  onPress={() => setShowStartTimePicker(true)}
+                >
+                  <Icon name="clock-start" size={20} color={theme.colors.primary} />
+                  <View>
+                    <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>Start</Text>
+                    <Text variant="bodyMedium">{formatTime(formData.startTime)}</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <Icon name="arrow-right" size={20} color={theme.colors.onSurfaceVariant} />
+
+                <TouchableOpacity
+                  style={[styles.timeSelector, { borderColor: errors.endTime ? theme.colors.error : theme.colors.outline }]}
+                  onPress={() => setShowEndTimePicker(true)}
+                >
+                  <Icon name="clock-end" size={20} color={theme.colors.primary} />
+                  <View>
+                    <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>End</Text>
+                    <Text variant="bodyMedium">{formatTime(formData.endTime)}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )}
+            {errors.endTime && <HelperText type="error">{errors.endTime}</HelperText>}
+          </Surface>
+
+          {/* Recurring */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Icon name="repeat" size={20} color={theme.colors.onSurfaceVariant} />
+                <Text variant="titleMedium">Recurring Event</Text>
+              </View>
+              <Switch
+                value={formData.isRecurring}
+                onValueChange={(v) => updateField('isRecurring', v)}
+              />
+            </View>
+
+            {formData.isRecurring && (
+              <SegmentedButtons
+                value={formData.recurringPattern}
+                onValueChange={(v) => updateField('recurringPattern', v as any)}
+                buttons={[
+                  { value: 'daily', label: 'Daily' },
+                  { value: 'weekly', label: 'Weekly' },
+                  { value: 'monthly', label: 'Monthly' },
+                ]}
+                style={styles.segmented}
+              />
+            )}
+          </Surface>
+
+          {/* Class Association */}
+          {(formData.eventType === 'class' || formData.eventType === 'exam') && (
+            <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Associate with Class</Text>
+              <View style={styles.classGrid}>
+                {classes.map((cls) => (
+                  <Chip
+                    key={cls.id}
+                    selected={formData.classId === cls.id}
+                    onPress={() => updateField('classId', formData.classId === cls.id ? '' : cls.id)}
+                    style={styles.classChip}
+                    showSelectedCheck
+                  >
+                    {cls.name} - {cls.section}
+                  </Chip>
+                ))}
+              </View>
+            </Surface>
+          )}
+
+          {/* Reminder */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Reminder</Text>
+            <View style={styles.reminderRow}>
+              {reminderOptions.map((option) => (
+                <Chip
+                  key={option.value}
+                  selected={formData.reminder === option.value}
+                  onPress={() => updateField('reminder', option.value)}
+                  style={styles.reminderChip}
+                >
+                  {option.label}
+                </Chip>
+              ))}
+            </View>
+          </Surface>
+
+          {/* Description */}
+          <Surface style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Description</Text>
+            <TextInput
+              mode="outlined"
+              label="Description (Optional)"
+              value={formData.description}
+              onChangeText={(v) => updateField('description', v)}
+              multiline
+              numberOfLines={3}
+            />
+          </Surface>
+
+          {/* Spacer */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        {/* Submit Button */}
+        <View style={[styles.bottomBar, { backgroundColor: theme.colors.surface }]}>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={createMutation.isPending}
+            disabled={createMutation.isPending}
+            style={[styles.submitButton, { backgroundColor: formData.color }]}
+            contentStyle={styles.submitButtonContent}
+            icon="calendar-plus"
+          >
+            Create Event
+          </Button>
+        </View>
+
+        {/* Date/Time Pickers */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={formData.date}
+            mode="date"
+            display="default"
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) updateField('date', date);
+            }}
+          />
+        )}
+        {showStartTimePicker && (
+          <DateTimePicker
+            value={formData.startTime}
+            mode="time"
+            display="default"
+            onChange={(event, time) => {
+              setShowStartTimePicker(false);
+              if (time) updateField('startTime', time);
+            }}
+          />
+        )}
+        {showEndTimePicker && (
+          <DateTimePicker
+            value={formData.endTime}
+            mode="time"
+            display="default"
+            onChange={(event, time) => {
+              setShowEndTimePicker(false);
+              if (time) updateField('endTime', time);
+            }}
+          />
+        )}
+
+        {/* Snackbar */}
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={2000}
+        >
+          {snackbar.message}
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  backButton: { marginRight: 16 },
+  colorIndicator: { width: 24, height: 24, borderRadius: 12 },
+  content: { flex: 1, padding: 16 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionTitle: { marginBottom: 12 },
+  typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  typeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  dateSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 12,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  switchLabel: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    gap: 8,
+  },
+  timeSelector: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 8,
+  },
+  segmented: { marginTop: 12 },
+  classGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  classChip: { marginBottom: 4 },
+  reminderRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  reminderChip: { marginBottom: 4 },
+  bottomBar: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  submitButton: { borderRadius: 8 },
+  submitButtonContent: { paddingVertical: 8 },
+});
+```
+
+
+### 10.15 Sprint 9 Checkpoint
+
+**Test Criteria:**
+- [ ] Doubts Inbox shows pending student questions
+- [ ] AI suggestions display with confidence level
+- [ ] DoubtAnswerScreen loads with student info and question
+- [ ] AI suggestion can be applied to answer field
+- [ ] Quick responses work correctly
+- [ ] Answer submission saves and navigates back
+- [ ] Teacher Calendar displays monthly view correctly
+- [ ] Calendar events show with correct type colors
+- [ ] CalendarEventCreateScreen opens from calendar
+- [ ] Event type selection changes color indicator
+- [ ] Date and time pickers work correctly
+- [ ] Recurring event options display when enabled
+- [ ] LeaveRequestCreateScreen shows all leave types
+- [ ] Date range selection calculates correct day count
+- [ ] Half-day option works for single-day leave
+- [ ] Class selection for substitute appears when enabled
+- [ ] Substitute Finder shows available teachers
+- [ ] Can request substitute for a specific date
+- [ ] Leave request status updates correctly
+- [ ] AI Insights show actionable recommendations
+- [ ] All demo features work in offline mode (cached data)
+
+---
+
+## 11. DATABASE SCHEMA
+
+### 11.1 Core Tables for Phase 1
 
 ```sql
 -- Teachers table
@@ -3563,7 +8992,94 @@ CREATE TABLE teacher_announcements (
 );
 ```
 
-### 10.2 RLS Policies
+### 11.2 Sprint 9 Demo Feature Tables
+
+```sql
+-- Student Doubts (for Doubts Inbox feature)
+CREATE TABLE student_doubts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  student_id UUID NOT NULL REFERENCES user_profiles(id),
+  class_id UUID NOT NULL REFERENCES classes(id),
+  subject_id UUID REFERENCES subjects(id),
+  topic TEXT,
+  question TEXT NOT NULL,
+  attachment_url TEXT,
+  priority TEXT DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'answered', 'closed')),
+  ai_suggestion JSONB,  -- { answer: string, confidence: number, sources: string[] }
+  answer TEXT,
+  answered_by UUID REFERENCES teachers(id),
+  answered_at TIMESTAMPTZ,
+  used_ai_suggestion BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_student_doubts_class ON student_doubts(class_id);
+CREATE INDEX idx_student_doubts_status ON student_doubts(status);
+
+-- Teacher Leaves (for Substitute Finder feature)
+CREATE TABLE teacher_leaves (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID NOT NULL REFERENCES teachers(id),
+  leave_date DATE NOT NULL,
+  leave_type TEXT DEFAULT 'casual' CHECK (leave_type IN ('casual', 'sick', 'earned', 'emergency', 'other')),
+  reason TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')),
+  approved_by UUID,
+  approved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(customer_id, teacher_id, leave_date)
+);
+
+-- Substitute Requests (for Substitute Finder feature)
+CREATE TABLE substitute_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  requesting_teacher_id UUID NOT NULL REFERENCES teachers(id),
+  substitute_teacher_id UUID NOT NULL REFERENCES teachers(id),
+  leave_id UUID REFERENCES teacher_leaves(id),
+  request_date DATE NOT NULL,
+  periods JSONB DEFAULT '[]',  -- Array of period numbers
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'completed')),
+  notes TEXT,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  feedback TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Calendar Events (for Teacher Calendar feature)
+CREATE TABLE calendar_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  teacher_id UUID REFERENCES teachers(id),  -- NULL for school-wide events
+  class_id UUID REFERENCES classes(id),
+  event_date DATE NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('class', 'exam', 'meeting', 'holiday', 'deadline', 'event')),
+  title_en TEXT NOT NULL,
+  title_hi TEXT,
+  description_en TEXT,
+  description_hi TEXT,
+  start_time TIME,
+  end_time TIME,
+  is_all_day BOOLEAN DEFAULT false,
+  is_recurring BOOLEAN DEFAULT false,
+  recurrence_pattern JSONB,
+  color TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_calendar_events_date ON calendar_events(event_date);
+CREATE INDEX idx_calendar_events_teacher ON calendar_events(teacher_id);
+
+-- Add substitute_rating to teachers table
+ALTER TABLE teachers ADD COLUMN IF NOT EXISTS substitute_rating DECIMAL(3,2) DEFAULT 4.0;
+```
+
+### 11.3 RLS Policies
 
 ```sql
 -- Teachers can only see their own data
@@ -3585,25 +9101,63 @@ CREATE POLICY "Teachers see submissions" ON assignment_submissions
 -- Teachers can mark attendance for their classes
 CREATE POLICY "Teachers mark attendance" ON attendance_records
   FOR ALL USING (class_id IN (SELECT class_id FROM teacher_classes WHERE teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())));
+
+-- Sprint 9: RLS for Demo Features
+
+-- Teachers can see doubts from their classes
+CREATE POLICY "Teachers see class doubts" ON student_doubts
+  FOR SELECT USING (class_id IN (SELECT class_id FROM teacher_classes WHERE teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())));
+
+-- Teachers can answer doubts for their classes
+CREATE POLICY "Teachers answer doubts" ON student_doubts
+  FOR UPDATE USING (class_id IN (SELECT class_id FROM teacher_classes WHERE teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())));
+
+-- Teachers can manage their own leaves
+CREATE POLICY "Teachers manage own leaves" ON teacher_leaves
+  FOR ALL USING (teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid()));
+
+-- Teachers can see substitute requests they're involved in
+CREATE POLICY "Teachers see substitute requests" ON substitute_requests
+  FOR SELECT USING (
+    requesting_teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())
+    OR substitute_teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())
+  );
+
+-- Teachers can create substitute requests
+CREATE POLICY "Teachers create substitute requests" ON substitute_requests
+  FOR INSERT WITH CHECK (requesting_teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid()));
+
+-- Teachers can see their calendar events and school-wide events
+CREATE POLICY "Teachers see calendar events" ON calendar_events
+  FOR SELECT USING (
+    teacher_id IN (SELECT id FROM teachers WHERE user_id = auth.uid())
+    OR teacher_id IS NULL
+  );
 ```
 
 
 ---
 
-## 11. PLATFORM STUDIO CONFIG
+## 12. PLATFORM STUDIO CONFIG
 
-### 11.1 Screen Registry Additions
+### 12.1 Screen Registry Additions
 
 ```typescript
 // platform-studio/src/config/screenRegistry.ts
 export const TEACHER_SCREENS = {
-  // Phase 1 Screens
+  // ============================================
+  // DYNAMIC SCREENS (13) - Widget-based layouts
+  // ============================================
+
+  // Sprint 2: Dashboard Core
   'teacher-home': {
     type: 'dynamic',
     customization: 'full',
     allowed_roles: ['teacher'],
     default_widgets: ['teacher.hero-card', 'teacher.stats-grid', 'teacher.upcoming-classes', 'teacher.pending-grading', 'teacher.at-risk-students', 'teacher.quick-actions'],
   },
+
+  // Sprint 3: Class Management
   'class-hub': {
     type: 'dynamic',
     customization: 'full',
@@ -3616,36 +9170,46 @@ export const TEACHER_SCREENS = {
     allowed_roles: ['teacher'],
     default_widgets: ['class.roster', 'class.stats', 'class.recent-activity'],
   },
-  'grading-hub': {
-    type: 'dynamic',
-    customization: 'full',
-    allowed_roles: ['teacher'],
-    default_widgets: ['grading.stats', 'grading.pending-list', 'grading.recent', 'grading.rubric-templates'],
-  },
-  'attendance-mark': {
+  'class-roster': {
     type: 'dynamic',
     customization: 'medium',
     allowed_roles: ['teacher'],
-    default_widgets: ['attendance.quick-mark', 'attendance.today-summary'],
+    default_widgets: ['class.roster-list', 'class.roster-stats'],
   },
+
+  // Sprint 4: Attendance
   'attendance-reports': {
     type: 'dynamic',
     customization: 'medium',
     allowed_roles: ['teacher'],
     default_widgets: ['attendance.today-summary', 'attendance.trends', 'attendance.alerts'],
   },
+
+  // Sprint 5: Grading
+  'grading-hub': {
+    type: 'dynamic',
+    customization: 'full',
+    allowed_roles: ['teacher'],
+    default_widgets: ['grading.stats', 'grading.pending-list', 'grading.recent', 'grading.rubric-templates'],
+  },
+
+  // Sprint 6: Analytics
   'analytics-home': {
     type: 'dynamic',
     customization: 'full',
     allowed_roles: ['teacher'],
     default_widgets: ['analytics.class-performance', 'analytics.student-comparison', 'analytics.trends'],
   },
+
+  // Sprint 7: Communication
   'communication-hub': {
     type: 'dynamic',
     customization: 'full',
     allowed_roles: ['teacher'],
     default_widgets: ['teacher.messages-inbox', 'teacher.announcements', 'teacher.parent-contacts'],
   },
+
+  // Sprint 8: Profile
   'profile-teacher': {
     type: 'dynamic',
     customization: 'medium',
@@ -3656,10 +9220,110 @@ export const TEACHER_SCREENS = {
     customization: 'medium',
     allowed_roles: ['teacher'],
   },
+
+  // Sprint 9: Demo Showcase
+  'doubts-inbox': {
+    type: 'dynamic',
+    customization: 'full',
+    allowed_roles: ['teacher'],
+    default_widgets: ['teacher.doubts-inbox', 'teacher.ai-insights'],
+  },
+  'teacher-calendar': {
+    type: 'dynamic',
+    customization: 'full',
+    allowed_roles: ['teacher'],
+    default_widgets: ['teacher.calendar', 'teacher.calendar-events'],
+  },
+  'leave-history': {
+    type: 'dynamic',
+    customization: 'medium',
+    allowed_roles: ['teacher'],
+    default_widgets: ['teacher.leave-history', 'teacher.leave-stats'],
+  },
+
+  // ============================================
+  // FIXED SCREENS (11) - Custom components
+  // ============================================
+
+  // Sprint 1: Auth
+  'login-teacher': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'LoginTeacherScreen',
+  },
+  'onboarding-teacher': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'OnboardingTeacherScreen',
+  },
+
+  // Sprint 4: Attendance
+  'attendance-mark': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'AttendanceMarkScreen',
+  },
+
+  // Sprint 5: Assignments & Grading
+  'assignment-create': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'AssignmentCreateScreen',
+  },
+  'assignment-detail': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'AssignmentDetailScreen',
+  },
+  'grade-submission': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'GradeSubmissionScreen',
+  },
+
+  // Sprint 6: Student Detail
+  'student-detail-teacher': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'StudentDetailTeacherScreen',
+  },
+
+  // Sprint 9: Demo Showcase
+  'doubt-answer': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'DoubtAnswerScreen',
+  },
+  'leave-request-create': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'LeaveRequestCreateScreen',
+  },
+  'calendar-event-create': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'CalendarEventCreateScreen',
+  },
+  'substitute-finder': {
+    type: 'fixed',
+    customization: 'none',
+    allowed_roles: ['teacher'],
+    component: 'SubstituteFinderScreen',
+  },
 };
 ```
 
-### 11.2 Widget Registry Additions
+### 12.2 Widget Registry Additions
 
 ```typescript
 // platform-studio/src/config/widgetRegistry.ts
@@ -3797,10 +9461,58 @@ export const TEACHER_WIDGETS = {
     component: 'ParentContactsWidget',
     defaultConfig: { showSearch: true, maxItems: 5 },
   },
+
+  // Sprint 9: Demo Showcase Widgets
+  'teacher.doubts-inbox': {
+    name: 'Student Doubts Inbox',
+    category: 'doubts',
+    component: 'DoubtsInboxWidget',
+    defaultConfig: { maxItems: 5, showAiSuggestion: true },
+  },
+  'teacher.doubt-detail': {
+    name: 'Doubt Detail',
+    category: 'doubts',
+    component: 'DoubtDetailWidget',
+    defaultConfig: { showAiSuggestion: true },
+  },
+  'teacher.calendar': {
+    name: 'Teacher Calendar',
+    category: 'schedule',
+    component: 'TeacherCalendarWidget',
+    defaultConfig: { defaultView: 'month', showLegend: true },
+  },
+  'teacher.calendar-events': {
+    name: 'Calendar Events',
+    category: 'schedule',
+    component: 'CalendarEventsWidget',
+    defaultConfig: { maxItems: 5, showTime: true },
+  },
+  'teacher.substitute-request': {
+    name: 'Substitute Request',
+    category: 'leave',
+    component: 'SubstituteRequestWidget',
+  },
+  'teacher.available-substitutes': {
+    name: 'Available Substitutes',
+    category: 'leave',
+    component: 'AvailableSubstitutesWidget',
+    defaultConfig: { showRating: true, maxItems: 5 },
+  },
+  'teacher.leave-request': {
+    name: 'Leave Request',
+    category: 'leave',
+    component: 'LeaveRequestWidget',
+  },
+  'teacher.ai-insights': {
+    name: 'AI Insights',
+    category: 'ai',
+    component: 'AIInsightsWidget',
+    defaultConfig: { maxItems: 4, showActions: true },
+  },
 };
 ```
 
-### 11.3 Navigation Config
+### 12.3 Navigation Config
 
 ```typescript
 // Default teacher navigation tabs
@@ -3818,9 +9530,9 @@ export const TEACHER_NAVIGATION = {
 
 ---
 
-## 12. TESTING CHECKLIST
+## 13. TESTING CHECKLIST
 
-### 12.1 Sprint-by-Sprint Testing
+### 13.1 Sprint-by-Sprint Testing
 
 #### Sprint 1: Foundation + Auth
 - [ ] Teacher login with valid credentials
@@ -3904,7 +9616,27 @@ export const TEACHER_NAVIGATION = {
 - [ ] All widgets have proper empty states
 - [ ] All widgets have proper error states
 
-### 12.2 Cross-Cutting Tests
+#### Sprint 9: Demo Showcase Features
+- [ ] Doubts Inbox shows pending student questions
+- [ ] Doubts display with priority indicators (urgent/high/normal/low)
+- [ ] AI suggestions show with confidence percentage
+- [ ] Can use AI suggestion to populate answer
+- [ ] Can edit AI suggestion before sending
+- [ ] Answer submission updates doubt status
+- [ ] Teacher Calendar displays monthly view correctly
+- [ ] Calendar events show with correct type colors
+- [ ] Can navigate between months
+- [ ] Clicking date shows events for that day
+- [ ] Substitute Finder shows available teachers
+- [ ] Available substitutes show rating and free slots
+- [ ] Can request substitute for a specific date
+- [ ] Leave request status updates correctly
+- [ ] AI Insights show actionable recommendations
+- [ ] Insights display severity (critical/warning/info/success)
+- [ ] Can take action on actionable insights
+- [ ] All demo features work with cached data (offline)
+
+### 13.2 Cross-Cutting Tests
 
 #### Offline Support
 - [ ] App shows offline indicator when disconnected
@@ -3930,7 +9662,7 @@ export const TEACHER_NAVIGATION = {
 - [ ] Custom section names display
 - [ ] Welcome message shows if configured
 
-### 12.3 Demo Scenarios
+### 13.3 Demo Scenarios
 
 1. **Teacher Login Flow**
    - Login → Onboarding (first time) → Dashboard
@@ -3947,33 +9679,87 @@ export const TEACHER_NAVIGATION = {
 5. **Analytics Review**
    - Dashboard → Analytics → View Class Performance → Compare Students
 
+6. **AI-Powered Doubt Resolution (Demo Highlight)**
+   - Dashboard → Doubts Inbox → Select Doubt → View AI Suggestion → Use/Edit Suggestion → Send Answer
+
+7. **Substitute Request Flow (Demo Highlight)**
+   - Profile → Request Leave → Select Date → View Available Substitutes → Request Substitute → Confirmation
+
+8. **Calendar Management (Demo Highlight)**
+   - Dashboard → Calendar Widget → Browse Months → View Events → Navigate to Event Detail
+
+9. **At-Risk Student Intervention (Demo Highlight)**
+   - Dashboard → AI Insights → View At-Risk Alert → Take Action → Contact Parent
+
 ---
 
-## 📊 PHASE 1 SUMMARY
+## PHASE 1 SUMMARY
 
 | Metric | Count |
 |--------|-------|
-| **Fixed Screens** | 4 |
+| **Fixed Screens** | 11 |
 | **Dynamic Screens** | 13 |
-| **Widgets** | 24 |
-| **Query Hooks** | 12 |
-| **Mutation Hooks** | 6 |
-| **DB Tables** | 8 |
-| **Sprints** | 8 |
+| **Widgets** | 32 |
+| **Query Hooks** | 16 |
+| **Mutation Hooks** | 9 |
+| **DB Tables** | 12 |
+| **Sprints** | 9 |
 
 **Phase 1 delivers a complete demo-ready Teacher app with:**
-- Full authentication flow
-- Dashboard with key metrics
-- Class management
-- Attendance marking
-- Assignment creation and grading
-- Student analytics
-- Parent communication
-- Profile management
+
+**Fixed Screens (11):**
+| Sprint | Screen | Purpose |
+|--------|--------|---------|
+| Sprint 1 | LoginTeacherScreen | Authentication form |
+| Sprint 1 | OnboardingTeacherScreen | First-time setup wizard |
+| Sprint 4 | AttendanceMarkScreen | Bulk attendance marking |
+| Sprint 5 | AssignmentCreateScreen | Create new assignments |
+| Sprint 5 | AssignmentDetailScreen | View/edit assignment |
+| Sprint 5 | GradeSubmissionScreen | Grade student submissions |
+| Sprint 6 | StudentDetailTeacherScreen | Student profile with actions |
+| Sprint 9 | DoubtAnswerScreen | AI-assisted answer form |
+| Sprint 9 | LeaveRequestCreateScreen | Leave application form |
+| Sprint 9 | CalendarEventCreateScreen | Create calendar events |
+| Sprint 9 | SubstituteFinderScreen | Find replacement teachers |
+
+**Dynamic Screens (13):**
+| Sprint | Screen | Widget Count |
+|--------|--------|--------------|
+| Sprint 2 | TeacherDashboardScreen | 6 widgets |
+| Sprint 3 | ClassHubScreen | 3 widgets |
+| Sprint 3 | ClassDetailScreen | 3 widgets |
+| Sprint 3 | ClassRosterScreen | 2 widgets |
+| Sprint 4 | AttendanceReportsScreen | 3 widgets |
+| Sprint 5 | GradingHubScreen | 4 widgets |
+| Sprint 6 | AnalyticsHomeScreen | 3 widgets |
+| Sprint 7 | CommunicationHubScreen | 3 widgets |
+| Sprint 8 | ProfileTeacherScreen | 2 widgets |
+| Sprint 8 | NotificationsTeacherScreen | 2 widgets |
+| Sprint 9 | DoubtsInboxScreen | 2 widgets |
+| Sprint 9 | TeacherCalendarScreen | 2 widgets |
+| Sprint 9 | LeaveHistoryScreen | 2 widgets |
+
+**Core Features:**
+- Full authentication flow with onboarding
+- Dashboard with key metrics and quick actions
+- Class management with student rosters
+- Attendance marking with bulk actions and alerts
+- Assignment creation with rubric builder
+- Grading with quick scores and rubric scoring
+- Student analytics with performance trends
+- Parent communication hub
+- Profile management and notifications
+
+**Demo Showcase Features (Sprint 9):**
+- AI-Powered Doubts Inbox with smart suggestions
+- Doubt Answer Screen with AI suggestion integration
+- Teacher Calendar with event creation
+- Leave Request with substitute finder flow
+- AI Insights with actionable recommendations
 
 **Phase 2 (Later) will add:**
 - Live Class System (WebRTC)
-- AI Teaching Insights
+- Advanced AI Teaching Insights
 - Voice Assessment
 - Professional Development
 - Automation Engine

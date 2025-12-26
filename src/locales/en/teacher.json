@@ -1,0 +1,914 @@
+{
+  "screens": {
+    "home": {
+      "title": "Teacher Home",
+      "subtitle": "Your teaching dashboard"
+    },
+    "atRiskStudents": {
+      "title": "At-Risk Students",
+      "subtitle": "Students needing attention",
+      "stats": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "tabs": {
+        "all": "All",
+        "byClass": "By Class",
+        "byBatch": "By Batch"
+      },
+      "empty": {
+        "title": "No At-Risk Students",
+        "subtitle": "All students are performing well!"
+      }
+    },
+    "rubricDetail": {
+      "title": "Rubric Details",
+      "criteria": "Criteria",
+      "maxScore": "Max Score",
+      "type": "Type",
+      "gradingCriteria": "Grading Criteria",
+      "noCriteria": "No criteria defined",
+      "useForAssignment": "Use for Assignment",
+      "duplicate": "Duplicate",
+      "states": {
+        "loading": "Loading rubric...",
+        "error": "Rubric not found"
+      }
+    },
+    "assignments": {
+      "title": "Assignments",
+      "tabs": {
+        "all": "All",
+        "pending": "Pending",
+        "graded": "Graded",
+        "draft": "Drafts"
+      },
+      "sections": {
+        "overview": "Overview",
+        "pendingGrading": "Pending Grading",
+        "allAssignments": "All Assignments"
+      },
+      "actions": {
+        "create": "Create Assignment"
+      },
+      "states": {
+        "loading": "Loading assignments...",
+        "empty": "No assignments yet",
+        "error": "Failed to load assignments"
+      }
+    },
+    "assignmentDetail": {
+      "title": "Assignment Details",
+      "info": {
+        "maxScore": "Max Score",
+        "dueDate": "Due Date",
+        "submissions": "Submissions",
+        "noDeadline": "No deadline"
+      },
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "graded": "Graded"
+      },
+      "sections": {
+        "submissions": "Submissions"
+      },
+      "actions": {
+        "publish": "Publish",
+        "close": "Close",
+        "edit": "Edit"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "closed": "Closed",
+        "pending": "Pending",
+        "submitted": "Submitted",
+        "late": "Late",
+        "graded": "Graded",
+        "returned": "Returned",
+        "resubmit": "Resubmit"
+      },
+      "messages": {
+        "published": "Assignment published!",
+        "closed": "Assignment closed",
+        "publishFailed": "Failed to publish",
+        "closeFailed": "Failed to close"
+      },
+      "states": {
+        "loading": "Loading assignment...",
+        "notFound": "Assignment not found",
+        "noSubmissions": "No submissions yet",
+        "noFiltered": "No {{filter}} submissions"
+      }
+    }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Continue",
+    "getStarted": "Get Started",
+    "welcome": {
+      "title": "Welcome, Teacher!",
+      "description": "Let's get you set up to manage your classes effectively. This will only take a minute.",
+      "classes": "Classes",
+      "students": "Students"
+    },
+    "classes": {
+      "title": "Your Classes",
+      "description": "You've been assigned to the following classes. You can manage attendance, assignments, and grades for each.",
+      "noClasses": "No classes assigned yet. Contact admin."
+    },
+    "notifications": {
+      "title": "Stay Updated",
+      "description": "Choose which notifications you want to receive.",
+      "assignments": "Assignment Updates",
+      "assignmentsSub": "Submissions and deadlines",
+      "attendance": "Attendance Reminders",
+      "attendanceSub": "Daily attendance prompts",
+      "messages": "Parent Messages",
+      "messagesSub": "New messages from parents",
+      "announcements": "School Announcements",
+      "announcementsSub": "Important updates"
+    },
+    "features": {
+      "title": "Key Features",
+      "attendance": "Quick Attendance",
+      "attendanceDesc": "Mark attendance in seconds with smart defaults",
+      "assignments": "Assignments & Tests",
+      "assignmentsDesc": "Create, grade, and track submissions easily",
+      "progress": "Student Progress",
+      "progressDesc": "Real-time analytics and performance insights",
+      "ai": "AI Assistant",
+      "aiDesc": "Get help answering doubts and creating content"
+    },
+    "preferences": {
+      "title": "Your Preferences",
+      "description": "Customize your teaching experience. You can change these anytime in Settings.",
+      "gradingScale": "Default Grading Scale",
+      "studentPhotos": "Show Student Photos",
+      "studentPhotosSub": "Display photos in attendance and grades",
+      "quickAttendance": "Quick Attendance Mode",
+      "quickAttendanceSub": "One-tap to mark present",
+      "dailyDigest": "Daily Digest Email",
+      "dailyDigestSub": "Summary of pending tasks each morning"
+    },
+    "complete": {
+      "title": "You're All Set!",
+      "description": "Start managing your classes and helping students succeed.",
+      "quickStart": "Quick Start Tips",
+      "tip1": "Mark attendance for your first class",
+      "tip2": "Create your first assignment",
+      "tip3": "Check student progress analytics"
+    }
+  },
+  "widgets": {
+    "teacherHero": {
+      "title": "Teacher Dashboard",
+      "subtitle": "{{count}} classes today",
+      "defaultName": "Teacher",
+      "greetings": {
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening"
+      },
+      "stats": {
+        "classes": "Classes",
+        "grading": "To Grade",
+        "attendance": "Attendance",
+        "atRisk": "At Risk"
+      },
+      "avatarHint": "View profile",
+      "notificationsHint": "View notifications",
+      "scheduleHint": "View schedule",
+      "classesStatHint": "{{count}} classes today",
+      "gradingStatHint": "{{count}} items pending grading",
+      "attendanceStatHint": "{{rate}}% attendance rate",
+      "atRiskStatHint": "{{count}} at-risk students"
+    },
+    "teacherStats": {
+      "title": "My Stats",
+      "subtitle": "Your teaching statistics",
+      "totalStudents": "Total Students",
+      "classesToday": "Classes Today",
+      "pendingGrading": "Pending Grading",
+      "attendance": "Attendance",
+      "statHint": "{{label}}: {{value}}",
+      "error": "Failed to load stats"
+    },
+    "upcomingClasses": {
+      "title": "Today's Classes",
+      "subtitle": "Your schedule for today",
+      "now": "NOW",
+      "viewAll": "View Full Schedule",
+      "states": {
+        "loading": "Loading schedule...",
+        "empty": "No classes today",
+        "error": "Failed to load schedule"
+      }
+    },
+    "classPerformance": {
+      "title": "Class Performance",
+      "subtitle": "Analytics for your classes"
+    },
+    "doubtsToAnswer": {
+      "title": "Doubts to Answer",
+      "subtitle": "Student questions waiting for you"
+    },
+    "pendingGrading": {
+      "title": "Pending Grading",
+      "subtitle": "Assignments and tests to review",
+      "viewAll": "View All Grading",
+      "retry": "Retry",
+      "overdue": "{{days}} days overdue",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "dueIn": "Due in {{days}} days",
+      "types": {
+        "assignment": "Assignment",
+        "test": "Test",
+        "quiz": "Quiz",
+        "project": "Project"
+      },
+      "states": {
+        "loading": "Loading pending items...",
+        "empty": "All caught up!",
+        "emptySubtitle": "No items pending grading",
+        "error": "Failed to load grading items"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Common teaching tasks",
+      "states": {
+        "loading": "Loading actions...",
+        "empty": "No quick actions available",
+        "error": "Failed to load actions"
+      }
+    },
+    "messagesInbox": {
+      "title": "Messages",
+      "subtitle": "Parent and student messages",
+      "viewAll": "View All Messages",
+      "states": {
+        "loading": "Loading messages...",
+        "empty": "No messages yet",
+        "error": "Failed to load messages"
+      }
+    },
+    "announcements": {
+      "title": "Announcements",
+      "subtitle": "Your class announcements",
+      "viewAll": "View All Announcements",
+      "new": "New Announcement",
+      "create": "Create Announcement",
+      "states": {
+        "loading": "Loading announcements...",
+        "empty": "No announcements yet",
+        "error": "Failed to load"
+      }
+    },
+    "parentContacts": {
+      "title": "Parent Contacts",
+      "subtitle": "Contact parents of your students",
+      "viewAll": "View All Contacts",
+      "searchPlaceholder": "Search by name...",
+      "noResults": "No contacts found",
+      "states": {
+        "loading": "Loading contacts...",
+        "empty": "No parent contacts yet",
+        "error": "Failed to load contacts"
+      }
+    },
+    "doubtsInbox": {
+      "title": "Student Doubts",
+      "subtitle": "Questions from your students",
+      "viewAll": "View All Doubts",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "urgent": "Urgent"
+      },
+      "states": {
+        "loading": "Loading doubts...",
+        "empty": "No pending doubts!",
+        "emptySubtitle": "All student questions answered",
+        "error": "Failed to load doubts"
+      }
+    },
+    "doubtDetail": {
+      "title": "Doubt Detail",
+      "subtitle": "Student question details",
+      "question": "Question",
+      "aiSuggestion": "AI Suggested Answer",
+      "yourAnswer": "Your Answer",
+      "useAiAnswer": "Use This Answer",
+      "answerNow": "Answer Now",
+      "states": {
+        "loading": "Loading doubt...",
+        "error": "Doubt not found"
+      }
+    },
+    "calendar": {
+      "title": "My Calendar",
+      "subtitle": "Upcoming events and schedule",
+      "viewFull": "View Full Calendar",
+      "quickAdd": "Add New Event",
+      "addEvent": "Add Event",
+      "states": {
+        "loading": "Loading events...",
+        "empty": "No upcoming events",
+        "error": "Failed to load events"
+      }
+    },
+    "calendarEvents": {
+      "title": "Calendar Events",
+      "subtitle": "Detailed view of your schedule",
+      "viewAll": "View All {{count}} Events",
+      "create": "Create Event",
+      "addNew": "Add New Event",
+      "filters": {
+        "all": "All",
+        "class": "Classes",
+        "meeting": "Meetings",
+        "exam": "Exams",
+        "deadline": "Deadlines"
+      },
+      "types": {
+        "class": "Class",
+        "meeting": "Meeting",
+        "exam": "Exam",
+        "deadline": "Deadline",
+        "holiday": "Holiday",
+        "personal": "Personal",
+        "event": "Event"
+      },
+      "states": {
+        "loading": "Loading events...",
+        "empty": "No events scheduled",
+        "error": "Failed to load events"
+      }
+    },
+    "substituteManager": {
+      "title": "Substitute Manager",
+      "subtitle": "Request and find substitute teachers",
+      "tabs": {
+        "myRequests": "My Requests",
+        "available": "Available",
+        "openRequests": "Open"
+      },
+      "createRequest": "Request Substitute",
+      "offerHelp": "Offer to Help",
+      "viewAll": "View All Substitutes",
+      "empty": {
+        "myRequests": "No substitute requests",
+        "available": "No teachers available",
+        "openRequests": "No open requests"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "fulfilled": "Fulfilled",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load data"
+      }
+    },
+    "leaveRequest": {
+      "title": "Leave Requests",
+      "subtitle": "Manage your leave applications",
+      "applyLeave": "Apply for Leave",
+      "viewAll": "View All Requests",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "balance": {
+        "sick": "Sick",
+        "casual": "Casual",
+        "earned": "Earned"
+      },
+      "types": {
+        "sick": "Sick Leave",
+        "casual": "Casual Leave",
+        "earned": "Earned Leave",
+        "maternity": "Maternity Leave",
+        "paternity": "Paternity Leave",
+        "unpaid": "Unpaid Leave",
+        "other": "Other Leave"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "states": {
+        "loading": "Loading requests...",
+        "empty": "No leave requests",
+        "error": "Failed to load requests"
+      }
+    },
+    "aiInsights": {
+      "title": "AI Insights",
+      "subtitle": "Smart recommendations for your classes",
+      "unread": "unread",
+      "filters": {
+        "all": "All",
+        "unread": "Unread",
+        "highPriority": "Priority"
+      },
+      "types": {
+        "performanceAlert": "Performance Alert",
+        "engagementInsight": "Engagement",
+        "teachingRecommendation": "Recommendation",
+        "assessmentSuggestion": "Assessment",
+        "deadlineReminder": "Deadline",
+        "resourceRecommendation": "Resource",
+        "studentAtRisk": "At-Risk Student",
+        "classTrend": "Class Trend"
+      },
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "time": {
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "actions": {
+        "viewAll": "View All Insights",
+        "dismiss": "Dismiss",
+        "markRead": "Mark as Read"
+      },
+      "states": {
+        "loading": "Loading insights...",
+        "empty": "No AI insights available.\nCheck back later!",
+        "error": "Failed to load insights"
+      }
+    },
+    "classCards": {
+      "title": "My Classes",
+      "subtitle": "Your assigned classes",
+      "states": {
+        "loading": "Loading classes...",
+        "empty": "No classes assigned",
+        "error": "Failed to load classes"
+      }
+    },
+    "classRoster": {
+      "title": "Class Roster",
+      "subtitle": "Students in this class",
+      "searchPlaceholder": "Search students...",
+      "sort": {
+        "roll_number": "Roll No.",
+        "name": "Name",
+        "attendance": "Attendance",
+        "score": "Score"
+      },
+      "states": {
+        "loading": "Loading students...",
+        "empty": "No students in this class",
+        "noResults": "No students found",
+        "error": "Failed to load students"
+      }
+    },
+    "classStats": {
+      "title": "Class Statistics",
+      "subtitle": "Performance metrics",
+      "totalStudents": "Total Students",
+      "attendanceRate": "Attendance",
+      "averageScore": "Average Score",
+      "pendingAssignments": "Pending Work",
+      "topPerformers": "Top Performers",
+      "atRisk": "At Risk",
+      "states": {
+        "loading": "Loading stats...",
+        "error": "Failed to load stats"
+      }
+    },
+    "classActivity": {
+      "title": "Recent Activity",
+      "subtitle": "Latest class events",
+      "states": {
+        "loading": "Loading activity...",
+        "empty": "No recent activity",
+        "error": "Failed to load activity"
+      }
+    },
+    "activityTimeline": {
+      "title": "Activity Timeline",
+      "subtitle": "Filtered view of all class activities",
+      "states": {
+        "loading": "Loading activity...",
+        "empty": "No recent activity",
+        "error": "Failed to load activity"
+      },
+      "filters": {
+        "all": "All",
+        "assignment": "Assignment",
+        "test": "Test",
+        "attendance": "Attendance",
+        "grade": "Grade",
+        "announcement": "Announcement",
+        "material": "Material",
+        "doubt": "Doubt"
+      },
+      "viewAll": "View all activity"
+    },
+    "classOverview": {
+      "title": "Class Overview",
+      "subtitle": "At-a-glance view of all classes",
+      "states": {
+        "loading": "Loading classes...",
+        "empty": "No classes assigned",
+        "error": "Failed to load classes"
+      },
+      "needsAttention": "Needs Attention",
+      "students": "students",
+      "allGood": "All students on track!",
+      "allGoodSubtext": "No students need immediate attention",
+      "actions": {
+        "attendance": "Attendance",
+        "roster": "Roster",
+        "message": "Message",
+        "remedial": "Remedial",
+        "notify": "Notify"
+      },
+      "studentActions": {
+        "call": "Call Parent",
+        "whatsapp": "WhatsApp",
+        "remedial": "Remedial",
+        "meeting": "PTM"
+      },
+      "alerts": {
+        "notifyTitle": "Notify Parents",
+        "notifyMessage": "Send progress alert to parents of: {{students}}?",
+        "noPhone": "No Phone Number",
+        "noPhoneMessage": "Parent phone number not available"
+      },
+      "risk": {
+        "both": "Attendance & Score",
+        "attendance": "Low Attendance",
+        "score": "Low Score"
+      }
+    },
+    "attendanceHero": {
+      "title": "Today's Attendance",
+      "subtitle": "Daily attendance overview",
+      "classesMarked": "{{marked}}/{{total}} classes marked",
+      "mark": "Mark",
+      "todayRate": "Attendance Rate",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "total": "Total",
+      "pending": "{{count}} classes pending",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceQuickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Attendance actions",
+      "mark": "Mark Attendance",
+      "history": "View History",
+      "reports": "Reports",
+      "alerts": "Low Attendance"
+    },
+    "attendanceRecent": {
+      "title": "Recent Attendance",
+      "subtitle": "Recently marked attendance",
+      "today": "Today",
+      "viewAll": "View All History",
+      "states": {
+        "loading": "Loading...",
+        "empty": "No recent attendance",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceTrends": {
+      "title": "Attendance Trends",
+      "subtitle": "Attendance over time",
+      "week": "7 Days",
+      "month": "30 Days",
+      "quarter": "90 Days",
+      "average": "Average",
+      "perfect": "100% Attendance",
+      "low": "Below 75%",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceClassCompare": {
+      "title": "Class Comparison",
+      "subtitle": "Attendance by class",
+      "students": "students",
+      "today": "Today",
+      "states": {
+        "loading": "Loading...",
+        "empty": "No classes",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceLowAlerts": {
+      "title": "Low Attendance Alerts",
+      "subtitle": "Students needing attention",
+      "studentsBelow": "students below {{threshold}}%",
+      "daysAbsent": "days absent",
+      "lastPresent": "Last",
+      "call": "Call",
+      "view": "View",
+      "viewAll": "View All {{count}} Students",
+      "allGood": "All Students On Track!",
+      "allGoodMessage": "No students below {{threshold}}% attendance",
+      "noPhone": "No Phone",
+      "noPhoneMessage": "Parent phone not available",
+      "whatsappMessage": "Dear Parent, we noticed {{student}}'s attendance has been low. Please ensure regular attendance.",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceTodaySummary": {
+      "title": "Today's Attendance",
+      "subtitle": "Quick attendance overview",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "total": "Total",
+      "classesMarked": "{{marked}}/{{total}} classes marked",
+      "pending": "pending",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceTrendsCompact": {
+      "title": "7-Day Trend",
+      "subtitle": "Attendance rate over time",
+      "thisWeek": "This Week",
+      "vsLastWeek": "vs Last Week",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load"
+      }
+    },
+    "attendanceAlerts": {
+      "title": "Low Attendance",
+      "subtitle": "Students needing attention",
+      "count": "{{count}} students below {{threshold}}%",
+      "viewAll": "View all {{count}} students",
+      "noPhone": "No Phone",
+      "noPhoneMessage": "Parent phone not available",
+      "whatsappMessage": "Dear Parent, we noticed {{student}}'s attendance has been low. Please ensure regular attendance.",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load",
+        "allGood": "All On Track!",
+        "allGoodMessage": "No students below {{threshold}}% attendance"
+      }
+    },
+    "attendanceQuickMark": {
+      "title": "Quick Mark",
+      "subtitle": "One-tap attendance marking",
+      "pending": "pending",
+      "students": "students",
+      "allPresent": "All Present",
+      "viewAll": "+{{count}} more classes",
+      "states": {
+        "loading": "Loading...",
+        "error": "Failed to load classes",
+        "allDone": "All Done!",
+        "allDoneMessage": "All classes marked for today"
+      },
+      "success": {
+        "title": "Marked!",
+        "message": "{{count}} students marked present in {{className}}"
+      },
+      "error": {
+        "title": "Error",
+        "message": "Failed to mark attendance"
+      }
+    },
+    "studentStats": {
+      "title": "Student Overview",
+      "subtitle": "Key student metrics",
+      "totalStudents": "Students",
+      "classes": "Classes",
+      "attendance": "Attendance",
+      "performance": "Avg Score",
+      "topPerformers": "Top Performers",
+      "needAttention": "Need Attention"
+    },
+    "classStudents": {
+      "title": "Students by Class",
+      "subtitle": "View students in each class",
+      "students": "students",
+      "more": "more",
+      "noData": "No student data available"
+    },
+    "topPerformers": {
+      "title": "Top Performers",
+      "subtitle": "High-achieving students",
+      "noData": "No top performers yet",
+      "viewAll": "View All Top Performers"
+    },
+    "gradingActions": {
+      "title": "Grading Actions",
+      "subtitle": "Quick access to grading",
+      "grading": "Grading Hub",
+      "assignments": "Assignments"
+    },
+    "studentQuickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Student management actions",
+      "grading": "Grading Hub",
+      "assignment": "Assignment",
+      "attendance": "Attendance",
+      "reports": "Reports",
+      "message": "Send Message",
+      "atRisk": "At-Risk"
+    },
+    "gradingHubActions": {
+      "title": "Quick Actions",
+      "subtitle": "Grading tasks",
+      "gradeSubmissions": "Grade Now",
+      "createAssignment": "New Assignment",
+      "viewAssignments": "All Assignments",
+      "gradingRubrics": "Rubrics"
+    },
+    "createAssignment": {
+      "title": "Create Assignment",
+      "description": "Create a new assignment for your students",
+      "buttonLabel": "New Assignment"
+    },
+    "submissionsList": {
+      "title": "Ready to Grade",
+      "subtitle": "Student submissions awaiting your review",
+      "viewAll": "View All Submissions",
+      "states": {
+        "loading": "Loading submissions...",
+        "error": "Failed to load submissions",
+        "empty": "All Caught Up!",
+        "emptySubtitle": "No pending submissions to grade"
+      },
+      "timeAgo": {
+        "minutes": "{{count}}m ago",
+        "hours": "{{count}}h ago",
+        "days": "{{count}}d ago"
+      }
+    },
+    "gradeSubmission": {
+      "title": "Grade Submission",
+      "subtitle": "Grade the next pending submission",
+      "gradeNow": "Grade Now",
+      "pending": "pending",
+      "allDone": "All Caught Up!",
+      "noSubmissions": "No pending submissions to grade",
+      "error": "Failed to load"
+    },
+    "gradingStats": {
+      "title": "Grading Statistics",
+      "subtitle": "Overview of grading progress",
+      "assignments": "Assignments",
+      "pending": "Pending",
+      "graded": "Graded",
+      "avgScore": "Avg Score",
+      "distribution": "Grade Distribution",
+      "states": {
+        "loading": "Loading stats...",
+        "error": "Failed to load stats",
+        "empty": "No grading data"
+      }
+    }
+  },
+  "screens": {
+    "classHub": {
+      "title": "My Classes",
+      "subtitle": "Manage your assigned classes"
+    },
+    "classDetail": {
+      "title": "Class Details",
+      "subtitle": "Overview and management",
+      "sections": {
+        "stats": "Class Statistics",
+        "activity": "Recent Activity",
+        "roster": "Students"
+      },
+      "actions": {
+        "markAttendance": "Attendance",
+        "newAssignment": "Assignment",
+        "newTest": "Test",
+        "announce": "Announce"
+      }
+    },
+    "classRoster": {
+      "title": "Class Roster",
+      "titleWithClass": "{{className}} Students",
+      "subtitle": "View and manage students"
+    },
+    "attendanceMark": {
+      "title": "Mark Attendance",
+      "subtitle": "Record student attendance",
+      "labels": {
+        "selectClass": "Select Class",
+        "selectDate": "Select Date",
+        "roll": "Roll",
+        "students": "students",
+        "markAll": "Mark All:"
+      },
+      "stats": {
+        "total": "Total",
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "rate": "Rate"
+      },
+      "actions": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "allPresent": "Present",
+        "allAbsent": "Absent"
+      },
+      "states": {
+        "loading": "Loading...",
+        "selectClass": "Please select a class to mark attendance",
+        "error": "Failed to load students",
+        "empty": "No students in this class"
+      },
+      "messages": {
+        "saveSuccess": "Success",
+        "saveSuccessDetail": "Attendance saved for {{count}} students",
+        "saveFailed": "Error",
+        "saveFailedDetail": "Failed to save attendance. Please try again."
+      }
+    },
+    "gradeSubmission": {
+      "title": "Grade Submission",
+      "subtitle": "Review and grade student work",
+      "sections": {
+        "score": "Score",
+        "feedback": "Feedback"
+      },
+      "labels": {
+        "student": "Student",
+        "assignment": "Assignment",
+        "late": "Late",
+        "submitted": "Submitted"
+      },
+      "form": {
+        "score": "Score",
+        "max": "Max",
+        "feedback": "Add feedback (optional)"
+      },
+      "quickFeedback": {
+        "excellent": "Excellent work! Keep it up.",
+        "excellentShort": "Excellent",
+        "good": "Good effort. Minor improvements needed.",
+        "goodShort": "Good",
+        "average": "Satisfactory. Review the concepts again.",
+        "averageShort": "Average",
+        "needsWork": "Needs improvement. Please revise.",
+        "needsWorkShort": "Needs Work",
+        "incomplete": "Incomplete submission. Please resubmit.",
+        "incompleteShort": "Incomplete"
+      },
+      "actions": {
+        "submit": "Submit Grade",
+        "return": "Return"
+      },
+      "states": {
+        "loading": "Loading submission...",
+        "error": "Failed to load submission",
+        "empty": "Submission not found"
+      },
+      "messages": {
+        "gradeSuccess": "Grade submitted successfully!",
+        "gradeFailed": "Failed to submit grade",
+        "returned": "Returned to student",
+        "returnedResubmit": "Returned for resubmission",
+        "returnFailed": "Failed to return submission"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "attendance": "Attendance",
+    "schedule": "Schedule",
+    "classes": "Classes",
+    "students": "Students",
+    "profile": "Profile"
+  }
+}

@@ -19,11 +19,13 @@ import {
   Circle,
   Bell,
   Bot,
+  Menu,
 } from "lucide-react";
 
 const sidebarItems = [
   { href: "/studio", label: "Dashboard", icon: LayoutDashboard },
   { href: "/studio/navigation", label: "Navigation", icon: Navigation },
+  { href: "/studio/drawer", label: "Drawer", icon: Menu },
   { href: "/studio/screens", label: "Screens", icon: Layers },
   { href: "/studio/theme", label: "Theme", icon: Palette },
   { href: "/studio/branding", label: "Branding", icon: FileText },

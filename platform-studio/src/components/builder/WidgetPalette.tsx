@@ -15,6 +15,7 @@ export function WidgetPalette({ widgets, usedWidgetIds }: WidgetPaletteProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([
     "schedule",
     "study",
+    "communication",
   ]);
 
   const toggleCategory = (category: string) => {

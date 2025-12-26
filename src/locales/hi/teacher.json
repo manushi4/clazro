@@ -1,0 +1,914 @@
+{
+  "screens": {
+    "home": {
+      "title": "शिक्षक होम",
+      "subtitle": "आपका शिक्षण डैशबोर्ड"
+    },
+    "atRiskStudents": {
+      "title": "जोखिम वाले छात्र",
+      "subtitle": "ध्यान देने योग्य छात्र",
+      "stats": {
+        "critical": "गंभीर",
+        "high": "उच्च",
+        "medium": "मध्यम",
+        "low": "कम"
+      },
+      "tabs": {
+        "all": "सभी",
+        "byClass": "कक्षा के अनुसार",
+        "byBatch": "बैच के अनुसार"
+      },
+      "empty": {
+        "title": "कोई जोखिम वाले छात्र नहीं",
+        "subtitle": "सभी छात्र अच्छा प्रदर्शन कर रहे हैं!"
+      }
+    },
+    "rubricDetail": {
+      "title": "रूब्रिक विवरण",
+      "criteria": "मानदंड",
+      "maxScore": "अधिकतम अंक",
+      "type": "प्रकार",
+      "gradingCriteria": "ग्रेडिंग मानदंड",
+      "noCriteria": "कोई मानदंड परिभाषित नहीं",
+      "useForAssignment": "असाइनमेंट के लिए उपयोग करें",
+      "duplicate": "डुप्लिकेट",
+      "states": {
+        "loading": "रूब्रिक लोड हो रहा है...",
+        "error": "रूब्रिक नहीं मिला"
+      }
+    },
+    "assignments": {
+      "title": "असाइनमेंट",
+      "tabs": {
+        "all": "सभी",
+        "pending": "लंबित",
+        "graded": "ग्रेड किए गए",
+        "draft": "ड्राफ्ट"
+      },
+      "sections": {
+        "overview": "अवलोकन",
+        "pendingGrading": "लंबित ग्रेडिंग",
+        "allAssignments": "सभी असाइनमेंट"
+      },
+      "actions": {
+        "create": "असाइनमेंट बनाएं"
+      },
+      "states": {
+        "loading": "असाइनमेंट लोड हो रहे हैं...",
+        "empty": "अभी तक कोई असाइनमेंट नहीं",
+        "error": "असाइनमेंट लोड करने में विफल"
+      }
+    },
+    "assignmentDetail": {
+      "title": "असाइनमेंट विवरण",
+      "info": {
+        "maxScore": "अधिकतम अंक",
+        "dueDate": "नियत तारीख",
+        "submissions": "सबमिशन",
+        "noDeadline": "कोई समय सीमा नहीं"
+      },
+      "filters": {
+        "all": "सभी",
+        "pending": "लंबित",
+        "graded": "ग्रेड किए गए"
+      },
+      "sections": {
+        "submissions": "सबमिशन"
+      },
+      "actions": {
+        "publish": "प्रकाशित करें",
+        "close": "बंद करें",
+        "edit": "संपादित करें"
+      },
+      "status": {
+        "draft": "ड्राफ्ट",
+        "published": "प्रकाशित",
+        "closed": "बंद",
+        "pending": "लंबित",
+        "submitted": "जमा किया गया",
+        "late": "देर से",
+        "graded": "ग्रेड किया गया",
+        "returned": "वापस किया गया",
+        "resubmit": "पुनः जमा करें"
+      },
+      "messages": {
+        "published": "असाइनमेंट प्रकाशित!",
+        "closed": "असाइनमेंट बंद",
+        "publishFailed": "प्रकाशित करने में विफल",
+        "closeFailed": "बंद करने में विफल"
+      },
+      "states": {
+        "loading": "असाइनमेंट लोड हो रहा है...",
+        "notFound": "असाइनमेंट नहीं मिला",
+        "noSubmissions": "अभी तक कोई सबमिशन नहीं",
+        "noFiltered": "कोई {{filter}} सबमिशन नहीं"
+      }
+    }
+  },
+  "onboarding": {
+    "skip": "छोड़ें",
+    "next": "जारी रखें",
+    "getStarted": "शुरू करें",
+    "welcome": {
+      "title": "स्वागत है, शिक्षक!",
+      "description": "आइए आपको अपनी कक्षाओं को प्रभावी ढंग से प्रबंधित करने के लिए तैयार करें। इसमें केवल एक मिनट लगेगा।",
+      "classes": "कक्षाएं",
+      "students": "छात्र"
+    },
+    "classes": {
+      "title": "आपकी कक्षाएं",
+      "description": "आपको निम्नलिखित कक्षाओं में नियुक्त किया गया है। आप प्रत्येक के लिए उपस्थिति, असाइनमेंट और ग्रेड प्रबंधित कर सकते हैं।",
+      "noClasses": "अभी तक कोई कक्षा नियुक्त नहीं। व्यवस्थापक से संपर्क करें।"
+    },
+    "notifications": {
+      "title": "अपडेट रहें",
+      "description": "चुनें कि आप कौन सी सूचनाएं प्राप्त करना चाहते हैं।",
+      "assignments": "असाइनमेंट अपडेट",
+      "assignmentsSub": "सबमिशन और समय सीमा",
+      "attendance": "उपस्थिति रिमाइंडर",
+      "attendanceSub": "दैनिक उपस्थिति प्रॉम्प्ट",
+      "messages": "अभिभावक संदेश",
+      "messagesSub": "अभिभावकों के नए संदेश",
+      "announcements": "स्कूल घोषणाएं",
+      "announcementsSub": "महत्वपूर्ण अपडेट"
+    },
+    "features": {
+      "title": "मुख्य विशेषताएं",
+      "attendance": "त्वरित उपस्थिति",
+      "attendanceDesc": "स्मार्ट डिफॉल्ट के साथ सेकंड में उपस्थिति दर्ज करें",
+      "assignments": "असाइनमेंट और टेस्ट",
+      "assignmentsDesc": "आसानी से बनाएं, ग्रेड करें और सबमिशन ट्रैक करें",
+      "progress": "छात्र प्रगति",
+      "progressDesc": "रीयल-टाइम एनालिटिक्स और प्रदर्शन अंतर्दृष्टि",
+      "ai": "AI सहायक",
+      "aiDesc": "प्रश्नों का उत्तर देने और सामग्री बनाने में सहायता प्राप्त करें"
+    },
+    "preferences": {
+      "title": "आपकी प्राथमिकताएं",
+      "description": "अपने शिक्षण अनुभव को अनुकूलित करें। आप इन्हें सेटिंग्स में कभी भी बदल सकते हैं।",
+      "gradingScale": "डिफॉल्ट ग्रेडिंग स्केल",
+      "studentPhotos": "छात्र फोटो दिखाएं",
+      "studentPhotosSub": "उपस्थिति और ग्रेड में फोटो प्रदर्शित करें",
+      "quickAttendance": "त्वरित उपस्थिति मोड",
+      "quickAttendanceSub": "उपस्थित चिह्नित करने के लिए एक-टैप",
+      "dailyDigest": "दैनिक डाइजेस्ट ईमेल",
+      "dailyDigestSub": "हर सुबह लंबित कार्यों का सारांश"
+    },
+    "complete": {
+      "title": "आप तैयार हैं!",
+      "description": "अपनी कक्षाओं का प्रबंधन शुरू करें और छात्रों को सफल होने में मदद करें।",
+      "quickStart": "त्वरित शुरुआत टिप्स",
+      "tip1": "अपनी पहली कक्षा के लिए उपस्थिति दर्ज करें",
+      "tip2": "अपना पहला असाइनमेंट बनाएं",
+      "tip3": "छात्र प्रगति एनालिटिक्स देखें"
+    }
+  },
+  "widgets": {
+    "teacherHero": {
+      "title": "शिक्षक डैशबोर्ड",
+      "subtitle": "आज {{count}} कक्षाएं",
+      "defaultName": "शिक्षक",
+      "greetings": {
+        "morning": "सुप्रभात",
+        "afternoon": "नमस्कार",
+        "evening": "शुभ संध्या"
+      },
+      "stats": {
+        "classes": "कक्षाएं",
+        "grading": "ग्रेडिंग",
+        "attendance": "उपस्थिति",
+        "atRisk": "जोखिम में"
+      },
+      "avatarHint": "प्रोफ़ाइल देखें",
+      "notificationsHint": "सूचनाएं देखें",
+      "scheduleHint": "शेड्यूल देखें",
+      "classesStatHint": "आज {{count}} कक्षाएं",
+      "gradingStatHint": "{{count}} आइटम ग्रेडिंग के लिए लंबित",
+      "attendanceStatHint": "{{rate}}% उपस्थिति दर",
+      "atRiskStatHint": "{{count}} जोखिम वाले छात्र"
+    },
+    "teacherStats": {
+      "title": "मेरे आंकड़े",
+      "subtitle": "आपके शिक्षण आंकड़े",
+      "totalStudents": "कुल छात्र",
+      "classesToday": "आज की कक्षाएं",
+      "pendingGrading": "लंबित ग्रेडिंग",
+      "attendance": "उपस्थिति",
+      "statHint": "{{label}}: {{value}}",
+      "error": "आंकड़े लोड करने में विफल"
+    },
+    "upcomingClasses": {
+      "title": "आज की कक्षाएं",
+      "subtitle": "आज का आपका शेड्यूल",
+      "now": "अभी",
+      "viewAll": "पूरा शेड्यूल देखें",
+      "states": {
+        "loading": "शेड्यूल लोड हो रहा है...",
+        "empty": "आज कोई कक्षा नहीं",
+        "error": "शेड्यूल लोड करने में विफल"
+      }
+    },
+    "classPerformance": {
+      "title": "कक्षा प्रदर्शन",
+      "subtitle": "आपकी कक्षाओं के लिए विश्लेषण"
+    },
+    "doubtsToAnswer": {
+      "title": "उत्तर देने के लिए प्रश्न",
+      "subtitle": "छात्रों के प्रश्न आपका इंतजार कर रहे हैं"
+    },
+    "pendingGrading": {
+      "title": "लंबित ग्रेडिंग",
+      "subtitle": "समीक्षा के लिए असाइनमेंट और परीक्षाएं",
+      "viewAll": "सभी ग्रेडिंग देखें",
+      "retry": "पुनः प्रयास",
+      "overdue": "{{days}} दिन देरी",
+      "dueToday": "आज देय",
+      "dueTomorrow": "कल देय",
+      "dueIn": "{{days}} दिनों में देय",
+      "types": {
+        "assignment": "असाइनमेंट",
+        "test": "परीक्षा",
+        "quiz": "प्रश्नोत्तरी",
+        "project": "परियोजना"
+      },
+      "states": {
+        "loading": "लंबित आइटम लोड हो रहे हैं...",
+        "empty": "सब कुछ पूरा!",
+        "emptySubtitle": "कोई आइटम लंबित नहीं",
+        "error": "ग्रेडिंग आइटम लोड करने में विफल"
+      }
+    },
+    "quickActions": {
+      "title": "त्वरित कार्य",
+      "subtitle": "सामान्य शिक्षण कार्य",
+      "states": {
+        "loading": "कार्य लोड हो रहे हैं...",
+        "empty": "कोई त्वरित कार्य उपलब्ध नहीं",
+        "error": "कार्य लोड करने में विफल"
+      }
+    },
+    "messagesInbox": {
+      "title": "संदेश",
+      "subtitle": "अभिभावक और छात्र संदेश",
+      "viewAll": "सभी संदेश देखें",
+      "states": {
+        "loading": "संदेश लोड हो रहे हैं...",
+        "empty": "अभी कोई संदेश नहीं",
+        "error": "संदेश लोड करने में विफल"
+      }
+    },
+    "announcements": {
+      "title": "घोषणाएं",
+      "subtitle": "आपकी कक्षा की घोषणाएं",
+      "viewAll": "सभी घोषणाएं देखें",
+      "new": "नई घोषणा",
+      "create": "घोषणा बनाएं",
+      "states": {
+        "loading": "घोषणाएं लोड हो रही हैं...",
+        "empty": "अभी कोई घोषणा नहीं",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "parentContacts": {
+      "title": "अभिभावक संपर्क",
+      "subtitle": "अपने छात्रों के अभिभावकों से संपर्क करें",
+      "viewAll": "सभी संपर्क देखें",
+      "searchPlaceholder": "नाम से खोजें...",
+      "noResults": "कोई संपर्क नहीं मिला",
+      "states": {
+        "loading": "संपर्क लोड हो रहे हैं...",
+        "empty": "अभी कोई अभिभावक संपर्क नहीं",
+        "error": "संपर्क लोड करने में विफल"
+      }
+    },
+    "doubtsInbox": {
+      "title": "छात्र संदेह",
+      "subtitle": "आपके छात्रों के प्रश्न",
+      "viewAll": "सभी संदेह देखें",
+      "filters": {
+        "all": "सभी",
+        "pending": "लंबित",
+        "urgent": "अत्यावश्यक"
+      },
+      "states": {
+        "loading": "संदेह लोड हो रहे हैं...",
+        "empty": "कोई लंबित संदेह नहीं!",
+        "emptySubtitle": "सभी छात्र प्रश्नों का उत्तर दिया गया",
+        "error": "संदेह लोड करने में विफल"
+      }
+    },
+    "doubtDetail": {
+      "title": "संदेह विवरण",
+      "subtitle": "छात्र प्रश्न विवरण",
+      "question": "प्रश्न",
+      "aiSuggestion": "AI सुझाव उत्तर",
+      "yourAnswer": "आपका उत्तर",
+      "useAiAnswer": "इस उत्तर का उपयोग करें",
+      "answerNow": "अभी उत्तर दें",
+      "states": {
+        "loading": "संदेह लोड हो रहा है...",
+        "error": "संदेह नहीं मिला"
+      }
+    },
+    "calendar": {
+      "title": "मेरा कैलेंडर",
+      "subtitle": "आगामी कार्यक्रम और शेड्यूल",
+      "viewFull": "पूरा कैलेंडर देखें",
+      "quickAdd": "नया कार्यक्रम जोड़ें",
+      "addEvent": "कार्यक्रम जोड़ें",
+      "states": {
+        "loading": "कार्यक्रम लोड हो रहे हैं...",
+        "empty": "कोई आगामी कार्यक्रम नहीं",
+        "error": "कार्यक्रम लोड करने में विफल"
+      }
+    },
+    "calendarEvents": {
+      "title": "कैलेंडर कार्यक्रम",
+      "subtitle": "आपके शेड्यूल का विस्तृत दृश्य",
+      "viewAll": "सभी {{count}} कार्यक्रम देखें",
+      "create": "कार्यक्रम बनाएं",
+      "addNew": "नया कार्यक्रम जोड़ें",
+      "filters": {
+        "all": "सभी",
+        "class": "कक्षाएं",
+        "meeting": "बैठकें",
+        "exam": "परीक्षाएं",
+        "deadline": "समय सीमाएं"
+      },
+      "types": {
+        "class": "कक्षा",
+        "meeting": "बैठक",
+        "exam": "परीक्षा",
+        "deadline": "समय सीमा",
+        "holiday": "छुट्टी",
+        "personal": "व्यक्तिगत",
+        "event": "कार्यक्रम"
+      },
+      "states": {
+        "loading": "कार्यक्रम लोड हो रहे हैं...",
+        "empty": "कोई कार्यक्रम निर्धारित नहीं",
+        "error": "कार्यक्रम लोड करने में विफल"
+      }
+    },
+    "substituteManager": {
+      "title": "प्रतिस्थापन प्रबंधक",
+      "subtitle": "प्रतिस्थापन शिक्षकों का अनुरोध और खोज करें",
+      "tabs": {
+        "myRequests": "मेरे अनुरोध",
+        "available": "उपलब्ध",
+        "openRequests": "खुले"
+      },
+      "createRequest": "प्रतिस्थापन अनुरोध",
+      "offerHelp": "सहायता प्रदान करें",
+      "viewAll": "सभी प्रतिस्थापन देखें",
+      "empty": {
+        "myRequests": "कोई प्रतिस्थापन अनुरोध नहीं",
+        "available": "कोई शिक्षक उपलब्ध नहीं",
+        "openRequests": "कोई खुले अनुरोध नहीं"
+      },
+      "status": {
+        "pending": "लंबित",
+        "approved": "स्वीकृत",
+        "fulfilled": "पूर्ण",
+        "rejected": "अस्वीकृत",
+        "cancelled": "रद्द"
+      },
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "डेटा लोड करने में विफल"
+      }
+    },
+    "leaveRequest": {
+      "title": "अवकाश अनुरोध",
+      "subtitle": "अपने अवकाश आवेदन प्रबंधित करें",
+      "applyLeave": "अवकाश के लिए आवेदन करें",
+      "viewAll": "सभी अनुरोध देखें",
+      "filters": {
+        "all": "सभी",
+        "pending": "लंबित",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत"
+      },
+      "balance": {
+        "sick": "बीमारी",
+        "casual": "आकस्मिक",
+        "earned": "अर्जित"
+      },
+      "types": {
+        "sick": "बीमारी अवकाश",
+        "casual": "आकस्मिक अवकाश",
+        "earned": "अर्जित अवकाश",
+        "maternity": "मातृत्व अवकाश",
+        "paternity": "पितृत्व अवकाश",
+        "unpaid": "अवैतनिक अवकाश",
+        "other": "अन्य अवकाश"
+      },
+      "status": {
+        "pending": "लंबित",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत",
+        "cancelled": "रद्द"
+      },
+      "states": {
+        "loading": "अनुरोध लोड हो रहे हैं...",
+        "empty": "कोई अवकाश अनुरोध नहीं",
+        "error": "अनुरोध लोड करने में विफल"
+      }
+    },
+    "aiInsights": {
+      "title": "AI अंतर्दृष्टि",
+      "subtitle": "आपकी कक्षाओं के लिए स्मार्ट सिफारिशें",
+      "unread": "अपठित",
+      "filters": {
+        "all": "सभी",
+        "unread": "अपठित",
+        "highPriority": "प्राथमिकता"
+      },
+      "types": {
+        "performanceAlert": "प्रदर्शन अलर्ट",
+        "engagementInsight": "सहभागिता",
+        "teachingRecommendation": "सिफारिश",
+        "assessmentSuggestion": "मूल्यांकन",
+        "deadlineReminder": "समय सीमा",
+        "resourceRecommendation": "संसाधन",
+        "studentAtRisk": "जोखिम में छात्र",
+        "classTrend": "कक्षा रुझान"
+      },
+      "priority": {
+        "low": "कम",
+        "medium": "मध्यम",
+        "high": "उच्च",
+        "critical": "गंभीर"
+      },
+      "time": {
+        "minutesAgo": "{{count}} मिनट पहले",
+        "hoursAgo": "{{count}} घंटे पहले",
+        "daysAgo": "{{count}} दिन पहले"
+      },
+      "actions": {
+        "viewAll": "सभी अंतर्दृष्टि देखें",
+        "dismiss": "खारिज करें",
+        "markRead": "पढ़ा हुआ चिह्नित करें"
+      },
+      "states": {
+        "loading": "अंतर्दृष्टि लोड हो रही है...",
+        "empty": "कोई AI अंतर्दृष्टि उपलब्ध नहीं।\nबाद में देखें!",
+        "error": "अंतर्दृष्टि लोड करने में विफल"
+      }
+    },
+    "classCards": {
+      "title": "मेरी कक्षाएं",
+      "subtitle": "आपकी नियुक्त कक्षाएं",
+      "states": {
+        "loading": "कक्षाएं लोड हो रही हैं...",
+        "empty": "कोई कक्षा नियुक्त नहीं",
+        "error": "कक्षाएं लोड करने में विफल"
+      }
+    },
+    "classRoster": {
+      "title": "कक्षा छात्र सूची",
+      "subtitle": "इस कक्षा के छात्र",
+      "searchPlaceholder": "छात्र खोजें...",
+      "sort": {
+        "roll_number": "रोल नं.",
+        "name": "नाम",
+        "attendance": "उपस्थिति",
+        "score": "अंक"
+      },
+      "states": {
+        "loading": "छात्र लोड हो रहे हैं...",
+        "empty": "इस कक्षा में कोई छात्र नहीं",
+        "noResults": "कोई छात्र नहीं मिला",
+        "error": "छात्र लोड करने में विफल"
+      }
+    },
+    "classStats": {
+      "title": "कक्षा आंकड़े",
+      "subtitle": "प्रदर्शन मैट्रिक्स",
+      "totalStudents": "कुल छात्र",
+      "attendanceRate": "उपस्थिति",
+      "averageScore": "औसत अंक",
+      "pendingAssignments": "लंबित कार्य",
+      "topPerformers": "शीर्ष प्रदर्शक",
+      "atRisk": "जोखिम में",
+      "states": {
+        "loading": "आंकड़े लोड हो रहे हैं...",
+        "error": "आंकड़े लोड करने में विफल"
+      }
+    },
+    "classActivity": {
+      "title": "हालिया गतिविधि",
+      "subtitle": "नवीनतम कक्षा घटनाएं",
+      "states": {
+        "loading": "गतिविधि लोड हो रही है...",
+        "empty": "कोई हालिया गतिविधि नहीं",
+        "error": "गतिविधि लोड करने में विफल"
+      }
+    },
+    "activityTimeline": {
+      "title": "गतिविधि टाइमलाइन",
+      "subtitle": "सभी कक्षा गतिविधियों का फ़िल्टर दृश्य",
+      "states": {
+        "loading": "गतिविधि लोड हो रही है...",
+        "empty": "कोई हालिया गतिविधि नहीं",
+        "error": "गतिविधि लोड करने में विफल"
+      },
+      "filters": {
+        "all": "सभी",
+        "assignment": "असाइनमेंट",
+        "test": "परीक्षा",
+        "attendance": "उपस्थिति",
+        "grade": "ग्रेड",
+        "announcement": "घोषणा",
+        "material": "सामग्री",
+        "doubt": "प्रश्न"
+      },
+      "viewAll": "सभी गतिविधि देखें"
+    },
+    "classOverview": {
+      "title": "कक्षा अवलोकन",
+      "subtitle": "सभी कक्षाओं का एक नज़र में दृश्य",
+      "states": {
+        "loading": "कक्षाएं लोड हो रही हैं...",
+        "empty": "कोई कक्षा नियुक्त नहीं",
+        "error": "कक्षाएं लोड करने में विफल"
+      },
+      "needsAttention": "ध्यान देने योग्य",
+      "students": "छात्र",
+      "allGood": "सभी छात्र ट्रैक पर हैं!",
+      "allGoodSubtext": "किसी भी छात्र को तत्काल ध्यान देने की आवश्यकता नहीं",
+      "actions": {
+        "attendance": "उपस्थिति",
+        "roster": "छात्र सूची",
+        "message": "संदेश",
+        "remedial": "सुधारात्मक",
+        "notify": "सूचित करें"
+      },
+      "studentActions": {
+        "call": "अभिभावक को कॉल",
+        "whatsapp": "व्हाट्सएप",
+        "remedial": "सुधारात्मक",
+        "meeting": "PTM"
+      },
+      "alerts": {
+        "notifyTitle": "अभिभावकों को सूचित करें",
+        "notifyMessage": "इन छात्रों के अभिभावकों को प्रगति अलर्ट भेजें: {{students}}?",
+        "noPhone": "फ़ोन नंबर नहीं",
+        "noPhoneMessage": "अभिभावक का फ़ोन नंबर उपलब्ध नहीं"
+      },
+      "risk": {
+        "both": "उपस्थिति और अंक",
+        "attendance": "कम उपस्थिति",
+        "score": "कम अंक"
+      }
+    },
+    "attendanceHero": {
+      "title": "आज की उपस्थिति",
+      "subtitle": "दैनिक उपस्थिति अवलोकन",
+      "classesMarked": "{{marked}}/{{total}} कक्षाएं चिह्नित",
+      "mark": "चिह्नित करें",
+      "todayRate": "उपस्थिति दर",
+      "present": "उपस्थित",
+      "absent": "अनुपस्थित",
+      "late": "देर से",
+      "total": "कुल",
+      "pending": "{{count}} कक्षाएं लंबित",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceQuickActions": {
+      "title": "त्वरित कार्य",
+      "subtitle": "उपस्थिति कार्य",
+      "mark": "उपस्थिति चिह्नित करें",
+      "history": "इतिहास देखें",
+      "reports": "रिपोर्ट",
+      "alerts": "कम उपस्थिति"
+    },
+    "attendanceRecent": {
+      "title": "हालिया उपस्थिति",
+      "subtitle": "हाल ही में चिह्नित उपस्थिति",
+      "today": "आज",
+      "viewAll": "सभी इतिहास देखें",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "empty": "कोई हालिया उपस्थिति नहीं",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceTrends": {
+      "title": "उपस्थिति रुझान",
+      "subtitle": "समय के साथ उपस्थिति",
+      "week": "7 दिन",
+      "month": "30 दिन",
+      "quarter": "90 दिन",
+      "average": "औसत",
+      "perfect": "100% उपस्थिति",
+      "low": "75% से नीचे",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceClassCompare": {
+      "title": "कक्षा तुलना",
+      "subtitle": "कक्षा के अनुसार उपस्थिति",
+      "students": "छात्र",
+      "today": "आज",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "empty": "कोई कक्षा नहीं",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceLowAlerts": {
+      "title": "कम उपस्थिति अलर्ट",
+      "subtitle": "ध्यान देने योग्य छात्र",
+      "studentsBelow": "{{threshold}}% से नीचे छात्र",
+      "daysAbsent": "दिन अनुपस्थित",
+      "lastPresent": "अंतिम",
+      "call": "कॉल करें",
+      "view": "देखें",
+      "viewAll": "सभी {{count}} छात्र देखें",
+      "allGood": "सभी छात्र ट्रैक पर हैं!",
+      "allGoodMessage": "{{threshold}}% उपस्थिति से नीचे कोई छात्र नहीं",
+      "noPhone": "कोई फ़ोन नहीं",
+      "noPhoneMessage": "अभिभावक का फ़ोन उपलब्ध नहीं",
+      "whatsappMessage": "प्रिय अभिभावक, हमने देखा कि {{student}} की उपस्थिति कम रही है। कृपया नियमित उपस्थिति सुनिश्चित करें।",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceTodaySummary": {
+      "title": "आज की उपस्थिति",
+      "subtitle": "त्वरित उपस्थिति अवलोकन",
+      "present": "उपस्थित",
+      "absent": "अनुपस्थित",
+      "late": "देर से",
+      "total": "कुल",
+      "classesMarked": "{{marked}}/{{total}} कक्षाएं चिह्नित",
+      "pending": "लंबित",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceTrendsCompact": {
+      "title": "7-दिन का रुझान",
+      "subtitle": "समय के साथ उपस्थिति दर",
+      "thisWeek": "इस सप्ताह",
+      "vsLastWeek": "पिछले सप्ताह की तुलना",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल"
+      }
+    },
+    "attendanceAlerts": {
+      "title": "कम उपस्थिति",
+      "subtitle": "ध्यान देने योग्य छात्र",
+      "count": "{{threshold}}% से नीचे {{count}} छात्र",
+      "viewAll": "सभी {{count}} छात्र देखें",
+      "noPhone": "कोई फ़ोन नहीं",
+      "noPhoneMessage": "अभिभावक का फ़ोन उपलब्ध नहीं",
+      "whatsappMessage": "प्रिय अभिभावक, हमने देखा कि {{student}} की उपस्थिति कम रही है। कृपया नियमित उपस्थिति सुनिश्चित करें।",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "लोड करने में विफल",
+        "allGood": "सभी ट्रैक पर!",
+        "allGoodMessage": "{{threshold}}% उपस्थिति से नीचे कोई छात्र नहीं"
+      }
+    },
+    "attendanceQuickMark": {
+      "title": "त्वरित चिह्नित",
+      "subtitle": "एक-टैप उपस्थिति चिह्नित करें",
+      "pending": "लंबित",
+      "students": "छात्र",
+      "allPresent": "सभी उपस्थित",
+      "viewAll": "+{{count}} और कक्षाएं",
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "error": "कक्षाएं लोड करने में विफल",
+        "allDone": "सब हो गया!",
+        "allDoneMessage": "आज की सभी कक्षाएं चिह्नित"
+      },
+      "success": {
+        "title": "चिह्नित!",
+        "message": "{{className}} में {{count}} छात्र उपस्थित चिह्नित"
+      },
+      "error": {
+        "title": "त्रुटि",
+        "message": "उपस्थिति चिह्नित करने में विफल"
+      }
+    },
+    "studentStats": {
+      "title": "छात्र अवलोकन",
+      "subtitle": "प्रमुख छात्र मैट्रिक्स",
+      "totalStudents": "छात्र",
+      "classes": "कक्षाएं",
+      "attendance": "उपस्थिति",
+      "performance": "औसत अंक",
+      "topPerformers": "शीर्ष प्रदर्शक",
+      "needAttention": "ध्यान चाहिए"
+    },
+    "classStudents": {
+      "title": "कक्षा के अनुसार छात्र",
+      "subtitle": "प्रत्येक कक्षा में छात्र देखें",
+      "students": "छात्र",
+      "more": "और",
+      "noData": "कोई छात्र डेटा उपलब्ध नहीं"
+    },
+    "topPerformers": {
+      "title": "शीर्ष प्रदर्शक",
+      "subtitle": "उच्च प्रदर्शन करने वाले छात्र",
+      "noData": "अभी कोई शीर्ष प्रदर्शक नहीं",
+      "viewAll": "सभी शीर्ष प्रदर्शक देखें"
+    },
+    "gradingActions": {
+      "title": "ग्रेडिंग कार्य",
+      "subtitle": "ग्रेडिंग तक त्वरित पहुंच",
+      "grading": "ग्रेडिंग हब",
+      "assignments": "असाइनमेंट"
+    },
+    "studentQuickActions": {
+      "title": "त्वरित कार्य",
+      "subtitle": "छात्र प्रबंधन कार्य",
+      "grading": "ग्रेडिंग हब",
+      "assignment": "असाइनमेंट",
+      "attendance": "उपस्थिति",
+      "reports": "रिपोर्ट",
+      "message": "संदेश भेजें",
+      "atRisk": "जोखिम में"
+    },
+    "gradingHubActions": {
+      "title": "त्वरित कार्य",
+      "subtitle": "ग्रेडिंग कार्य",
+      "gradeSubmissions": "अभी ग्रेड करें",
+      "createAssignment": "नया असाइनमेंट",
+      "viewAssignments": "सभी असाइनमेंट",
+      "gradingRubrics": "रूब्रिक"
+    },
+    "createAssignment": {
+      "title": "असाइनमेंट बनाएं",
+      "description": "अपने छात्रों के लिए नया असाइनमेंट बनाएं",
+      "buttonLabel": "नया असाइनमेंट"
+    },
+    "submissionsList": {
+      "title": "ग्रेड करने को तैयार",
+      "subtitle": "छात्र सबमिशन आपकी समीक्षा की प्रतीक्षा में",
+      "viewAll": "सभी सबमिशन देखें",
+      "states": {
+        "loading": "सबमिशन लोड हो रहे हैं...",
+        "error": "सबमिशन लोड करने में विफल",
+        "empty": "सब पकड़ लिया!",
+        "emptySubtitle": "ग्रेड करने के लिए कोई लंबित सबमिशन नहीं"
+      },
+      "timeAgo": {
+        "minutes": "{{count}} मिनट पहले",
+        "hours": "{{count}} घंटे पहले",
+        "days": "{{count}} दिन पहले"
+      }
+    },
+    "gradeSubmission": {
+      "title": "सबमिशन ग्रेड करें",
+      "subtitle": "अगला लंबित सबमिशन ग्रेड करें",
+      "gradeNow": "अभी ग्रेड करें",
+      "pending": "लंबित",
+      "allDone": "सब हो गया!",
+      "noSubmissions": "ग्रेड करने के लिए कोई लंबित सबमिशन नहीं",
+      "error": "लोड करने में विफल"
+    },
+    "gradingStats": {
+      "title": "ग्रेडिंग आंकड़े",
+      "subtitle": "ग्रेडिंग प्रगति का अवलोकन",
+      "assignments": "असाइनमेंट",
+      "pending": "लंबित",
+      "graded": "ग्रेड किए",
+      "avgScore": "औसत अंक",
+      "distribution": "ग्रेड वितरण",
+      "states": {
+        "loading": "आंकड़े लोड हो रहे हैं...",
+        "error": "आंकड़े लोड करने में विफल",
+        "empty": "कोई ग्रेडिंग डेटा नहीं"
+      }
+    }
+  },
+  "screens": {
+    "classHub": {
+      "title": "मेरी कक्षाएं",
+      "subtitle": "अपनी नियुक्त कक्षाओं का प्रबंधन करें"
+    },
+    "classDetail": {
+      "title": "कक्षा विवरण",
+      "subtitle": "अवलोकन और प्रबंधन",
+      "sections": {
+        "stats": "कक्षा आंकड़े",
+        "activity": "हालिया गतिविधि",
+        "roster": "छात्र"
+      },
+      "actions": {
+        "markAttendance": "उपस्थिति",
+        "newAssignment": "असाइनमेंट",
+        "newTest": "परीक्षा",
+        "announce": "घोषणा"
+      }
+    },
+    "classRoster": {
+      "title": "कक्षा छात्र सूची",
+      "titleWithClass": "{{className}} छात्र",
+      "subtitle": "छात्रों को देखें और प्रबंधित करें"
+    },
+    "attendanceMark": {
+      "title": "उपस्थिति दर्ज करें",
+      "subtitle": "छात्र उपस्थिति रिकॉर्ड करें",
+      "labels": {
+        "selectClass": "कक्षा चुनें",
+        "selectDate": "तारीख चुनें",
+        "roll": "रोल",
+        "students": "छात्र",
+        "markAll": "सभी को चिह्नित करें:"
+      },
+      "stats": {
+        "total": "कुल",
+        "present": "उपस्थित",
+        "absent": "अनुपस्थित",
+        "late": "देरी",
+        "rate": "दर"
+      },
+      "actions": {
+        "save": "सहेजें",
+        "cancel": "रद्द करें",
+        "allPresent": "उपस्थित",
+        "allAbsent": "अनुपस्थित"
+      },
+      "states": {
+        "loading": "लोड हो रहा है...",
+        "selectClass": "उपस्थिति दर्ज करने के लिए कक्षा चुनें",
+        "error": "छात्रों को लोड करने में विफल",
+        "empty": "इस कक्षा में कोई छात्र नहीं"
+      },
+      "messages": {
+        "saveSuccess": "सफल",
+        "saveSuccessDetail": "{{count}} छात्रों की उपस्थिति सहेजी गई",
+        "saveFailed": "त्रुटि",
+        "saveFailedDetail": "उपस्थिति सहेजने में विफल। कृपया पुनः प्रयास करें।"
+      }
+    },
+    "gradeSubmission": {
+      "title": "ग्रेड सबमिशन",
+      "subtitle": "छात्र के काम की समीक्षा और ग्रेडिंग",
+      "sections": {
+        "score": "अंक",
+        "feedback": "प्रतिक्रिया"
+      },
+      "labels": {
+        "student": "छात्र",
+        "assignment": "असाइनमेंट",
+        "late": "देर से",
+        "submitted": "जमा किया"
+      },
+      "form": {
+        "score": "अंक",
+        "max": "अधिकतम",
+        "feedback": "प्रतिक्रिया जोड़ें (वैकल्पिक)"
+      },
+      "quickFeedback": {
+        "excellent": "उत्कृष्ट काम! ऐसे ही करते रहो।",
+        "excellentShort": "उत्कृष्ट",
+        "good": "अच्छा प्रयास। मामूली सुधार की जरूरत।",
+        "goodShort": "अच्छा",
+        "average": "संतोषजनक। अवधारणाओं को फिर से देखें।",
+        "averageShort": "औसत",
+        "needsWork": "सुधार की जरूरत। कृपया संशोधित करें।",
+        "needsWorkShort": "सुधार चाहिए",
+        "incomplete": "अधूरी प्रस्तुति। कृपया पुनः जमा करें।",
+        "incompleteShort": "अधूरा"
+      },
+      "actions": {
+        "submit": "ग्रेड जमा करें",
+        "return": "वापस करें"
+      },
+      "states": {
+        "loading": "सबमिशन लोड हो रहा है...",
+        "error": "सबमिशन लोड करने में विफल",
+        "empty": "सबमिशन नहीं मिला"
+      },
+      "messages": {
+        "gradeSuccess": "ग्रेड सफलतापूर्वक जमा!",
+        "gradeFailed": "ग्रेड जमा करने में विफल",
+        "returned": "छात्र को वापस किया",
+        "returnedResubmit": "पुनः जमा करने के लिए वापस किया",
+        "returnFailed": "सबमिशन वापस करने में विफल"
+      }
+    }
+  },
+  "navigation": {
+    "home": "होम",
+    "attendance": "उपस्थिति",
+    "schedule": "शेड्यूल",
+    "classes": "कक्षाएं",
+    "students": "छात्र",
+    "profile": "प्रोफ़ाइल"
+  }
+}

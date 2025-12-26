@@ -4,7 +4,7 @@ import { useAppTheme } from "../theme/useAppTheme";
 import { useCustomerConfig } from "../hooks/config/useCustomerConfig";
 import { useConfigStore } from "../stores/configStore";
 import { useDemoUser } from "../hooks/useDemoUser";
-import { DynamicTabNavigator } from "../navigation";
+import { DynamicDrawerNavigator } from "../navigation";
 import { useTranslation } from "react-i18next";
 import { useInit } from "../hooks/useInit";
 import { useBackgroundSync } from "../hooks/useBackgroundSync";
@@ -67,7 +67,7 @@ export const AppContent: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={statusBarStyle} />
-      <DynamicTabNavigator role={role} />
+      <DynamicDrawerNavigator role={role} />
       {__DEV__ && <DevRoleSwitcher />}
     </View>
   );

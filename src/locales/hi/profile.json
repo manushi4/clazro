@@ -1,5 +1,86 @@
 {
   "title": "प्रोफ़ाइल",
+  "states": {
+    "loading": "प्रोफ़ाइल लोड हो रहा है...",
+    "error": "प्रोफ़ाइल लोड करने में विफल"
+  },
+  "sections": {
+    "personal": "व्यक्तिगत जानकारी",
+    "preferences": "प्राथमिकताएं",
+    "notifications": "सूचनाएं",
+    "support": "सहायता"
+  },
+  "fields": {
+    "email": "ईमेल",
+    "phone": "फ़ोन",
+    "class": "कक्षा",
+    "rollNumber": "रोल नंबर"
+  },
+  "stats": {
+    "xp": "XP",
+    "streak": "दिन स्ट्रीक",
+    "badges": "बैज"
+  },
+  "roles": {
+    "student": "छात्र",
+    "teacher": "शिक्षक",
+    "parent": "अभिभावक",
+    "admin": "व्यवस्थापक"
+  },
+  "settings": {
+    "language": {
+      "title": "भाषा बदलें",
+      "label": "भाषा",
+      "confirm": "{{language}} में बदलें?"
+    },
+    "theme": {
+      "title": "थीम चुनें",
+      "label": "थीम",
+      "system": "सिस्टम",
+      "light": "लाइट",
+      "dark": "डार्क"
+    },
+    "notifications": {
+      "push": "पुश सूचनाएं",
+      "manage": "सूचनाएं प्रबंधित करें"
+    }
+  },
+  "support": {
+    "helpFeedback": "सहायता और फीडबैक",
+    "about": "ऐप के बारे में",
+    "privacy": "गोपनीयता नीति"
+  },
+  "teacher": {
+    "quickActions": "त्वरित कार्य",
+    "teachingInfo": "शिक्षण जानकारी",
+    "reports": "रिपोर्ट",
+    "stats": {
+      "classes": "कक्षाएं",
+      "students": "छात्र",
+      "rating": "रेटिंग",
+      "experience": "अनुभव"
+    },
+    "actions": {
+      "schedule": "मेरा शेड्यूल",
+      "attendance": "उपस्थिति",
+      "grading": "ग्रेडिंग",
+      "students": "मेरे छात्र",
+      "classes": "मेरी कक्षाएं",
+      "reports": "रिपोर्ट"
+    },
+    "fields": {
+      "subjects": "विषय",
+      "classes": "आवंटित कक्षाएं",
+      "department": "विभाग",
+      "joinDate": "शामिल हुए",
+      "employeeId": "कर्मचारी आईडी"
+    }
+  },
+  "logout": {
+    "title": "लॉगआउट",
+    "confirm": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+    "button": "लॉगआउट"
+  },
   "widgets": {
     "profileCard": {
       "title": "प्रोफ़ाइल",

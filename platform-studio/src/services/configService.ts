@@ -1,5 +1,6 @@
 import { getSupabase } from "@/lib/supabase/client";
 import { TabConfig, ScreenWidgetConfig, ThemeConfig, CustomerBranding, Role } from "@/types";
+import { LayoutSettings, DEFAULT_LAYOUT_SETTINGS } from "@/stores/configStore";
 
 const supabase = getSupabase();
 
@@ -123,7 +124,7 @@ export async function fetchScreenLayout(
 
 export async function fetchAllScreenLayouts(
   customerId: string
-): Promise<Record<Role, Record<string, { screen_id: string; widgets: ScreenWidgetConfig[] }>>> {
+): Promise<Record<Role, Record<string, { screen_id: string; widgets: ScreenWidgetConfig[]; layoutSettings?: LayoutSettings }>>> {
   const { data, error } = await supabase
     .from("screen_layouts")
     .select("*")
@@ -132,7 +133,7 @@ export async function fetchAllScreenLayouts(
 
   if (error) throw error;
 
-  const result: Record<Role, Record<string, { screen_id: string; widgets: ScreenWidgetConfig[] }>> = {
+  const result: Record<Role, Record<string, { screen_id: string; widgets: ScreenWidgetConfig[]; layoutSettings?: LayoutSettings }>> = {
     student: {},
     teacher: {},
     parent: {},
@@ -144,7 +145,12 @@ export async function fetchAllScreenLayouts(
     const screenId = row.screen_id;
 
     if (!result[role][screenId]) {
-      result[role][screenId] = { screen_id: screenId, widgets: [] };
+      result[role][screenId] = {
+        screen_id: screenId,
+        widgets: [],
+        // Get layoutSettings from the first row (they should all be the same for a screen)
+        layoutSettings: row.layout_settings || DEFAULT_LAYOUT_SETTINGS,
+      };
     }
 
     result[role][screenId].widgets.push({
@@ -166,7 +172,8 @@ export async function saveScreenLayout(
   customerId: string,
   role: Role,
   screenId: string,
-  widgets: ScreenWidgetConfig[]
+  widgets: ScreenWidgetConfig[],
+  layoutSettings?: LayoutSettings
 ) {
   // Delete existing widgets for this screen
   await supabase
@@ -178,7 +185,7 @@ export async function saveScreenLayout(
 
   if (widgets.length === 0) return;
 
-  // Insert new widgets
+  // Insert new widgets with layout settings
   const widgetsToInsert = widgets.map((widget, index) => ({
     customer_id: customerId,
     role,
@@ -191,6 +198,7 @@ export async function saveScreenLayout(
     grid_row: widget.grid_row,
     custom_props: widget.custom_props || {},
     visibility_rules: widget.visibility_rules || [],
+    layout_settings: layoutSettings || DEFAULT_LAYOUT_SETTINGS,
   }));
 
   const { error } = await supabase.from("screen_layouts").insert(widgetsToInsert);

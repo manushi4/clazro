@@ -4,6 +4,29 @@ import type { Role } from "../../types/permission.types";
 import type { CustomerBranding } from "../../types/branding.types";
 import type { ScreenWidgetConfig } from "../../types/config.types";
 
+// Layout settings for controlling widget appearance
+export type LayoutSettings = {
+  gap: number; // Space between widgets (px)
+  containerStyle: "card" | "flat" | "seamless"; // card = separate boxes, flat = connected look, seamless = continuous flow
+  showShadow: boolean;
+  borderRadius: number;
+  padding: number;
+};
+
+export const DEFAULT_LAYOUT_SETTINGS: LayoutSettings = {
+  gap: 12,
+  containerStyle: "card",
+  showShadow: true,
+  borderRadius: 12,
+  padding: 16,
+};
+
+// Screen layout result including widgets and layout settings
+export type ScreenLayoutResult = {
+  widgets: ScreenWidgetConfig[];
+  layoutSettings: LayoutSettings;
+};
+
 // Component styles type
 export type ComponentStyles = {
   buttonStyle: 'filled' | 'outlined' | 'text';
@@ -109,6 +132,7 @@ const DEFAULT_SCREEN_LAYOUTS: Record<string, ScreenWidgetConfig[]> = {
     { widgetId: "schedule.today", position: 2, size: "standard", enabled: true, customProps: { maxItems: 3 } },
     { widgetId: "actions.quick", position: 3, size: "standard", enabled: true, customProps: { columns: "2" } },
     { widgetId: "assignments.upcoming", position: 4, size: "standard", enabled: true, customProps: { maxItems: 3 } },
+    { widgetId: "analytics.class-performance", position: 5, size: "standard", enabled: true, customProps: { maxItems: 6, showRank: true, showTrend: true, showClassAverage: true } },
   ],
   
   // ============ ADMIN SCREENS ============
@@ -175,6 +199,42 @@ const DEFAULT_SCREEN_LAYOUTS: Record<string, ScreenWidgetConfig[]> = {
     { widgetId: "settings.appearance", position: 3, size: "standard", enabled: true, customProps: {} },
     { widgetId: "settings.about", position: 4, size: "compact", enabled: true, customProps: {} },
   ],
+
+  // ============ TEACHER SCREENS ============
+
+  // Teacher Home Dashboard
+  "teacher-home": [
+    { widgetId: "teacher.hero-card", position: 1, size: "expanded", enabled: true, customProps: { showNotifications: true, showScheduleButton: true } },
+    { widgetId: "teacher.stats-grid", position: 2, size: "standard", enabled: true, customProps: { showAllStats: true } },
+    { widgetId: "teacher.upcoming-classes", position: 3, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "teacher.pending-grading", position: 4, size: "standard", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "teacher.at-risk-students", position: 5, size: "compact", enabled: true, customProps: { maxItems: 3 } },
+    { widgetId: "teacher.quick-actions", position: 6, size: "compact", enabled: true, customProps: { showAllActions: true } },
+    { widgetId: "teacher.calendar", position: 7, size: "standard", enabled: true, customProps: { maxItems: 5, showQuickAdd: true } },
+    { widgetId: "teacher.calendar-events", position: 8, size: "expanded", enabled: true, customProps: { maxItems: 10, showFilters: true } },
+    { widgetId: "teacher.substitute-manager", position: 9, size: "expanded", enabled: true, customProps: { maxItems: 5 } },
+    { widgetId: "teacher.leave-request", position: 10, size: "expanded", enabled: true, customProps: { maxItems: 5, showBalance: true } },
+    { widgetId: "teacher.ai-insights", position: 11, size: "expanded", enabled: true, customProps: { maxItems: 5, showPriorityBadge: true, showUnreadCount: true } },
+  ],
+
+  // Teacher Grading Hub
+  "grading-hub": [
+    { widgetId: "teacher.grade-submission", position: 1, size: "standard", enabled: true, customProps: {} },
+    { widgetId: "teacher.submissions-list", position: 2, size: "expanded", enabled: true, customProps: { maxItems: 10, showFilters: true } },
+    { widgetId: "grading.stats", position: 3, size: "standard", enabled: true, customProps: { showDistribution: true, showAvgScore: true } },
+    { widgetId: "teacher.pending-grading", position: 4, size: "standard", enabled: true, customProps: { maxItems: 5, showProgress: true } },
+    { widgetId: "grading.recent", position: 5, size: "standard", enabled: true, customProps: { maxItems: 5, showGrade: true, showScore: true } },
+    { widgetId: "grading.rubric-templates", position: 6, size: "standard", enabled: true, customProps: { maxItems: 6, layoutStyle: "grid", showCreateButton: true } },
+  ],
+
+  // Teacher Assignments Hub
+  "teacher-assignments": [
+    { widgetId: "teacher.create-assignment", position: 1, size: "standard", enabled: true, customProps: { variant: "banner", showIcon: true, showDescription: true } },
+    { widgetId: "grading.stats", position: 2, size: "standard", enabled: true, customProps: { showDistribution: true, showAvgScore: true } },
+    { widgetId: "teacher.pending-grading", position: 3, size: "expanded", enabled: true, customProps: { maxItems: 10, showProgress: true } },
+    { widgetId: "grading.recent", position: 4, size: "standard", enabled: true, customProps: { maxItems: 5, showGrade: true, showScore: true } },
+  ],
+
   // Study/Library screens
   "study": [
     { widgetId: "hero.greeting", position: 1, size: "compact", enabled: true, customProps: { variant: "study" } },
@@ -266,7 +326,7 @@ export async function fetchScreenLayout(
   customerId: string,
   role: Role,
   screenId: string
-): Promise<ScreenWidgetConfig[]> {
+): Promise<ScreenLayoutResult> {
   const supabase = getSupabase();
 
   const { data, error } = await supabase
@@ -280,7 +340,10 @@ export async function fetchScreenLayout(
 
   if (error) throw error;
 
-  const layouts = (data || []).map((row: any) => ({
+  // Get layout settings from the first row (they're the same for all widgets in a screen)
+  const layoutSettings: LayoutSettings = data?.[0]?.layout_settings || DEFAULT_LAYOUT_SETTINGS;
+
+  const widgets = (data || []).map((row: any) => ({
     widgetId: row.widget_id,
     position: row.position,
     size: row.size || "standard",
@@ -292,12 +355,12 @@ export async function fetchScreenLayout(
   }));
 
   // Return database layouts if available
-  if (layouts.length > 0) {
-    return layouts;
+  if (widgets.length > 0) {
+    return { widgets, layoutSettings };
   }
 
   // Use fallback layouts for all roles when database is empty
-  return getFallbackLayout(screenId);
+  return { widgets: getFallbackLayout(screenId), layoutSettings: DEFAULT_LAYOUT_SETTINGS };
 }
 
 export async function fetchAllScreenLayouts(customerId: string, role: Role) {

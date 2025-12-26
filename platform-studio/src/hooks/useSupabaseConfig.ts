@@ -23,6 +23,7 @@ export function useSupabaseConfig() {
     setCustomerId,
     setTabs,
     setScreenLayout,
+    setLayoutSettings,
     setTheme,
     setBranding,
     markSaved,
@@ -62,6 +63,10 @@ export function useSupabaseConfig() {
             if (layout.widgets && layout.widgets.length > 0) {
               setScreenLayout(role, screenId, layout.widgets);
             }
+            // Also set layout settings if present
+            if (layout.layoutSettings) {
+              setLayoutSettings(role, screenId, layout.layoutSettings);
+            }
           });
         });
       }
@@ -96,8 +101,10 @@ export function useSupabaseConfig() {
   // Save screen layout mutation
   const saveScreenMutation = useMutation({
     mutationFn: async ({ role, screenId }: { role: Role; screenId: string }) => {
-      const widgets = screenLayouts[role][screenId]?.widgets || [];
-      await saveScreenLayout(DEMO_CUSTOMER_ID, role, screenId, widgets);
+      const layout = screenLayouts[role][screenId];
+      const widgets = layout?.widgets || [];
+      const layoutSettings = layout?.layoutSettings;
+      await saveScreenLayout(DEMO_CUSTOMER_ID, role, screenId, widgets, layoutSettings);
       await triggerConfigChangeEvent(DEMO_CUSTOMER_ID, "layout_updated");
     },
     onSuccess: () => {

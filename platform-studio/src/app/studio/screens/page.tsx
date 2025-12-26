@@ -22,8 +22,10 @@ import { WidgetPalette } from "@/components/builder/WidgetPalette";
 import { DevicePreview } from "@/components/preview/DevicePreview";
 import { useConfigStore } from "@/stores/configStore";
 import { useSupabaseConfig } from "@/hooks/useSupabaseConfig";
-import { Eye, Save, Loader2, Settings } from "lucide-react";
+import { Eye, Save, Loader2, Settings, Layout } from "lucide-react";
 import { WidgetPropertiesPanel } from "@/components/builder/WidgetPropertiesPanel";
+import { LayoutSettingsPanel } from "@/components/builder/LayoutSettingsPanel";
+import { DEFAULT_LAYOUT_SETTINGS } from "@/stores/configStore";
 
 export default function ScreenBuilder() {
   const {
@@ -32,6 +34,7 @@ export default function ScreenBuilder() {
     screenLayouts,
     tabs,
     setScreenLayout,
+    setLayoutSettings,
     theme,
     branding,
     isDirty,
@@ -46,6 +49,7 @@ export default function ScreenBuilder() {
   const [selectedScreen, setSelectedScreen] = useState(defaultScreen);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedWidget, setSelectedWidget] = useState<string | null>(null);
+  const [showLayoutSettings, setShowLayoutSettings] = useState(false);
 
   // Update selected screen when role changes
   useEffect(() => {
@@ -59,8 +63,9 @@ export default function ScreenBuilder() {
   const screens = getScreensForRole(selectedRole);
   const availableWidgets = getWidgetsForRole(selectedRole);
 
-  // Get current widgets from store
+  // Get current widgets and layout settings from store
   const currentWidgets = screenLayouts[selectedRole][selectedScreen]?.widgets || [];
+  const currentLayoutSettings = screenLayouts[selectedRole][selectedScreen]?.layoutSettings || DEFAULT_LAYOUT_SETTINGS;
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -197,6 +202,17 @@ export default function ScreenBuilder() {
             </span>
           )}
           <button
+            onClick={() => setShowLayoutSettings(!showLayoutSettings)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${
+              showLayoutSettings
+                ? "bg-primary-100 text-primary-700"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            <Layout size={16} />
+            Layout
+          </button>
+          <button
             onClick={handleSave}
             disabled={isSaving}
             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 font-medium"
@@ -241,9 +257,27 @@ export default function ScreenBuilder() {
             </div>
           </div>
 
-          {/* Right Panel - Properties + Preview side by side */}
+          {/* Right Panel - Properties + Layout + Preview side by side */}
           <div className="flex border-l">
-            {/* Properties Panel - always visible when widget selected */}
+            {/* Layout Settings Panel - visible when Layout button clicked */}
+            {showLayoutSettings && (
+              <div className="w-64 border-r bg-white overflow-hidden flex flex-col">
+                <div className="px-4 py-3 border-b bg-gray-50">
+                  <div className="flex items-center gap-2">
+                    <Layout size={14} className="text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700">Layout Settings</span>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-auto">
+                  <LayoutSettingsPanel
+                    settings={currentLayoutSettings}
+                    onUpdate={(updates) => setLayoutSettings(selectedRole, selectedScreen, updates)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Properties Panel - visible when widget selected */}
             {selectedWidgetData && selectedWidgetMeta && (
               <div className="w-72 border-r bg-white overflow-hidden flex flex-col">
                 <div className="px-4 py-3 border-b bg-gray-50">

@@ -12,6 +12,7 @@ import { useCustomerThemeQuery } from "../hooks/queries/useCustomerThemeQuery";
 import { getWidgetEntry } from "../config/widgetRegistry";
 import { WidgetContainer } from "../components/widgets/base/WidgetContainer";
 import { WidgetErrorBoundary } from "../components/widgets/base/WidgetErrorBoundary";
+import { DEFAULT_LAYOUT_SETTINGS } from "../services/config/configService";
 import { usePermissions } from "../hooks/config/usePermissions";
 import { useFeatures } from "../hooks/config/useFeatures";
 import { useNetworkStatus } from "../offline/networkStore";
@@ -68,17 +69,30 @@ export const DynamicScreen: React.FC<Props> = ({
 
   // Fetch screen layout from Supabase
   const {
-    data: widgets,
+    data: layoutData,
     isLoading: layoutLoading,
     error: layoutError,
     refetch: refetchLayout,
   } = useScreenLayoutQuery(screenId, role, customerId);
 
-  // Debug logging in dev mode
+  // Extract widgets and layout settings
+  const widgets = layoutData?.widgets;
+  const layoutSettings = layoutData?.layoutSettings || DEFAULT_LAYOUT_SETTINGS;
+
+  // Debug: log layout settings
+  React.useEffect(() => {
+    if (__DEV__ && layoutData) {
+      console.log(`[DynamicScreen] Layout settings for ${screenId}:`, layoutSettings);
+    }
+  }, [screenId, layoutData, layoutSettings]);
+
+  // Debug logging in dev mode - only log once per screen
+  const hasLoggedRef = React.useRef<string>('');
   useEffect(() => {
-    if (__DEV__) {
+    if (__DEV__ && widgets && hasLoggedRef.current !== screenId) {
+      hasLoggedRef.current = screenId;
       console.log(`[DynamicScreen] screenId=${screenId}, role=${role}, widgets=`, widgets?.length ?? 0);
-      if (widgets && widgets.length > 0) {
+      if (widgets.length > 0) {
         console.log(`[DynamicScreen] Widget IDs:`, widgets.map(w => w.widgetId).join(', '));
       }
     }
@@ -95,11 +109,15 @@ export const DynamicScreen: React.FC<Props> = ({
     trackScreenView(screenId);
   }, [screenId, trackScreenView]);
 
+  // Track focus events - use ref to avoid dependency on onFocused changing
+  const onFocusedRef = React.useRef(onFocused);
+  onFocusedRef.current = onFocused;
+
   useFocusEffect(
     React.useCallback(() => {
-      onFocused?.();
+      onFocusedRef.current?.();
       return () => {};
-    }, [onFocused])
+    }, [])
   );
 
   // Build visibility context
@@ -173,11 +191,17 @@ export const DynamicScreen: React.FC<Props> = ({
     );
   }
 
+  // For seamless style, use subtle section spacing (8px) for flow feel
+  const effectiveGap = layoutSettings.containerStyle === "seamless" ? 8 : layoutSettings.gap;
+
   // Render widgets
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[
+        styles.content,
+        { padding: layoutSettings.padding, gap: effectiveGap }
+      ]}
       refreshControl={
         <RefreshControl
           refreshing={layoutLoading}
@@ -245,13 +269,6 @@ export const DynamicScreen: React.FC<Props> = ({
           );
         }
 
-        // Track widget render
-        trackWidgetEvent(widgetConfig.widgetId, "render", {
-          screenId,
-          position: widgetConfig.position,
-          size: widgetConfig.size,
-        });
-
         return (
           <WidgetErrorBoundary
             key={widgetConfig.widgetId}
@@ -262,10 +279,11 @@ export const DynamicScreen: React.FC<Props> = ({
             }}
             roundness={roundness}
           >
-            <WidgetContainer 
-              metadata={metadata} 
+            <WidgetContainer
+              metadata={metadata}
               size={widgetConfig.size}
               customProps={widgetConfig.customProps}
+              layoutSettings={layoutSettings}
             >
               <WidgetComponent
                 customerId={customerId}
@@ -289,8 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 16,
-    gap: 12,
+    // padding and gap now applied dynamically from layoutSettings
   },
   loadingContainer: {
     flex: 1,

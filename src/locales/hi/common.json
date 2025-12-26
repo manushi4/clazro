@@ -58,7 +58,31 @@
                          "unread":  "अपठित",
                          "general":  "सामान्य",
                          "deleteTitle":  "सूचना हटाएं",
-                         "deleteMessage":  "क्या आप वाकई इस सूचना को हटाना चाहते हैं?"
+                         "deleteMessage":  "क्या आप वाकई इस सूचना को हटाना चाहते हैं?",
+                         "markAllReadTitle": "सभी को पढ़ा हुआ चिह्नित करें",
+                         "markAllReadMessage": "क्या आप वाकई सभी सूचनाओं को पढ़ा हुआ चिह्नित करना चाहते हैं?",
+                         "searchPlaceholder": "सूचनाएं खोजें...",
+                         "filters": {
+                           "all": "सभी",
+                           "unread": "अपठित",
+                           "read": "पढ़ी गई"
+                         },
+                         "categories": {
+                           "all": "सभी",
+                           "assignments": "असाइनमेंट",
+                           "doubts": "संदेह",
+                           "attendance": "उपस्थिति",
+                           "announcements": "घोषणाएं",
+                           "grades": "ग्रेड",
+                           "schedule": "अनुसूची"
+                         },
+                         "states": {
+                           "loading": "सूचनाएं लोड हो रही हैं...",
+                           "empty": "अभी तक कोई सूचना नहीं",
+                           "noUnread": "कोई अपठित सूचना नहीं",
+                           "emptySubtext": "जब आपको सूचनाएं मिलेंगी, वे यहां दिखाई देंगी",
+                           "error": "सूचनाएं लोड करने में विफल"
+                         }
                      },
     "announcements":  {
                          "title":  "घोषणाएं",

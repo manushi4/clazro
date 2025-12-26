@@ -67,6 +67,9 @@ export * from './useUpcomingEventsQuery';
 // Notifications preview queries
 export * from './useNotificationsPreviewQuery';
 
+// Notifications list queries
+export * from './useNotificationsListQuery';
+
 // Tasks overview queries
 export * from './useTasksOverviewQuery';
 
@@ -137,3 +140,9 @@ export * from './useAITutorQuery';
 
 // Media banner queries
 export * from './useMediaBannerQuery';
+
+// Class performance queries
+export * from './useClassPerformanceQuery';
+
+// Top performers queries
+export * from './useTopPerformersQuery';

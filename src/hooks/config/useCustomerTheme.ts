@@ -57,10 +57,12 @@ export function useCustomerTheme(customerId: string = DEMO_CUSTOMER_ID): Extende
   const { data: supabaseTheme } = useQuery({
     queryKey: ["customer-theme", customerId],
     queryFn: () => fetchCustomerTheme(customerId),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1 * 60 * 1000, // 1 minute (reduced from 5 minutes for faster theme updates)
     gcTime: 30 * 60 * 1000,
     retry: 2,
     enabled: !!customerId,
+    refetchOnWindowFocus: true, // Refetch theme when app comes to foreground
+    refetchOnMount: true, // Always check for latest theme on mount
   });
 
   // Fallback to local config store

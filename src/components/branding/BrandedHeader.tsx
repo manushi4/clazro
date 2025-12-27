@@ -5,6 +5,8 @@ import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/
 import { useBranding } from "../../context/BrandingContext";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { AppText } from "../../ui/components/AppText";
+import { useDrawerEnabled } from "../../hooks/queries/useDrawerConfigQuery";
+import { useDrawerStore } from "../../stores/drawerStore";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 type Props = {
@@ -14,6 +16,7 @@ type Props = {
   title?: string; // Override title (otherwise uses app name)
   onNotificationPress?: () => void;
   notificationCount?: number;
+  showDrawerButton?: boolean; // Show hamburger menu (default: true if drawer enabled)
 };
 
 export const BrandedHeader: React.FC<Props> = ({
@@ -23,11 +26,21 @@ export const BrandedHeader: React.FC<Props> = ({
   title,
   onNotificationPress,
   notificationCount = 0,
+  showDrawerButton,
 }) => {
   const branding = useBranding();
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const drawerEnabled = useDrawerEnabled();
+  const { openDrawer } = useDrawerStore();
+
+  // Show drawer button if drawer is enabled and we're not showing back button
+  const shouldShowDrawer = showDrawerButton ?? (drawerEnabled && !showBackButton);
+
+  const handleDrawerPress = () => {
+    openDrawer();
+  };
 
   const handleNotificationPress = () => {
     if (onNotificationPress) {
@@ -52,11 +65,15 @@ export const BrandedHeader: React.FC<Props> = ({
       ]}
     >
       <View style={styles.content}>
-        {/* Left section - Back button or Logo */}
+        {/* Left section - Drawer button, Back button, or Logo */}
         <View style={styles.leftSection}>
           {showBackButton ? (
             <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
               <Icon name="arrow-left" size={24} color={colors.onSurface} />
+            </TouchableOpacity>
+          ) : shouldShowDrawer ? (
+            <TouchableOpacity onPress={handleDrawerPress} style={styles.menuButton}>
+              <Icon name="menu" size={24} color={colors.onSurface} />
             </TouchableOpacity>
           ) : logoUrl ? (
             <Image
@@ -162,6 +179,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   backButton: {
+    padding: 4,
+  },
+  menuButton: {
     padding: 4,
   },
   iconButton: {

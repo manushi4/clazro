@@ -130,7 +130,7 @@ export const TrendsWidget: React.FC<WidgetProps> = ({
       message: `${WIDGET_ID}_view_details`,
       level: 'info',
     });
-    onNavigate?.('analytics-dashboard');
+    onNavigate?.('trends-detail');
   };
 
   // Get metric color

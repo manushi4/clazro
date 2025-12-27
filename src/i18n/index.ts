@@ -9,6 +9,7 @@ import enProgress from "../locales/en/progress.json";
 import enProfile from "../locales/en/profile.json";
 import enSettings from "../locales/en/settings.json";
 import enParent from "../locales/en/parent.json";
+import enTeacher from "../locales/en/teacher.json";
 import hiCommon from "../locales/hi/common.json";
 import hiDashboard from "../locales/hi/dashboard.json";
 import hiAdmin from "../locales/hi/admin.json";
@@ -18,6 +19,7 @@ import hiProgress from "../locales/hi/progress.json";
 import hiProfile from "../locales/hi/profile.json";
 import hiSettings from "../locales/hi/settings.json";
 import hiParent from "../locales/hi/parent.json";
+import hiTeacher from "../locales/hi/teacher.json";
 import { loadPersistedLanguageWithSource } from "./persistLanguage";
 
 const resources = {
@@ -31,6 +33,7 @@ const resources = {
     profile: enProfile,
     settings: enSettings,
     parent: enParent,
+    teacher: enTeacher,
   },
   hi: {
     common: hiCommon,
@@ -42,6 +45,7 @@ const resources = {
     profile: hiProfile,
     settings: hiSettings,
     parent: hiParent,
+    teacher: hiTeacher,
   },
 };
 
@@ -52,7 +56,7 @@ i18n.use(initReactI18next).init({
   resources,
   lng: "en", // Default to English initially
   fallbackLng: "en",
-  ns: ["common", "dashboard", "admin", "study", "doubts", "progress", "profile", "settings", "parent"],
+  ns: ["common", "dashboard", "admin", "study", "doubts", "progress", "profile", "settings", "parent", "teacher"],
   defaultNS: "common",
   interpolation: { escapeValue: false },
 });

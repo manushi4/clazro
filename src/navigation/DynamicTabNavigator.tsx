@@ -28,8 +28,8 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen, LiveClassesListScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
-import { 
-  LoginAdminScreen, 
+import {
+  LoginAdminScreen,
   TwoFactorSetupScreen,
   UserDetailScreen,
   UserImpersonationScreen,
@@ -59,6 +59,33 @@ import {
   AdmissionsListScreen,
   AdmissionsDashboardScreen,
 } from "../screens/admin";
+import {
+  TrendsDetailScreen,
+  GrowthDetailScreen,
+  EngagementDetailScreen,
+  ComparisonsDetailScreen,
+  UserAnalyticsScreen,
+  RevenueAnalyticsScreen,
+  SessionsAnalyticsScreen,
+  ContentAnalyticsScreen,
+  AttendanceAnalyticsScreen,
+  GradeAnalyticsScreen,
+  PendingWorkAnalyticsScreen,
+} from "../screens/admin/analytics";
+import { AtRiskStudentsScreen } from "../screens/teacher/AtRiskStudentsScreen";
+// ClassHubScreen is resolved via routeRegistry (it's a tab root screen, not in COMMON_SCREENS)
+import { ClassDetailScreen as TeacherClassDetailScreen } from "../screens/teacher/ClassDetailScreen";
+import { ClassRosterScreen } from "../screens/teacher/ClassRosterScreen";
+import { AttendanceMarkScreen } from "../screens/teacher/AttendanceMarkScreen";
+import { AttendanceHistoryScreen } from "../screens/teacher/AttendanceHistoryScreen";
+import { AttendanceReportsScreen } from "../screens/teacher/AttendanceReportsScreen";
+import { AttendanceAlertsScreen } from "../screens/teacher/AttendanceAlertsScreen";
+import { GradingHubScreen } from "../screens/teacher/GradingHubScreen";
+import { AssignmentCreateScreen } from "../screens/teacher/AssignmentCreateScreen";
+import { AssignmentDetailTeacherScreen } from "../screens/teacher/AssignmentDetailTeacherScreen";
+import { GradeSubmissionScreen } from "../screens/teacher/GradeSubmissionScreen";
+import { RubricDetailScreen } from "../screens/teacher/RubricDetailScreen";
+import { TeacherAssignmentsScreen } from "../screens/teacher/TeacherAssignmentsScreen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Common screens available from any tab (not widget-based)
@@ -123,7 +150,7 @@ const COMMON_SCREENS = [
   { screenId: "live-classes-list", component: LiveClassesListScreen },
   { screenId: "assignments-home", component: DynamicScreen },
   { screenId: "progress-home", component: DynamicScreen },
-  { screenId: "profile-home", component: DynamicScreen },
+  // NOTE: profile-home is NOT here - it's registered as a tab root screen
   { screenId: "schedule-screen", component: DynamicScreen },
   // Test center (accessible via widget navigation)
   { screenId: "test-center", component: DynamicScreen },
@@ -176,6 +203,47 @@ const COMMON_SCREENS = [
   { screenId: "admission-create", component: AdmissionCreateScreen },
   { screenId: "admissions-list", component: AdmissionsListScreen },
   { screenId: "admissions-dashboard", component: AdmissionsDashboardScreen },
+  // Admin Analytics Detail screens (Sprint 7)
+  { screenId: "trends-detail", component: TrendsDetailScreen },
+  { screenId: "growth-detail", component: GrowthDetailScreen },
+  { screenId: "engagement-detail", component: EngagementDetailScreen },
+  { screenId: "comparisons-detail", component: ComparisonsDetailScreen },
+  // Dedicated metric analytics screens (each metric type has its own screen)
+  { screenId: "user-analytics", component: UserAnalyticsScreen },
+  { screenId: "revenue-analytics", component: RevenueAnalyticsScreen },
+  { screenId: "sessions-analytics", component: SessionsAnalyticsScreen },
+  { screenId: "content-analytics", component: ContentAnalyticsScreen },
+  { screenId: "attendance-analytics", component: AttendanceAnalyticsScreen },
+  { screenId: "grade-analytics", component: GradeAnalyticsScreen },
+  { screenId: "pending-work-analytics", component: PendingWorkAnalyticsScreen },
+  // Teacher screens (NOTE: class-hub is NOT here - it's a tab root screen, not a navigable sub-screen)
+  { screenId: "AtRiskStudents", component: AtRiskStudentsScreen },
+  { screenId: "at-risk-students", component: AtRiskStudentsScreen },
+  { screenId: "TeacherClassDetail", component: TeacherClassDetailScreen },
+  { screenId: "teacher-class-detail", component: TeacherClassDetailScreen },
+  { screenId: "ClassRoster", component: ClassRosterScreen },
+  { screenId: "class-roster", component: ClassRosterScreen },
+  // Teacher Attendance screens
+  { screenId: "AttendanceMark", component: AttendanceMarkScreen },
+  { screenId: "attendance-mark", component: AttendanceMarkScreen },
+  { screenId: "AttendanceHistory", component: AttendanceHistoryScreen },
+  { screenId: "attendance-history", component: AttendanceHistoryScreen },
+  { screenId: "AttendanceReports", component: AttendanceReportsScreen },
+  { screenId: "attendance-reports", component: AttendanceReportsScreen },
+  { screenId: "AttendanceAlerts", component: AttendanceAlertsScreen },
+  { screenId: "attendance-alerts", component: AttendanceAlertsScreen },
+  // Teacher Grading screens
+  // NOTE: grading-hub is NOT here - it's a tab root screen, resolved via routeRegistry
+  { screenId: "AssignmentCreate", component: AssignmentCreateScreen },
+  { screenId: "assignment-create", component: AssignmentCreateScreen },
+  { screenId: "AssignmentDetailTeacher", component: AssignmentDetailTeacherScreen },
+  { screenId: "assignment-detail-teacher", component: AssignmentDetailTeacherScreen },
+  { screenId: "GradeSubmission", component: GradeSubmissionScreen },
+  { screenId: "grade-submission", component: GradeSubmissionScreen },
+  { screenId: "RubricDetail", component: RubricDetailScreen },
+  { screenId: "rubric-detail", component: RubricDetailScreen },
+  { screenId: "TeacherAssignments", component: TeacherAssignmentsScreen },
+  { screenId: "teacher-assignments", component: TeacherAssignmentsScreen },
 ];
 
 // Map icon names from DB to MaterialCommunityIcons
@@ -331,11 +399,6 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
   const currentTab = tabs.find((t) => t.tabId === tabId);
   const rootScreenId = currentTab?.initialRoute;
 
-  // Debug logging
-  if (__DEV__) {
-    console.log(`[TabStack] tabId=${tabId}, rootScreenId=${rootScreenId}, screens from config=${screens.length}`);
-  }
-
   const enabledScreens = useMemo(() => {
     const filtered = screens.filter((s) => {
       if (s.requiredPermissions && s.requiredPermissions.some((code) => !has(code))) return false;
@@ -344,9 +407,6 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
     
     // If no screens from config, create a default screen using the tab's root screen
     if (filtered.length === 0 && rootScreenId) {
-      if (__DEV__) {
-        console.log(`[TabStack] Using rootScreenId as default: ${rootScreenId}`);
-      }
       return [{ screenId: rootScreenId, tabId, orderIndex: 0, enabled: true }];
     }
     
@@ -363,25 +423,20 @@ const TabStack: React.FC<{ role: Role; tabId: string }> = ({ role, tabId }) => {
             name={screen.screenId}
             options={{ headerShown: false }}
           >
-            {({ route }) => (
-              <ScreenErrorBoundaryWrapper screenId={screen.screenId}>
-                {(() => {
-                  const resolved = resolveScreen(screen.screenId);
-                  if (__DEV__) {
-                    console.log(`[TabStack] Rendering screen: ${screen.screenId}, resolved:`, resolved?.screenId);
-                  }
-                  const Component = resolved?.component ?? DynamicScreen;
-                  const screenIdToUse = (route.params as { screenId?: string })?.screenId ?? screen.screenId;
-                  return (
-                    <Component
-                      screenId={screenIdToUse}
-                      role={role}
-                      onFocused={() => trackNavigation(screen.screenId, { tabId })}
-                    />
-                  );
-                })()}
-              </ScreenErrorBoundaryWrapper>
-            )}
+            {({ route }) => {
+              const resolved = resolveScreen(screen.screenId);
+              const Component = resolved?.component ?? DynamicScreen;
+              const screenIdToUse = (route.params as { screenId?: string })?.screenId ?? screen.screenId;
+              return (
+                <ScreenErrorBoundaryWrapper screenId={screen.screenId}>
+                  <Component
+                    screenId={screenIdToUse}
+                    role={role}
+                    onFocused={() => trackNavigation(screen.screenId, { tabId })}
+                  />
+                </ScreenErrorBoundaryWrapper>
+              );
+            }}
           </Stack.Screen>
         ))}
         {/* Common screens accessible from any tab */}

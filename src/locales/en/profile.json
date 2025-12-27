@@ -1,5 +1,86 @@
 {
   "title": "Profile",
+  "states": {
+    "loading": "Loading profile...",
+    "error": "Failed to load profile"
+  },
+  "sections": {
+    "personal": "Personal Information",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "support": "Support"
+  },
+  "fields": {
+    "email": "Email",
+    "phone": "Phone",
+    "class": "Class",
+    "rollNumber": "Roll Number"
+  },
+  "stats": {
+    "xp": "XP",
+    "streak": "Day Streak",
+    "badges": "Badges"
+  },
+  "roles": {
+    "student": "Student",
+    "teacher": "Teacher",
+    "parent": "Parent",
+    "admin": "Administrator"
+  },
+  "settings": {
+    "language": {
+      "title": "Change Language",
+      "label": "Language",
+      "confirm": "Switch to {{language}}?"
+    },
+    "theme": {
+      "title": "Choose Theme",
+      "label": "Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "notifications": {
+      "push": "Push Notifications",
+      "manage": "Manage Notifications"
+    }
+  },
+  "support": {
+    "helpFeedback": "Help & Feedback",
+    "about": "About",
+    "privacy": "Privacy Policy"
+  },
+  "teacher": {
+    "quickActions": "Quick Actions",
+    "teachingInfo": "Teaching Information",
+    "reports": "Reports",
+    "stats": {
+      "classes": "Classes",
+      "students": "Students",
+      "rating": "Rating",
+      "experience": "Experience"
+    },
+    "actions": {
+      "schedule": "My Schedule",
+      "attendance": "Attendance",
+      "grading": "Grading",
+      "students": "My Students",
+      "classes": "My Classes",
+      "reports": "Reports"
+    },
+    "fields": {
+      "subjects": "Subjects",
+      "classes": "Classes Assigned",
+      "department": "Department",
+      "joinDate": "Joined",
+      "employeeId": "Employee ID"
+    }
+  },
+  "logout": {
+    "title": "Logout",
+    "confirm": "Are you sure you want to logout?",
+    "button": "Logout"
+  },
   "widgets": {
     "profileCard": {
       "title": "Profile",

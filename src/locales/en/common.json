@@ -57,7 +57,31 @@
     "unread": "Unread",
     "general": "General",
     "deleteTitle": "Delete Notification",
-    "deleteMessage": "Are you sure you want to delete this notification?"
+    "deleteMessage": "Are you sure you want to delete this notification?",
+    "markAllReadTitle": "Mark All as Read",
+    "markAllReadMessage": "Are you sure you want to mark all notifications as read?",
+    "searchPlaceholder": "Search notifications...",
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "categories": {
+      "all": "All",
+      "assignments": "Assignments",
+      "doubts": "Doubts",
+      "attendance": "Attendance",
+      "announcements": "Announcements",
+      "grades": "Grades",
+      "schedule": "Schedule"
+    },
+    "states": {
+      "loading": "Loading notifications...",
+      "empty": "No notifications yet",
+      "noUnread": "No unread notifications",
+      "emptySubtext": "When you receive notifications, they'll appear here",
+      "error": "Failed to load notifications"
+    }
   },
   "announcements": {
     "title": "Announcements",

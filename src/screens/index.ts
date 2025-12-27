@@ -33,3 +33,6 @@ export { AssignmentDetailScreen } from "./parent";
 
 // AI screens
 export { AITutorScreen } from "./ai";
+
+// Teacher screens
+export { OnboardingTeacherScreen } from "./teacher";

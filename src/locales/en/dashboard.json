@@ -1052,6 +1052,114 @@
         "viewAll": "View Analytics",
         "retry": "Retry"
       }
+    },
+    "atRiskStudents": {
+      "title": "At-Risk Students",
+      "subtitle": "Students needing attention",
+      "metrics": {
+        "attendance": "Attend",
+        "assignments": "Tasks",
+        "score": "Score"
+      },
+      "followUp": "Follow-up:",
+      "states": {
+        "loading": "Loading...",
+        "empty": "No at-risk students",
+        "error": "Failed to load"
+      },
+      "actions": {
+        "viewAll": "View All Students",
+        "retry": "Retry"
+      }
+    },
+    "gradingStats": {
+      "title": "Grading Statistics",
+      "subtitle": "Overview of grading progress",
+      "assignments": "Assignments",
+      "pending": "Pending",
+      "graded": "Graded",
+      "avgScore": "Avg Score",
+      "distribution": "Grade Distribution",
+      "states": {
+        "loading": "Loading stats...",
+        "error": "Failed to load stats",
+        "empty": "No grading data"
+      }
+    },
+    "gradingRecent": {
+      "title": "Recent Grades",
+      "subtitle": "Recently graded submissions",
+      "viewAll": "View All Grades",
+      "states": {
+        "loading": "Loading...",
+        "empty": "No recent grades",
+        "emptySubtitle": "Graded submissions will appear here",
+        "error": "Failed to load"
+      },
+      "timeAgo": {
+        "minutes": "{{count}}m ago",
+        "hours": "{{count}}h ago",
+        "days": "{{count}}d ago"
+      }
+    },
+    "rubricTemplates": {
+      "title": "Rubric Templates",
+      "subtitle": "Grading rubrics for assignments",
+      "criteria": "criteria",
+      "points": "pts",
+      "custom": "Custom",
+      "createCustom": "Create Custom Rubric",
+      "states": {
+        "loading": "Loading templates...",
+        "empty": "No rubric templates",
+        "error": "Failed to load templates"
+      }
+    },
+    "classPerformance": {
+      "title": "Class Performance",
+      "subtitle": "Student performance by class",
+      "labels": {
+        "avgScore": "Avg Score",
+        "topSubject": "Top",
+        "classAvg": "Class Avg",
+        "rank": "Rank",
+        "grade": "Grade",
+        "score": "Score",
+        "trend": "Trend",
+        "allClasses": "All Classes",
+        "selectClass": "Select Class",
+        "students": "Students",
+        "period": "Period"
+      },
+      "states": {
+        "loading": "Loading performance...",
+        "empty": "No performance data yet",
+        "error": "Failed to load performance"
+      },
+      "actions": {
+        "viewAll": "View All Students",
+        "retry": "Retry"
+      }
+    },
+    "topPerformers": {
+      "title": "Top Performers",
+      "subtitle": "Best performing students",
+      "labels": {
+        "allClasses": "All Classes",
+        "selectClass": "Select Class",
+        "rank": "Rank",
+        "score": "Score",
+        "subject": "Best Subject"
+      },
+      "states": {
+        "loading": "Loading top performers...",
+        "empty": "No performers data yet",
+        "error": "Failed to load data"
+      },
+      "actions": {
+        "viewAll": "View All Rankings",
+        "retry": "Retry"
+      }
     }
   }
 }

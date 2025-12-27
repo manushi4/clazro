@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useConfigStore } from "@/stores/configStore";
 import {
@@ -13,16 +13,20 @@ import {
 } from "@/services/configService";
 import { Role, DEFAULT_THEME, DEFAULT_BRANDING } from "@/types";
 
-const DEMO_CUSTOMER_ID = process.env.NEXT_PUBLIC_DEMO_CUSTOMER_ID || "";
+// Default customer ID as fallback
+const DEFAULT_CUSTOMER_ID = process.env.NEXT_PUBLIC_DEMO_CUSTOMER_ID || "";
 
 export function useSupabaseConfig() {
   const queryClient = useQueryClient();
   const [isInitialized, setIsInitialized] = useState(false);
+  const previousCustomerIdRef = useRef<string | null>(null);
 
   const {
+    customerId: storeCustomerId,
     setCustomerId,
     setTabs,
     setScreenLayout,
+    setLayoutSettings,
     setTheme,
     setBranding,
     markSaved,
@@ -33,18 +37,31 @@ export function useSupabaseConfig() {
     branding,
   } = useConfigStore();
 
+  // Use store customerId or fallback to default
+  const customerId = storeCustomerId || DEFAULT_CUSTOMER_ID;
+
   // Load config from Supabase
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["config", DEMO_CUSTOMER_ID],
-    queryFn: () => loadFullConfig(DEMO_CUSTOMER_ID),
-    enabled: !!DEMO_CUSTOMER_ID,
+    queryKey: ["config", customerId],
+    queryFn: () => loadFullConfig(customerId),
+    enabled: !!customerId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Reset initialization when customer changes
+  useEffect(() => {
+    if (previousCustomerIdRef.current && previousCustomerIdRef.current !== customerId) {
+      setIsInitialized(false);
+      // Invalidate queries for the new customer
+      queryClient.invalidateQueries({ queryKey: ["config", customerId] });
+    }
+    previousCustomerIdRef.current = customerId;
+  }, [customerId, queryClient]);
 
   // Initialize store from Supabase data
   useEffect(() => {
     if (data && !isInitialized) {
-      setCustomerId(DEMO_CUSTOMER_ID);
+      setCustomerId(customerId);
 
       // Set tabs for all roles
       if (data.tabs) {
@@ -61,6 +78,10 @@ export function useSupabaseConfig() {
           Object.entries(data.screenLayouts[role] || {}).forEach(([screenId, layout]) => {
             if (layout.widgets && layout.widgets.length > 0) {
               setScreenLayout(role, screenId, layout.widgets);
+            }
+            // Also set layout settings if present
+            if (layout.layoutSettings) {
+              setLayoutSettings(role, screenId, layout.layoutSettings);
             }
           });
         });
@@ -84,49 +105,51 @@ export function useSupabaseConfig() {
   // Save tabs mutation
   const saveTabsMutation = useMutation({
     mutationFn: async (role: Role) => {
-      await saveNavigationTabs(DEMO_CUSTOMER_ID, role, tabs[role]);
-      await triggerConfigChangeEvent(DEMO_CUSTOMER_ID, "navigation_updated");
+      await saveNavigationTabs(customerId, role, tabs[role]);
+      await triggerConfigChangeEvent(customerId, "navigation_updated");
     },
     onSuccess: () => {
       markSaved();
-      queryClient.invalidateQueries({ queryKey: ["config", DEMO_CUSTOMER_ID] });
+      queryClient.invalidateQueries({ queryKey: ["config", customerId] });
     },
   });
 
   // Save screen layout mutation
   const saveScreenMutation = useMutation({
     mutationFn: async ({ role, screenId }: { role: Role; screenId: string }) => {
-      const widgets = screenLayouts[role][screenId]?.widgets || [];
-      await saveScreenLayout(DEMO_CUSTOMER_ID, role, screenId, widgets);
-      await triggerConfigChangeEvent(DEMO_CUSTOMER_ID, "layout_updated");
+      const layout = screenLayouts[role][screenId];
+      const widgets = layout?.widgets || [];
+      const layoutSettings = layout?.layoutSettings;
+      await saveScreenLayout(customerId, role, screenId, widgets, layoutSettings);
+      await triggerConfigChangeEvent(customerId, "layout_updated");
     },
     onSuccess: () => {
       markSaved();
-      queryClient.invalidateQueries({ queryKey: ["config", DEMO_CUSTOMER_ID] });
+      queryClient.invalidateQueries({ queryKey: ["config", customerId] });
     },
   });
 
   // Save theme mutation
   const saveThemeMutation = useMutation({
     mutationFn: async () => {
-      await saveTheme(DEMO_CUSTOMER_ID, theme);
-      await triggerConfigChangeEvent(DEMO_CUSTOMER_ID, "theme_updated");
+      await saveTheme(customerId, theme);
+      await triggerConfigChangeEvent(customerId, "theme_updated");
     },
     onSuccess: () => {
       markSaved();
-      queryClient.invalidateQueries({ queryKey: ["config", DEMO_CUSTOMER_ID] });
+      queryClient.invalidateQueries({ queryKey: ["config", customerId] });
     },
   });
 
   // Save branding mutation
   const saveBrandingMutation = useMutation({
     mutationFn: async () => {
-      await saveBranding(DEMO_CUSTOMER_ID, branding);
-      await triggerConfigChangeEvent(DEMO_CUSTOMER_ID, "branding_updated");
+      await saveBranding(customerId, branding);
+      await triggerConfigChangeEvent(customerId, "branding_updated");
     },
     onSuccess: () => {
       markSaved();
-      queryClient.invalidateQueries({ queryKey: ["config", DEMO_CUSTOMER_ID] });
+      queryClient.invalidateQueries({ queryKey: ["config", customerId] });
     },
   });
 
@@ -135,7 +158,7 @@ export function useSupabaseConfig() {
     error,
     isInitialized,
     refetch,
-    customerId: DEMO_CUSTOMER_ID,
+    customerId,
     saveTabs: (role: Role) => saveTabsMutation.mutateAsync(role),
     saveScreen: (role: Role, screenId: string) => saveScreenMutation.mutateAsync({ role, screenId }),
     saveTheme: () => saveThemeMutation.mutateAsync(),

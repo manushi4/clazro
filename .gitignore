@@ -16,5 +16,7 @@ android/build/
 # IDE
 .vscode/
 .kiro/
-.claude/
 .mcp.json
+
+# Claude settings (keep local settings private)
+.claude/settings.local.json

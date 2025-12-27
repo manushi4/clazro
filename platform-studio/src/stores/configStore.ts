@@ -12,10 +12,36 @@ import {
   DEFAULT_NOTIFICATION_SETTINGS,
 } from "@/types";
 
+// Customer type for multi-tenant support
+export type Customer = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+};
+
+// Layout settings for controlling widget appearance
+export type LayoutSettings = {
+  gap: number; // Space between widgets (px)
+  containerStyle: "card" | "flat" | "seamless"; // card = separate boxes, flat = connected look, seamless = continuous flow
+  showShadow: boolean;
+  borderRadius: number;
+  padding: number;
+};
+
+export const DEFAULT_LAYOUT_SETTINGS: LayoutSettings = {
+  gap: 12,
+  containerStyle: "card",
+  showShadow: true,
+  borderRadius: 12,
+  padding: 16,
+};
+
 // Screen layout type
 export type ScreenLayout = {
   screen_id: string;
   widgets: ScreenWidgetConfig[];
+  layoutSettings?: LayoutSettings;
 };
 
 // Complete config state
@@ -23,6 +49,9 @@ export type ConfigState = {
   // Current selection
   customerId: string | null;
   selectedRole: Role;
+
+  // Available customers for multi-tenant support
+  customers: Customer[];
 
   // Navigation (per role)
   tabs: Record<Role, TabConfig[]>;
@@ -46,6 +75,8 @@ export type ConfigState = {
   // Actions
   setCustomerId: (id: string) => void;
   setSelectedRole: (role: Role) => void;
+  setCustomers: (customers: Customer[]) => void;
+  addCustomer: (customer: Customer) => void;
 
   // Tab actions
   setTabs: (role: Role, tabs: TabConfig[]) => void;
@@ -60,6 +91,7 @@ export type ConfigState = {
   updateWidget: (role: Role, screenId: string, widgetId: string, updates: Partial<ScreenWidgetConfig>) => void;
   deleteWidget: (role: Role, screenId: string, widgetId: string) => void;
   reorderWidgets: (role: Role, screenId: string, fromIndex: number, toIndex: number) => void;
+  setLayoutSettings: (role: Role, screenId: string, settings: Partial<LayoutSettings>) => void;
 
   // Theme actions
   setTheme: (theme: Partial<ThemeConfig>) => void;
@@ -87,10 +119,10 @@ const DEFAULT_STUDENT_TABS: TabConfig[] = [
 
 const DEFAULT_TEACHER_TABS: TabConfig[] = [
   { tab_id: "home", customer_id: "", role: "teacher", label: "Home", icon: "home", order_index: 1, enabled: true, root_screen_id: "teacher-home" },
-  { tab_id: "classes", customer_id: "", role: "teacher", label: "Classes", icon: "school", order_index: 2, enabled: true, root_screen_id: "classes-screen" },
-  { tab_id: "students", customer_id: "", role: "teacher", label: "Students", icon: "people", order_index: 3, enabled: true, root_screen_id: "students-screen" },
-  { tab_id: "doubts", customer_id: "", role: "teacher", label: "Doubts", icon: "help", order_index: 4, enabled: true, root_screen_id: "teacher-doubts" },
-  { tab_id: "profile", customer_id: "", role: "teacher", label: "Profile", icon: "person", order_index: 5, enabled: true, root_screen_id: "profile-home" },
+  { tab_id: "teach", customer_id: "", role: "teacher", label: "Teach", icon: "school", order_index: 2, enabled: true, root_screen_id: "class-hub" },
+  { tab_id: "assess", customer_id: "", role: "teacher", label: "Assess", icon: "clipboard-check", order_index: 3, enabled: true, root_screen_id: "grading-hub" },
+  { tab_id: "connect", customer_id: "", role: "teacher", label: "Connect", icon: "message-text", order_index: 4, enabled: true, root_screen_id: "communication-hub" },
+  { tab_id: "profile", customer_id: "", role: "teacher", label: "Profile", icon: "account", order_index: 5, enabled: true, root_screen_id: "profile-home" },
 ];
 
 const DEFAULT_PARENT_TABS: TabConfig[] = [
@@ -112,16 +144,67 @@ const DEFAULT_STUDENT_HOME_WIDGETS: ScreenWidgetConfig[] = [
   { widget_id: "schedule.today", position: 2, size: "compact", enabled: true },
   { widget_id: "actions.quick", position: 3, size: "standard", enabled: true },
   { widget_id: "assignments.pending", position: 4, size: "compact", enabled: true },
-  { widget_id: "doubts.inbox", position: 5, size: "compact", enabled: true },
-  { widget_id: "progress.snapshot", position: 6, size: "standard", enabled: true },
+  { widget_id: "analytics.class-performance", position: 5, size: "standard", enabled: true, config: { maxItems: 6, showRank: true, showTrend: true, showClassAverage: true } },
+  { widget_id: "doubts.inbox", position: 6, size: "compact", enabled: true },
+  { widget_id: "progress.snapshot", position: 7, size: "standard", enabled: true },
 ];
 
+// Tab 1: HOME - Daily overview, quick access, AI insights
 const DEFAULT_TEACHER_HOME_WIDGETS: ScreenWidgetConfig[] = [
-  { widget_id: "hero.greeting", position: 1, size: "standard", enabled: true },
-  { widget_id: "schedule.today", position: 2, size: "standard", enabled: true },
-  { widget_id: "analytics.class-performance", position: 3, size: "expanded", enabled: true },
-  { widget_id: "doubts.to-answer", position: 4, size: "standard", enabled: true },
-  { widget_id: "assignments.to-grade", position: 5, size: "compact", enabled: true },
+  { widget_id: "hero.greeting", position: 1, size: "compact", enabled: true },
+  { widget_id: "teacher.stats-grid", position: 2, size: "standard", enabled: true },
+  { widget_id: "schedule.today", position: 3, size: "standard", enabled: true },
+  { widget_id: "schedule.upcoming-class", position: 4, size: "compact", enabled: true },
+  { widget_id: "teacher.pending-grading", position: 5, size: "standard", enabled: true },
+  { widget_id: "teacher.at-risk-students", position: 6, size: "standard", enabled: true },
+  { widget_id: "teacher.ai-insights", position: 7, size: "expanded", enabled: true },
+  { widget_id: "teacher.quick-actions", position: 8, size: "compact", enabled: true },
+];
+
+// Tab 2: TEACH - Classes, attendance, student management
+const DEFAULT_TEACHER_CLASS_HUB_WIDGETS: ScreenWidgetConfig[] = [
+  { widget_id: "teacher.classOverview", position: 1, size: "expanded", enabled: true },
+  { widget_id: "class.cards", position: 2, size: "expanded", enabled: true },
+  { widget_id: "teacher.attendanceHero", position: 3, size: "standard", enabled: true },
+  { widget_id: "attendance.quick-mark", position: 4, size: "standard", enabled: true },
+  { widget_id: "attendance.today-summary", position: 5, size: "compact", enabled: true },
+  { widget_id: "attendance.trends", position: 6, size: "compact", enabled: true },
+  { widget_id: "attendance.alerts", position: 7, size: "standard", enabled: true },
+  { widget_id: "class.recentActivity", position: 8, size: "standard", enabled: true },
+];
+
+// Tab 3: ASSESS - Grading, assignments, student performance
+const DEFAULT_TEACHER_GRADING_HUB_WIDGETS: ScreenWidgetConfig[] = [
+  { widget_id: "teacher.grading-stats", position: 1, size: "standard", enabled: true },
+  { widget_id: "teacher.submissions-list", position: 2, size: "expanded", enabled: true },
+  { widget_id: "teacher.pending-grading", position: 3, size: "standard", enabled: true },
+  { widget_id: "grading.recent", position: 4, size: "standard", enabled: true },
+  { widget_id: "teacher.rubric-templates", position: 5, size: "standard", enabled: true },
+  { widget_id: "teacher.create-assignment", position: 6, size: "compact", enabled: true },
+  { widget_id: "teacher.grade-submission", position: 7, size: "standard", enabled: true },
+  { widget_id: "analytics.class-performance", position: 8, size: "expanded", enabled: true },
+];
+
+// Tab 4: CONNECT - Messages, doubts, announcements, parent contact
+const DEFAULT_TEACHER_COMMUNICATION_HUB_WIDGETS: ScreenWidgetConfig[] = [
+  { widget_id: "teacher.messages-inbox", position: 1, size: "expanded", enabled: true },
+  { widget_id: "teacher.doubts-inbox", position: 2, size: "standard", enabled: true },
+  { widget_id: "teacher.announcements", position: 3, size: "standard", enabled: true },
+  { widget_id: "teacher.parent-contacts", position: 4, size: "standard", enabled: true },
+  { widget_id: "parent.notifications-preview", position: 5, size: "standard", enabled: true },
+  { widget_id: "doubts.to-answer", position: 6, size: "standard", enabled: true },
+];
+
+// Tab 5: PROFILE - Calendar, leave, settings, personal management
+const DEFAULT_TEACHER_PROFILE_WIDGETS: ScreenWidgetConfig[] = [
+  { widget_id: "profile.card", position: 1, size: "standard", enabled: true },
+  { widget_id: "teacher.calendar", position: 2, size: "expanded", enabled: true },
+  { widget_id: "teacher.calendar-events", position: 3, size: "standard", enabled: true },
+  { widget_id: "teacher.leave-request", position: 4, size: "standard", enabled: true },
+  { widget_id: "teacher.substitute-manager", position: 5, size: "standard", enabled: true },
+  { widget_id: "profile.stats", position: 6, size: "compact", enabled: true },
+  { widget_id: "profile.achievements", position: 7, size: "compact", enabled: true },
+  { widget_id: "settings.account", position: 8, size: "compact", enabled: true },
 ];
 
 const DEFAULT_PARENT_HOME_WIDGETS: ScreenWidgetConfig[] = [
@@ -154,6 +237,7 @@ export const useConfigStore = create<ConfigState>()(
       // Initial state
       customerId: null,
       selectedRole: "student",
+      customers: [],
 
       tabs: {
         student: DEFAULT_STUDENT_TABS,
@@ -171,11 +255,63 @@ export const useConfigStore = create<ConfigState>()(
           "profile-home": { screen_id: "profile-home", widgets: [] },
         },
         teacher: {
+          // Tab 1: Home
           "teacher-home": { screen_id: "teacher-home", widgets: DEFAULT_TEACHER_HOME_WIDGETS },
-          "classes-screen": { screen_id: "classes-screen", widgets: [] },
-          "students-screen": { screen_id: "students-screen", widgets: [] },
-          "teacher-doubts": { screen_id: "teacher-doubts", widgets: [] },
-          "profile-home": { screen_id: "profile-home", widgets: [] },
+          // Tab 2: Teach (class-hub)
+          "class-hub": { screen_id: "class-hub", widgets: DEFAULT_TEACHER_CLASS_HUB_WIDGETS },
+          "attendance-home": { screen_id: "attendance-home", widgets: [
+            { widget_id: "media.banner", position: 1, size: "standard", enabled: true },
+            { widget_id: "teacher.attendanceHero", position: 2, size: "expanded", enabled: true },
+            { widget_id: "attendance.quick-mark", position: 3, size: "standard", enabled: true },
+            { widget_id: "teacher.attendanceQuickActions", position: 4, size: "compact", enabled: true },
+            { widget_id: "teacher.attendanceRecent", position: 5, size: "standard", enabled: true },
+            { widget_id: "attendance.today-summary", position: 6, size: "compact", enabled: true },
+            { widget_id: "attendance.trends", position: 7, size: "compact", enabled: true },
+            { widget_id: "attendance.alerts", position: 8, size: "standard", enabled: true },
+          ] },
+          "teacher-class-detail": { screen_id: "teacher-class-detail", widgets: [
+            { widget_id: "class.stats", position: 1, size: "standard", enabled: true },
+            { widget_id: "class.activity", position: 2, size: "standard", enabled: true },
+            { widget_id: "class.roster", position: 3, size: "expanded", enabled: true },
+          ] },
+          "class-roster": { screen_id: "class-roster", widgets: [
+            { widget_id: "class.roster", position: 1, size: "expanded", enabled: true },
+          ] },
+          "students-screen": { screen_id: "students-screen", widgets: [
+            { widget_id: "teacher.student-quick-actions", position: 1, size: "standard", enabled: true },
+            { widget_id: "teacher.student-stats", position: 2, size: "standard", enabled: true },
+            { widget_id: "analytics.class-performance", position: 3, size: "standard", enabled: true },
+            { widget_id: "analytics.top-performers", position: 4, size: "standard", enabled: true },
+            { widget_id: "teacher.at-risk-students", position: 5, size: "standard", enabled: true },
+            { widget_id: "teacher.class-students", position: 6, size: "expanded", enabled: true },
+          ] },
+          // Tab 3: Assess (grading-hub)
+          "grading-hub": { screen_id: "grading-hub", widgets: DEFAULT_TEACHER_GRADING_HUB_WIDGETS },
+          // Tab 4: Connect (communication-hub)
+          "communication-hub": { screen_id: "communication-hub", widgets: DEFAULT_TEACHER_COMMUNICATION_HUB_WIDGETS },
+          "teacher-doubts": { screen_id: "teacher-doubts", widgets: [
+            { widget_id: "teacher.doubts-inbox", position: 1, size: "expanded", enabled: true },
+            { widget_id: "doubts.to-answer", position: 2, size: "standard", enabled: true },
+          ] },
+          "messages": { screen_id: "messages", widgets: [
+            { widget_id: "teacher.messages-inbox", position: 1, size: "expanded", enabled: true },
+            { widget_id: "teacher.quick-actions", position: 2, size: "compact", enabled: true },
+          ] },
+          "notifications": { screen_id: "notifications", widgets: [
+            { widget_id: "parent.notifications-preview", position: 1, size: "expanded", enabled: true },
+          ] },
+          "announcements": { screen_id: "announcements", widgets: [
+            { widget_id: "teacher.announcements", position: 1, size: "expanded", enabled: true },
+          ] },
+          // Tab 5: Profile
+          "profile-home": { screen_id: "profile-home", widgets: DEFAULT_TEACHER_PROFILE_WIDGETS },
+          "settings-home": { screen_id: "settings-home", widgets: [
+            { widget_id: "settings.account", position: 1, size: "standard", enabled: true },
+            { widget_id: "settings.notifications", position: 2, size: "standard", enabled: true },
+            { widget_id: "settings.appearance", position: 3, size: "standard", enabled: true },
+            { widget_id: "settings.about", position: 4, size: "standard", enabled: true },
+            { widget_id: "settings.logout", position: 5, size: "compact", enabled: true },
+          ] },
         },
         parent: {
           "parent-home": { screen_id: "parent-home", widgets: DEFAULT_PARENT_HOME_WIDGETS },
@@ -325,6 +461,11 @@ export const useConfigStore = create<ConfigState>()(
       // Actions
       setCustomerId: (id) => set({ customerId: id }),
       setSelectedRole: (role) => set({ selectedRole: role }),
+      setCustomers: (customers) => set({ customers }),
+      addCustomer: (customer) =>
+        set((state) => ({
+          customers: [...state.customers, customer],
+        })),
 
       // Tab actions
       setTabs: (role, tabs) =>
@@ -459,6 +600,31 @@ export const useConfigStore = create<ConfigState>()(
           };
         }),
 
+      setLayoutSettings: (role, screenId, settings) =>
+        set((state) => {
+          const currentLayout = state.screenLayouts[role][screenId] || {
+            screen_id: screenId,
+            widgets: [],
+          };
+          return {
+            screenLayouts: {
+              ...state.screenLayouts,
+              [role]: {
+                ...state.screenLayouts[role],
+                [screenId]: {
+                  ...currentLayout,
+                  layoutSettings: {
+                    ...DEFAULT_LAYOUT_SETTINGS,
+                    ...currentLayout.layoutSettings,
+                    ...settings,
+                  },
+                },
+              },
+            },
+            isDirty: true,
+          };
+        }),
+
       // Theme actions
       setTheme: (theme) =>
         set((state) => ({
@@ -507,6 +673,7 @@ export const useConfigStore = create<ConfigState>()(
       name: "platform-studio-config",
       partialize: (state) => ({
         customerId: state.customerId,
+        customers: state.customers,
         tabs: state.tabs,
         screenLayouts: state.screenLayouts,
         theme: state.theme,
@@ -532,3 +699,8 @@ export const useTheme = () => useConfigStore((state) => state.theme);
 export const useBranding = () => useConfigStore((state) => state.branding);
 export const useNotificationSettings = () => useConfigStore((state) => state.notificationSettings);
 export const useIsDirty = () => useConfigStore((state) => state.isDirty);
+
+export const useCurrentLayoutSettings = (screenId: string) => {
+  const { selectedRole, screenLayouts } = useConfigStore();
+  return screenLayouts[selectedRole][screenId]?.layoutSettings || DEFAULT_LAYOUT_SETTINGS;
+};

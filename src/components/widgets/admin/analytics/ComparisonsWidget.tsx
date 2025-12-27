@@ -105,7 +105,7 @@ export const ComparisonsWidget: React.FC<WidgetProps> = ({
       message: `${WIDGET_ID}_view_details`,
       level: 'info',
     });
-    onNavigate?.('analytics-dashboard');
+    onNavigate?.('comparisons-detail');
   };
 
   const handleMetricPress = (metric: ComparisonMetric) => {
@@ -116,15 +116,16 @@ export const ComparisonsWidget: React.FC<WidgetProps> = ({
       level: 'info',
       data: { metric: metric.id },
     });
-    
+
+    // Each metric navigates to its own dedicated analytics screen
     const screenMap: Record<string, string> = {
-      users: 'users-management',
-      revenue: 'finance-dashboard',
-      engagement: 'analytics-dashboard',
-      content: 'content-management',
-      sessions: 'analytics-dashboard',
+      users: 'user-analytics',        // User Analytics Screen
+      revenue: 'revenue-analytics',   // Revenue Analytics Screen
+      engagement: 'engagement-detail', // Engagement Analytics Screen
+      content: 'content-analytics',   // Content Analytics Screen
+      sessions: 'sessions-analytics', // Sessions Analytics Screen
     };
-    onNavigate?.(screenMap[metric.id] || 'analytics-dashboard');
+    onNavigate?.(screenMap[metric.id] || 'comparisons-detail');
   };
 
   // Get color for metric

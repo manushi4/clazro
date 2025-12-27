@@ -384,7 +384,7 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
           </AppText>
           <TouchableOpacity
             style={styles.viewAllButton}
-            onPress={() => onNavigate?.('notifications')}
+            onPress={() => onNavigate?.('notifications-list')}
           >
             <AppText style={[styles.viewAllText, { color: colors.primary }]}>
               {t('widgets.notificationsPreview.actions.viewAll', { defaultValue: 'View All' })}

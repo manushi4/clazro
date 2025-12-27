@@ -1,8 +1,8 @@
 import { DynamicScreen } from "./DynamicScreen";
 import { SettingsScreen, LanguageSelectionScreen } from "../screens/settings";
-import { EditProfileScreen, HelpFeedbackScreen } from "../screens/profile";
+import { ProfileScreen, EditProfileScreen, HelpFeedbackScreen } from "../screens/profile";
 import { GlobalAnalyticsScreen, SubjectAnalyticsScreen, GamifiedHubScreen, SubjectProgressScreen, SubjectPerformanceScreen, SubjectDetailScreen, SubjectReportScreen } from "../screens/progress";
-import { NotificationDetailScreen } from "../screens/notifications";
+import { NotificationDetailScreen, NotificationsListScreen } from "../screens/notifications";
 import { AnnouncementDetailScreen } from "../screens/announcements";
 import { FeeDetailScreen, FeePaymentScreen, PaymentDetailScreen } from "../screens/fees";
 import { ChildStatsScreen, ChildWeakAreaScreen, AssignmentDetailScreen, TeacherDetailScreen, AiInsightDetailScreen, PredictionDetailScreen, ComparisonDetailsScreen } from "../screens/parent";
@@ -11,12 +11,12 @@ import { DoubtDetailScreen, DoubtSubmitScreen } from "../screens/doubts";
 import { ClassDetailScreen, LiveClassScreen } from "../screens/schedule";
 import { TestDetailScreen, TestAttemptScreen, TestResultScreen, TestReviewScreen } from "../screens/tests";
 import { AITutorScreen } from "../screens/ai";
-import { 
-  LoginAdminScreen, 
-  TwoFactorSetupScreen, 
-  PasswordResetScreen, 
-  AdminDashboardScreen, 
-  UserManagementScreen, 
+import {
+  LoginAdminScreen,
+  TwoFactorSetupScreen,
+  PasswordResetScreen,
+  AdminDashboardScreen,
+  UserManagementScreen,
   UserDetailScreen,
   UserImpersonationScreen,
   UserCreateScreen,
@@ -38,6 +38,21 @@ import {
   AdmissionDetailScreen,
   AdmissionCreateScreen,
 } from "../screens/admin";
+import { TrendsDetailScreen, GrowthDetailScreen, EngagementDetailScreen, ComparisonsDetailScreen } from "../screens/admin/analytics";
+import { AtRiskStudentsScreen } from "../screens/teacher/AtRiskStudentsScreen";
+// ClassHubScreen removed - now uses DynamicScreen to read from screen_layouts
+import { ClassDetailScreen as TeacherClassDetailScreen } from "../screens/teacher/ClassDetailScreen";
+import { ClassRosterScreen } from "../screens/teacher/ClassRosterScreen";
+import { AttendanceMarkScreen } from "../screens/teacher/AttendanceMarkScreen";
+import { AttendanceHistoryScreen } from "../screens/teacher/AttendanceHistoryScreen";
+import { AttendanceReportsScreen } from "../screens/teacher/AttendanceReportsScreen";
+import { AttendanceAlertsScreen } from "../screens/teacher/AttendanceAlertsScreen";
+import { GradingHubScreen } from "../screens/teacher/GradingHubScreen";
+import { AssignmentCreateScreen } from "../screens/teacher/AssignmentCreateScreen";
+import { AssignmentDetailTeacherScreen } from "../screens/teacher/AssignmentDetailTeacherScreen";
+import { GradeSubmissionScreen } from "../screens/teacher/GradeSubmissionScreen";
+import { RubricDetailScreen } from "../screens/teacher/RubricDetailScreen";
+import { TeacherAssignmentsScreen } from "../screens/teacher/TeacherAssignmentsScreen";
 
 export type RouteDefinition = {
   screenId: string;
@@ -50,6 +65,64 @@ const registry: Record<string, RouteDefinition> = {
   "student-home": { screenId: "student-home", component: DynamicScreen },
   "parent-home": { screenId: "parent-home", component: DynamicScreen },
   "teacher-home": { screenId: "teacher-home", component: DynamicScreen },
+  "communication-hub": { screenId: "communication-hub", component: DynamicScreen },
+
+  // Teacher At-Risk Students (Fixed screen - view all at-risk students)
+  "at-risk-students": { screenId: "at-risk-students", component: AtRiskStudentsScreen },
+  "AtRiskStudents": { screenId: "AtRiskStudents", component: AtRiskStudentsScreen },
+
+  // Teacher Class Hub (Dynamic screen - reads from screen_layouts)
+  "class-hub": { screenId: "class-hub", component: DynamicScreen },
+  "ClassHub": { screenId: "ClassHub", component: DynamicScreen },
+
+  // Teacher Class Detail (Fixed screen - Sprint 3 Class Management)
+  "teacher-class-detail": { screenId: "teacher-class-detail", component: TeacherClassDetailScreen },
+  "TeacherClassDetail": { screenId: "TeacherClassDetail", component: TeacherClassDetailScreen },
+
+  // Teacher Class Roster (Fixed screen - Sprint 3 Class Management)
+  "class-roster": { screenId: "class-roster", component: ClassRosterScreen },
+  "ClassRoster": { screenId: "ClassRoster", component: ClassRosterScreen },
+
+  // Teacher Attendance Home (Dynamic screen - Attendance tab)
+  "attendance-home": { screenId: "attendance-home", component: DynamicScreen },
+  "AttendanceHome": { screenId: "AttendanceHome", component: DynamicScreen },
+
+  // Teacher Attendance Mark (Fixed screen - Sprint 4 Attendance)
+  "attendance-mark": { screenId: "attendance-mark", component: AttendanceMarkScreen },
+  "AttendanceMark": { screenId: "AttendanceMark", component: AttendanceMarkScreen },
+
+  // Teacher Attendance Reports (Fixed screen - Analytics)
+  "attendance-reports": { screenId: "attendance-reports", component: AttendanceReportsScreen },
+  "AttendanceReports": { screenId: "AttendanceReports", component: AttendanceReportsScreen },
+
+  // Teacher Attendance History (Fixed screen)
+  "attendance-history": { screenId: "attendance-history", component: AttendanceHistoryScreen },
+  "AttendanceHistory": { screenId: "AttendanceHistory", component: AttendanceHistoryScreen },
+
+  // Teacher Attendance Alerts (Fixed screen - Low attendance students)
+  "attendance-alerts": { screenId: "attendance-alerts", component: AttendanceAlertsScreen },
+  "AttendanceAlerts": { screenId: "AttendanceAlerts", component: AttendanceAlertsScreen },
+
+  // Teacher Grading Hub (Dynamic screen)
+  "grading-hub": { screenId: "grading-hub", component: GradingHubScreen },
+  "GradingHub": { screenId: "GradingHub", component: GradingHubScreen },
+
+  // Teacher Assignment screens (Fixed)
+  "assignment-create": { screenId: "assignment-create", component: AssignmentCreateScreen },
+  "AssignmentCreate": { screenId: "AssignmentCreate", component: AssignmentCreateScreen },
+  "assignment-detail-teacher": { screenId: "assignment-detail-teacher", component: AssignmentDetailTeacherScreen },
+  "AssignmentDetailTeacher": { screenId: "AssignmentDetailTeacher", component: AssignmentDetailTeacherScreen },
+  "grade-submission": { screenId: "grade-submission", component: GradeSubmissionScreen },
+  "GradeSubmission": { screenId: "GradeSubmission", component: GradeSubmissionScreen },
+
+  // Teacher Rubric screens (Fixed)
+  "rubric-detail": { screenId: "rubric-detail", component: RubricDetailScreen },
+  "RubricDetail": { screenId: "RubricDetail", component: RubricDetailScreen },
+
+  // Teacher Assignments screen (Fixed)
+  "teacher-assignments": { screenId: "teacher-assignments", component: TeacherAssignmentsScreen },
+  "TeacherAssignments": { screenId: "TeacherAssignments", component: TeacherAssignmentsScreen },
+
   "study.library": { screenId: "study.library", component: DynamicScreen },
   "study-hub": { screenId: "study-hub", component: DynamicScreen },
   "ask.doubts": { screenId: "ask.doubts", component: DynamicScreen },
@@ -60,9 +133,10 @@ const registry: Record<string, RouteDefinition> = {
   "progress-home": { screenId: "progress-home", component: DynamicScreen },
   "admin.panel": { screenId: "admin.panel", component: DynamicScreen },
   
-  // Profile screen (widget-based)
-  "profile.home": { screenId: "profile.home", component: DynamicScreen },
-  "profile-home": { screenId: "profile-home", component: DynamicScreen },
+  // Profile screen (fixed screen)
+  "profile.home": { screenId: "profile.home", component: ProfileScreen },
+  "profile-home": { screenId: "profile-home", component: ProfileScreen },
+  "Profile": { screenId: "Profile", component: ProfileScreen },
   
   // Parent screens (widget-based)
   "child-progress-screen": { screenId: "child-progress-screen", component: DynamicScreen },
@@ -162,6 +236,10 @@ const registry: Record<string, RouteDefinition> = {
   "payment-history": { screenId: "payment-history", component: DynamicScreen },
   "PaymentHistory": { screenId: "PaymentHistory", component: DynamicScreen },
   
+  // Notifications list (Fixed screen - full notifications list with filters)
+  "notifications-list": { screenId: "notifications-list", component: NotificationsListScreen },
+  "NotificationsList": { screenId: "NotificationsList", component: NotificationsListScreen },
+
   // Notification detail (Fixed screen)
   "notification-detail": { screenId: "notification-detail", component: NotificationDetailScreen },
   "NotificationDetail": { screenId: "NotificationDetail", component: NotificationDetailScreen },
@@ -302,6 +380,16 @@ const registry: Record<string, RouteDefinition> = {
   // Admin Analytics Dashboard (Dynamic screen - widget-based)
   "admin-analytics": { screenId: "admin-analytics", component: DynamicScreen },
   "AdminAnalytics": { screenId: "AdminAnalytics", component: DynamicScreen },
+
+  // Admin Analytics Detail Screens (Fixed - Sprint 7)
+  "trends-detail": { screenId: "trends-detail", component: TrendsDetailScreen },
+  "TrendsDetail": { screenId: "TrendsDetail", component: TrendsDetailScreen },
+  "growth-detail": { screenId: "growth-detail", component: GrowthDetailScreen },
+  "GrowthDetail": { screenId: "GrowthDetail", component: GrowthDetailScreen },
+  "engagement-detail": { screenId: "engagement-detail", component: EngagementDetailScreen },
+  "EngagementDetail": { screenId: "EngagementDetail", component: EngagementDetailScreen },
+  "comparisons-detail": { screenId: "comparisons-detail", component: ComparisonsDetailScreen },
+  "ComparisonsDetail": { screenId: "ComparisonsDetail", component: ComparisonsDetailScreen },
 
   // Admin Content Management (Dynamic screen - widget-based)
   "content-management": { screenId: "content-management", component: ContentManagementScreen },

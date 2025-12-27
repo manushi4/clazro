@@ -40,6 +40,8 @@ export { useGrowthMetricsQuery } from './useGrowthMetricsQuery';
 export type { GrowthData, GrowthMetric, GrowthTrendPoint, GrowthPeriod } from './useGrowthMetricsQuery';
 export { useComparisonsQuery } from './useComparisonsQuery';
 export type { ComparisonData, ComparisonMetric, ComparisonPeriod } from './useComparisonsQuery';
+export { useEngagementQuery } from './useEngagementQuery';
+export type { EngagementData, EngagementMetric, EngagementPeriod } from './useEngagementQuery';
 export { useContentStatsQuery } from './useContentStatsQuery';
 export type { ContentStats, ContentTypeStats, ContentStatusStats, ContentType, ContentStatus } from './useContentStatsQuery';
 export { useContentListQuery, CONTENT_TYPE_CONFIG, CONTENT_STATUS_CONFIG, formatViewCount, formatDuration } from './useContentListQuery';
@@ -109,3 +111,12 @@ export type {
   ComparisonData,
   UseAnalyticsDashboardQueryOptions,
 } from './useAnalyticsDashboardQuery';
+
+// Sprint 9: Settings + Audit
+export { useAuditLogsQuery, formatAuditLogMessage, getAuditLogRelativeTime, AUDIT_ACTION_CONFIG, AUDIT_ENTITY_CONFIG } from './useAuditLogsQuery';
+export type {
+  AuditLog,
+  AuditAction,
+  AuditEntityType,
+  UseAuditLogsQueryOptions,
+} from './useAuditLogsQuery';

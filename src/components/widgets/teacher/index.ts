@@ -1,0 +1,10 @@
+export { TeacherHeroWidget } from './TeacherHeroWidget';
+export { TeacherStatsWidget } from './TeacherStatsWidget';
+export { UpcomingClassesWidget } from './UpcomingClassesWidget';
+export { PendingGradingWidget } from './PendingGradingWidget';
+export { ClassRecentActivityWidget } from './ClassRecentActivityWidget';
+export { GradingHubActionsWidget } from './GradingHubActionsWidget';
+export { SubmissionsListWidget } from './SubmissionsListWidget';
+export { GradeSubmissionWidget } from './GradeSubmissionWidget';
+export { CreateAssignmentWidget } from './CreateAssignmentWidget';
+export { GradingStatsWidget } from './GradingStatsWidget';

@@ -47,7 +47,7 @@ export const NotificationsPreviewWidget: React.FC<WidgetProps> = ({
 
   const handleViewAll = () => {
     trackWidgetEvent(WIDGET_ID, "click", { action: "view_all" });
-    onNavigate?.("notifications");
+    onNavigate?.("notifications-list");
   };
 
 

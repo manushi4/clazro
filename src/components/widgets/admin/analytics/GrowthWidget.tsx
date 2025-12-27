@@ -110,7 +110,7 @@ export const GrowthWidget: React.FC<WidgetProps> = ({
       message: `${WIDGET_ID}_view_details`,
       level: 'info',
     });
-    onNavigate?.('analytics-dashboard');
+    onNavigate?.('growth-detail');
   };
 
   const handleMetricPress = (metric: GrowthMetric) => {
@@ -121,15 +121,15 @@ export const GrowthWidget: React.FC<WidgetProps> = ({
       level: 'info',
       data: { metric: metric.id },
     });
-    
-    // Navigate to relevant screen based on metric
+
+    // Each metric navigates to its own dedicated analytics screen
     const screenMap: Record<string, string> = {
-      users: 'users-management',
-      revenue: 'finance-dashboard',
-      engagement: 'analytics-dashboard',
-      content: 'content-management',
+      users: 'user-analytics',        // User Analytics Screen
+      revenue: 'revenue-analytics',   // Revenue Analytics Screen
+      engagement: 'engagement-detail', // Engagement Analytics Screen
+      content: 'content-analytics',   // Content Analytics Screen
     };
-    onNavigate?.(screenMap[metric.id] || 'analytics-dashboard');
+    onNavigate?.(screenMap[metric.id] || 'growth-detail');
   };
 
   // Get color for metric

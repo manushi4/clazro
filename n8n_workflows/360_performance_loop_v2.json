@@ -1,0 +1,354 @@
+{
+  "name": "360 Performance Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-completed",
+        "responseMode": "responseNode",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Test Completed Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "notes": "ENTRY POINT: Receives POST request from app when student completes a test.\n\nExpected payload:\n- test_result_id: UUID of test result\n- student_id, student_name, student_fcm_token\n- parent_fcm_token, teacher_fcm_token\n- test_name, score (0-100), batch_avg\n\nWebhook URL: /webhook/test-completed"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate required fields\nconst required = [\n  'test_result_id',\n  'student_id',\n  'student_name',\n  'student_fcm_token',\n  'parent_fcm_token',\n  'teacher_fcm_token',\n  'test_name',\n  'score'\n];\n\nconst data = $input.first().json;\nconst missing = required.filter(field => !data[field] && data[field] !== 0);\n\nif (missing.length > 0) {\n  throw new Error(`Missing required fields: ${missing.join(', ')}`);\n}\n\n// Validate score is a number between 0-100\nif (typeof data.score !== 'number' || data.score < 0 || data.score > 100) {\n  throw new Error('Score must be a number between 0 and 100');\n}\n\n// Add metadata\nreturn {\n  ...data,\n  processed_at: new Date().toISOString(),\n  notification_id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,\n  batch_avg: data.batch_avg || 0\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "VALIDATION: Checks all required fields exist and are valid.\n\nValidations:\n1. Required fields: test_result_id, student_id, student_name, FCM tokens, test_name, score\n2. Score must be number between 0-100\n\nAdds metadata:\n- processed_at: Timestamp\n- notification_id: Unique ID for tracking\n\nOn error: Routes to 'Respond Validation Error' node"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: 'Validation failed', message: $json.message } }}"
+      },
+      "id": "respond-validation-error",
+      "name": "Respond Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [460, 500],
+      "notes": "ERROR RESPONSE: Returns 400 error when validation fails.\n\nResponse format:\n{\n  success: false,\n  error: 'Validation failed',\n  message: '<specific error>'\n}\n\nTriggered when: Missing required fields or invalid score value"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "automation_logs",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop" },
+            { "fieldName": "event_type", "fieldValue": "test_completed" },
+            { "fieldName": "notification_id", "fieldValue": "={{ $json.notification_id }}" },
+            { "fieldName": "student_id", "fieldValue": "={{ $json.student_id }}" },
+            { "fieldName": "status", "fieldValue": "processing" },
+            { "fieldName": "input_data", "fieldValue": "={{ JSON.stringify($json) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.processed_at }}" }
+          ]
+        }
+      },
+      "id": "log-start",
+      "name": "Log Processing Start",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "onError": "continueRegularOutput",
+      "notes": "AUDIT LOG: Records that processing has started.\n\nTable: automation_logs\nFields logged:\n- workflow_name: '360 Performance Loop'\n- event_type: 'test_completed'\n- notification_id: Unique tracking ID\n- student_id: Who completed the test\n- status: 'processing'\n- input_data: Full payload JSON\n\nError handling: Continues even if logging fails (non-blocking)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare notification payloads for all recipients\nconst data = $input.first().json;\n\nconst notifications = [\n  {\n    recipient_type: 'student',\n    recipient_id: data.student_id,\n    fcm_token: data.student_fcm_token,\n    title: 'Test Result Available',\n    body: `You scored ${data.score}% in ${data.test_name}`,\n    data: {\n      type: 'test_result',\n      test_result_id: data.test_result_id,\n      score: data.score\n    },\n    notification_id: data.notification_id,\n    original_data: data\n  },\n  {\n    recipient_type: 'parent',\n    recipient_id: data.parent_id || 'unknown',\n    fcm_token: data.parent_fcm_token,\n    title: `${data.student_name} - Test Result`,\n    body: `Scored ${data.score}% in ${data.test_name}. Batch avg: ${data.batch_avg}%`,\n    data: {\n      type: 'child_test_result',\n      test_result_id: data.test_result_id,\n      student_id: data.student_id,\n      score: data.score\n    },\n    notification_id: data.notification_id,\n    original_data: data\n  },\n  {\n    recipient_type: 'teacher',\n    recipient_id: data.teacher_id || 'unknown',\n    fcm_token: data.teacher_fcm_token,\n    title: 'Student Test Completed',\n    body: `${data.student_name} scored ${data.score}% in ${data.test_name}`,\n    data: {\n      type: 'student_test_analytics',\n      test_result_id: data.test_result_id,\n      student_id: data.student_id,\n      score: data.score\n    },\n    notification_id: data.notification_id,\n    original_data: data\n  }\n];\n\nreturn notifications;"
+      },
+      "id": "prepare-notifications",
+      "name": "Prepare All Notifications",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "notes": "PREPARE PAYLOADS: Creates 3 notification objects for Student, Parent, Teacher.\n\nFor Student:\n- Title: 'Test Result Available'\n- Body: 'You scored X% in [test_name]'\n- Deep link data: test_result screen\n\nFor Parent:\n- Title: '[student_name] - Test Result'\n- Body: 'Scored X% in [test]. Batch avg: Y%'\n- Includes comparison context\n\nFor Teacher:\n- Title: 'Student Test Completed'\n- Body: '[student] scored X% in [test]'\n- Analytics context\n\nOutput: Array of 3 notification objects"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "split-notifications",
+      "name": "Split Notifications",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "notes": "SPLIT ARRAY: Converts array of 3 notifications into 3 separate items.\n\nInput: Single item with array of 3 notifications\nOutput: 3 separate items (one per recipient)\n\nThis enables parallel processing - each notification is handled independently, so one failure doesn't block others."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-token",
+              "leftValue": "={{ $json.fcm_token }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-token",
+      "name": "Has FCM Token?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1340, 300],
+      "notes": "TOKEN CHECK: Validates FCM token exists before attempting to send.\n\nCondition: fcm_token is not empty\n\nTrue path (has token): Proceeds to send FCM notification\nFalse path (no token): Skips to 'Mark Skipped' node\n\nThis prevents unnecessary API calls and errors when user hasn't registered for push notifications."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"token\": \"{{ $json.fcm_token }}\",\n    \"notification\": {\n      \"title\": \"{{ $json.title }}\",\n      \"body\": \"{{ $json.body }}\"\n    },\n    \"data\": {{ JSON.stringify($json.data) }},\n    \"android\": {\n      \"priority\": \"high\",\n      \"notification\": {\n        \"channel_id\": \"default\",\n        \"click_action\": \"OPEN_APP\"\n      }\n    },\n    \"apns\": {\n      \"payload\": {\n        \"aps\": {\n          \"alert\": {\n            \"title\": \"{{ $json.title }}\",\n            \"body\": \"{{ $json.body }}\"\n          },\n          \"sound\": \"default\",\n          \"badge\": 1\n        }\n      }\n    }\n  }\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-fcm",
+      "name": "Send FCM Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1560, 200],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "SEND PUSH: Calls Firebase Cloud Messaging API to deliver notification.\n\nEndpoint: FCM v1 API (HTTP v1)\nAuth: Google Service Account OAuth2\n\nPayload includes:\n- notification: Title + Body (shown in system tray)\n- data: Custom payload for app handling\n- android: High priority, channel config\n- apns: iOS specific settings\n\nRetry config:\n- Max tries: 3\n- Wait between: 2 seconds\n- Timeout: 10 seconds\n\nOn error: Routes to 'Mark Failed' (doesn't stop workflow)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark as success\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  status: 'sent',\n  sent_at: new Date().toISOString(),\n  fcm_response: $('Send FCM Notification').first().json\n};"
+      },
+      "id": "mark-success",
+      "name": "Mark Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 160],
+      "notes": "SUCCESS TRACKING: Records successful notification delivery.\n\nCaptures:\n- notification_id: For correlation\n- recipient_type: student/parent/teacher\n- recipient_id: User ID\n- status: 'sent'\n- sent_at: Timestamp\n- fcm_response: FCM API response (message_id)\n\nThis data flows to Merge node for aggregation."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark as failed\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  status: 'failed',\n  failed_at: new Date().toISOString(),\n  error: 'FCM request failed after retries'\n};"
+      },
+      "id": "mark-failed",
+      "name": "Mark Failed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 300],
+      "notes": "FAILURE TRACKING: Records failed notification after all retries exhausted.\n\nCaptures:\n- notification_id: For correlation\n- recipient_type: Who we failed to notify\n- recipient_id: User ID\n- status: 'failed'\n- failed_at: Timestamp\n- error: Failure reason\n\nTriggered when: FCM API fails 3 consecutive times\nCommon causes: Invalid token, network issues, FCM outage"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark as skipped - no token\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  status: 'skipped',\n  reason: 'No FCM token available',\n  skipped_at: new Date().toISOString()\n};"
+      },
+      "id": "mark-skipped",
+      "name": "Mark Skipped",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 440],
+      "notes": "SKIP TRACKING: Records when notification was intentionally skipped.\n\nCaptures:\n- notification_id: For correlation\n- recipient_type: Who was skipped\n- recipient_id: User ID\n- status: 'skipped'\n- reason: Why it was skipped\n- skipped_at: Timestamp\n\nTriggered when: User has no FCM token registered\nCommon causes: User denied notifications, new user, logged out"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-results",
+      "name": "Merge All Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2000, 300],
+      "notes": "COLLECT RESULTS: Waits for all 3 notification attempts and combines them.\n\nInputs from:\n1. Mark Success (sent notifications)\n2. Mark Failed (failed notifications)\n3. Mark Skipped (skipped notifications)\n\nMode: Combine All - waits for all branches to complete\n\nOutput: Array of 3 result objects (one per recipient)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate results\nconst results = $input.all().map(item => item.json);\n\nconst summary = {\n  notification_id: results[0]?.notification_id,\n  total: results.length,\n  sent: results.filter(r => r.status === 'sent').length,\n  failed: results.filter(r => r.status === 'failed').length,\n  skipped: results.filter(r => r.status === 'skipped').length,\n  details: results,\n  completed_at: new Date().toISOString()\n};\n\nsummary.all_successful = summary.failed === 0;\n\nreturn summary;"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2220, 300],
+      "notes": "SUMMARIZE: Creates final summary of all notification attempts.\n\nCalculates:\n- total: Always 3 (student + parent + teacher)\n- sent: Count of successful deliveries\n- failed: Count of failures\n- skipped: Count of skipped\n- all_successful: true if failed = 0\n\nOutput structure:\n{\n  notification_id: 'notif_xxx',\n  total: 3,\n  sent: 2,\n  failed: 0,\n  skipped: 1,\n  all_successful: true,\n  details: [...]\n}"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "notification_logs",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "notification_id", "fieldValue": "={{ $json.notification_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop" },
+            { "fieldName": "total_recipients", "fieldValue": "={{ $json.total }}" },
+            { "fieldName": "sent_count", "fieldValue": "={{ $json.sent }}" },
+            { "fieldName": "failed_count", "fieldValue": "={{ $json.failed }}" },
+            { "fieldName": "skipped_count", "fieldValue": "={{ $json.skipped }}" },
+            { "fieldName": "status", "fieldValue": "={{ $json.all_successful ? 'completed' : 'partial' }}" },
+            { "fieldName": "details", "fieldValue": "={{ JSON.stringify($json.details) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "save-notification-log",
+      "name": "Save Notification Log",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2440, 300],
+      "onError": "continueRegularOutput",
+      "notes": "PERSIST LOG: Saves notification batch summary to database.\n\nTable: notification_logs\n\nFields:\n- notification_id: Unique batch ID\n- workflow_name: '360 Performance Loop'\n- total_recipients: 3\n- sent_count, failed_count, skipped_count\n- status: 'completed' or 'partial'\n- details: Full JSON of all results\n\nError handling: Continues even if save fails (non-blocking)\nUsed for: Admin dashboard, analytics, debugging"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "admin_notifications",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "type", "fieldValue": "test_completed" },
+            { "fieldName": "title", "fieldValue": "Test Completed - All Roles Notified" },
+            { "fieldName": "body", "fieldValue": "={{ 'Student: ' + $json.details[0].original_data.student_name + ' | Score: ' + $json.details[0].original_data.score + '%' }}" },
+            { "fieldName": "data", "fieldValue": "={{ JSON.stringify($json) }}" },
+            { "fieldName": "read", "fieldValue": false },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "notify-admin-dashboard",
+      "name": "Update Admin Dashboard",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2660, 300],
+      "onError": "continueRegularOutput",
+      "notes": "ADMIN FEED: Adds entry to admin notification feed.\n\nTable: admin_notifications\n\nCreates card showing:\n- Type: test_completed\n- Title: 'Test Completed - All Roles Notified'\n- Body: 'Student: [name] | Score: X%'\n- Data: Full summary JSON\n- Read: false (unread)\n\nThis appears in Admin Dashboard's notification widget.\nError handling: Non-blocking"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"notification_id\": \"{{ $json.notification_id }}\",\n  \"summary\": {\n    \"total\": {{ $json.total }},\n    \"sent\": {{ $json.sent }},\n    \"failed\": {{ $json.failed }},\n    \"skipped\": {{ $json.skipped }}\n  },\n  \"all_successful\": {{ $json.all_successful }},\n  \"completed_at\": \"{{ $json.completed_at }}\"\n}",
+        "options": {
+          "responseCode": "={{ $json.all_successful ? 200 : 207 }}"
+        }
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2880, 300],
+      "notes": "FINAL RESPONSE: Returns result to calling application.\n\nResponse codes:\n- 200: All notifications sent successfully\n- 207: Partial success (Multi-Status)\n\nResponse body:\n{\n  success: true,\n  notification_id: 'notif_xxx',\n  summary: { total, sent, failed, skipped },\n  all_successful: true/false,\n  completed_at: timestamp\n}\n\nApp can use notification_id for tracking/debugging."
+    }
+  ],
+  "connections": {
+    "Test Completed Webhook": {
+      "main": [
+        [{ "node": "Validate Input", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [{ "node": "Log Processing Start", "type": "main", "index": 0 }]
+      ],
+      "error": [
+        [{ "node": "Respond Validation Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Processing Start": {
+      "main": [
+        [{ "node": "Prepare All Notifications", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare All Notifications": {
+      "main": [
+        [{ "node": "Split Notifications", "type": "main", "index": 0 }]
+      ]
+    },
+    "Split Notifications": {
+      "main": [
+        [{ "node": "Has FCM Token?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Has FCM Token?": {
+      "main": [
+        [{ "node": "Send FCM Notification", "type": "main", "index": 0 }],
+        [{ "node": "Mark Skipped", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send FCM Notification": {
+      "main": [
+        [{ "node": "Mark Success", "type": "main", "index": 0 }]
+      ],
+      "error": [
+        [{ "node": "Mark Failed", "type": "main", "index": 0 }]
+      ]
+    },
+    "Mark Success": {
+      "main": [
+        [{ "node": "Merge All Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Mark Failed": {
+      "main": [
+        [{ "node": "Merge All Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Mark Skipped": {
+      "main": [
+        [{ "node": "Merge All Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Merge All Results": {
+      "main": [
+        [{ "node": "Aggregate Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [{ "node": "Save Notification Log", "type": "main", "index": 0 }]
+      ]
+    },
+    "Save Notification Log": {
+      "main": [
+        [{ "node": "Update Admin Dashboard", "type": "main", "index": 0 }]
+      ]
+    },
+    "Update Admin Dashboard": {
+      "main": [
+        [{ "node": "Respond Success", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "errorWorkflow": ""
+  },
+  "staticData": null
+}

@@ -1,0 +1,446 @@
+{
+  "name": "AI Study Streak Protection - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## AI Study Streak Protection\n\n**Webhook:** POST /webhook/streak-protection\n\n**Purpose:** Prevent students from losing study streaks using AI-powered personalized motivation\n\n**Trigger:** 2 hours before streak break\n\n**AI Features:**\n- Personalized motivation message\n- Quick study suggestions\n- Streak milestone recognition\n\n**Headers:** `X-API-KEY`",
+        "height": 340,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Authentication\n\nValidates API key from headers.\n\n**Valid Keys:**\n- sk_test_manushi_2025\n- sk_prod_manushi_2025\n\n**Returns 401** if invalid",
+        "height": 180,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-auth",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 80]
+    },
+    {
+      "parameters": {
+        "content": "## Input Validation\n\n**Required Fields:**\n- student_id, student_name\n- current_streak (days)\n- last_study_time\n- streak_deadline\n- fcm_token or phone\n\n**Optional:**\n- favorite_subjects\n- study_preferences",
+        "height": 240,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-validation",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Gemini AI Integration\n\n**Model:** gemini-1.5-flash\n**Temperature:** 0.8 (creative)\n\n**AI Generates:**\n- Personalized motivation\n- Quick study activity (5-10 min)\n- Streak milestone message\n- Encouraging tone\n\n**Fallback:** Template message",
+        "height": 260,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-ai",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1500, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Push Notification\n\n**Channel:** Firebase FCM\n**Priority:** High\n**Action:** Deep link to quick study\n\n**Example:**\n\"Hey Rahul! Your 15-day streak is at risk! Complete a quick 5-min Physics quiz to keep it alive!\"",
+        "height": 200,
+        "width": 300,
+        "color": 2
+      },
+      "id": "sticky-push",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2100, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Success Logging\n\n**Logs to:** Supabase\n\n**Tracked:**\n- AI response quality\n- Token usage & cost\n- Student engagement\n- Streak saved rate",
+        "height": 180,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-success",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2500, -40]
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n**AI Fallback:** Template message\n**DLQ:** Failed notifications\n**Slack:** Ops alerts\n\n**Returns 500** on error",
+        "height": 180,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-error",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2500, 460]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-protection",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Webhook Authentication\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\n\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\nconst correlationId = body.correlation_id || \n  'streak_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  student_id: body.student_id,\n  student_name: body.student_name,\n  current_streak: body.current_streak || 0,\n  longest_streak: body.longest_streak || body.current_streak || 0,\n  last_study_time: body.last_study_time,\n  streak_deadline: body.streak_deadline,\n  hours_remaining: body.hours_remaining || 2,\n  favorite_subjects: body.favorite_subjects || [],\n  recent_topics: body.recent_topics || [],\n  study_preferences: body.study_preferences || {},\n  fcm_token: body.fcm_token,\n  phone: body.phone,\n  email: body.email,\n  language: body.language || 'en',\n  _trace: trace,\n  _raw: body,\n  _auth_passed: true\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Input Validation for Streak Protection\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['student_id', 'student_name', 'current_streak'],\n  properties: {\n    student_id: { type: 'string', minLength: 1 },\n    student_name: { type: 'string', minLength: 1 },\n    current_streak: { type: 'number', min: 1 }\n  }\n};\n\n// Check required fields\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Validate streak is positive\nif (data.current_streak !== undefined && data.current_streak < 1) {\n  errors.push('current_streak must be at least 1');\n}\n\n// Must have at least one notification channel\nif (!data.fcm_token && !data.phone && !data.email) {\n  errors.push('At least one notification channel required (fcm_token, phone, or email)');\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\n// Calculate streak milestone\nlet milestone = null;\nconst streak = data.current_streak;\nif (streak === 7) milestone = 'week';\nelse if (streak === 14) milestone = 'two_weeks';\nelse if (streak === 30) milestone = 'month';\nelse if (streak === 50) milestone = 'fifty_days';\nelse if (streak === 100) milestone = 'hundred_days';\nelse if (streak === 365) milestone = 'year';\nelse if (streak % 100 === 0) milestone = streak + '_days';\n\nreturn {\n  student_id: String(data.student_id).trim(),\n  student_name: String(data.student_name).trim(),\n  current_streak: parseInt(data.current_streak),\n  longest_streak: parseInt(data.longest_streak || data.current_streak),\n  last_study_time: data.last_study_time || null,\n  streak_deadline: data.streak_deadline || null,\n  hours_remaining: parseFloat(data.hours_remaining || 2),\n  favorite_subjects: Array.isArray(data.favorite_subjects) ? data.favorite_subjects : [],\n  recent_topics: Array.isArray(data.recent_topics) ? data.recent_topics : [],\n  study_preferences: data.study_preferences || {},\n  fcm_token: data.fcm_token || '',\n  phone: data.phone || '',\n  email: data.email || '',\n  language: data.language || 'en',\n  _milestone: milestone,\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Duplicate Check for Streak Protection\n// Prevents spamming same student within 4 hours\n// ============================================\nconst data = $json;\nconst dedupeKey = 'streak_' + data.student_id + '_' + new Date().toISOString().split('T')[0];\n\nconst processed = $getWorkflowStaticData('global');\nconst recentAlerts = processed.recentAlerts || {};\n\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 4 * 60 * 60 * 1000; // 4 hours\n\n// Clean up old entries\nfor (const key in recentAlerts) {\n  if (now - recentAlerts[key] > DEDUP_WINDOW_MS) {\n    delete recentAlerts[key];\n  }\n}\n\nif (recentAlerts[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Streak protection already sent to this student today',\n    dedupe_key: dedupeKey,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\nrecentAlerts[dedupeKey] = now;\nprocessed.recentAlerts = recentAlerts;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare AI Prompt for Gemini\n// ============================================\nconst data = $json;\n\nconst subjectsList = data.favorite_subjects.length > 0 \n  ? data.favorite_subjects.join(', ') \n  : 'general topics';\n\nconst topicsList = data.recent_topics.length > 0\n  ? data.recent_topics.slice(0, 3).join(', ')\n  : 'their recent studies';\n\nlet milestoneContext = '';\nif (data._milestone) {\n  milestoneContext = `\\n\\nIMPORTANT: The student is about to complete a ${data._milestone} milestone (${data.current_streak} days). Make this extra special and celebratory while still urgent!`;\n}\n\nconst prompt = `You are a friendly and encouraging study coach for Indian students. Generate a SHORT, personalized streak protection message.\n\nSTUDENT CONTEXT:\n- Name: ${data.student_name}\n- Current Streak: ${data.current_streak} days\n- Hours Until Streak Breaks: ${data.hours_remaining}\n- Favorite Subjects: ${subjectsList}\n- Recent Topics: ${topicsList}\n- Language Preference: ${data.language === 'hi' ? 'Hindi (Hinglish)' : 'English'}${milestoneContext}\n\nGENERATE A JSON RESPONSE with these fields:\n{\n  \"title\": \"Short catchy title (max 50 chars)\",\n  \"message\": \"Personalized motivational message (max 150 chars)\",\n  \"quick_activity\": \"A specific 5-10 minute study activity suggestion\",\n  \"activity_type\": \"quiz|flashcard|video|read|practice\",\n  \"subject\": \"The subject for the activity\",\n  \"emoji\": \"One relevant emoji\"\n}\n\nRULES:\n1. Be encouraging, not pushy\n2. Reference their streak proudly\n3. Suggest a QUICK activity (5-10 mins max)\n4. Use their name\n5. Create urgency without anxiety\n6. If milestone, celebrate it!\n\nReturn ONLY valid JSON, no markdown.`;\n\nconst geminiPayload = {\n  contents: [{\n    parts: [{ text: prompt }]\n  }],\n  generationConfig: {\n    temperature: 0.8,\n    maxOutputTokens: 300,\n    topP: 0.9\n  }\n};\n\nreturn {\n  ...data,\n  _prompt: prompt,\n  _gemini_payload: geminiPayload,\n  _ai_prepared: true\n};"
+      },
+      "id": "prep-ai",
+      "name": "Prepare AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1600, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{ $json._gemini_key || 'YOUR_GEMINI_KEY' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._gemini_payload) }}",
+        "options": {
+          "timeout": 15000,
+          "retry": { "maxTries": 2, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "call-gemini",
+      "name": "Call Gemini AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1800, 180],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Parse Gemini Response\n// ============================================\nconst prevData = $('Prepare AI Prompt').first().json;\nconst response = $json;\n\nlet aiContent = null;\nlet parseSuccess = false;\n\ntry {\n  // Extract text from Gemini response\n  const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';\n  \n  // Try to parse as JSON\n  const cleanText = text.replace(/```json\\n?|```\\n?/g, '').trim();\n  aiContent = JSON.parse(cleanText);\n  parseSuccess = true;\n  \n  // Calculate token usage for cost tracking\n  const inputTokens = response.usageMetadata?.promptTokenCount || 0;\n  const outputTokens = response.usageMetadata?.candidatesTokenCount || 0;\n  const totalTokens = inputTokens + outputTokens;\n  const costUsd = (inputTokens * 0.000000075) + (outputTokens * 0.0000003); // Gemini Flash pricing\n  \n  return {\n    ...prevData,\n    _ai_response: aiContent,\n    _ai_success: true,\n    _tokens: { input: inputTokens, output: outputTokens, total: totalTokens },\n    _cost_usd: costUsd,\n    _notification: {\n      title: aiContent.title || 'Your streak is at risk!',\n      message: aiContent.message || `Hey ${prevData.student_name}! Don't break your ${prevData.current_streak}-day streak!`,\n      quick_activity: aiContent.quick_activity || 'Complete a quick 5-minute quiz',\n      activity_type: aiContent.activity_type || 'quiz',\n      subject: aiContent.subject || 'General',\n      emoji: aiContent.emoji || '🔥'\n    }\n  };\n} catch (e) {\n  // Fallback to template message\n  return {\n    ...prevData,\n    _ai_response: null,\n    _ai_success: false,\n    _ai_error: e.message,\n    _notification: {\n      title: '🔥 Streak Alert!',\n      message: `Hey ${prevData.student_name}! Your amazing ${prevData.current_streak}-day streak needs you! Just 5 mins to keep it alive!`,\n      quick_activity: 'Complete a quick 5-minute revision quiz',\n      activity_type: 'quiz',\n      subject: prevData.favorite_subjects[0] || 'General',\n      emoji: '🔥'\n    },\n    _tokens: { input: 0, output: 0, total: 0 },\n    _cost_usd: 0\n  };\n}"
+      },
+      "id": "parse-ai",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// AI Fallback Handler\n// ============================================\nconst prevData = $('Prepare AI Prompt').first().json;\n\n// Generate fallback message\nconst streakEmoji = prevData.current_streak >= 30 ? '🏆' : prevData.current_streak >= 7 ? '⭐' : '🔥';\n\nreturn {\n  ...prevData,\n  _ai_response: null,\n  _ai_success: false,\n  _ai_error: 'API call failed',\n  _notification: {\n    title: streakEmoji + ' Streak Alert!',\n    message: `Hey ${prevData.student_name}! Your incredible ${prevData.current_streak}-day streak is waiting for you! Just 5 mins to keep the momentum going!`,\n    quick_activity: 'Complete a quick 5-minute practice session',\n    activity_type: 'practice',\n    subject: prevData.favorite_subjects[0] || 'General',\n    emoji: streakEmoji\n  },\n  _tokens: { input: 0, output: 0, total: 0 },\n  _cost_usd: 0,\n  _used_fallback: true\n};"
+      },
+      "id": "ai-fallback",
+      "name": "AI Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare Push Notification\n// ============================================\nconst data = $json;\nconst notif = data._notification;\n\nconst fcmPayload = {\n  message: {\n    token: data.fcm_token,\n    notification: {\n      title: notif.title,\n      body: notif.message\n    },\n    data: {\n      type: 'streak_protection',\n      student_id: data.student_id,\n      current_streak: String(data.current_streak),\n      activity_type: notif.activity_type,\n      subject: notif.subject,\n      quick_activity: notif.quick_activity,\n      deep_link: 'manushi://study/quick?type=' + notif.activity_type + '&subject=' + encodeURIComponent(notif.subject)\n    },\n    android: {\n      priority: 'high',\n      notification: {\n        sound: 'streak_alert',\n        channel_id: 'streak_protection',\n        icon: 'ic_streak',\n        color: '#FF6B35'\n      }\n    },\n    apns: {\n      payload: {\n        aps: {\n          sound: 'default',\n          badge: 1,\n          'mutable-content': 1\n        }\n      }\n    }\n  }\n};\n\nreturn {\n  ...data,\n  _fcm_payload: fcmPayload,\n  _push_prepared: true\n};"
+      },
+      "id": "prep-push",
+      "name": "Prepare Push Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._fcm_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-push",
+      "name": "Send Push Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 180],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'Streak protection sent successfully',\n  event_type: 'streak_protection',\n  student_id: data.student_id,\n  current_streak: data.current_streak,\n  ai_used: data._ai_success,\n  tokens_used: data._tokens?.total || 0,\n  cost_usd: data._cost_usd || 0,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  message: 'Streak protection notification sent',\n  streak: {\n    current: data.current_streak,\n    longest: data.longest_streak,\n    hours_remaining: data.hours_remaining,\n    milestone: data._milestone\n  },\n  notification: {\n    title: data._notification.title,\n    message: data._notification.message,\n    activity: data._notification.quick_activity,\n    activity_type: data._notification.activity_type\n  },\n  ai: {\n    used: data._ai_success,\n    tokens: data._tokens,\n    cost_usd: data._cost_usd\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2600, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Notification Fallback Handler\n// ============================================\nconst data = $('Prepare Push Notification').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(data._trace.started_at).getTime();\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'error',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Fallback',\n  message: 'Streak protection notification failed',\n  error_code: 'NOTIFICATION_FAILED',\n  error_message: errorInfo.message || 'Unknown error',\n  student_id: data.student_id,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: false,\n  message: 'Failed to send streak protection, logged for retry',\n  streak: {\n    current: data.current_streak,\n    student_name: data.student_name\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'notification_failed' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "notif-fallback",
+      "name": "Notification Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2600, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"streak_protection\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"ai_tokens\": {{ $json.ai.tokens.total || 0 }},\n  \"ai_cost_usd\": {{ $json.ai.cost_usd || 0 }},\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2800, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dlq-check", "leftValue": "={{ $json._needs_dlq }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-needs-dlq",
+      "name": "Needs DLQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2800, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/dead_letter_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"AI Study Streak Protection\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"NOTIFICATION_FAILED\",\n  \"error_message\": \"{{ $json._error_info.message || 'Streak protection failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3000, 440],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":fire: *Streak Protection Failed*\",\n  \"attachments\": [{\n    \"color\": \"warning\",\n    \"fields\": [\n      {\"title\": \"Student\", \"value\": \"{{ $json.streak.student_name }}\", \"short\": true},\n      {\"title\": \"Streak\", \"value\": \"{{ $json.streak.current }} days\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'Unknown' }}\", \"short\": false}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3200, 440],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, streak: $json.streak, notification: $json.notification, ai: $json.ai, student: $json.student, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3000, 180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, streak: $json.streak, _trace: { correlation_id: $json._trace.correlation_id, path: $json._trace.path } }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3400, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 360]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Auth Check", "type": "main", "index": 0}]] },
+    "Auth Check": { "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]] },
+    "Is Authenticated?": { "main": [ [{"node": "Validate Input", "type": "main", "index": 0}], [{"node": "Respond Unauthorized", "type": "main", "index": 0}] ] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Duplicate Check", "type": "main", "index": 0}], [{"node": "Respond Invalid", "type": "main", "index": 0}] ] },
+    "Duplicate Check": { "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]] },
+    "Not Duplicate?": { "main": [ [{"node": "Prepare AI Prompt", "type": "main", "index": 0}], [{"node": "Respond Duplicate", "type": "main", "index": 0}] ] },
+    "Prepare AI Prompt": { "main": [[{"node": "Call Gemini AI", "type": "main", "index": 0}]] },
+    "Call Gemini AI": { "main": [[{"node": "Parse AI Response", "type": "main", "index": 0}]], "error": [[{"node": "AI Fallback", "type": "main", "index": 0}]] },
+    "Parse AI Response": { "main": [[{"node": "Prepare Push Notification", "type": "main", "index": 0}]] },
+    "AI Fallback": { "main": [[{"node": "Prepare Push Notification", "type": "main", "index": 0}]] },
+    "Prepare Push Notification": { "main": [[{"node": "Send Push Notification", "type": "main", "index": 0}]] },
+    "Send Push Notification": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]], "error": [[{"node": "Notification Fallback", "type": "main", "index": 0}]] },
+    "Success Handler": { "main": [[{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Notification Fallback": { "main": [[{"node": "Needs DLQ?", "type": "main", "index": 0}]] },
+    "Needs DLQ?": { "main": [ [{"node": "Respond Fallback", "type": "main", "index": 0}], [{"node": "Dead Letter Queue", "type": "main", "index": 0}] ] },
+    "Dead Letter Queue": { "main": [[{"node": "Slack Alert", "type": "main", "index": 0}]] },
+    "Slack Alert": { "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

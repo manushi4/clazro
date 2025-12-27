@@ -1,0 +1,414 @@
+{
+  "name": "Live Class Multi-Reminder - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "live-class-reminder",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Webhook Authentication\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\n\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\nconst correlationId = body.correlation_id || \n  'corr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  class_id: body.class_id,\n  class_name: body.class_name,\n  class_time: body.class_time,\n  join_link: body.join_link,\n  teacher_name: body.teacher_name,\n  subject: body.subject,\n  student_id: body.student_id,\n  student_name: body.student_name,\n  student_phone: body.student_phone,\n  parent_phone: body.parent_phone,\n  parent_name: body.parent_name,\n  fcm_token: body.fcm_token,\n  reminder_type: body.reminder_type || '30min',\n  _trace: trace,\n  _raw: body,\n  _auth_passed: true\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Input Validation for Live Class Reminder\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['class_id', 'class_name', 'student_id', 'student_name', 'reminder_type'],\n  properties: {\n    class_id: { type: 'string', minLength: 1, maxLength: 100 },\n    class_name: { type: 'string', minLength: 1, maxLength: 200 },\n    student_id: { type: 'string', minLength: 1, maxLength: 50 },\n    student_name: { type: 'string', minLength: 1, maxLength: 100 },\n    reminder_type: { type: 'string', values: ['30min', '5min', 'no_join'] }\n  }\n};\n\n// Check required fields\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Validate reminder_type\nconst validTypes = ['30min', '5min', 'no_join'];\nif (data.reminder_type && !validTypes.includes(data.reminder_type)) {\n  errors.push('reminder_type must be one of: 30min, 5min, no_join');\n}\n\n// Validate join_link for 30min and 5min reminders\nif (['30min', '5min'].includes(data.reminder_type) && !data.join_link) {\n  errors.push('join_link is required for 30min and 5min reminders');\n}\n\n// Validate parent_phone for no_join reminder\nif (data.reminder_type === 'no_join' && !data.parent_phone) {\n  errors.push('parent_phone is required for no_join alerts');\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\nreturn {\n  class_id: String(data.class_id).trim().substring(0, 100),\n  class_name: String(data.class_name).trim().substring(0, 200),\n  class_time: data.class_time || new Date().toISOString(),\n  join_link: data.join_link || '',\n  teacher_name: String(data.teacher_name || 'Teacher').trim().substring(0, 100),\n  subject: String(data.subject || '').trim().substring(0, 100),\n  student_id: String(data.student_id).trim().substring(0, 50),\n  student_name: String(data.student_name).trim().substring(0, 100),\n  student_phone: String(data.student_phone || '').trim(),\n  parent_phone: String(data.parent_phone || '').trim(),\n  parent_name: String(data.parent_name || 'Parent').trim().substring(0, 100),\n  fcm_token: data.fcm_token || '',\n  reminder_type: data.reminder_type,\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Duplicate Detection for Live Class Reminder\n// ============================================\nconst data = $json;\nconst dedupeKey = data.class_id + '_' + data.student_id + '_' + data.reminder_type;\n\nconst processed = $getWorkflowStaticData('global');\nconst recentRequests = processed.recentRequests || {};\n\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5 minutes\n\nfor (const key in recentRequests) {\n  if (now - recentRequests[key] > DEDUP_WINDOW_MS) {\n    delete recentRequests[key];\n  }\n}\n\nif (recentRequests[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Reminder already sent for this class/student/type',\n    dedupe_key: dedupeKey,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\nrecentRequests[dedupeKey] = now;\nprocessed.recentRequests = recentRequests;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json.reminder_type }}", "rightValue": "30min", "operator": { "type": "string", "operation": "equals" } }]
+              },
+              "renameOutput": true,
+              "outputKey": "30min_push"
+            },
+            {
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json.reminder_type }}", "rightValue": "5min", "operator": { "type": "string", "operation": "equals" } }]
+              },
+              "renameOutput": true,
+              "outputKey": "5min_sms"
+            },
+            {
+              "conditions": {
+                "conditions": [{ "leftValue": "={{ $json.reminder_type }}", "rightValue": "no_join", "operator": { "type": "string", "operation": "equals" } }]
+              },
+              "renameOutput": true,
+              "outputKey": "no_join_parent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "switch-reminder",
+      "name": "Route by Reminder Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1600, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// 30-Minute Push Notification Preparation\n// ============================================\nconst data = $json;\nconst classTime = new Date(data.class_time);\nconst timeStr = classTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });\n\nconst notification = {\n  title: 'Class Starting in 30 Minutes!',\n  body: data.class_name + ' with ' + data.teacher_name + ' at ' + timeStr + '. Tap to join!',\n  data: {\n    type: 'live_class_reminder',\n    class_id: data.class_id,\n    join_link: data.join_link,\n    reminder_type: '30min'\n  }\n};\n\nconst fcmPayload = {\n  message: {\n    token: data.fcm_token,\n    notification: {\n      title: notification.title,\n      body: notification.body\n    },\n    data: notification.data,\n    android: {\n      priority: 'high',\n      notification: {\n        sound: 'default',\n        channel_id: 'live_class'\n      }\n    }\n  }\n};\n\nreturn {\n  ...data,\n  _notification: notification,\n  _fcm_payload: fcmPayload,\n  _channel: 'push',\n  _reminder_sent: '30min'\n};"
+      },
+      "id": "prep-30min",
+      "name": "Prepare 30min Push",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 60]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._fcm_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-push",
+      "name": "Send Push Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2000, 60],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// 5-Minute SMS Preparation\n// ============================================\nconst data = $json;\nconst classTime = new Date(data.class_time);\nconst timeStr = classTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });\n\nconst smsMessage = 'Hi ' + data.student_name + '! Your ' + data.class_name + ' class starts in 5 mins at ' + timeStr + '. Join now: ' + data.join_link;\n\n// MSG91 SMS Payload\nconst smsPayload = {\n  flow_id: 'YOUR_FLOW_ID',\n  sender: 'MANUSH',\n  mobiles: data.student_phone.replace(/\\+/g, ''),\n  VAR1: data.student_name,\n  VAR2: data.class_name,\n  VAR3: timeStr,\n  VAR4: data.join_link\n};\n\nreturn {\n  ...data,\n  _sms_message: smsMessage,\n  _sms_payload: smsPayload,\n  _channel: 'sms',\n  _reminder_sent: '5min'\n};"
+      },
+      "id": "prep-5min",
+      "name": "Prepare 5min SMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://control.msg91.com/api/v5/flow/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._sms_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-sms",
+      "name": "Send SMS to Student",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2000, 180],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// No-Join Parent Alert Preparation\n// ============================================\nconst data = $json;\nconst classTime = new Date(data.class_time);\nconst timeStr = classTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });\n\nconst parentSms = 'Dear ' + data.parent_name + ', ' + data.student_name + ' did not join the ' + data.class_name + ' class scheduled at ' + timeStr + '. Please ensure they join. Link: ' + data.join_link;\n\nconst smsPayload = {\n  flow_id: 'YOUR_PARENT_ALERT_FLOW_ID',\n  sender: 'MANUSH',\n  mobiles: data.parent_phone.replace(/\\+/g, ''),\n  VAR1: data.parent_name,\n  VAR2: data.student_name,\n  VAR3: data.class_name,\n  VAR4: timeStr,\n  VAR5: data.join_link\n};\n\nreturn {\n  ...data,\n  _sms_message: parentSms,\n  _sms_payload: smsPayload,\n  _channel: 'sms_parent',\n  _reminder_sent: 'no_join',\n  _is_parent_alert: true\n};"
+      },
+      "id": "prep-nojoin",
+      "name": "Prepare No-Join Parent Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://control.msg91.com/api/v5/flow/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._sms_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-parent-sms",
+      "name": "Send SMS to Parent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2000, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler - Merge all reminder types\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'Live class reminder sent',\n  event_type: 'live_class_reminder',\n  reminder_type: data._reminder_sent,\n  channel: data._channel,\n  recipient_id: data.student_id,\n  class_id: data.class_id,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  message: 'Reminder sent successfully',\n  reminder: {\n    type: data._reminder_sent,\n    channel: data._channel,\n    class_name: data.class_name,\n    student_name: data.student_name\n  },\n  class: {\n    id: data.class_id,\n    name: data.class_name,\n    time: data.class_time,\n    join_link: data.join_link\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success_' + data._reminder_sent }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Fallback Handler for Failed Notifications\n// ============================================\nconst data = $('Duplicate Check').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(data._trace.started_at).getTime();\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'error',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Fallback',\n  message: 'Notification delivery failed',\n  error_code: 'NOTIFICATION_FAILED',\n  error_message: errorInfo.message || 'Unknown error',\n  reminder_type: data.reminder_type,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: false,\n  message: 'Failed to send reminder, logged for retry',\n  reminder: {\n    type: data.reminder_type,\n    class_name: data.class_name,\n    student_name: data.student_name\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'notification_failed' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "fallback",
+      "name": "Notification Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"live_class_reminder\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dlq-check", "leftValue": "={{ $json._needs_dlq }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-needs-dlq",
+      "name": "Needs DLQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2400, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/dead_letter_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"NOTIFICATION_FAILED\",\n  \"error_message\": \"{{ $json._error_info.message || 'Notification delivery failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2600, 460],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":rotating_light: *Live Class Reminder Failed*\",\n  \"attachments\": [{\n    \"color\": \"danger\",\n    \"fields\": [\n      {\"title\": \"Class\", \"value\": \"{{ $json.reminder.class_name }}\", \"short\": true},\n      {\"title\": \"Student\", \"value\": \"{{ $json.reminder.student_name }}\", \"short\": true},\n      {\"title\": \"Reminder Type\", \"value\": \"{{ $json.reminder.type }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'Unknown' }}\", \"short\": true}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2800, 460],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, reminder: $json.reminder, class: $json.class, student: $json.student, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, reminder: $json.reminder, _trace: { correlation_id: $json._trace.correlation_id, path: $json._trace.path } }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3000, 460]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 360]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Auth Check", "type": "main", "index": 0}]] },
+    "Auth Check": { "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]] },
+    "Is Authenticated?": { "main": [ [{"node": "Validate Input", "type": "main", "index": 0}], [{"node": "Respond Unauthorized", "type": "main", "index": 0}] ] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Duplicate Check", "type": "main", "index": 0}], [{"node": "Respond Invalid", "type": "main", "index": 0}] ] },
+    "Duplicate Check": { "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]] },
+    "Not Duplicate?": { "main": [ [{"node": "Route by Reminder Type", "type": "main", "index": 0}], [{"node": "Respond Duplicate", "type": "main", "index": 0}] ] },
+    "Route by Reminder Type": { "main": [ [{"node": "Prepare 30min Push", "type": "main", "index": 0}], [{"node": "Prepare 5min SMS", "type": "main", "index": 0}], [{"node": "Prepare No-Join Parent Alert", "type": "main", "index": 0}] ] },
+    "Prepare 30min Push": { "main": [[{"node": "Send Push Notification", "type": "main", "index": 0}]] },
+    "Send Push Notification": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]], "error": [[{"node": "Notification Fallback", "type": "main", "index": 0}]] },
+    "Prepare 5min SMS": { "main": [[{"node": "Send SMS to Student", "type": "main", "index": 0}]] },
+    "Send SMS to Student": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]], "error": [[{"node": "Notification Fallback", "type": "main", "index": 0}]] },
+    "Prepare No-Join Parent Alert": { "main": [[{"node": "Send SMS to Parent", "type": "main", "index": 0}]] },
+    "Send SMS to Parent": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]], "error": [[{"node": "Notification Fallback", "type": "main", "index": 0}]] },
+    "Success Handler": { "main": [[{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Notification Fallback": { "main": [[{"node": "Needs DLQ?", "type": "main", "index": 0}]] },
+    "Needs DLQ?": { "main": [ [{"node": "Respond Fallback", "type": "main", "index": 0}], [{"node": "Dead Letter Queue", "type": "main", "index": 0}] ] },
+    "Dead Letter Queue": { "main": [[{"node": "Slack Alert", "type": "main", "index": 0}]] },
+    "Slack Alert": { "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

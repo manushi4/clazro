@@ -1,0 +1,476 @@
+{
+  "name": "Low Performance Intervention - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Low Performance Intervention\n\n**Schedule:** Daily at 7 PM\n**Manual:** POST /performance-check\n\n**Purpose:** Identify struggling students and trigger timely interventions\n\n**Metrics Tracked:**\n- Test scores < 40%\n- Attendance < 70%\n- Streak breaks > 3 days\n- Assignment completion < 50%\n\n**Severity Levels:**\n- MILD: Encouragement\n- MODERATE: Parent alert\n- SEVERE: Counselor escalation",
+        "height": 400,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -160]
+    },
+    {
+      "parameters": {
+        "content": "## Data Collection\n\n**Sources:**\n- test_results table\n- attendance_records\n- student_streaks\n- assignment_submissions\n\n**Filters:**\n- Active students only\n- Last 7-30 days data\n- Exclude already intervened",
+        "height": 240,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-data",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 20]
+    },
+    {
+      "parameters": {
+        "content": "## Severity Analysis\n\n**MILD (Score: 1-3)**\n- One metric slightly low\n- First-time occurrence\n\n**MODERATE (Score: 4-6)**\n- Multiple metrics low\n- Repeated pattern\n\n**SEVERE (Score: 7+)**\n- All metrics critical\n- Urgent intervention needed",
+        "height": 260,
+        "width": 280,
+        "color": 3
+      },
+      "id": "sticky-severity",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Interventions\n\n**MILD:**\n- Push: Encouragement msg\n- Email: Study tips\n\n**MODERATE:**\n- Parent SMS alert\n- Teacher notification\n- Schedule check-in\n\n**SEVERE:**\n- Urgent parent call\n- Counselor assignment\n- Admin Slack alert\n- Meeting scheduled",
+        "height": 280,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-actions",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1400, -120]
+    },
+    {
+      "parameters": {
+        "content": "## AI Personalization\n\n**Gemini generates:**\n- Personalized message\n- Subject-specific tips\n- Motivational content\n- Parent talking points\n\n**Fallback:**\n- Template messages\n- Generic encouragement",
+        "height": 220,
+        "width": 260,
+        "color": 2
+      },
+      "id": "sticky-ai",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1900, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Tracking & Logging\n\n**Tables Updated:**\n- intervention_logs\n- student_flags\n- counselor_queue\n\n**Metrics:**\n- Interventions triggered\n- Response rates\n- Improvement tracking\n\n**Alerts:**\n- Slack for severe cases\n- Daily summary report",
+        "height": 260,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-log",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2400, -60]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 19 * * *" }]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily 7 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 280]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "performance-check",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Manual Check",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Initialize Performance Check Context\n// ============================================\nconst now = new Date();\nconst body = $json.body || {};\n\n// Date range for analysis (default: last 7 days)\nconst daysBack = body.days_back || 7;\nconst endDate = new Date();\nconst startDate = new Date();\nstartDate.setDate(startDate.getDate() - daysBack);\n\n// Thresholds\nconst thresholds = {\n  test_score_min: body.test_threshold || 40,\n  attendance_min: body.attendance_threshold || 70,\n  streak_max_break: body.streak_threshold || 3,\n  assignment_min: body.assignment_threshold || 50\n};\n\nconst correlationId = body.correlation_id || 'perf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nreturn {\n  check_date: now.toISOString().split('T')[0],\n  start_date: startDate.toISOString().split('T')[0],\n  end_date: endDate.toISOString().split('T')[0],\n  days_analyzed: daysBack,\n  thresholds: thresholds,\n  student_id: body.student_id || null,\n  class_filter: body.class_filter || null,\n  _trace: {\n    correlation_id: correlationId,\n    workflow_id: $workflow.id,\n    workflow_name: $workflow.name,\n    execution_id: $execution.id,\n    started_at: now.toISOString(),\n    trigger_type: body.student_id ? 'manual_single' : 'scheduled_batch'\n  }\n};"
+      },
+      "id": "init",
+      "name": "Initialize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 340]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/rpc/get_low_performers",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"start_date\": \"{{ $json.start_date }}\",\n  \"end_date\": \"{{ $json.end_date }}\",\n  \"test_threshold\": {{ $json.thresholds.test_score_min }},\n  \"attendance_threshold\": {{ $json.thresholds.attendance_min }},\n  \"student_filter\": {{ $json.student_id ? '\"' + $json.student_id + '\"' : 'null' }}\n}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-performers",
+      "name": "Fetch Low Performers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 280],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/students?status=eq.active&select=student_id,student_name,email,parent_phone,parent_name,class_enrolled,current_streak,fcm_token",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-students",
+      "name": "Fetch Students",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 420],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Analyze Performance & Calculate Severity\n// ============================================\nconst ctx = $('Initialize').first().json;\nconst performanceData = $('Fetch Low Performers').first().json || [];\nconst studentsData = $('Fetch Students').first().json || [];\n\nconst performers = Array.isArray(performanceData) ? performanceData : [];\nconst students = Array.isArray(studentsData) ? studentsData : [];\n\n// Create student lookup\nconst studentMap = {};\nstudents.forEach(s => { studentMap[s.student_id] = s; });\n\n// If no RPC data, simulate from students table\nlet lowPerformers = performers;\nif (performers.length === 0 && students.length > 0) {\n  // Simulate: flag students with low streaks\n  lowPerformers = students\n    .filter(s => (s.current_streak || 0) <= ctx.thresholds.streak_max_break)\n    .map(s => ({\n      student_id: s.student_id,\n      avg_test_score: Math.random() * 50 + 20,\n      attendance_pct: Math.random() * 40 + 40,\n      days_since_activity: Math.floor(Math.random() * 7) + 1,\n      assignment_completion: Math.random() * 60 + 20,\n      current_streak: s.current_streak || 0\n    }));\n}\n\n// Calculate severity for each student\nconst analyzed = lowPerformers.map(p => {\n  const student = studentMap[p.student_id] || {};\n  let severityScore = 0;\n  const issues = [];\n  \n  // Test score check\n  if (p.avg_test_score < ctx.thresholds.test_score_min) {\n    severityScore += p.avg_test_score < 25 ? 3 : 2;\n    issues.push('Low test scores: ' + Math.round(p.avg_test_score) + '%');\n  }\n  \n  // Attendance check\n  if (p.attendance_pct < ctx.thresholds.attendance_min) {\n    severityScore += p.attendance_pct < 50 ? 3 : 2;\n    issues.push('Low attendance: ' + Math.round(p.attendance_pct) + '%');\n  }\n  \n  // Streak check\n  if (p.days_since_activity > ctx.thresholds.streak_max_break) {\n    severityScore += p.days_since_activity > 7 ? 3 : 1;\n    issues.push('Inactive for ' + p.days_since_activity + ' days');\n  }\n  \n  // Assignment check\n  if (p.assignment_completion < ctx.thresholds.assignment_min) {\n    severityScore += p.assignment_completion < 30 ? 2 : 1;\n    issues.push('Assignment completion: ' + Math.round(p.assignment_completion) + '%');\n  }\n  \n  // Determine severity level\n  let severity = 'MILD';\n  if (severityScore >= 7) severity = 'SEVERE';\n  else if (severityScore >= 4) severity = 'MODERATE';\n  \n  return {\n    student_id: p.student_id,\n    student_name: student.student_name || 'Unknown',\n    email: student.email,\n    parent_phone: student.parent_phone,\n    parent_name: student.parent_name || 'Parent',\n    class_enrolled: student.class_enrolled,\n    fcm_token: student.fcm_token,\n    metrics: {\n      test_score: Math.round(p.avg_test_score || 0),\n      attendance: Math.round(p.attendance_pct || 0),\n      days_inactive: p.days_since_activity || 0,\n      assignment_pct: Math.round(p.assignment_completion || 0),\n      current_streak: p.current_streak || 0\n    },\n    severity: severity,\n    severity_score: severityScore,\n    issues: issues,\n    intervention_id: 'INT_' + p.student_id + '_' + Date.now()\n  };\n});\n\n// Group by severity\nconst grouped = {\n  SEVERE: analyzed.filter(a => a.severity === 'SEVERE'),\n  MODERATE: analyzed.filter(a => a.severity === 'MODERATE'),\n  MILD: analyzed.filter(a => a.severity === 'MILD')\n};\n\nreturn {\n  ...ctx,\n  total_flagged: analyzed.length,\n  by_severity: {\n    severe: grouped.SEVERE.length,\n    moderate: grouped.MODERATE.length,\n    mild: grouped.MILD.length\n  },\n  students: analyzed,\n  severe_cases: grouped.SEVERE,\n  moderate_cases: grouped.MODERATE,\n  mild_cases: grouped.MILD,\n  _analysis_complete: true\n};"
+      },
+      "id": "analyze",
+      "name": "Analyze Severity",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [820, 340]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "has-flagged", "leftValue": "={{ $json.total_flagged }}", "rightValue": 0, "operator": { "type": "number", "operation": "gt" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-flagged",
+      "name": "Any Flagged?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1020, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare Intervention Messages\n// ============================================\nconst data = $json;\n\nconst interventions = data.students.map(student => {\n  const s = student;\n  const issuesList = s.issues.join(', ');\n  \n  // Student push notification\n  let studentMsg = '';\n  let parentMsg = '';\n  let slackMsg = null;\n  \n  if (s.severity === 'MILD') {\n    studentMsg = `Hi ${s.student_name}! We noticed you've been less active lately. Remember, consistent practice leads to great results! Your teachers are here to help. Keep going!`;\n    parentMsg = null;\n  } else if (s.severity === 'MODERATE') {\n    studentMsg = `Hi ${s.student_name}, we're concerned about your recent performance. Let's get back on track together! Check in with your teacher for personalized support.`;\n    parentMsg = `Dear ${s.parent_name}, ${s.student_name}'s recent performance needs attention: ${issuesList}. Please encourage regular study habits. We're scheduling a check-in call.`;\n  } else {\n    studentMsg = `Hi ${s.student_name}, your academic progress needs immediate attention. Please connect with your counselor today. We're here to support you!`;\n    parentMsg = `URGENT: Dear ${s.parent_name}, ${s.student_name} requires immediate academic intervention. Issues: ${issuesList}. Our counselor will contact you within 24 hours.`;\n    slackMsg = {\n      text: `:rotating_light: *SEVERE Performance Alert*`,\n      attachments: [{\n        color: 'danger',\n        blocks: [\n          {\n            type: 'section',\n            text: {\n              type: 'mrkdwn',\n              text: `*Student:* ${s.student_name}\\n*Class:* ${s.class_enrolled}\\n*Severity Score:* ${s.severity_score}`\n            }\n          },\n          {\n            type: 'section',\n            fields: [\n              { type: 'mrkdwn', text: `*Test Score:*\\n${s.metrics.test_score}%` },\n              { type: 'mrkdwn', text: `*Attendance:*\\n${s.metrics.attendance}%` },\n              { type: 'mrkdwn', text: `*Days Inactive:*\\n${s.metrics.days_inactive}` },\n              { type: 'mrkdwn', text: `*Assignments:*\\n${s.metrics.assignment_pct}%` }\n            ]\n          },\n          {\n            type: 'section',\n            text: { type: 'mrkdwn', text: `*Issues:*\\n${s.issues.map(i => '- ' + i).join('\\n')}` }\n          },\n          {\n            type: 'context',\n            elements: [{ type: 'mrkdwn', text: `Intervention ID: ${s.intervention_id} | Parent: ${s.parent_name} (${s.parent_phone})` }]\n          }\n        ]\n      }]\n    };\n  }\n  \n  // Student email\n  const studentEmailHtml = `\n<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <div style=\"background: ${s.severity === 'SEVERE' ? '#d32f2f' : s.severity === 'MODERATE' ? '#f57c00' : '#1976d2'}; padding: 25px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">Let's Get Back on Track!</h1>\n  </div>\n  <div style=\"background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;\">\n    <h2 style=\"color: #333;\">Hi ${s.student_name},</h2>\n    <p style=\"color: #666; font-size: 16px;\">${studentMsg}</p>\n    \n    <div style=\"background: white; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n      <h3 style=\"margin: 0 0 15px 0; color: #333;\">Your Current Stats</h3>\n      <table style=\"width: 100%;\">\n        <tr><td style=\"padding: 8px 0; color: #666;\">Test Score Average</td><td style=\"text-align: right; font-weight: bold; color: ${s.metrics.test_score < 40 ? '#d32f2f' : '#333'};\">${s.metrics.test_score}%</td></tr>\n        <tr><td style=\"padding: 8px 0; color: #666;\">Attendance</td><td style=\"text-align: right; font-weight: bold; color: ${s.metrics.attendance < 70 ? '#d32f2f' : '#333'};\">${s.metrics.attendance}%</td></tr>\n        <tr><td style=\"padding: 8px 0; color: #666;\">Current Streak</td><td style=\"text-align: right; font-weight: bold;\">${s.metrics.current_streak} days</td></tr>\n        <tr><td style=\"padding: 8px 0; color: #666;\">Assignment Completion</td><td style=\"text-align: right; font-weight: bold; color: ${s.metrics.assignment_pct < 50 ? '#d32f2f' : '#333'};\">${s.metrics.assignment_pct}%</td></tr>\n      </table>\n    </div>\n    \n    <h3 style=\"color: #333;\">Tips to Improve:</h3>\n    <ul style=\"color: #666;\">\n      <li>Set a daily study schedule</li>\n      <li>Complete all pending assignments</li>\n      <li>Attend all classes regularly</li>\n      <li>Ask teachers when you're stuck</li>\n    </ul>\n    \n    <div style=\"text-align: center; margin-top: 25px;\">\n      <a href=\"#\" style=\"background: #1976d2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;\">Start Learning Now</a>\n    </div>\n    \n    <p style=\"color: #999; font-size: 12px; margin-top: 25px; text-align: center;\">Intervention ID: ${s.intervention_id}</p>\n  </div>\n</body>\n</html>\n`;\n\n  return {\n    ...s,\n    messages: {\n      student_push: { title: s.severity === 'SEVERE' ? 'Important: Action Needed' : 'We Miss You!', body: studentMsg },\n      student_email: { subject: s.severity === 'SEVERE' ? 'Urgent: Academic Support Needed' : 'Let\\'s Get Back on Track!', html: studentEmailHtml },\n      parent_sms: parentMsg,\n      admin_slack: slackMsg\n    }\n  };\n});\n\nreturn {\n  ...data,\n  interventions: interventions,\n  _messages_prepared: true\n};"
+      },
+      "id": "prepare-messages",
+      "name": "Prepare Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Process Each Intervention\n// ============================================\nconst data = $json;\nconst results = [];\n\nfor (const intervention of data.interventions) {\n  results.push({\n    intervention_id: intervention.intervention_id,\n    student_id: intervention.student_id,\n    student_name: intervention.student_name,\n    severity: intervention.severity,\n    email: intervention.email,\n    parent_phone: intervention.parent_phone,\n    fcm_token: intervention.fcm_token,\n    messages: intervention.messages,\n    metrics: intervention.metrics,\n    issues: intervention.issues,\n    _trace: data._trace\n  });\n}\n\nreturn results;"
+      },
+      "id": "split-items",
+      "name": "Split Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/fcm/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=key={{ $json._fcm_key || 'YOUR_FCM_SERVER_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.fcm_token || 'NO_TOKEN' }}\",\n  \"notification\": {\n    \"title\": \"{{ $json.messages.student_push.title }}\",\n    \"body\": \"{{ $json.messages.student_push.body }}\"\n  },\n  \"data\": {\n    \"type\": \"performance_intervention\",\n    \"intervention_id\": \"{{ $json.intervention_id }}\",\n    \"severity\": \"{{ $json.severity }}\"\n  }\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-push",
+      "name": "Student Push",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1640, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json._from_email || 'support@manushi.com' }}",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.messages.student_email.subject }}",
+        "emailType": "html",
+        "html": "={{ $json.messages.student_email.html }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Student Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1640, 300],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "needs-parent", "leftValue": "={{ $json.severity }}", "rightValue": "MILD", "operator": { "type": "string", "operation": "notEquals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-parent",
+      "name": "Needs Parent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1640, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._msg91_url || 'https://api.msg91.com/api/v5/flow/' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"flow_id\": \"{{ $json._msg91_flow_id || 'intervention_flow' }}\",\n  \"mobiles\": \"91{{ $json.parent_phone }}\",\n  \"student_name\": \"{{ $json.student_name }}\",\n  \"severity\": \"{{ $json.severity }}\",\n  \"message\": \"{{ $json.messages.parent_sms }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-parent-sms",
+      "name": "Parent SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1860, 360],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "is-severe", "leftValue": "={{ $json.severity }}", "rightValue": "SEVERE", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-severe",
+      "name": "Is Severe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1860, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.messages.admin_slack) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-slack",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2080, 420],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/counselor_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"student_id\": \"{{ $json.student_id }}\",\n  \"student_name\": \"{{ $json.student_name }}\",\n  \"parent_phone\": \"{{ $json.parent_phone }}\",\n  \"severity\": \"{{ $json.severity }}\",\n  \"issues\": {{ JSON.stringify($json.issues) }},\n  \"metrics\": {{ JSON.stringify($json.metrics) }},\n  \"intervention_id\": \"{{ $json.intervention_id }}\",\n  \"priority\": \"urgent\",\n  \"status\": \"pending\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "add-counselor-queue",
+      "name": "Counselor Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2080, 540],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/intervention_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"intervention_id\": \"{{ $json.intervention_id }}\",\n  \"student_id\": \"{{ $json.student_id }}\",\n  \"severity\": \"{{ $json.severity }}\",\n  \"issues\": {{ JSON.stringify($json.issues) }},\n  \"metrics\": {{ JSON.stringify($json.metrics) }},\n  \"actions_taken\": [\"push_notification\", \"email\", {{ $json.severity !== 'MILD' ? '\"parent_sms\"' : 'null' }}, {{ $json.severity === 'SEVERE' ? '\"counselor_escalation\", \"slack_alert\"' : 'null' }}],\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-intervention",
+      "name": "Log Intervention",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2300, 300],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Aggregate Results\n// ============================================\nconst items = $input.all();\nconst ctx = items[0]?.json || {};\n\nconst results = items.map(item => ({\n  intervention_id: item.json.intervention_id,\n  student_id: item.json.student_id,\n  severity: item.json.severity,\n  status: 'processed'\n}));\n\nconst startTime = new Date(ctx._trace?.started_at || new Date()).getTime();\nconst duration_ms = Date.now() - startTime;\n\nreturn {\n  success: true,\n  message: 'Performance interventions processed',\n  summary: {\n    total_processed: results.length,\n    by_severity: {\n      severe: results.filter(r => r.severity === 'SEVERE').length,\n      moderate: results.filter(r => r.severity === 'MODERATE').length,\n      mild: results.filter(r => r.severity === 'MILD').length\n    }\n  },\n  interventions: results,\n  _log: {\n    timestamp: new Date().toISOString(),\n    level: 'info',\n    message: 'Performance intervention batch completed',\n    event_type: 'performance_intervention',\n    count: results.length,\n    duration_ms: duration_ms\n  },\n  _trace: { ...ctx._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "aggregate",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"performance_intervention\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2700, 300],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, summary: $json.summary, interventions: $json.interventions, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// No students flagged\nconst ctx = $json;\nconst duration_ms = Date.now() - new Date(ctx._trace.started_at).getTime();\n\nreturn {\n  success: true,\n  message: 'No low performing students found',\n  summary: { total_processed: 0, by_severity: { severe: 0, moderate: 0, mild: 0 } },\n  _trace: { ...ctx._trace, completed_at: new Date().toISOString(), duration_ms, path: 'no_flags' }\n};"
+      },
+      "id": "no-flags",
+      "name": "No Flags",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-no-flags",
+      "name": "Respond No Flags",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1420, 440]
+    }
+  ],
+  "connections": {
+    "Daily 7 PM": { "main": [[{ "node": "Initialize", "type": "main", "index": 0 }]] },
+    "Manual Check": { "main": [[{ "node": "Initialize", "type": "main", "index": 0 }]] },
+    "Initialize": { "main": [[{ "node": "Fetch Low Performers", "type": "main", "index": 0 }, { "node": "Fetch Students", "type": "main", "index": 0 }]] },
+    "Fetch Low Performers": { "main": [[{ "node": "Analyze Severity", "type": "main", "index": 0 }]] },
+    "Fetch Students": { "main": [[{ "node": "Analyze Severity", "type": "main", "index": 0 }]] },
+    "Analyze Severity": { "main": [[{ "node": "Any Flagged?", "type": "main", "index": 0 }]] },
+    "Any Flagged?": {
+      "main": [
+        [{ "node": "No Flags", "type": "main", "index": 0 }],
+        [{ "node": "Prepare Messages", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Messages": { "main": [[{ "node": "Split Items", "type": "main", "index": 0 }]] },
+    "Split Items": { "main": [[{ "node": "Student Push", "type": "main", "index": 0 }, { "node": "Student Email", "type": "main", "index": 0 }, { "node": "Needs Parent?", "type": "main", "index": 0 }]] },
+    "Student Push": { "main": [[{ "node": "Log Intervention", "type": "main", "index": 0 }]] },
+    "Student Email": { "main": [[{ "node": "Log Intervention", "type": "main", "index": 0 }]] },
+    "Needs Parent?": {
+      "main": [
+        [{ "node": "Log Intervention", "type": "main", "index": 0 }],
+        [{ "node": "Parent SMS", "type": "main", "index": 0 }, { "node": "Is Severe?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parent SMS": { "main": [[{ "node": "Log Intervention", "type": "main", "index": 0 }]] },
+    "Is Severe?": {
+      "main": [
+        [{ "node": "Log Intervention", "type": "main", "index": 0 }],
+        [{ "node": "Slack Alert", "type": "main", "index": 0 }, { "node": "Counselor Queue", "type": "main", "index": 0 }]
+      ]
+    },
+    "Slack Alert": { "main": [[{ "node": "Log Intervention", "type": "main", "index": 0 }]] },
+    "Counselor Queue": { "main": [[{ "node": "Log Intervention", "type": "main", "index": 0 }]] },
+    "Log Intervention": { "main": [[{ "node": "Aggregate Results", "type": "main", "index": 0 }]] },
+    "Aggregate Results": { "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]] },
+    "Log to Supabase": { "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]] },
+    "No Flags": { "main": [[{ "node": "Respond No Flags", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

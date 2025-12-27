@@ -1,0 +1,278 @@
+{
+  "name": "AI Study Streak Protection v4 - Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## AI STUDY STREAK PROTECTION\n**No Database Required for Testing**\n\nFlow: Webhook -> Gemini AI -> Response\n\nFeatures:\n- Personalized motivational messages\n- Student context awareness\n- Multi-language support\n- Streak-specific messaging",
+        "height": 180,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, 40]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 1: ENTRY & CONFIG\n**Requirements:** #10 Config, #14 Observability\n\n- Correlation ID\n- Feature flags\n- AI model selection\n- Cost estimation",
+        "height": 140,
+        "width": 260,
+        "color": 1
+      },
+      "id": "sticky-zone1",
+      "name": "Zone 1 - Entry",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, 240]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 2: VALIDATION\n**Requirements:** #6 Validation, #13 Contracts\n\n- Schema validation\n- Student data normalization\n- Streak context preparation",
+        "height": 140,
+        "width": 260,
+        "color": 2
+      },
+      "id": "sticky-zone2",
+      "name": "Zone 2 - Validation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [620, 240]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 3: AI GENERATION\n**Requirements:** #2 Retry, #9 Timeout, #18 Dependency\n\n- Gemini 2.5 Flash API\n- Personalized message\n- Fallback templates\n- Cost tracking",
+        "height": 140,
+        "width": 280,
+        "color": 3
+      },
+      "id": "sticky-zone3",
+      "name": "Zone 3 - AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1100, 240]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 4: RESPONSE\n**Requirements:** #4 Monitoring, #15 Cost\n\n- Format notification\n- Metrics (in-memory)\n- Return payload\n- No DB required",
+        "height": 140,
+        "width": 260,
+        "color": 5
+      },
+      "id": "sticky-zone4",
+      "name": "Zone 4 - Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1620, 240]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-protection-v4",
+        "responseMode": "responseNode",
+        "options": { "responseCode": 200 }
+      },
+      "id": "webhook-trigger",
+      "name": "Streak Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 460],
+      "notes": "Entry point - receives student activity data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #10: Environment Config & Feature Flags\n// REQUIREMENT #14: Observability - Correlation ID\n// REQUIREMENT #11: Release Management\n\nconst ENV = {\n  environment: 'development',\n  version: '4.0.0',\n  \n  features: {\n    ai_enabled: true,\n    personalization_enabled: true,\n    multi_language: true,\n    fallback_templates: true\n  },\n  \n  ai: {\n    model: 'gemini-2.5-flash',\n    endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',\n    max_tokens: 256,\n    temperature: 0.8\n  },\n  \n  limits: {\n    max_retries: 2,\n    ai_timeout_ms: 15000\n  },\n  \n  costs: {\n    gemini_per_1k_input: 0.000075,\n    gemini_per_1k_output: 0.0003\n  },\n  \n  // Fallback templates when AI fails\n  fallback_messages: {\n    low_streak: \"Hey {name}! Your {streak}-day streak is at risk. Just 5 minutes of study keeps the momentum going!\",\n    medium_streak: \"Don't let your amazing {streak}-day streak slip away, {name}! A quick review session is all you need.\",\n    high_streak: \"{name}, you've built an incredible {streak}-day streak! Don't break the chain - your future self will thank you.\"\n  }\n};\n\n// Generate correlation ID\nconst correlationId = $json.correlation_id || `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\nconst _trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  workflow_version: ENV.version,\n  execution_id: $execution.id,\n  environment: ENV.environment,\n  started_at: new Date().toISOString()\n};\n\nreturn {\n  ...$json,\n  _env: ENV,\n  _trace: _trace,\n  _request_id: `req_${Date.now()}`\n};"
+      },
+      "id": "env-config",
+      "name": "Environment Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 460],
+      "notes": "Sets up Gemini config and correlation ID"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #6: Data Validation\n// REQUIREMENT #13: Data Mapping Contracts\n\nconst data = $input.first().json;\n\n// Validate required fields\nconst required = ['student_id', 'student_name', 'current_streak'];\nconst missing = required.filter(field => data[field] === undefined && data[field] !== 0);\n\nif (missing.length > 0) {\n  throw new Error(`VALIDATION_ERROR: Missing fields: ${missing.join(', ')}`);\n}\n\n// Normalize and enrich student context\nconst studentContext = {\n  student_id: String(data.student_id),\n  name: data.student_name || 'Student',\n  first_name: (data.student_name || 'Student').split(' ')[0],\n  \n  // Streak info\n  current_streak: parseInt(data.current_streak) || 0,\n  longest_streak: parseInt(data.longest_streak) || data.current_streak || 0,\n  hours_until_break: parseFloat(data.hours_until_break) || 2,\n  \n  // Preferences\n  preferred_subject: data.preferred_subject || 'your studies',\n  language: data.language || 'en',\n  tone: data.tone || 'friendly', // friendly, motivational, urgent\n  \n  // Activity context\n  last_activity: data.last_activity || 'yesterday',\n  recent_topic: data.recent_topic,\n  average_session_minutes: data.average_session_minutes || 15,\n  \n  // Notification preferences\n  fcm_token: data.fcm_token,\n  \n  // Categorize streak level\n  streak_level: data.current_streak < 7 ? 'low' : \n                data.current_streak < 30 ? 'medium' : 'high'\n};\n\n// Estimate input tokens for cost tracking\nconst estimatedInputTokens = Math.ceil(JSON.stringify(studentContext).length / 4) + 200;\n\nreturn {\n  student: studentContext,\n  _env: data._env,\n  _trace: data._trace,\n  _request_id: data._request_id,\n  _cost_estimate: {\n    input_tokens: estimatedInputTokens,\n    estimated_cost: (estimatedInputTokens / 1000) * data._env.costs.gemini_per_1k_input\n  },\n  validated_at: new Date().toISOString()\n};"
+      },
+      "id": "validate-normalize",
+      "name": "Validate & Prepare Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 460],
+      "notes": "Validates input and prepares student context for AI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #18: Pre-flight check for AI vendor\n\nconst data = $input.first().json;\nconst student = data.student;\nconst ENV = data._env;\n\n// Build the prompt for Gemini\nconst systemPrompt = `You are a friendly, encouraging study coach for Indian students. \nGenerate a SHORT, personalized push notification message (max 2 sentences) to prevent a student from breaking their study streak.\n\nTone: ${student.tone}\nLanguage: ${student.language === 'hi' ? 'Hindi (Hinglish is okay)' : 'English'}\n\nRules:\n- Be warm and personal, use their first name\n- Reference their specific streak count\n- Create urgency but stay positive\n- Suggest a quick action (5-10 min activity)\n- If they have a recent topic, mention it\n- Keep it under 160 characters for push notification`;\n\nconst userPrompt = `Student Context:\n- Name: ${student.first_name}\n- Current Streak: ${student.current_streak} days\n- Longest Streak: ${student.longest_streak} days\n- Hours Until Streak Breaks: ${student.hours_until_break}\n- Preferred Subject: ${student.preferred_subject}\n- Last Topic Studied: ${student.recent_topic || 'Not specified'}\n- Average Session: ${student.average_session_minutes} minutes\n\nGenerate a personalized streak protection notification message:`;\n\nreturn {\n  ...data,\n  _ai_request: {\n    system_prompt: systemPrompt,\n    user_prompt: userPrompt,\n    model: ENV.ai.model,\n    endpoint: ENV.ai.endpoint\n  },\n  preflight_at: new Date().toISOString()\n};"
+      },
+      "id": "prepare-prompt",
+      "name": "Prepare AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 460],
+      "notes": "Builds personalized prompt for Gemini"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.ai.endpoint }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": []
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"text\": \"{{ $json._ai_request.system_prompt }}\\n\\n{{ $json._ai_request.user_prompt }}\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.8,\n    \"maxOutputTokens\": 256,\n    \"topP\": 0.95,\n    \"topK\": 40\n  },\n  \"safetySettings\": [\n    {\n      \"category\": \"HARM_CATEGORY_HARASSMENT\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    },\n    {\n      \"category\": \"HARM_CATEGORY_HATE_SPEECH\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    }\n  ]\n}",
+        "options": { "timeout": 15000 }
+      },
+      "id": "call-gemini",
+      "name": "Call Gemini AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1100, 400],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "notes": "REQUIREMENT #2: Retry, #9: 15s timeout"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse successful Gemini response\nconst data = $('Prepare AI Prompt').first().json;\nconst geminiResponse = $input.first().json;\n\nlet generatedMessage = '';\nlet tokensUsed = { input: 0, output: 0 };\n\ntry {\n  // Extract text from Gemini response\n  generatedMessage = geminiResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';\n  generatedMessage = generatedMessage.trim();\n  \n  // Get token usage if available\n  tokensUsed = {\n    input: geminiResponse.usageMetadata?.promptTokenCount || data._cost_estimate.input_tokens,\n    output: geminiResponse.usageMetadata?.candidatesTokenCount || Math.ceil(generatedMessage.length / 4)\n  };\n} catch (e) {\n  // Will fall through to use fallback\n}\n\n// If empty or too long, truncate\nif (generatedMessage.length > 200) {\n  generatedMessage = generatedMessage.substring(0, 197) + '...';\n}\n\n// Calculate actual cost\nconst actualCost = \n  (tokensUsed.input / 1000) * data._env.costs.gemini_per_1k_input +\n  (tokensUsed.output / 1000) * data._env.costs.gemini_per_1k_output;\n\nreturn {\n  student: data.student,\n  notification: {\n    title: 'Streak Alert!',\n    body: generatedMessage,\n    source: 'gemini_ai',\n    generated_at: new Date().toISOString()\n  },\n  _ai_result: {\n    success: true,\n    model: data._env.ai.model,\n    tokens: tokensUsed,\n    cost: actualCost\n  },\n  _env: data._env,\n  _trace: data._trace\n};"
+      },
+      "id": "parse-success",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 340],
+      "notes": "Extracts message from Gemini response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #3: Fallback Strategy\n// AI failed - use template fallback\n\nconst data = $('Prepare AI Prompt').first().json;\nconst student = data.student;\nconst ENV = data._env;\n\n// Select fallback template based on streak level\nlet template = ENV.fallback_messages[student.streak_level] || ENV.fallback_messages.low_streak;\n\n// Replace placeholders\nlet fallbackMessage = template\n  .replace('{name}', student.first_name)\n  .replace('{streak}', student.current_streak);\n\nreturn {\n  student: student,\n  notification: {\n    title: 'Streak Alert!',\n    body: fallbackMessage,\n    source: 'fallback_template',\n    generated_at: new Date().toISOString()\n  },\n  _ai_result: {\n    success: false,\n    model: data._env.ai.model,\n    error: 'AI unavailable, used fallback',\n    tokens: { input: 0, output: 0 },\n    cost: 0\n  },\n  _env: data._env,\n  _trace: data._trace\n};"
+      },
+      "id": "fallback-template",
+      "name": "Use Fallback Template",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 500],
+      "notes": "REQUIREMENT #3: Fallback when AI fails"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "all"
+      },
+      "id": "merge-paths",
+      "name": "Merge Paths",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1560, 420],
+      "notes": "Combines AI success and fallback paths"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #4: Monitoring\n// REQUIREMENT #15: Cost Controls\n// Format final response\n\nconst data = $input.first().json;\nconst student = data.student;\nconst notification = data.notification;\nconst aiResult = data._ai_result;\nconst trace = data._trace;\n\n// Build FCM-ready notification payload\nconst fcmPayload = {\n  token: student.fcm_token || 'NO_TOKEN_PROVIDED',\n  notification: {\n    title: notification.title,\n    body: notification.body\n  },\n  data: {\n    type: 'streak_protection',\n    student_id: student.student_id,\n    current_streak: String(student.current_streak),\n    action: 'OPEN_STUDY_SESSION',\n    correlation_id: trace.correlation_id\n  },\n  android: {\n    priority: 'high',\n    notification: {\n      channel_id: 'streak_alerts',\n      icon: 'ic_streak',\n      color: '#FF6B35'\n    }\n  },\n  apns: {\n    payload: {\n      aps: {\n        alert: {\n          title: notification.title,\n          body: notification.body\n        },\n        sound: 'default',\n        badge: 1\n      }\n    }\n  }\n};\n\n// Calculate processing time\nconst processingTime = Date.now() - new Date(trace.started_at).getTime();\n\n// Build metrics (in-memory, no DB required)\nconst metrics = {\n  workflow_name: 'AI Study Streak Protection v4',\n  execution_id: trace.execution_id,\n  correlation_id: trace.correlation_id,\n  processing_time_ms: processingTime,\n  ai_model: data._env.ai.model,\n  ai_success: aiResult.success,\n  ai_source: notification.source,\n  tokens_used: aiResult.tokens,\n  cost_usd: aiResult.cost,\n  student_streak: student.current_streak,\n  streak_level: student.streak_level\n};\n\nreturn {\n  success: true,\n  correlation_id: trace.correlation_id,\n  \n  // The notification to send\n  notification: {\n    title: notification.title,\n    body: notification.body,\n    source: notification.source\n  },\n  \n  // FCM-ready payload (if you want to test with FCM)\n  fcm_payload: fcmPayload,\n  \n  // Student context (for reference)\n  student: {\n    id: student.student_id,\n    name: student.first_name,\n    streak: student.current_streak,\n    streak_level: student.streak_level\n  },\n  \n  // AI details\n  ai: {\n    model: aiResult.model,\n    success: aiResult.success,\n    tokens: aiResult.tokens,\n    cost: `$${aiResult.cost.toFixed(6)}`\n  },\n  \n  // Metrics\n  metrics: metrics,\n  \n  execution_id: trace.execution_id,\n  completed_at: new Date().toISOString()\n};"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 420],
+      "notes": "Formats final response with FCM payload and metrics"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2000, 420],
+      "notes": "Returns complete notification payload"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: $json.message || 'Validation failed', correlation_id: $json._trace?.correlation_id } }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 620],
+      "notes": "Returns validation errors"
+    },
+    {
+      "parameters": {
+        "triggerOn": "workflowFailure"
+      },
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [140, 720],
+      "notes": "REQUIREMENT #1: Global error handler"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Classify and log error (in-memory, no DB)\nconst error = $json;\nconst errorMessage = error.message || String(error);\n\nlet category = 'unknown';\nlet severity = 'error';\n\nif (errorMessage.includes('VALIDATION_ERROR')) {\n  category = 'validation';\n  severity = 'warning';\n} else if (errorMessage.includes('gemini') || errorMessage.includes('429')) {\n  category = 'ai_vendor';\n  severity = 'error';\n} else if (errorMessage.includes('timeout')) {\n  category = 'timeout';\n  severity = 'error';\n}\n\n// Log to console (visible in n8n execution log)\nconsole.log('ERROR:', {\n  error_id: `err_${Date.now()}`,\n  workflow: 'AI Study Streak Protection v4',\n  category: category,\n  severity: severity,\n  message: errorMessage,\n  timestamp: new Date().toISOString()\n});\n\nreturn {\n  error_logged: true,\n  category: category,\n  message: errorMessage\n};"
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 720],
+      "notes": "Logs error to execution log (no DB)"
+    }
+  ],
+  "connections": {
+    "Streak Alert Webhook": {
+      "main": [[{ "node": "Environment Config", "type": "main", "index": 0 }]]
+    },
+    "Environment Config": {
+      "main": [[{ "node": "Validate & Prepare Context", "type": "main", "index": 0 }]]
+    },
+    "Validate & Prepare Context": {
+      "main": [[{ "node": "Prepare AI Prompt", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Respond Error", "type": "main", "index": 0 }]]
+    },
+    "Prepare AI Prompt": {
+      "main": [[{ "node": "Call Gemini AI", "type": "main", "index": 0 }]]
+    },
+    "Call Gemini AI": {
+      "main": [[{ "node": "Parse AI Response", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Use Fallback Template", "type": "main", "index": 0 }]]
+    },
+    "Parse AI Response": {
+      "main": [[{ "node": "Merge Paths", "type": "main", "index": 0 }]]
+    },
+    "Use Fallback Template": {
+      "main": [[{ "node": "Merge Paths", "type": "main", "index": 1 }]]
+    },
+    "Merge Paths": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    },
+    "Error Trigger": {
+      "main": [[{ "node": "Log Error", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

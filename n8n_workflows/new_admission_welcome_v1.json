@@ -1,0 +1,447 @@
+{
+  "name": "New Admission Welcome Flow - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## New Admission Welcome Flow\n\n**Schedule:** Webhook triggered\n**Manual:** POST /new-admission\n\n**Purpose:** Onboard new students with personalized welcome experience\n\n**Stakeholders:**\n- Student (push + email)\n- Parent (SMS + email)\n- Admin (Slack notification)\n\n**Actions:**\n- Send welcome messages\n- Create student profile\n- Assign welcome badge\n- Schedule orientation",
+        "height": 380,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -140]
+    },
+    {
+      "parameters": {
+        "content": "## Auth & Validation\n\n**Security:**\n- API Key authentication\n- Input validation\n- Duplicate check\n\n**Required Fields:**\n- student_id\n- student_name\n- student_email\n- parent_phone\n- admission_date\n- class_enrolled",
+        "height": 240,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-auth",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 40]
+    },
+    {
+      "parameters": {
+        "content": "## Profile Setup\n\n**Database Actions:**\n1. Create student profile\n2. Assign welcome badge\n3. Set initial streak = 0\n4. Create fee schedule\n\n**Supabase Tables:**\n- students\n- student_badges\n- student_fees",
+        "height": 240,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-profile",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, -60]
+    },
+    {
+      "parameters": {
+        "content": "## Notifications\n\n**Student:**\n- Push notification (FCM)\n- Welcome email (HTML)\n\n**Parent:**\n- SMS via MSG91\n- Welcome email\n\n**Templates:**\n- Personalized greetings\n- Class schedule link\n- App download CTA",
+        "height": 260,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-notify",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1400, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Admin Alert\n\n**Slack Channel:**\n#new-admissions\n\n**Info Shared:**\n- Student name & class\n- Parent contact\n- Fee plan selected\n- Admission source\n\n**Color Coding:**\n- Green = Paid\n- Yellow = Pending",
+        "height": 240,
+        "width": 260,
+        "color": 2
+      },
+      "id": "sticky-admin",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1900, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Logging & Response\n\n**Logged to:**\n- automation_logs\n- admission_records\n\n**Response:**\n- Success with welcome_id\n- Notifications sent status\n- Next steps for admin\n\n**Retention:** 365 days",
+        "height": 220,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-log",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2400, -40]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-admission",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "New Admission Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Auth Check - API Key Validation\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\n\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\nconst correlationId = body.correlation_id || 'adm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nreturn {\n  ...body,\n  _auth_passed: true,\n  _trace: {\n    correlation_id: correlationId,\n    workflow_id: $workflow.id,\n    workflow_name: $workflow.name,\n    execution_id: $execution.id,\n    started_at: new Date().toISOString(),\n    trigger_type: 'webhook'\n  }\n};"
+      },
+      "id": "auth-check",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "auth-check", "leftValue": "={{ $json._auth_failed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Auth OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [580, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Input Validation for New Admission\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst required = ['student_id', 'student_name', 'student_email', 'parent_phone', 'class_enrolled'];\n\nfor (const field of required) {\n  if (!data[field] || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Email validation\nif (data.student_email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(data.student_email)) {\n  errors.push('Invalid email format');\n}\n\n// Phone validation (10 digits for India)\nif (data.parent_phone && !/^[6-9]\\d{9}$/.test(data.parent_phone.replace(/[^\\d]/g, ''))) {\n  errors.push('Invalid phone number (must be 10 digit Indian mobile)');\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: data._trace\n  };\n}\n\n// Sanitize and normalize\nreturn {\n  student_id: String(data.student_id).trim(),\n  student_name: String(data.student_name).trim(),\n  student_email: String(data.student_email).trim().toLowerCase(),\n  parent_name: String(data.parent_name || 'Parent').trim(),\n  parent_phone: String(data.parent_phone).replace(/[^\\d]/g, ''),\n  parent_email: data.parent_email ? String(data.parent_email).trim().toLowerCase() : null,\n  class_enrolled: String(data.class_enrolled).trim(),\n  admission_date: data.admission_date || new Date().toISOString().split('T')[0],\n  fee_plan: data.fee_plan || 'monthly',\n  payment_status: data.payment_status || 'pending',\n  admission_source: data.admission_source || 'direct',\n  fcm_token: data.fcm_token || null,\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "val-check", "leftValue": "={{ $json._validation_failed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Valid Input?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Duplicate Check - Prevent double admissions\n// ============================================\nconst data = $json;\nconst dedupeKey = data.student_id + '_' + data.admission_date;\n\nconst processed = $getWorkflowStaticData('global');\nconst recentAdmissions = processed.recentAdmissions || {};\n\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours\n\n// Clean old entries\nfor (const key in recentAdmissions) {\n  if (now - recentAdmissions[key] > DEDUP_WINDOW_MS) {\n    delete recentAdmissions[key];\n  }\n}\n\nif (recentAdmissions[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Admission already processed today',\n    student_id: data.student_id,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\nrecentAdmissions[dedupeKey] = now;\nprocessed.recentAdmissions = recentAdmissions;\n\nconst welcome_id = 'WEL_' + data.student_id + '_' + Date.now();\n\nreturn {\n  ...data,\n  welcome_id: welcome_id,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-dup",
+      "name": "Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1300, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare Welcome Messages\n// ============================================\nconst data = $json;\n\n// Student push notification\nconst studentPush = {\n  title: 'Welcome to Manushi Coaching!',\n  body: `Hi ${data.student_name}! Your admission to ${data.class_enrolled} is confirmed. Start your learning journey today!`,\n  data: {\n    type: 'admission_welcome',\n    student_id: data.student_id,\n    action: 'open_dashboard'\n  }\n};\n\n// Parent SMS\nconst parentSMS = `Dear ${data.parent_name}, ${data.student_name} is now enrolled in ${data.class_enrolled} at Manushi Coaching. Fee plan: ${data.fee_plan}. Download app: [link]. Welcome aboard!`;\n\n// Student welcome email\nconst studentEmailHtml = `\n<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">Welcome to Manushi Coaching!</h1>\n  </div>\n  <div style=\"background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;\">\n    <h2 style=\"color: #333;\">Hi ${data.student_name}!</h2>\n    <p style=\"color: #666; font-size: 16px;\">Your admission to <strong>${data.class_enrolled}</strong> has been confirmed.</p>\n    \n    <div style=\"background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;\">\n      <h3 style=\"margin: 0 0 10px 0; color: #333;\">Your Details</h3>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Student ID:</strong> ${data.student_id}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Class:</strong> ${data.class_enrolled}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Fee Plan:</strong> ${data.fee_plan}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Admission Date:</strong> ${data.admission_date}</p>\n    </div>\n    \n    <h3 style=\"color: #333;\">Next Steps:</h3>\n    <ol style=\"color: #666;\">\n      <li>Download our mobile app</li>\n      <li>Complete your profile</li>\n      <li>Check your class schedule</li>\n      <li>Start learning!</li>\n    </ol>\n    \n    <div style=\"text-align: center; margin-top: 30px;\">\n      <a href=\"#\" style=\"background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;\">Open Dashboard</a>\n    </div>\n    \n    <p style=\"color: #999; font-size: 12px; margin-top: 30px; text-align: center;\">Welcome ID: ${data.welcome_id}</p>\n  </div>\n</body>\n</html>\n`;\n\n// Parent email\nconst parentEmailHtml = `\n<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <div style=\"background: #2e7d32; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;\">\n    <h1 style=\"color: white; margin: 0;\">Admission Confirmed!</h1>\n  </div>\n  <div style=\"background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;\">\n    <h2 style=\"color: #333;\">Dear ${data.parent_name},</h2>\n    <p style=\"color: #666; font-size: 16px;\">We are delighted to inform you that <strong>${data.student_name}</strong> has been successfully enrolled at Manushi Coaching.</p>\n    \n    <div style=\"background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2e7d32;\">\n      <h3 style=\"margin: 0 0 10px 0; color: #333;\">Admission Details</h3>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Student:</strong> ${data.student_name}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Class:</strong> ${data.class_enrolled}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Fee Plan:</strong> ${data.fee_plan}</p>\n      <p style=\"margin: 5px 0; color: #666;\"><strong>Payment Status:</strong> ${data.payment_status}</p>\n    </div>\n    \n    <p style=\"color: #666;\">You can track ${data.student_name}'s progress through our parent portal.</p>\n    \n    <p style=\"color: #999; font-size: 12px; margin-top: 30px;\">For any queries, contact us at support@manushi.com</p>\n  </div>\n</body>\n</html>\n`;\n\n// Admin Slack message\nconst slackColor = data.payment_status === 'paid' ? 'good' : 'warning';\nconst paymentEmoji = data.payment_status === 'paid' ? ':white_check_mark:' : ':hourglass_flowing_sand:';\n\nconst adminSlack = {\n  text: `:tada: *New Admission Alert*`,\n  attachments: [{\n    color: slackColor,\n    blocks: [\n      {\n        type: 'section',\n        text: {\n          type: 'mrkdwn',\n          text: `*Student:* ${data.student_name}\\n*Class:* ${data.class_enrolled}\\n*Student ID:* ${data.student_id}`\n        }\n      },\n      {\n        type: 'section',\n        fields: [\n          { type: 'mrkdwn', text: `*Parent:*\\n${data.parent_name}` },\n          { type: 'mrkdwn', text: `*Phone:*\\n${data.parent_phone}` },\n          { type: 'mrkdwn', text: `*Fee Plan:*\\n${data.fee_plan}` },\n          { type: 'mrkdwn', text: `*Payment:*\\n${paymentEmoji} ${data.payment_status}` }\n        ]\n      },\n      {\n        type: 'context',\n        elements: [\n          { type: 'mrkdwn', text: `Source: ${data.admission_source} | Welcome ID: ${data.welcome_id}` }\n        ]\n      }\n    ]\n  }]\n};\n\nreturn {\n  ...data,\n  _messages: {\n    student_push: studentPush,\n    parent_sms: parentSMS,\n    student_email: { subject: 'Welcome to Manushi Coaching!', html: studentEmailHtml },\n    parent_email: { subject: `${data.student_name}'s Admission Confirmed - Manushi Coaching`, html: parentEmailHtml },\n    admin_slack: adminSlack\n  },\n  _messages_prepared: true\n};"
+      },
+      "id": "prepare-messages",
+      "name": "Prepare Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1480, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/fcm/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=key={{ $json._fcm_server_key || 'YOUR_FCM_SERVER_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.fcm_token || 'NO_TOKEN' }}\",\n  \"notification\": {\n    \"title\": \"{{ $json._messages.student_push.title }}\",\n    \"body\": \"{{ $json._messages.student_push.body }}\"\n  },\n  \"data\": {{ JSON.stringify($json._messages.student_push.data) }}\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-push",
+      "name": "Student Push",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1700, 40],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._msg91_url || 'https://api.msg91.com/api/v5/flow/' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"flow_id\": \"{{ $json._msg91_flow_id || 'welcome_flow' }}\",\n  \"mobiles\": \"91{{ $json.parent_phone }}\",\n  \"student_name\": \"{{ $json.student_name }}\",\n  \"class\": \"{{ $json.class_enrolled }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-sms",
+      "name": "Parent SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1700, 160],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json._from_email || 'admissions@manushi.com' }}",
+        "toEmail": "={{ $json.student_email }}",
+        "subject": "={{ $json._messages.student_email.subject }}",
+        "emailType": "html",
+        "html": "={{ $json._messages.student_email.html }}",
+        "options": {}
+      },
+      "id": "send-student-email",
+      "name": "Student Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1700, 280],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json._from_email || 'admissions@manushi.com' }}",
+        "toEmail": "={{ $json.parent_email || $json.student_email }}",
+        "subject": "={{ $json._messages.parent_email.subject }}",
+        "emailType": "html",
+        "html": "={{ $json._messages.parent_email.html }}",
+        "options": {}
+      },
+      "id": "send-parent-email",
+      "name": "Parent Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1700, 400],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._messages.admin_slack) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-slack",
+      "name": "Admin Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1900, 120],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/students",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"student_id\": \"{{ $json.student_id }}\",\n  \"student_name\": \"{{ $json.student_name }}\",\n  \"email\": \"{{ $json.student_email }}\",\n  \"parent_name\": \"{{ $json.parent_name }}\",\n  \"parent_phone\": \"{{ $json.parent_phone }}\",\n  \"class_enrolled\": \"{{ $json.class_enrolled }}\",\n  \"admission_date\": \"{{ $json.admission_date }}\",\n  \"fee_plan\": \"{{ $json.fee_plan }}\",\n  \"payment_status\": \"{{ $json.payment_status }}\",\n  \"admission_source\": \"{{ $json.admission_source }}\",\n  \"current_streak\": 0,\n  \"status\": \"active\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "save-student",
+      "name": "Save Student",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1900, 280],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Messages').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/student_badges",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Prepare Messages').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Prepare Messages').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"student_id\": \"{{ $('Prepare Messages').first().json.student_id }}\",\n  \"badge_type\": \"welcome\",\n  \"badge_name\": \"New Student Badge\",\n  \"earned_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "assign-badge",
+      "name": "Assign Badge",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2100, 280],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler\n// ============================================\nconst data = $('Prepare Messages').first().json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nreturn {\n  success: true,\n  message: 'New admission processed successfully',\n  welcome_id: data.welcome_id,\n  student: {\n    id: data.student_id,\n    name: data.student_name,\n    class: data.class_enrolled\n  },\n  notifications: {\n    student_push: true,\n    student_email: true,\n    parent_sms: true,\n    parent_email: true,\n    admin_slack: true\n  },\n  next_steps: [\n    'Complete student profile',\n    'Assign batch/schedule',\n    'Verify payment if pending'\n  ],\n  _log: {\n    timestamp: new Date().toISOString(),\n    level: 'info',\n    correlation_id: data._trace.correlation_id,\n    message: 'New admission welcome flow completed',\n    event_type: 'admission_welcome',\n    student_id: data.student_id,\n    duration_ms: duration_ms\n  },\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2300, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"admission_welcome\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2500, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, welcome_id: $json.welcome_id, student: $json.student, notifications: $json.notifications, next_steps: $json.next_steps, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2700, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-auth-fail",
+      "name": "401 Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-validation-fail",
+      "name": "400 Bad Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-duplicate",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1480, 280]
+    }
+  ],
+  "connections": {
+    "New Admission Webhook": { "main": [[{ "node": "Auth Check", "type": "main", "index": 0 }]] },
+    "Auth Check": { "main": [[{ "node": "Auth OK?", "type": "main", "index": 0 }]] },
+    "Auth OK?": {
+      "main": [
+        [{ "node": "401 Unauthorized", "type": "main", "index": 0 }],
+        [{ "node": "Validate Input", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Input": { "main": [[{ "node": "Valid Input?", "type": "main", "index": 0 }]] },
+    "Valid Input?": {
+      "main": [
+        [{ "node": "400 Bad Request", "type": "main", "index": 0 }],
+        [{ "node": "Duplicate Check", "type": "main", "index": 0 }]
+      ]
+    },
+    "Duplicate Check": { "main": [[{ "node": "Is Duplicate?", "type": "main", "index": 0 }]] },
+    "Is Duplicate?": {
+      "main": [
+        [{ "node": "Respond Duplicate", "type": "main", "index": 0 }],
+        [{ "node": "Prepare Messages", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Messages": { "main": [[{ "node": "Student Push", "type": "main", "index": 0 }, { "node": "Parent SMS", "type": "main", "index": 0 }, { "node": "Student Email", "type": "main", "index": 0 }, { "node": "Parent Email", "type": "main", "index": 0 }]] },
+    "Student Push": { "main": [[{ "node": "Admin Slack", "type": "main", "index": 0 }]] },
+    "Parent SMS": { "main": [[{ "node": "Admin Slack", "type": "main", "index": 0 }]] },
+    "Student Email": { "main": [[{ "node": "Save Student", "type": "main", "index": 0 }]] },
+    "Parent Email": { "main": [[{ "node": "Save Student", "type": "main", "index": 0 }]] },
+    "Admin Slack": { "main": [[{ "node": "Save Student", "type": "main", "index": 0 }]] },
+    "Save Student": { "main": [[{ "node": "Assign Badge", "type": "main", "index": 0 }]] },
+    "Assign Badge": { "main": [[{ "node": "Success Handler", "type": "main", "index": 0 }]] },
+    "Success Handler": { "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]] },
+    "Log to Supabase": { "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

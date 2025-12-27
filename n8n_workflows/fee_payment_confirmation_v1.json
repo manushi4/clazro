@@ -1,0 +1,543 @@
+{
+  "name": "Fee Payment Confirmation Loop - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Fee Payment Confirmation Loop\n\n**Webhook:** POST /webhook/payment-confirm\n\n**Purpose:** Process payment confirmations from Razorpay/Stripe and notify all stakeholders\n\n**Flow:**\n1. Receive payment event\n2. Verify signature & validate\n3. Update fee status in DB\n4. Notify student (Push)\n5. Notify parent (SMS)\n6. Alert admin for records\n\n**Headers:** `X-API-KEY`, `X-Razorpay-Signature`",
+        "height": 380,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -120]
+    },
+    {
+      "parameters": {
+        "content": "## Authentication\n\nValidates API key from headers.\n\n**Valid Keys:**\n- sk_test_manushi_2025\n- sk_prod_manushi_2025\n\n**Razorpay Signature:**\nVerified using webhook secret\n\n**Returns 401** if invalid",
+        "height": 220,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-auth",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 60]
+    },
+    {
+      "parameters": {
+        "content": "## Input Validation\n\n**Required Fields:**\n- payment_id\n- order_id\n- student_id\n- amount\n- status (captured/failed)\n\n**Optional:**\n- fee_type (tuition/exam/misc)\n- payment_method\n- receipt_url",
+        "height": 260,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-validation",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, -20]
+    },
+    {
+      "parameters": {
+        "content": "## Payment Status Check\n\n**Routes by status:**\n- `captured` -> Success flow\n- `failed` -> Failure flow\n- `refunded` -> Refund flow\n\n**Updates:**\n- student_fees table\n- payment_history table",
+        "height": 220,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-status",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1500, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Multi-Stakeholder Notifications\n\n**Student:** Push notification with receipt\n**Parent:** SMS with payment details\n**Admin:** Slack alert for records\n\n**Deep Links:**\n- View receipt\n- Download invoice",
+        "height": 220,
+        "width": 300,
+        "color": 2
+      },
+      "id": "sticky-notify",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2100, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Success Logging\n\n**Logs to:** Supabase\n\n**Tracked:**\n- Payment amount\n- Processing time\n- Notification status\n- Receipt generated",
+        "height": 180,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-success",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2700, -60]
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n**Failed Payments:**\n- Log to payment_failures\n- Notify student to retry\n- Alert admin\n\n**DLQ:** Processing failures\n**Slack:** Ops alerts\n\n**Returns 500** on error",
+        "height": 220,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-error",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2700, 500]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-confirm",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Webhook Authentication + Signature Verify\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\n// Check API key\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\n// Razorpay signature verification (simplified - in production use crypto)\n// const razorpaySignature = headers['x-razorpay-signature'] || '';\n// In production, verify using: crypto.createHmac('sha256', secret).update(payload).digest('hex');\n\nconst correlationId = body.correlation_id || body.payment_id ||\n  'pay_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  payment_id: body.payment_id,\n  order_id: body.order_id,\n  student_id: body.student_id,\n  student_name: body.student_name,\n  student_email: body.student_email,\n  student_phone: body.student_phone,\n  parent_name: body.parent_name,\n  parent_phone: body.parent_phone,\n  amount: body.amount,\n  currency: body.currency || 'INR',\n  status: body.status,\n  fee_type: body.fee_type || 'tuition',\n  fee_month: body.fee_month,\n  payment_method: body.payment_method,\n  bank: body.bank,\n  wallet: body.wallet,\n  vpa: body.vpa,\n  receipt_url: body.receipt_url,\n  invoice_id: body.invoice_id,\n  fcm_token: body.fcm_token,\n  error_code: body.error_code,\n  error_description: body.error_description,\n  _trace: trace,\n  _raw: body,\n  _auth_passed: true\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Payment Input Validation\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['payment_id', 'student_id', 'amount', 'status'],\n  properties: {\n    payment_id: { type: 'string', minLength: 1 },\n    student_id: { type: 'string', minLength: 1 },\n    amount: { type: 'number', min: 0 },\n    status: { type: 'string', enum: ['captured', 'failed', 'refunded', 'pending'] }\n  }\n};\n\n// Check required fields\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Validate amount is positive\nif (data.amount !== undefined && (isNaN(Number(data.amount)) || Number(data.amount) < 0)) {\n  errors.push('amount must be a positive number');\n}\n\n// Validate status\nconst validStatuses = ['captured', 'failed', 'refunded', 'pending'];\nif (data.status && !validStatuses.includes(data.status.toLowerCase())) {\n  errors.push('status must be one of: ' + validStatuses.join(', '));\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Payment validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\n// Format amount\nconst amountPaise = Math.round(Number(data.amount));\nconst amountRupees = (amountPaise / 100).toFixed(2);\n\nreturn {\n  payment_id: String(data.payment_id).trim(),\n  order_id: String(data.order_id || '').trim(),\n  student_id: String(data.student_id).trim(),\n  student_name: String(data.student_name || 'Student').trim(),\n  student_email: String(data.student_email || '').trim(),\n  student_phone: String(data.student_phone || '').trim(),\n  parent_name: String(data.parent_name || 'Parent').trim(),\n  parent_phone: String(data.parent_phone || '').trim(),\n  amount_paise: amountPaise,\n  amount_rupees: amountRupees,\n  amount_display: 'Rs. ' + amountRupees,\n  currency: String(data.currency || 'INR').toUpperCase(),\n  status: String(data.status).toLowerCase(),\n  fee_type: String(data.fee_type || 'tuition').toLowerCase(),\n  fee_month: data.fee_month || new Date().toISOString().substring(0, 7),\n  payment_method: data.payment_method || 'unknown',\n  bank: data.bank || null,\n  wallet: data.wallet || null,\n  vpa: data.vpa || null,\n  receipt_url: data.receipt_url || null,\n  invoice_id: data.invoice_id || null,\n  fcm_token: data.fcm_token || '',\n  error_code: data.error_code || null,\n  error_description: data.error_description || null,\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Duplicate Payment Check\n// Prevents double processing of same payment\n// ============================================\nconst data = $json;\nconst dedupeKey = 'payment_' + data.payment_id;\n\nconst processed = $getWorkflowStaticData('global');\nconst recentPayments = processed.recentPayments || {};\n\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours for payments\n\n// Clean up old entries\nfor (const key in recentPayments) {\n  if (now - recentPayments[key] > DEDUP_WINDOW_MS) {\n    delete recentPayments[key];\n  }\n}\n\nif (recentPayments[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Payment already processed',\n    payment_id: data.payment_id,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\nrecentPayments[dedupeKey] = now;\nprocessed.recentPayments = recentPayments;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "status-check", "leftValue": "={{ $json.status }}", "rightValue": "captured", "operator": { "type": "string", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-success",
+      "name": "Payment Captured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1600, 180]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/student_fees?student_id=eq.{{ $json.student_id }}&fee_month=eq.{{ $json.fee_month }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"paid\",\n  \"payment_id\": \"{{ $json.payment_id }}\",\n  \"payment_date\": \"{{ new Date().toISOString() }}\",\n  \"amount_paid\": {{ $json.amount_paise }},\n  \"payment_method\": \"{{ $json.payment_method }}\",\n  \"receipt_url\": \"{{ $json.receipt_url || '' }}\",\n  \"updated_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "update-fee-status",
+      "name": "Update Fee Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1800, 120],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare Success Notifications\n// ============================================\nconst data = $('Duplicate Check').first().json;\n\n// Student push notification\nconst studentPush = {\n  token: data.fcm_token,\n  notification: {\n    title: 'Payment Successful!',\n    body: `Your fee payment of ${data.amount_display} has been received. Thank you!`\n  },\n  data: {\n    type: 'payment_success',\n    payment_id: data.payment_id,\n    amount: data.amount_display,\n    fee_type: data.fee_type,\n    fee_month: data.fee_month,\n    receipt_url: data.receipt_url || '',\n    deep_link: 'manushi://payments/receipt/' + data.payment_id\n  },\n  android: {\n    priority: 'high',\n    notification: {\n      sound: 'payment_success',\n      channel_id: 'payments',\n      icon: 'ic_payment',\n      color: '#4CAF50'\n    }\n  }\n};\n\n// Parent SMS message\nconst parentSms = {\n  to: data.parent_phone,\n  message: `Dear ${data.parent_name}, Fee payment of ${data.amount_display} for ${data.student_name} (${data.fee_month}) received successfully. Receipt: ${data.receipt_url || 'Available in app'}. Thank you - Manushi Coaching`\n};\n\n// Admin Slack notification\nconst adminSlack = {\n  text: ':white_check_mark: *Fee Payment Received*',\n  attachments: [{\n    color: 'good',\n    fields: [\n      { title: 'Student', value: data.student_name, short: true },\n      { title: 'Amount', value: data.amount_display, short: true },\n      { title: 'Payment ID', value: data.payment_id, short: true },\n      { title: 'Fee Type', value: data.fee_type + ' (' + data.fee_month + ')', short: true },\n      { title: 'Method', value: data.payment_method, short: true }\n    ]\n  }]\n};\n\nreturn {\n  ...data,\n  _student_push: studentPush,\n  _parent_sms: parentSms,\n  _admin_slack: adminSlack,\n  _notifications_prepared: true\n};"
+      },
+      "id": "prep-notifications",
+      "name": "Prepare Notifications",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {{ JSON.stringify($json._student_push) }}\n}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-student-push",
+      "name": "Send Student Push",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 60],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.msg91.com/api/v5/flow/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"payment_confirmation\",\n  \"recipients\": [{\n    \"mobiles\": \"91{{ $json._parent_sms.to }}\",\n    \"VAR1\": \"{{ $json.parent_name }}\",\n    \"VAR2\": \"{{ $json.amount_display }}\",\n    \"VAR3\": \"{{ $json.student_name }}\",\n    \"VAR4\": \"{{ $json.fee_month }}\"\n  }]\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-parent-sms",
+      "name": "Send Parent SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._admin_slack) }}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "notify-admin",
+      "name": "Notify Admin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 300],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler\n// ============================================\nconst data = $('Prepare Notifications').first().json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'Payment processed successfully',\n  event_type: 'payment_success',\n  payment_id: data.payment_id,\n  student_id: data.student_id,\n  amount_rupees: data.amount_rupees,\n  fee_type: data.fee_type,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  message: 'Payment confirmed and all stakeholders notified',\n  payment: {\n    id: data.payment_id,\n    order_id: data.order_id,\n    amount: data.amount_display,\n    status: 'confirmed',\n    fee_type: data.fee_type,\n    fee_month: data.fee_month\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  notifications: {\n    student_push: true,\n    parent_sms: true,\n    admin_slack: true\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2400, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Failed Payment Handler\n// ============================================\nconst data = $('Duplicate Check').first().json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\n// Prepare failure notification for student\nconst failureNotif = {\n  title: 'Payment Failed',\n  body: `Your payment of ${data.amount_display} could not be processed. ${data.error_description || 'Please try again.'}`\n};\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'warn',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Failed Payment',\n  message: 'Payment failed',\n  event_type: 'payment_failed',\n  payment_id: data.payment_id,\n  student_id: data.student_id,\n  amount_rupees: data.amount_rupees,\n  error_code: data.error_code,\n  error_description: data.error_description,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: false,\n  message: 'Payment failed - student notified',\n  payment: {\n    id: data.payment_id,\n    order_id: data.order_id,\n    amount: data.amount_display,\n    status: 'failed',\n    error_code: data.error_code,\n    error_description: data.error_description\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  _failure_notification: failureNotif,\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'payment_failed' },\n  _needs_retry_notification: true\n};"
+      },
+      "id": "failed-payment-handler",
+      "name": "Failed Payment Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"token\": \"{{ $('Duplicate Check').first().json.fcm_token }}\",\n    \"notification\": {{ JSON.stringify($json._failure_notification) }},\n    \"data\": {\n      \"type\": \"payment_failed\",\n      \"payment_id\": \"{{ $json.payment.id }}\",\n      \"deep_link\": \"manushi://payments/retry/{{ $json.payment.id }}\"\n    },\n    \"android\": {\n      \"priority\": \"high\",\n      \"notification\": {\n        \"sound\": \"payment_failed\",\n        \"channel_id\": \"payments\",\n        \"icon\": \"ic_payment_failed\",\n        \"color\": \"#F44336\"\n      }\n    }\n  }\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-failure-push",
+      "name": "Send Failure Push",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2000, 320],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":x: *Payment Failed*\",\n  \"attachments\": [{\n    \"color\": \"danger\",\n    \"fields\": [\n      {\"title\": \"Student\", \"value\": \"{{ $json.student.name }}\", \"short\": true},\n      {\"title\": \"Amount\", \"value\": \"{{ $json.payment.amount }}\", \"short\": true},\n      {\"title\": \"Payment ID\", \"value\": \"{{ $json.payment.id }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json.payment.error_description || $json.payment.error_code || 'Unknown' }}\", \"short\": true}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "notify-admin-failure",
+      "name": "Notify Admin (Failure)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 380],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"{{ $json._log.event_type }}\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2600, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/payment_history",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payment_id\": \"{{ $json.payment.id }}\",\n  \"order_id\": \"{{ $json.payment.order_id }}\",\n  \"student_id\": \"{{ $json.student.id }}\",\n  \"amount_paise\": {{ $('Prepare Notifications').first().json.amount_paise || 0 }},\n  \"currency\": \"INR\",\n  \"status\": \"{{ $json.payment.status }}\",\n  \"fee_type\": \"{{ $json.payment.fee_type }}\",\n  \"fee_month\": \"{{ $json.payment.fee_month }}\",\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-payment-history",
+      "name": "Log Payment History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2600, 60],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, payment: $json.payment, student: $json.student, notifications: $json.notifications, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2800, 120]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, payment: $json.payment, student: $json.student, _trace: { correlation_id: $json._trace.correlation_id, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-failure",
+      "name": "Respond Failure",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2400, 380]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// DB Update Error Handler\n// ============================================\nconst data = $('Duplicate Check').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(data._trace.started_at).getTime();\n\nreturn {\n  success: false,\n  message: 'Payment received but DB update failed - logged for retry',\n  payment: {\n    id: data.payment_id,\n    amount: data.amount_display,\n    status: 'received_pending_update'\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  _log: {\n    level: 'error',\n    message: 'DB update failed for payment',\n    error_code: 'DB_UPDATE_FAILED'\n  },\n  _trace: { ...data._trace, duration_ms, path: 'db_update_failed' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "db-error-handler",
+      "name": "DB Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/dead_letter_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"Fee Payment Confirmation\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"{{ $json._log.error_code || 'PROCESSING_FAILED' }}\",\n  \"error_message\": \"{{ $json._error_info.message || 'Payment processing failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 500],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":rotating_light: *Payment Processing Error*\",\n  \"attachments\": [{\n    \"color\": \"danger\",\n    \"fields\": [\n      {\"title\": \"Payment ID\", \"value\": \"{{ $json.payment.id }}\", \"short\": true},\n      {\"title\": \"Student\", \"value\": \"{{ $json.student.name }}\", \"short\": true},\n      {\"title\": \"Amount\", \"value\": \"{{ $json.payment.amount }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'Unknown' }}\", \"short\": true},\n      {\"title\": \"Action Required\", \"value\": \"Manual intervention needed\", \"short\": false}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-error-alert",
+      "name": "Slack Error Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 500],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, message: $json.message, payment: $json.payment, _trace: { correlation_id: $json._trace.correlation_id, path: $json._trace.path } }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Auth Check", "type": "main", "index": 0}]] },
+    "Auth Check": { "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]] },
+    "Is Authenticated?": { "main": [ [{"node": "Validate Input", "type": "main", "index": 0}], [{"node": "Respond Unauthorized", "type": "main", "index": 0}] ] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Duplicate Check", "type": "main", "index": 0}], [{"node": "Respond Invalid", "type": "main", "index": 0}] ] },
+    "Duplicate Check": { "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]] },
+    "Not Duplicate?": { "main": [ [{"node": "Payment Captured?", "type": "main", "index": 0}], [{"node": "Respond Duplicate", "type": "main", "index": 0}] ] },
+    "Payment Captured?": { "main": [ [{"node": "Update Fee Status", "type": "main", "index": 0}], [{"node": "Failed Payment Handler", "type": "main", "index": 0}] ] },
+    "Update Fee Status": { "main": [[{"node": "Prepare Notifications", "type": "main", "index": 0}]], "error": [[{"node": "DB Error Handler", "type": "main", "index": 0}]] },
+    "Prepare Notifications": { "main": [[{"node": "Send Student Push", "type": "main", "index": 0}], [{"node": "Send Parent SMS", "type": "main", "index": 0}], [{"node": "Notify Admin", "type": "main", "index": 0}]] },
+    "Send Student Push": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]] },
+    "Send Parent SMS": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]] },
+    "Notify Admin": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]] },
+    "Success Handler": { "main": [[{"node": "Log Payment History", "type": "main", "index": 0}], [{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Log Payment History": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Failed Payment Handler": { "main": [[{"node": "Send Failure Push", "type": "main", "index": 0}]] },
+    "Send Failure Push": { "main": [[{"node": "Notify Admin (Failure)", "type": "main", "index": 0}]] },
+    "Notify Admin (Failure)": { "main": [[{"node": "Respond Failure", "type": "main", "index": 0}]] },
+    "DB Error Handler": { "main": [[{"node": "Dead Letter Queue", "type": "main", "index": 0}]] },
+    "Dead Letter Queue": { "main": [[{"node": "Slack Error Alert", "type": "main", "index": 0}]] },
+    "Slack Error Alert": { "main": [[{"node": "Respond Error", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

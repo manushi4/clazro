@@ -1,0 +1,113 @@
+{
+  "name": "AI Study Streak - v1 Correlation ID",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-v1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Entry Point with Correlation ID\n// ============================================\n// NOTE: $request is NOT available in n8n Code nodes\n// NOTE: process.env is NOT available in n8n sandbox\n// Webhook POST data comes in $json.body, not $json directly\n\nconst body = $json.body || $json;\n\n// Generate correlation ID (accept from caller or generate new)\nconst correlationId = body.correlation_id || \n  'corr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\n// Create _trace object for propagation through workflow\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString()\n};\n\nreturn {\n  // Input data\n  student_id: body.student_id,\n  student_name: body.student_name,\n  current_streak: body.current_streak,\n  preferred_subject: body.preferred_subject || 'studies',\n  \n  // Trace object for propagation\n  _trace: trace\n};"
+      },
+      "id": "config",
+      "name": "Entry Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\"role\": \"user\", \"parts\": [{\"text\": \"Generate a SHORT motivational push notification (max 2 sentences, under 150 chars) for student {{ $json.student_name }} with {{ $json.current_streak }} day streak. Subject: {{ $json.preferred_subject }}. Be friendly and encouraging.\"}]}],\n  \"generationConfig\": {\"temperature\": 0.8, \"maxOutputTokens\": 500}\n}",
+        "options": {"timeout": 15000}
+      },
+      "id": "gemini",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Success Handler with Trace Propagation\n// ============================================\n\n// Get original config with _trace\nconst config = $('Entry Config').first().json;\nconst response = $json;\n\nlet message = '';\ntry {\n  message = response.candidates[0].content.parts[0].text || '';\n  message = message.trim().substring(0, 200);\n} catch(e) {\n  message = 'Hey ' + config.student_name + '! Keep your ' + config.current_streak + '-day streak alive!';\n}\n\n// Update trace with completion info\nconst trace = {\n  ...config._trace,\n  completed_at: new Date().toISOString(),\n  path: 'success',\n  ai_model: 'gemini-2.5-flash'\n};\n\nreturn {\n  success: true,\n  notification: {\n    title: 'Streak Alert',\n    body: message\n  },\n  student: {\n    id: config.student_id,\n    name: config.student_name,\n    streak: config.current_streak\n  },\n  ai_used: true,\n  \n  // Include trace in response\n  _trace: trace\n};"
+      },
+      "id": "parse",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Error/Fallback Handler with Trace\n// ============================================\n\n// Get original config with _trace\nconst config = $('Entry Config').first().json;\nconst fallback = 'Hey ' + config.student_name + '! Your ' + config.current_streak + '-day streak is amazing. Keep it going!';\n\n// Update trace with error info\nconst trace = {\n  ...config._trace,\n  completed_at: new Date().toISOString(),\n  path: 'fallback',\n  error_reason: 'ai_call_failed'\n};\n\nreturn {\n  success: true,\n  notification: {\n    title: 'Streak Alert',\n    body: fallback\n  },\n  student: {\n    id: config.student_id,\n    name: config.student_name,\n    streak: config.current_streak\n  },\n  ai_used: false,\n  \n  // Include trace in response\n  _trace: trace\n};"
+      },
+      "id": "fallback",
+      "name": "Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond1",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond2",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1000, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Entry Config", "type": "main", "index": 0}]]
+    },
+    "Entry Config": {
+      "main": [[{"node": "Call Gemini", "type": "main", "index": 0}]]
+    },
+    "Call Gemini": {
+      "main": [[{"node": "Parse Response", "type": "main", "index": 0}]],
+      "error": [[{"node": "Fallback", "type": "main", "index": 0}]]
+    },
+    "Parse Response": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    },
+    "Fallback": {
+      "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null
+}

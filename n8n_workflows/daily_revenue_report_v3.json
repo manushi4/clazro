@@ -1,0 +1,228 @@
+{
+  "name": "Daily Revenue Report - v3 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Daily Revenue Report\n\n**Triggers:**\n- Schedule: 8 AM daily\n- Manual: POST /revenue-report",
+        "height": 120,
+        "width": 240,
+        "color": 4
+      },
+      "id": "sticky1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [100, 200]
+    },
+    {
+      "parameters": {
+        "content": "## Data Queries\n\nFetches from Supabase:\n- Today's payments\n- Previous day\n- Month to date",
+        "height": 120,
+        "width": 220,
+        "color": 3
+      },
+      "id": "sticky2",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 200]
+    },
+    {
+      "parameters": {
+        "content": "## Process & Send\n\nCalculate metrics\nGenerate Slack + Email\nLog to database",
+        "height": 100,
+        "width": 200,
+        "color": 2
+      },
+      "id": "sticky3",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [160, 360]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "revenue-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [160, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst body = $json.body || {};\n\nlet startDate = body.report_date ? new Date(body.report_date) : new Date(now.setDate(now.getDate() - 1));\nstartDate.setHours(0, 0, 0, 0);\nlet endDate = new Date(startDate);\nendDate.setHours(23, 59, 59, 999);\n\nconst prevDay = new Date(startDate);\nprevDay.setDate(prevDay.getDate() - 1);\n\nconst monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);\n\nreturn {\n  report_date: startDate.toISOString().split('T')[0],\n  start_date: startDate.toISOString(),\n  end_date: endDate.toISOString(),\n  prev_day: prevDay.toISOString().split('T')[0],\n  month_start: monthStart.toISOString().split('T')[0],\n  day_name: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][startDate.getDay()],\n  _trace: {\n    correlation_id: 'rpt_' + Date.now(),\n    started_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "init",
+      "name": "Init",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 420]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json._supabase_url || 'https://PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $json.start_date }}&created_at=lte.{{ $json.end_date }}&status=eq.confirmed&select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch1",
+      "name": "Today",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [580, 360],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Init').first().json._supabase_url || 'https://PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $('Init').first().json.prev_day }}T00:00:00Z&created_at=lte.{{ $('Init').first().json.prev_day }}T23:59:59Z&status=eq.confirmed&select=amount_paise",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Init').first().json._supabase_key || 'KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Init').first().json._supabase_key || 'KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch2",
+      "name": "Previous",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [580, 480],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Init').first().json._supabase_url || 'https://PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $('Init').first().json.month_start }}T00:00:00Z&status=eq.confirmed&select=amount_paise",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Init').first().json._supabase_key || 'KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Init').first().json._supabase_key || 'KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch3",
+      "name": "MTD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [580, 600],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Init').first().json;\nconst today = $('Today').first().json || [];\nconst prev = $('Previous').first().json || [];\nconst mtd = $('MTD').first().json || [];\n\nconst t = Array.isArray(today) ? today : [];\nconst p = Array.isArray(prev) ? prev : [];\nconst m = Array.isArray(mtd) ? mtd : [];\n\nconst sum = (arr) => arr.reduce((s, x) => s + (x.amount_paise || 0), 0);\nconst fmt = (v) => 'Rs.' + (v/100).toLocaleString('en-IN');\n\nconst tTotal = sum(t), pTotal = sum(p), mTotal = sum(m);\nconst change = pTotal > 0 ? ((tTotal-pTotal)/pTotal*100).toFixed(1) : '0';\n\nreturn {\n  ...ctx,\n  today_total: fmt(tTotal),\n  today_count: t.length,\n  prev_total: fmt(pTotal),\n  mtd_total: fmt(mTotal),\n  mtd_count: m.length,\n  change: (tTotal >= pTotal ? '+' : '') + change + '%',\n  change_up: tTotal >= pTotal\n};"
+      },
+      "id": "calc",
+      "name": "Calculate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\nconst color = d.change_up ? 'good' : 'warning';\nconst icon = d.change_up ? ':chart_with_upwards_trend:' : ':chart_with_downwards_trend:';\n\nconst slack = {\n  text: `:moneybag: *Revenue Report - ${d.report_date}* (${d.day_name})`,\n  attachments: [{\n    color: color,\n    text: `*Today:* ${d.today_total} (${d.today_count} txns)\\n${icon} ${d.change} vs yesterday\\n\\n*Yesterday:* ${d.prev_total}\\n*MTD:* ${d.mtd_total} (${d.mtd_count} txns)`\n  }]\n};\n\nconst email = `<h2>Revenue Report - ${d.report_date}</h2><p><b>Today:</b> ${d.today_total} (${d.today_count} txns)</p><p><b>Change:</b> ${d.change}</p><p><b>MTD:</b> ${d.mtd_total}</p>`;\n\nreturn { ...d, _slack: slack, _email: email, _subject: 'Revenue ' + d.report_date + ' - ' + d.today_total };"
+      },
+      "id": "gen",
+      "name": "Generate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/XXX' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._slack) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "slack",
+      "name": "Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1200, 360],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "reports@manushi.com",
+        "toEmail": "={{ $json._admin_email || 'admin@manushi.com' }}",
+        "subject": "={{ $json._subject }}",
+        "emailType": "html",
+        "html": "={{ $json._email }}",
+        "options": {}
+      },
+      "id": "email",
+      "name": "Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1200, 480],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\nreturn {\n  success: true,\n  report_date: d.report_date,\n  summary: { today: d.today_total, count: d.today_count, mtd: d.mtd_total, change: d.change }\n};"
+      },
+      "id": "done",
+      "name": "Done",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 420]
+    }
+  ],
+  "connections": {
+    "Daily 8 AM": { "main": [[{ "node": "Init", "type": "main", "index": 0 }]] },
+    "Manual Trigger": { "main": [[{ "node": "Init", "type": "main", "index": 0 }]] },
+    "Init": { "main": [[{ "node": "Today", "type": "main", "index": 0 }, { "node": "Previous", "type": "main", "index": 0 }, { "node": "MTD", "type": "main", "index": 0 }]] },
+    "Today": { "main": [[{ "node": "Calculate", "type": "main", "index": 0 }]] },
+    "Previous": { "main": [[{ "node": "Calculate", "type": "main", "index": 0 }]] },
+    "MTD": { "main": [[{ "node": "Calculate", "type": "main", "index": 0 }]] },
+    "Calculate": { "main": [[{ "node": "Generate", "type": "main", "index": 0 }]] },
+    "Generate": { "main": [[{ "node": "Slack", "type": "main", "index": 0 }, { "node": "Email", "type": "main", "index": 0 }]] },
+    "Slack": { "main": [[{ "node": "Done", "type": "main", "index": 0 }]] },
+    "Email": { "main": [[{ "node": "Done", "type": "main", "index": 0 }]] },
+    "Done": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

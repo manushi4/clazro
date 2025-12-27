@@ -26,3 +26,6 @@ export function getSupabaseClient(): SupabaseClient<any> {
 
   return client;
 }
+
+// Named export for backwards compatibility with admin hooks
+export const supabase = getSupabaseClient();

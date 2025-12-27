@@ -1,0 +1,378 @@
+{
+  "name": "Daily Revenue Report - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Daily Revenue Report\n\n**Schedule:** Daily at 8:00 AM IST\n\n**Purpose:** Generate comprehensive daily revenue report for admin dashboard\n\n**Data Sources:**\n- payment_history table\n- student_fees table\n\n**Outputs:**\n- Slack report\n- Email summary\n- Supabase log\n\n**Metrics:** Total revenue, by fee type, by method, comparisons",
+        "height": 360,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -120]
+    },
+    {
+      "parameters": {
+        "content": "## Scheduler\n\n**Cron:** 0 8 * * * (8 AM daily)\n**Timezone:** Asia/Kolkata\n\n**Also supports:**\n- Manual webhook trigger\n- Date range override\n\n**Correlation ID:** Generated per run",
+        "height": 200,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-schedule",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 60]
+    },
+    {
+      "parameters": {
+        "content": "## Data Fetch\n\n**Queries:**\n1. Yesterday's payments\n2. Payment by fee type\n3. Payment by method\n4. Failed payments\n5. Pending fees\n\n**Filters:**\n- Date range\n- Status = captured",
+        "height": 260,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-fetch",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, -40]
+    },
+    {
+      "parameters": {
+        "content": "## Metrics Calculation\n\n**Revenue Metrics:**\n- Total collected (Rs.)\n- Transaction count\n- Average transaction\n- By fee type breakdown\n- By payment method\n\n**Comparisons:**\n- vs Yesterday\n- vs Same day last week\n- MTD progress",
+        "height": 280,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-metrics",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1500, -120]
+    },
+    {
+      "parameters": {
+        "content": "## Report Generation\n\n**Formats:**\n- Slack (rich formatting)\n- Email (HTML table)\n- JSON (for API)\n\n**Includes:**\n- Summary stats\n- Top 5 collections\n- Failed payments alert\n- Pending dues warning",
+        "height": 240,
+        "width": 300,
+        "color": 2
+      },
+      "id": "sticky-report",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2100, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Delivery & Logging\n\n**Channels:**\n- #finance-reports (Slack)\n- admin@manushi.com\n\n**Logged to:**\n- automation_logs\n- daily_reports table\n\n**Retention:** 90 days",
+        "height": 200,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-delivery",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2600, -60]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "revenue-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 480]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Initialize Report Context\n// ============================================\nconst now = new Date();\nconst body = $json.body || {};\n\n// Calculate date range (yesterday by default)\nlet reportDate = body.report_date || null;\nlet startDate, endDate;\n\nif (reportDate) {\n  // Use provided date\n  startDate = new Date(reportDate);\n  startDate.setHours(0, 0, 0, 0);\n  endDate = new Date(reportDate);\n  endDate.setHours(23, 59, 59, 999);\n} else {\n  // Yesterday\n  startDate = new Date(now);\n  startDate.setDate(startDate.getDate() - 1);\n  startDate.setHours(0, 0, 0, 0);\n  endDate = new Date(startDate);\n  endDate.setHours(23, 59, 59, 999);\n}\n\n// Format dates for queries\nconst startISO = startDate.toISOString();\nconst endISO = endDate.toISOString();\nconst reportDateStr = startDate.toISOString().split('T')[0];\n\n// Calculate comparison dates\nconst prevDay = new Date(startDate);\nprevDay.setDate(prevDay.getDate() - 1);\nconst prevDayStr = prevDay.toISOString().split('T')[0];\n\nconst lastWeekSameDay = new Date(startDate);\nlastWeekSameDay.setDate(lastWeekSameDay.getDate() - 7);\nconst lastWeekStr = lastWeekSameDay.toISOString().split('T')[0];\n\n// Month to date\nconst monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);\nconst monthStartStr = monthStart.toISOString().split('T')[0];\n\nconst correlationId = 'report_' + reportDateStr + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: now.toISOString(),\n  report_date: reportDateStr,\n  trigger_type: body.report_date ? 'manual' : 'scheduled'\n};\n\nreturn {\n  report_date: reportDateStr,\n  start_date: startISO,\n  end_date: endISO,\n  prev_day: prevDayStr,\n  last_week_same_day: lastWeekStr,\n  month_start: monthStartStr,\n  day_name: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][startDate.getDay()],\n  _trace: trace,\n  _initialized: true\n};"
+      },
+      "id": "init-context",
+      "name": "Initialize Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 380]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $json.start_date }}&created_at=lte.{{ $json.end_date }}&status=eq.confirmed&select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-payments",
+      "name": "Fetch Today Payments",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize Context').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $('Initialize Context').first().json.prev_day }}T00:00:00Z&created_at=lte.{{ $('Initialize Context').first().json.prev_day }}T23:59:59Z&status=eq.confirmed&select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-prev-day",
+      "name": "Fetch Previous Day",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 420],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize Context').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/payment_history?created_at=gte.{{ $('Initialize Context').first().json.month_start }}T00:00:00Z&created_at=lte.{{ $('Initialize Context').first().json.end_date }}&status=eq.confirmed&select=amount_paise",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-mtd",
+      "name": "Fetch MTD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 540],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize Context').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/student_fees?status=eq.pending&select=student_id,student_name,amount_due,fee_month,due_date",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize Context').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-pending",
+      "name": "Fetch Pending Fees",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 660],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Calculate Revenue Metrics\n// ============================================\nconst context = $('Initialize Context').first().json;\nconst todayPayments = $('Fetch Today Payments').first().json || [];\nconst prevDayPayments = $('Fetch Previous Day').first().json || [];\nconst mtdPayments = $('Fetch MTD').first().json || [];\nconst pendingFees = $('Fetch Pending Fees').first().json || [];\n\n// Handle case where data is not an array (error response)\nconst payments = Array.isArray(todayPayments) ? todayPayments : [];\nconst prevPayments = Array.isArray(prevDayPayments) ? prevDayPayments : [];\nconst mtd = Array.isArray(mtdPayments) ? mtdPayments : [];\nconst pending = Array.isArray(pendingFees) ? pendingFees : [];\n\n// Today's metrics\nconst todayTotal = payments.reduce((sum, p) => sum + (p.amount_paise || 0), 0);\nconst todayCount = payments.length;\nconst todayAvg = todayCount > 0 ? Math.round(todayTotal / todayCount) : 0;\n\n// Previous day metrics\nconst prevTotal = prevPayments.reduce((sum, p) => sum + (p.amount_paise || 0), 0);\nconst prevCount = prevPayments.length;\n\n// MTD metrics\nconst mtdTotal = mtd.reduce((sum, p) => sum + (p.amount_paise || 0), 0);\nconst mtdCount = mtd.length;\n\n// Pending fees\nconst pendingTotal = pending.reduce((sum, p) => sum + (p.amount_due || 0), 0);\nconst pendingCount = pending.length;\n\n// Breakdowns\nconst byFeeType = {};\nconst byPaymentMethod = {};\n\npayments.forEach(p => {\n  const feeType = p.fee_type || 'other';\n  const method = p.payment_method || 'unknown';\n  \n  if (!byFeeType[feeType]) byFeeType[feeType] = { count: 0, amount: 0 };\n  byFeeType[feeType].count++;\n  byFeeType[feeType].amount += p.amount_paise || 0;\n  \n  if (!byPaymentMethod[method]) byPaymentMethod[method] = { count: 0, amount: 0 };\n  byPaymentMethod[method].count++;\n  byPaymentMethod[method].amount += p.amount_paise || 0;\n});\n\n// Calculate changes\nconst dayChange = prevTotal > 0 ? ((todayTotal - prevTotal) / prevTotal * 100).toFixed(1) : 0;\nconst dayChangeSign = todayTotal >= prevTotal ? '+' : '';\n\n// Format currency helper\nconst formatCurrency = (paise) => {\n  const rupees = (paise / 100).toFixed(2);\n  return 'Rs. ' + Number(rupees).toLocaleString('en-IN');\n};\n\nreturn {\n  ...context,\n  metrics: {\n    today: {\n      total_paise: todayTotal,\n      total_display: formatCurrency(todayTotal),\n      count: todayCount,\n      average_paise: todayAvg,\n      average_display: formatCurrency(todayAvg)\n    },\n    previous_day: {\n      total_paise: prevTotal,\n      total_display: formatCurrency(prevTotal),\n      count: prevCount\n    },\n    mtd: {\n      total_paise: mtdTotal,\n      total_display: formatCurrency(mtdTotal),\n      count: mtdCount\n    },\n    pending: {\n      total_paise: pendingTotal,\n      total_display: formatCurrency(pendingTotal),\n      count: pendingCount\n    },\n    comparison: {\n      day_change_percent: dayChangeSign + dayChange + '%',\n      is_up: todayTotal >= prevTotal\n    },\n    by_fee_type: Object.entries(byFeeType).map(([type, data]) => ({\n      type,\n      count: data.count,\n      amount_display: formatCurrency(data.amount)\n    })),\n    by_payment_method: Object.entries(byPaymentMethod).map(([method, data]) => ({\n      method,\n      count: data.count,\n      amount_display: formatCurrency(data.amount)\n    }))\n  },\n  _raw_payments: payments.slice(0, 10), // Top 10 for report\n  _metrics_calculated: true\n};"
+      },
+      "id": "calculate-metrics",
+      "name": "Calculate Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Generate Formatted Reports\n// ============================================\nconst data = $json;\nconst m = data.metrics;\n\n// Trend emoji\nconst trendEmoji = m.comparison.is_up ? ':chart_with_upwards_trend:' : ':chart_with_downwards_trend:';\nconst statusEmoji = m.today.count > 0 ? ':white_check_mark:' : ':warning:';\n\n// Fee type breakdown\nlet feeTypeBreakdown = '';\nm.by_fee_type.forEach(ft => {\n  feeTypeBreakdown += `\\n   - ${ft.type}: ${ft.count} txns, ${ft.amount_display}`;\n});\n\n// Payment method breakdown\nlet methodBreakdown = '';\nm.by_payment_method.forEach(pm => {\n  methodBreakdown += `\\n   - ${pm.method}: ${pm.count} txns, ${pm.amount_display}`;\n});\n\n// Slack message\nconst slackMessage = {\n  text: `${statusEmoji} *Daily Revenue Report - ${data.report_date}* (${data.day_name})`,\n  attachments: [\n    {\n      color: m.comparison.is_up ? 'good' : 'warning',\n      blocks: [\n        {\n          type: 'section',\n          text: {\n            type: 'mrkdwn',\n            text: `*Today's Collection*\\n:moneybag: *${m.today.total_display}* (${m.today.count} transactions)\\n${trendEmoji} ${m.comparison.day_change_percent} vs yesterday`\n          }\n        },\n        {\n          type: 'section',\n          fields: [\n            { type: 'mrkdwn', text: `*Average Transaction*\\n${m.today.average_display}` },\n            { type: 'mrkdwn', text: `*Previous Day*\\n${m.previous_day.total_display}` },\n            { type: 'mrkdwn', text: `*MTD Collection*\\n${m.mtd.total_display}` },\n            { type: 'mrkdwn', text: `*MTD Transactions*\\n${m.mtd.count}` }\n          ]\n        },\n        {\n          type: 'section',\n          text: {\n            type: 'mrkdwn',\n            text: `*By Fee Type:*${feeTypeBreakdown || '\\n   No data'}`\n          }\n        },\n        {\n          type: 'section',\n          text: {\n            type: 'mrkdwn',\n            text: `*By Payment Method:*${methodBreakdown || '\\n   No data'}`\n          }\n        },\n        {\n          type: 'section',\n          text: {\n            type: 'mrkdwn',\n            text: `:warning: *Pending Dues*\\n${m.pending.total_display} from ${m.pending.count} students`\n          }\n        },\n        {\n          type: 'context',\n          elements: [\n            { type: 'mrkdwn', text: `Report ID: ${data._trace.correlation_id} | Generated: ${new Date().toISOString()}` }\n          ]\n        }\n      ]\n    }\n  ]\n};\n\n// Email HTML\nconst emailHtml = `\n<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <h2 style=\"color: #333;\">Daily Revenue Report - ${data.report_date}</h2>\n  <p style=\"color: #666;\">${data.day_name}</p>\n  \n  <div style=\"background: ${m.comparison.is_up ? '#e8f5e9' : '#fff3e0'}; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n    <h3 style=\"margin: 0; color: #333;\">Today's Collection</h3>\n    <p style=\"font-size: 32px; font-weight: bold; margin: 10px 0; color: #2e7d32;\">${m.today.total_display}</p>\n    <p style=\"margin: 0; color: #666;\">${m.today.count} transactions | ${m.comparison.day_change_percent} vs yesterday</p>\n  </div>\n  \n  <table style=\"width: 100%; border-collapse: collapse;\">\n    <tr>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee;\"><strong>Average Transaction</strong></td>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee; text-align: right;\">${m.today.average_display}</td>\n    </tr>\n    <tr>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee;\"><strong>Previous Day</strong></td>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee; text-align: right;\">${m.previous_day.total_display}</td>\n    </tr>\n    <tr>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee;\"><strong>Month to Date</strong></td>\n      <td style=\"padding: 10px; border-bottom: 1px solid #eee; text-align: right;\">${m.mtd.total_display} (${m.mtd.count} txns)</td>\n    </tr>\n    <tr style=\"background: #fff3e0;\">\n      <td style=\"padding: 10px;\"><strong>Pending Dues</strong></td>\n      <td style=\"padding: 10px; text-align: right; color: #e65100;\">${m.pending.total_display} (${m.pending.count} students)</td>\n    </tr>\n  </table>\n  \n  <p style=\"color: #999; font-size: 12px; margin-top: 30px;\">Report ID: ${data._trace.correlation_id}</p>\n</body>\n</html>\n`;\n\nreturn {\n  ...data,\n  _slack_message: slackMessage,\n  _email_html: emailHtml,\n  _email_subject: `Daily Revenue Report - ${data.report_date} - ${m.today.total_display}`,\n  _reports_generated: true\n};"
+      },
+      "id": "generate-reports",
+      "name": "Generate Reports",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._slack_message) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-slack",
+      "name": "Send Slack Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1300, 300],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json._from_email || 'reports@manushi.com' }}",
+        "toEmail": "={{ $json._admin_email || 'admin@manushi.com' }}",
+        "subject": "={{ $json._email_subject }}",
+        "emailType": "html",
+        "html": "={{ $json._email_html }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1300, 460],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'Daily revenue report generated',\n  event_type: 'daily_report',\n  report_date: data.report_date,\n  total_revenue: data.metrics.today.total_paise,\n  transaction_count: data.metrics.today.count,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  message: 'Daily revenue report generated and sent',\n  report: {\n    date: data.report_date,\n    day: data.day_name,\n    trigger: data._trace.trigger_type\n  },\n  summary: {\n    today_total: data.metrics.today.total_display,\n    today_count: data.metrics.today.count,\n    mtd_total: data.metrics.mtd.total_display,\n    pending_total: data.metrics.pending.total_display,\n    day_change: data.metrics.comparison.day_change_percent\n  },\n  delivery: {\n    slack: true,\n    email: true\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1500, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"daily_report\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1700, 380],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/daily_reports",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"report_date\": \"{{ $json.report.date }}\",\n  \"total_revenue_paise\": {{ $('Generate Reports').first().json.metrics.today.total_paise || 0 }},\n  \"transaction_count\": {{ $json.summary.today_count || 0 }},\n  \"mtd_revenue_paise\": {{ $('Generate Reports').first().json.metrics.mtd.total_paise || 0 }},\n  \"pending_dues_paise\": {{ $('Generate Reports').first().json.metrics.pending.total_paise || 0 }},\n  \"pending_count\": {{ $('Generate Reports').first().json.metrics.pending.count || 0 }},\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "save-report",
+      "name": "Save Report Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1700, 260],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, report: $json.report, summary: $json.summary, delivery: $json.delivery, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1900, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Error Handler\n// ============================================\nconst context = $('Initialize Context').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(context._trace.started_at).getTime();\n\nreturn {\n  success: false,\n  message: 'Failed to generate revenue report',\n  report: {\n    date: context.report_date,\n    error: errorInfo.message || 'Data fetch failed'\n  },\n  _log: {\n    level: 'error',\n    message: 'Revenue report generation failed',\n    error_code: 'REPORT_FAILED'\n  },\n  _trace: { ...context._trace, duration_ms, path: 'error' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 540]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":x: *Daily Revenue Report Failed*\",\n  \"attachments\": [{\n    \"color\": \"danger\",\n    \"fields\": [\n      {\"title\": \"Report Date\", \"value\": \"{{ $json.report.date }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json.report.error }}\", \"short\": true},\n      {\"title\": \"Correlation ID\", \"value\": \"{{ $json._trace.correlation_id }}\", \"short\": false}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-error",
+      "name": "Slack Error Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1100, 540],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, message: $json.message, report: $json.report, _trace: { correlation_id: $json._trace.correlation_id } }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 600]
+    }
+  ],
+  "connections": {
+    "Daily 8 AM": { "main": [[{"node": "Initialize Context", "type": "main", "index": 0}]] },
+    "Manual Trigger": { "main": [[{"node": "Initialize Context", "type": "main", "index": 0}]] },
+    "Initialize Context": { "main": [[{"node": "Fetch Today Payments", "type": "main", "index": 0}], [{"node": "Fetch Previous Day", "type": "main", "index": 0}], [{"node": "Fetch MTD", "type": "main", "index": 0}], [{"node": "Fetch Pending Fees", "type": "main", "index": 0}]] },
+    "Fetch Today Payments": { "main": [[{"node": "Calculate Metrics", "type": "main", "index": 0}]], "error": [[{"node": "Error Handler", "type": "main", "index": 0}]] },
+    "Fetch Previous Day": { "main": [[{"node": "Calculate Metrics", "type": "main", "index": 0}]] },
+    "Fetch MTD": { "main": [[{"node": "Calculate Metrics", "type": "main", "index": 0}]] },
+    "Fetch Pending Fees": { "main": [[{"node": "Calculate Metrics", "type": "main", "index": 0}]] },
+    "Calculate Metrics": { "main": [[{"node": "Generate Reports", "type": "main", "index": 0}]] },
+    "Generate Reports": { "main": [[{"node": "Send Slack Report", "type": "main", "index": 0}], [{"node": "Send Email Report", "type": "main", "index": 0}]] },
+    "Send Slack Report": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]] },
+    "Send Email Report": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]] },
+    "Success Handler": { "main": [[{"node": "Save Report Record", "type": "main", "index": 0}], [{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Save Report Record": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Error Handler": { "main": [[{"node": "Slack Error Alert", "type": "main", "index": 0}]] },
+    "Slack Error Alert": { "main": [[{"node": "Respond Error", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

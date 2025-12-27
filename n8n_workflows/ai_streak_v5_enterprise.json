@@ -1,0 +1,299 @@
+{
+  "name": "AI Study Streak - v5 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-v5",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Webhook Authentication\n// ============================================\n// Check for API key in header\n// NOTE: $request not available, use $json.headers\n\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\n// Get API key from header (case-insensitive)\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\n\n// Valid API keys (in production, store in n8n credentials or env)\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\n\n// Check if key is valid\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\n// Generate correlation ID\nconst correlationId = body.correlation_id || \n  'corr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  student_id: body.student_id,\n  student_name: body.student_name,\n  current_streak: body.current_streak,\n  preferred_subject: body.preferred_subject,\n  _trace: trace,\n  _raw: body,\n  _auth_passed: true\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Input Validation\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['student_id', 'student_name', 'current_streak'],\n  properties: {\n    student_id: { type: 'string', minLength: 1, maxLength: 50 },\n    student_name: { type: 'string', minLength: 1, maxLength: 100 },\n    current_streak: { type: 'number', minimum: 0, maximum: 9999 },\n    preferred_subject: { type: 'string', maxLength: 50 }\n  }\n};\n\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\nif (data.student_id && typeof data.student_id !== 'string') errors.push('student_id must be string');\nif (data.student_name && typeof data.student_name !== 'string') errors.push('student_name must be string');\nif (data.current_streak !== undefined && isNaN(Number(data.current_streak))) errors.push('current_streak must be number');\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\nreturn {\n  student_id: String(data.student_id).trim().substring(0, 50),\n  student_name: String(data.student_name).trim().substring(0, 100),\n  current_streak: Math.max(0, Math.min(9999, Number(data.current_streak))),\n  preferred_subject: String(data.preferred_subject || 'studies').trim().substring(0, 50),\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Duplicate Detection\n// ============================================\n// Check if this request was already processed\n// Uses correlation_id + student_id as unique key\n\nconst data = $json;\nconst dedupeKey = data._trace.correlation_id + '_' + data.student_id;\n\n// In production: Check Supabase for existing record\n// For now: Use static data storage (workflow-level cache)\nconst processed = $getWorkflowStaticData('global');\nconst recentRequests = processed.recentRequests || {};\n\n// Clean old entries (older than 5 minutes)\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5 minutes\n\nfor (const key in recentRequests) {\n  if (now - recentRequests[key] > DEDUP_WINDOW_MS) {\n    delete recentRequests[key];\n  }\n}\n\n// Check for duplicate\nif (recentRequests[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Request already processed',\n    dedupe_key: dedupeKey,\n    original_time: new Date(recentRequests[dedupeKey]).toISOString(),\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\n// Mark as processed\nrecentRequests[dedupeKey] = now;\nprocessed.recentRequests = recentRequests;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\"role\": \"user\", \"parts\": [{\"text\": \"Generate a SHORT motivational push notification (max 2 sentences, under 150 chars) for student {{ $json.student_name }} with {{ $json.current_streak }} day streak. Subject: {{ $json.preferred_subject }}. Be friendly and encouraging.\"}]}],\n  \"generationConfig\": {\"temperature\": 0.8, \"maxOutputTokens\": 500}\n}",
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "maxTries": 3,
+            "retryInterval": 1000,
+            "retryIntervalMultiplier": 2
+          }
+        }
+      },
+      "id": "gemini",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1600, 120],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Success + Cost + Log\n// ============================================\nconst PRICING = { model: 'gemini-2.5-flash', input_per_million: 0.15, output_per_million: 0.60 };\n\nconst config = $('Duplicate Check').first().json;\nconst response = $json;\nconst startTime = new Date(config._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst usage = response.usageMetadata || {};\nconst inputTokens = usage.promptTokenCount || 0;\nconst outputTokens = usage.candidatesTokenCount || 0;\nconst totalCost = ((inputTokens * 0.15) + (outputTokens * 0.60)) / 1000000;\n\nlet message = '';\ntry {\n  message = response.candidates[0].content.parts[0].text.trim().substring(0, 200);\n} catch(e) {\n  message = 'Hey ' + config.student_name + '! Keep your ' + config.current_streak + '-day streak alive!';\n}\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: config._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'AI notification generated',\n  event_type: 'streak_notification',\n  recipient_id: config.student_id,\n  duration_ms: duration_ms,\n  tokens_used: inputTokens + outputTokens,\n  cost_usd: Number(totalCost.toFixed(8))\n};\n\nreturn {\n  success: true,\n  notification: { title: 'Streak Alert', body: message },\n  student: { id: config.student_id, name: config.student_name, streak: config.current_streak },\n  ai_used: true,\n  _cost: { tokens: inputTokens + outputTokens, cost_usd: Number(totalCost.toFixed(8)) },\n  _log: log,\n  _trace: { ...config._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "parse",
+      "name": "Parse Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 60]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: AI Fallback\n// ============================================\nconst config = $('Duplicate Check').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(config._trace.started_at).getTime();\n\nconst fallback = 'Hey ' + config.student_name + '! Your ' + config.current_streak + '-day streak is amazing!';\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'warn',\n  correlation_id: config._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'AI Fallback',\n  message: 'AI failed, using fallback',\n  error_code: 'AI_FALLBACK',\n  error_message: errorInfo.message || 'Unknown',\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  notification: { title: 'Streak Alert', body: fallback },\n  student: { id: config.student_id, name: config.student_name, streak: config.current_streak },\n  ai_used: false,\n  _cost: { tokens: 0, cost_usd: 0 },\n  _log: log,\n  _trace: { ...config._trace, completed_at: new Date().toISOString(), duration_ms, path: 'ai_fallback' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "fallback",
+      "name": "AI Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"{{ $json._log.event_type || 'streak_notification' }}\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"tokens_used\": {{ $json._cost.tokens || 0 }},\n  \"cost_usd\": {{ $json._cost.cost_usd || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2000, 120],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dlq-check", "leftValue": "={{ $('AI Fallback').first().json._needs_dlq }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-needs-dlq",
+      "name": "Needs DLQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/dead_letter_queue",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"AI_FAILURE\",\n  \"error_message\": \"{{ $json._error_info.message || 'AI call failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 320],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":warning: *Workflow Alert*\",\n  \"attachments\": [{\n    \"color\": \"warning\",\n    \"fields\": [\n      {\"title\": \"Workflow\", \"value\": \"{{ $json._trace.workflow_name }}\", \"short\": true},\n      {\"title\": \"Execution\", \"value\": \"{{ $json._trace.execution_id }}\", \"short\": true},\n      {\"title\": \"Correlation ID\", \"value\": \"{{ $json._trace.correlation_id }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'AI call failed' }}\", \"short\": true},\n      {\"title\": \"Path\", \"value\": \"{{ $json._trace.path }}\", \"short\": true},\n      {\"title\": \"Duration\", \"value\": \"{{ $json._trace.duration_ms }}ms\", \"short\": true}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 320],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, notification: $json.notification, student: $json.student, ai_used: $json.ai_used, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2200, 60]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, notification: $json.notification, student: $json.student, ai_used: $json.ai_used, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 280]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Auth Check", "type": "main", "index": 0}]] },
+    "Auth Check": { "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]] },
+    "Is Authenticated?": { "main": [ [{"node": "Validate Input", "type": "main", "index": 0}], [{"node": "Respond Unauthorized", "type": "main", "index": 0}] ] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Duplicate Check", "type": "main", "index": 0}], [{"node": "Respond Invalid", "type": "main", "index": 0}] ] },
+    "Duplicate Check": { "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]] },
+    "Not Duplicate?": { "main": [ [{"node": "Call Gemini", "type": "main", "index": 0}], [{"node": "Respond Duplicate", "type": "main", "index": 0}] ] },
+    "Call Gemini": { "main": [[{"node": "Parse Success", "type": "main", "index": 0}]], "error": [[{"node": "AI Fallback", "type": "main", "index": 0}]] },
+    "Parse Success": { "main": [[{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "AI Fallback": { "main": [[{"node": "Needs DLQ?", "type": "main", "index": 0}]] },
+    "Needs DLQ?": { "main": [ [{"node": "Respond Fallback", "type": "main", "index": 0}], [{"node": "Dead Letter Queue", "type": "main", "index": 0}] ] },
+    "Dead Letter Queue": { "main": [[{"node": "Slack Alert", "type": "main", "index": 0}]] },
+    "Slack Alert": { "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

@@ -1,0 +1,429 @@
+{
+  "name": "Smart Doubt Chain - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "doubt-chain",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "doubt-chain-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN 1: Webhook Authentication\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\n// Get API key from header (case-insensitive)\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || \n               headers['authorization'] || '';\n\n// Valid API keys\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\n\n// Check if key is valid\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    },\n    _trace: {\n      correlation_id: 'auth_failed_' + Date.now(),\n      path: 'auth_failed'\n    }\n  };\n}\n\n// Generate correlation ID\nconst correlationId = body.correlation_id || \n  'doubt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  // Input data\n  doubt_id: body.doubt_id,\n  doubt_text: body.doubt_text,\n  subject: body.subject,\n  topic: body.topic,\n  student_id: body.student_id,\n  student_name: body.student_name,\n  student_class: body.student_class,\n  parent_fcm_token: body.parent_fcm_token,\n  student_fcm_token: body.student_fcm_token,\n  // Trace\n  _trace: trace,\n  _auth_passed: true,\n  _raw: body\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN 3: Input Validation for Doubt Chain\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['doubt_text', 'student_id', 'student_name'],\n  properties: {\n    doubt_id: { type: 'string', maxLength: 50 },\n    doubt_text: { type: 'string', minLength: 10, maxLength: 2000 },\n    subject: { type: 'string', maxLength: 50 },\n    topic: { type: 'string', maxLength: 100 },\n    student_id: { type: 'string', minLength: 1, maxLength: 50 },\n    student_name: { type: 'string', minLength: 1, maxLength: 100 },\n    student_class: { type: 'string', maxLength: 20 }\n  }\n};\n\n// Check required fields\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Type and length validation\nif (data.doubt_text && data.doubt_text.length < 10) {\n  errors.push('doubt_text must be at least 10 characters');\n}\nif (data.doubt_text && data.doubt_text.length > 2000) {\n  errors.push('doubt_text must be less than 2000 characters');\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { \n      code: 'VALIDATION_ERROR', \n      message: 'Input validation failed', \n      details: errors \n    },\n    _trace: { ...data._trace, path: 'validation_error' }\n  };\n}\n\n// Sanitize and return\nreturn {\n  doubt_id: String(data.doubt_id || 'doubt_' + Date.now()).trim().substring(0, 50),\n  doubt_text: String(data.doubt_text).trim().substring(0, 2000),\n  subject: String(data.subject || 'General').trim().substring(0, 50),\n  topic: String(data.topic || '').trim().substring(0, 100),\n  student_id: String(data.student_id).trim().substring(0, 50),\n  student_name: String(data.student_name).trim().substring(0, 100),\n  student_class: String(data.student_class || '').trim().substring(0, 20),\n  parent_fcm_token: data.parent_fcm_token || null,\n  student_fcm_token: data.student_fcm_token || null,\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN 4: Duplicate Detection + FAQ Counter\n// ============================================\nconst data = $json;\n\n// Create dedupe key from doubt text (normalized)\nconst normalizedDoubt = data.doubt_text.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 100);\nconst dedupeKey = data.student_id + '_' + normalizedDoubt;\n\n// Get workflow-level cache\nconst processed = $getWorkflowStaticData('global');\nconst recentDoubts = processed.recentDoubts || {};\nconst doubtCounter = processed.doubtCounter || {};\n\n// Clean old entries (older than 5 minutes)\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 5 * 60 * 1000;\n\nfor (const key in recentDoubts) {\n  if (now - recentDoubts[key] > DEDUP_WINDOW_MS) {\n    delete recentDoubts[key];\n  }\n}\n\n// Check for duplicate (same student, same doubt in 5 min)\nif (recentDoubts[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Duplicate doubt detected, already processing',\n    doubt_id: data.doubt_id,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\n// Mark as processed\nrecentDoubts[dedupeKey] = now;\nprocessed.recentDoubts = recentDoubts;\n\n// Count how many times this exact doubt has been asked (for FAQ)\nconst faqKey = data.subject + '_' + normalizedDoubt;\nconst previousCount = doubtCounter[faqKey] || 0;\nconst newCount = previousCount + 1;\ndoubtCounter[faqKey] = newCount;\nprocessed.doubtCounter = doubtCounter;\n\n// Flag if this doubt has been asked 3+ times (create FAQ)\nconst shouldCreateFAQ = newCount >= 3;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _faq_key: faqKey,\n  _doubt_count: newCount,\n  _should_create_faq: shouldCreateFAQ,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate + FAQ Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "not-duplicate", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"role\": \"user\",\n    \"parts\": [{\n      \"text\": \"You are an expert tutor for Indian students. A student has asked a doubt.\\n\\nStudent: {{ $json.student_name }} (Class {{ $json.student_class }})\\nSubject: {{ $json.subject }}\\nTopic: {{ $json.topic }}\\n\\nDoubt: {{ $json.doubt_text }}\\n\\nProvide a clear, helpful answer. At the end, rate your confidence (HIGH, MEDIUM, or LOW) based on:\\n- HIGH: You are certain the answer is correct and complete\\n- MEDIUM: Answer is likely correct but may need verification\\n- LOW: Question is ambiguous, complex, or requires teacher expertise\\n\\nFormat your response as:\\nANSWER: [Your detailed answer here]\\nCONFIDENCE: [HIGH/MEDIUM/LOW]\\nREASON: [Why this confidence level]\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.3,\n    \"maxOutputTokens\": 1000\n  }\n}",
+        "options": {
+          "timeout": 20000,
+          "retry": {
+            "maxTries": 3,
+            "retryInterval": 1000,
+            "retryIntervalMultiplier": 2
+          }
+        }
+      },
+      "id": "gemini",
+      "name": "Call Gemini AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1600, 120],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Parse AI Response + Determine Routing\n// ============================================\nconst PRICING = {\n  model: 'gemini-2.5-flash',\n  input_per_million: 0.15,\n  output_per_million: 0.60\n};\n\nconst config = $('Duplicate + FAQ Check').first().json;\nconst response = $json;\nconst startTime = new Date(config._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\n// Extract usage for cost tracking\nconst usage = response.usageMetadata || {};\nconst inputTokens = usage.promptTokenCount || 0;\nconst outputTokens = usage.candidatesTokenCount || 0;\nconst totalTokens = inputTokens + outputTokens;\nconst totalCost = ((inputTokens * 0.15) + (outputTokens * 0.60)) / 1000000;\n\n// Parse AI response\nlet fullResponse = '';\nlet answer = '';\nlet confidence = 'LOW';\nlet reason = '';\n\ntry {\n  fullResponse = response.candidates[0].content.parts[0].text || '';\n  \n  // Extract ANSWER section\n  const answerMatch = fullResponse.match(/ANSWER:\\s*([\\s\\S]*?)(?=CONFIDENCE:|$)/i);\n  if (answerMatch) {\n    answer = answerMatch[1].trim();\n  } else {\n    answer = fullResponse.substring(0, 800);\n  }\n  \n  // Extract CONFIDENCE level\n  const confidenceMatch = fullResponse.match(/CONFIDENCE:\\s*(HIGH|MEDIUM|LOW)/i);\n  if (confidenceMatch) {\n    confidence = confidenceMatch[1].toUpperCase();\n  }\n  \n  // Extract REASON\n  const reasonMatch = fullResponse.match(/REASON:\\s*([\\s\\S]*?)$/i);\n  if (reasonMatch) {\n    reason = reasonMatch[1].trim().substring(0, 200);\n  }\n} catch(e) {\n  answer = 'I apologize, but I could not process your question properly.';\n  confidence = 'LOW';\n  reason = 'Parse error: ' + e.message;\n}\n\n// Determine routing based on confidence\nconst routeToTeacher = confidence === 'LOW' || confidence === 'MEDIUM';\nconst canAnswerDirectly = confidence === 'HIGH';\n\nconst cost = {\n  model: PRICING.model,\n  tokens: { input: inputTokens, output: outputTokens, total: totalTokens },\n  cost_usd: Number(totalCost.toFixed(8))\n};\n\nreturn {\n  // Original data\n  doubt_id: config.doubt_id,\n  doubt_text: config.doubt_text,\n  subject: config.subject,\n  topic: config.topic,\n  student_id: config.student_id,\n  student_name: config.student_name,\n  student_class: config.student_class,\n  parent_fcm_token: config.parent_fcm_token,\n  student_fcm_token: config.student_fcm_token,\n  // AI response\n  ai_answer: answer,\n  ai_confidence: confidence,\n  ai_reason: reason,\n  ai_full_response: fullResponse,\n  // Routing decision\n  _route_to_teacher: routeToTeacher,\n  _can_answer_directly: canAnswerDirectly,\n  // FAQ data\n  _should_create_faq: config._should_create_faq,\n  _doubt_count: config._doubt_count,\n  _faq_key: config._faq_key,\n  // Cost and trace\n  _cost: cost,\n  _trace: {\n    ...config._trace,\n    duration_ms: duration_ms,\n    ai_confidence: confidence\n  },\n  _ai_success: true\n};"
+      },
+      "id": "parse-ai",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 60]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "high-confidence", "leftValue": "={{ $json._can_answer_directly }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-confidence",
+      "name": "High Confidence?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 60]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: AI Direct Answer - Success Path\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'AI Direct Answer',\n  message: 'AI answered doubt with HIGH confidence',\n  event_type: 'doubt_ai_answered',\n  recipient_id: data.student_id,\n  duration_ms: duration_ms,\n  tokens_used: data._cost.tokens.total,\n  cost_usd: data._cost.cost_usd,\n  ai_confidence: data.ai_confidence\n};\n\nconst trace = {\n  ...data._trace,\n  completed_at: new Date().toISOString(),\n  duration_ms: duration_ms,\n  path: 'ai_direct_answer',\n  resolution: 'ai_answered'\n};\n\nreturn {\n  success: true,\n  resolution: 'ai_answered',\n  doubt: {\n    id: data.doubt_id,\n    text: data.doubt_text,\n    subject: data.subject,\n    topic: data.topic\n  },\n  answer: {\n    text: data.ai_answer,\n    source: 'ai',\n    confidence: data.ai_confidence,\n    reason: data.ai_reason\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  faq_candidate: data._should_create_faq,\n  doubt_frequency: data._doubt_count,\n  _cost: data._cost,\n  _log: log,\n  _trace: trace\n};"
+      },
+      "id": "ai-answer",
+      "name": "AI Direct Answer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Route to Teacher - Queue Entry\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\n// Determine priority based on confidence and FAQ status\nlet priority = 'normal';\nif (data.ai_confidence === 'LOW') priority = 'high';\nif (data._should_create_faq) priority = 'high'; // Frequently asked = needs good answer\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Route to Teacher',\n  message: 'Doubt routed to teacher (AI confidence: ' + data.ai_confidence + ')',\n  event_type: 'doubt_routed_to_teacher',\n  recipient_id: data.student_id,\n  duration_ms: duration_ms,\n  tokens_used: data._cost.tokens.total,\n  cost_usd: data._cost.cost_usd,\n  ai_confidence: data.ai_confidence,\n  priority: priority\n};\n\nconst trace = {\n  ...data._trace,\n  duration_ms: duration_ms,\n  path: 'routed_to_teacher',\n  resolution: 'pending_teacher'\n};\n\n// Prepare teacher queue entry\nconst queueEntry = {\n  doubt_id: data.doubt_id,\n  doubt_text: data.doubt_text,\n  subject: data.subject,\n  topic: data.topic,\n  student_id: data.student_id,\n  student_name: data.student_name,\n  student_class: data.student_class,\n  ai_suggestion: data.ai_answer,\n  ai_confidence: data.ai_confidence,\n  ai_reason: data.ai_reason,\n  priority: priority,\n  status: 'pending',\n  faq_candidate: data._should_create_faq,\n  doubt_frequency: data._doubt_count,\n  created_at: new Date().toISOString(),\n  correlation_id: data._trace.correlation_id\n};\n\nreturn {\n  success: true,\n  resolution: 'routed_to_teacher',\n  doubt: {\n    id: data.doubt_id,\n    text: data.doubt_text,\n    subject: data.subject\n  },\n  routing: {\n    priority: priority,\n    reason: 'AI confidence: ' + data.ai_confidence,\n    ai_suggestion_provided: true\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  message: 'Your doubt has been forwarded to a teacher. You will receive an answer soon.',\n  estimated_response: '2-4 hours',\n  _queue_entry: queueEntry,\n  _cost: data._cost,\n  _log: log,\n  _trace: trace\n};"
+      },
+      "id": "route-teacher",
+      "name": "Route to Teacher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2200, 140]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN 12: AI Fallback Handler\n// ============================================\nconst config = $('Duplicate + FAQ Check').first().json;\nconst errorInfo = $json.error || {};\nconst startTime = new Date(config._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\n// Fallback: Always route to teacher when AI fails\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'warn',\n  correlation_id: config._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'AI Fallback',\n  message: 'AI call failed, routing to teacher',\n  event_type: 'doubt_ai_failed',\n  recipient_id: config.student_id,\n  duration_ms: duration_ms,\n  error_code: 'AI_FAILURE',\n  error_message: errorInfo.message || 'Unknown AI error'\n};\n\nconst trace = {\n  ...config._trace,\n  duration_ms: duration_ms,\n  path: 'ai_fallback_to_teacher',\n  error_reason: errorInfo.message || 'ai_call_failed'\n};\n\n// Queue entry for teacher\nconst queueEntry = {\n  doubt_id: config.doubt_id,\n  doubt_text: config.doubt_text,\n  subject: config.subject,\n  topic: config.topic,\n  student_id: config.student_id,\n  student_name: config.student_name,\n  student_class: config.student_class,\n  ai_suggestion: null,\n  ai_confidence: 'FAILED',\n  ai_reason: 'AI service unavailable',\n  priority: 'high',\n  status: 'pending',\n  faq_candidate: config._should_create_faq,\n  doubt_frequency: config._doubt_count,\n  created_at: new Date().toISOString(),\n  correlation_id: config._trace.correlation_id\n};\n\nreturn {\n  success: true,\n  resolution: 'routed_to_teacher',\n  doubt: {\n    id: config.doubt_id,\n    text: config.doubt_text,\n    subject: config.subject\n  },\n  routing: {\n    priority: 'high',\n    reason: 'AI service unavailable',\n    ai_suggestion_provided: false\n  },\n  student: {\n    id: config.student_id,\n    name: config.student_name\n  },\n  message: 'Your doubt has been forwarded to a teacher. You will receive an answer soon.',\n  estimated_response: '2-4 hours',\n  _queue_entry: queueEntry,\n  _cost: { model: 'none', tokens: { total: 0 }, cost_usd: 0 },\n  _log: log,\n  _trace: trace,\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "fallback",
+      "name": "AI Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT.supabase.co/rest/v1/doubt_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "YOUR_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_ANON_KEY" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._queue_entry) }}",
+        "options": { "timeout": 5000 },
+        "onError": "continueRegularOutput"
+      },
+      "id": "save-queue",
+      "name": "Save to Teacher Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 140]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT.supabase.co/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "YOUR_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_ANON_KEY" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"{{ $json._log.event_type }}\",\n  \"recipient_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"tokens_used\": {{ $json._cost.tokens.total || 0 }},\n  \"cost_usd\": {{ $json._cost.cost_usd || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 },
+        "onError": "continueRegularOutput"
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "needs-dlq", "leftValue": "={{ $json._needs_dlq }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-dlq",
+      "name": "Needs DLQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT.supabase.co/rest/v1/dead_letter_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "YOUR_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_ANON_KEY" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"Smart Doubt Chain\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"AI_FAILURE\",\n  \"error_message\": \"{{ $json._error_info.message || 'AI service failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 },
+        "onError": "continueRegularOutput"
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":warning: *Smart Doubt Chain Alert*\",\n  \"attachments\": [{\n    \"color\": \"warning\",\n    \"fields\": [\n      {\"title\": \"Workflow\", \"value\": \"Smart Doubt Chain\", \"short\": true},\n      {\"title\": \"Correlation ID\", \"value\": \"{{ $json._trace.correlation_id }}\", \"short\": true},\n      {\"title\": \"Student\", \"value\": \"{{ $json.student.name }} ({{ $json.student.id }})\", \"short\": true},\n      {\"title\": \"Subject\", \"value\": \"{{ $json.doubt.subject }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'AI service failed' }}\", \"short\": false},\n      {\"title\": \"Status\", \"value\": \"Routed to teacher (fallback)\", \"short\": false}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 },
+        "onError": "continueRegularOutput"
+      },
+      "id": "slack",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2400, 280]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-ai",
+      "name": "Respond AI Answer",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"resolution\": \"routed_to_teacher\",\n  \"doubt\": {{ JSON.stringify($('Route to Teacher').first().json.doubt) }},\n  \"message\": \"Your doubt has been forwarded to a teacher. You will receive an answer soon.\",\n  \"estimated_response\": \"2-4 hours\",\n  \"routing\": {{ JSON.stringify($('Route to Teacher').first().json.routing) }},\n  \"_trace\": {{ JSON.stringify($('Route to Teacher').first().json._trace) }}\n}",
+        "options": {}
+      },
+      "id": "respond-teacher",
+      "name": "Respond Teacher Route",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 140]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"resolution\": \"routed_to_teacher\",\n  \"doubt\": {{ JSON.stringify($('AI Fallback').first().json.doubt) }},\n  \"message\": \"Your doubt has been forwarded to a teacher. You will receive an answer soon.\",\n  \"estimated_response\": \"2-4 hours\",\n  \"note\": \"AI assistance temporarily unavailable\",\n  \"_trace\": {{ JSON.stringify($('AI Fallback').first().json._trace) }}\n}",
+        "options": {}
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2600, 280]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 380]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 260]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Auth Check", "type": "main", "index": 0}]]
+    },
+    "Auth Check": {
+      "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]]
+    },
+    "Is Authenticated?": {
+      "main": [
+        [{"node": "Validate Input", "type": "main", "index": 0}],
+        [{"node": "Respond Unauthorized", "type": "main", "index": 0}]
+      ]
+    },
+    "Validate Input": {
+      "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]]
+    },
+    "Is Valid?": {
+      "main": [
+        [{"node": "Duplicate + FAQ Check", "type": "main", "index": 0}],
+        [{"node": "Respond Invalid", "type": "main", "index": 0}]
+      ]
+    },
+    "Duplicate + FAQ Check": {
+      "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]]
+    },
+    "Not Duplicate?": {
+      "main": [
+        [{"node": "Call Gemini AI", "type": "main", "index": 0}],
+        [{"node": "Respond Duplicate", "type": "main", "index": 0}]
+      ]
+    },
+    "Call Gemini AI": {
+      "main": [[{"node": "Parse AI Response", "type": "main", "index": 0}]],
+      "error": [[{"node": "AI Fallback", "type": "main", "index": 0}]]
+    },
+    "Parse AI Response": {
+      "main": [[{"node": "High Confidence?", "type": "main", "index": 0}]]
+    },
+    "High Confidence?": {
+      "main": [
+        [{"node": "AI Direct Answer", "type": "main", "index": 0}],
+        [{"node": "Route to Teacher", "type": "main", "index": 0}]
+      ]
+    },
+    "AI Direct Answer": {
+      "main": [[{"node": "Log to Supabase", "type": "main", "index": 0}]]
+    },
+    "Log to Supabase": {
+      "main": [[{"node": "Respond AI Answer", "type": "main", "index": 0}]]
+    },
+    "Route to Teacher": {
+      "main": [[{"node": "Save to Teacher Queue", "type": "main", "index": 0}]]
+    },
+    "Save to Teacher Queue": {
+      "main": [[{"node": "Respond Teacher Route", "type": "main", "index": 0}]]
+    },
+    "AI Fallback": {
+      "main": [[{"node": "Needs DLQ?", "type": "main", "index": 0}]]
+    },
+    "Needs DLQ?": {
+      "main": [
+        [{"node": "Dead Letter Queue", "type": "main", "index": 0}],
+        [{"node": "Respond Fallback", "type": "main", "index": 0}]
+      ]
+    },
+    "Dead Letter Queue": {
+      "main": [[{"node": "Slack Alert", "type": "main", "index": 0}]]
+    },
+    "Slack Alert": {
+      "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null
+}

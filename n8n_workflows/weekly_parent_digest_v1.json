@@ -1,0 +1,419 @@
+{
+  "name": "Weekly Parent Digest - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Weekly Parent Digest\n\n**Schedule:** Saturday 9 AM\n**Manual:** POST /parent-digest\n\n**Purpose:** Keep parents informed about their child's weekly progress\n\n**Contents:**\n- Attendance summary\n- Test scores & grades\n- Assignment completion\n- Streak & engagement\n- Teacher remarks\n- Upcoming schedule\n\n**Delivery:**\n- Email (detailed HTML)\n- SMS (brief summary)",
+        "height": 400,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -180]
+    },
+    {
+      "parameters": {
+        "content": "## Data Collection\n\n**Per Student:**\n- Classes attended/total\n- Test scores this week\n- Assignments submitted\n- Current streak\n- Badges earned\n\n**Period:** Last 7 days\n**Source:** Supabase views",
+        "height": 240,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-data",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Digest Generation\n\n**Sections:**\n1. Weekly Highlights\n2. Attendance Report\n3. Academic Performance\n4. Engagement Score\n5. Teacher Notes\n6. Next Week Preview\n\n**Personalization:**\n- Student name\n- Class-specific data\n- Trend indicators",
+        "height": 280,
+        "width": 280,
+        "color": 3
+      },
+      "id": "sticky-digest",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Email Template\n\n**Design:**\n- Mobile-responsive\n- Brand colors\n- Clear metrics\n- Action buttons\n\n**CTAs:**\n- View full report\n- Contact teacher\n- Pay pending fees\n- Download app",
+        "height": 240,
+        "width": 260,
+        "color": 1
+      },
+      "id": "sticky-email",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1400, -120]
+    },
+    {
+      "parameters": {
+        "content": "## SMS Summary\n\n**Format:**\nDear [Parent],\n[Student] weekly report:\nAttendance: X/Y\nAvg Score: Z%\nStreak: N days\nView details: [link]\n\n**Length:** <160 chars",
+        "height": 220,
+        "width": 260,
+        "color": 2
+      },
+      "id": "sticky-sms",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1900, -100]
+    },
+    {
+      "parameters": {
+        "content": "## Tracking\n\n**Logged:**\n- Digests sent\n- Delivery status\n- Open rates\n\n**Tables:**\n- digest_logs\n- parent_engagement\n\n**Alerts:**\n- Failed deliveries\n- Bounce handling",
+        "height": 220,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-track",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2400, -60]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 6" }]
+        }
+      },
+      "id": "schedule",
+      "name": "Saturday 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 260]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "parent-digest",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Initialize Weekly Digest Context\n// ============================================\nconst now = new Date();\nconst body = $json.body || {};\n\n// Calculate week range (last 7 days)\nconst endDate = new Date();\nconst startDate = new Date();\nstartDate.setDate(startDate.getDate() - 7);\n\n// Week number calculation\nconst weekStart = new Date(startDate);\nconst weekNum = Math.ceil((((weekStart - new Date(weekStart.getFullYear(), 0, 1)) / 86400000) + 1) / 7);\n\nconst correlationId = body.correlation_id || 'digest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nreturn {\n  week_number: weekNum,\n  week_label: 'Week ' + weekNum + ', ' + startDate.getFullYear(),\n  start_date: startDate.toISOString().split('T')[0],\n  end_date: endDate.toISOString().split('T')[0],\n  generated_at: now.toISOString(),\n  student_filter: body.student_id || null,\n  class_filter: body.class_filter || null,\n  test_mode: body.test_mode || false,\n  _trace: {\n    correlation_id: correlationId,\n    workflow_id: $workflow.id,\n    workflow_name: $workflow.name,\n    execution_id: $execution.id,\n    started_at: now.toISOString(),\n    trigger_type: body.student_id ? 'manual_single' : 'scheduled_batch'\n  }\n};"
+      },
+      "id": "init",
+      "name": "Initialize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 320]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/students?status=eq.active&select=student_id,student_name,email,parent_name,parent_phone,parent_email,class_enrolled,current_streak,admission_date",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-students",
+      "name": "Fetch Students",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 260],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/attendance_records?date=gte.{{ $('Initialize').first().json.start_date }}&date=lte.{{ $('Initialize').first().json.end_date }}&select=student_id,date,status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-attendance",
+      "name": "Fetch Attendance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 380],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/test_results?test_date=gte.{{ $('Initialize').first().json.start_date }}&test_date=lte.{{ $('Initialize').first().json.end_date }}&select=student_id,test_name,subject,score,max_score,test_date",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-tests",
+      "name": "Fetch Tests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 500],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Initialize').first().json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/assignments?due_date=gte.{{ $('Initialize').first().json.start_date }}&due_date=lte.{{ $('Initialize').first().json.end_date }}&select=student_id,assignment_name,subject,status,submitted_at,score",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('Initialize').first().json._supabase_key || 'YOUR_ANON_KEY' }}" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "fetch-assignments",
+      "name": "Fetch Assignments",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 620],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Compile Weekly Digest for Each Student\n// ============================================\nconst ctx = $('Initialize').first().json;\nconst studentsData = $('Fetch Students').first().json || [];\nconst attendanceData = $('Fetch Attendance').first().json || [];\nconst testsData = $('Fetch Tests').first().json || [];\nconst assignmentsData = $('Fetch Assignments').first().json || [];\n\nconst students = Array.isArray(studentsData) ? studentsData : [];\nconst attendance = Array.isArray(attendanceData) ? attendanceData : [];\nconst tests = Array.isArray(testsData) ? testsData : [];\nconst assignments = Array.isArray(assignmentsData) ? assignmentsData : [];\n\n// Filter if specific student requested\nlet targetStudents = students;\nif (ctx.student_filter) {\n  targetStudents = students.filter(s => s.student_id === ctx.student_filter);\n}\n\n// Group data by student\nconst attendanceByStudent = {};\nattendance.forEach(a => {\n  if (!attendanceByStudent[a.student_id]) attendanceByStudent[a.student_id] = [];\n  attendanceByStudent[a.student_id].push(a);\n});\n\nconst testsByStudent = {};\ntests.forEach(t => {\n  if (!testsByStudent[t.student_id]) testsByStudent[t.student_id] = [];\n  testsByStudent[t.student_id].push(t);\n});\n\nconst assignmentsByStudent = {};\nassignments.forEach(a => {\n  if (!assignmentsByStudent[a.student_id]) assignmentsByStudent[a.student_id] = [];\n  assignmentsByStudent[a.student_id].push(a);\n});\n\n// Generate digest for each student\nconst digests = targetStudents.map(student => {\n  const sid = student.student_id;\n  const sAttendance = attendanceByStudent[sid] || [];\n  const sTests = testsByStudent[sid] || [];\n  const sAssignments = assignmentsByStudent[sid] || [];\n  \n  // Attendance metrics\n  const totalClasses = sAttendance.length || 7;\n  const presentCount = sAttendance.filter(a => a.status === 'present').length;\n  const attendancePct = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 100;\n  \n  // Test metrics\n  let avgScore = 0;\n  let highestScore = 0;\n  let lowestScore = 100;\n  const testDetails = [];\n  \n  if (sTests.length > 0) {\n    const scores = sTests.map(t => {\n      const pct = t.max_score > 0 ? Math.round((t.score / t.max_score) * 100) : 0;\n      testDetails.push({ name: t.test_name, subject: t.subject, score: pct });\n      return pct;\n    });\n    avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);\n    highestScore = Math.max(...scores);\n    lowestScore = Math.min(...scores);\n  }\n  \n  // Assignment metrics\n  const totalAssignments = sAssignments.length;\n  const completedAssignments = sAssignments.filter(a => a.status === 'submitted' || a.status === 'graded').length;\n  const assignmentPct = totalAssignments > 0 ? Math.round((completedAssignments / totalAssignments) * 100) : 100;\n  \n  // Engagement score (weighted average)\n  const engagementScore = Math.round(\n    (attendancePct * 0.3) + \n    (avgScore * 0.4) + \n    (assignmentPct * 0.2) + \n    (Math.min(student.current_streak * 10, 100) * 0.1)\n  );\n  \n  // Determine highlights and concerns\n  const highlights = [];\n  const concerns = [];\n  \n  if (attendancePct >= 90) highlights.push('Excellent attendance!');\n  else if (attendancePct < 70) concerns.push('Attendance needs improvement');\n  \n  if (avgScore >= 80) highlights.push('Strong test performance!');\n  else if (avgScore < 50 && sTests.length > 0) concerns.push('Test scores need attention');\n  \n  if (assignmentPct >= 90) highlights.push('All assignments completed!');\n  else if (assignmentPct < 60) concerns.push('Missing assignments');\n  \n  if (student.current_streak >= 7) highlights.push(student.current_streak + ' day learning streak!');\n  \n  // Grade letter\n  let grade = 'A';\n  if (engagementScore < 90) grade = 'A';\n  if (engagementScore < 80) grade = 'B';\n  if (engagementScore < 70) grade = 'C';\n  if (engagementScore < 60) grade = 'D';\n  if (engagementScore < 50) grade = 'F';\n  \n  const digestId = 'DIG_' + sid + '_' + ctx.week_number + '_' + Date.now();\n  \n  return {\n    digest_id: digestId,\n    student_id: sid,\n    student_name: student.student_name,\n    parent_name: student.parent_name || 'Parent',\n    parent_email: student.parent_email || student.email,\n    parent_phone: student.parent_phone,\n    class_enrolled: student.class_enrolled,\n    week_label: ctx.week_label,\n    week_number: ctx.week_number,\n    period: ctx.start_date + ' to ' + ctx.end_date,\n    metrics: {\n      attendance: { present: presentCount, total: totalClasses, percentage: attendancePct },\n      tests: { count: sTests.length, average: avgScore, highest: highestScore, lowest: lowestScore, details: testDetails },\n      assignments: { completed: completedAssignments, total: totalAssignments, percentage: assignmentPct },\n      streak: student.current_streak || 0,\n      engagement_score: engagementScore,\n      grade: grade\n    },\n    highlights: highlights,\n    concerns: concerns,\n    _trace: ctx._trace\n  };\n});\n\nreturn {\n  ...ctx,\n  total_students: digests.length,\n  digests: digests,\n  _digests_compiled: true\n};"
+      },
+      "id": "compile-digests",
+      "name": "Compile Digests",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 380]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "has-students", "leftValue": "={{ $json.total_students }}", "rightValue": 0, "operator": { "type": "number", "operation": "gt" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-students",
+      "name": "Any Students?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1060, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Generate Email & SMS Content\n// ============================================\nconst data = $json;\n\nconst digestsWithContent = data.digests.map(d => {\n  const m = d.metrics;\n  const gradeColor = m.grade === 'A' ? '#4caf50' : m.grade === 'B' ? '#8bc34a' : m.grade === 'C' ? '#ff9800' : m.grade === 'D' ? '#ff5722' : '#f44336';\n  const attendanceColor = m.attendance.percentage >= 80 ? '#4caf50' : m.attendance.percentage >= 60 ? '#ff9800' : '#f44336';\n  const testColor = m.tests.average >= 70 ? '#4caf50' : m.tests.average >= 50 ? '#ff9800' : '#f44336';\n  \n  // Test details HTML\n  let testDetailsHtml = '';\n  if (m.tests.details.length > 0) {\n    testDetailsHtml = m.tests.details.map(t => \n      `<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${t.subject}</td><td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${t.name}</td><td style=\"padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;\">${t.score}%</td></tr>`\n    ).join('');\n  } else {\n    testDetailsHtml = '<tr><td colspan=\"3\" style=\"padding: 15px; text-align: center; color: #999;\">No tests this week</td></tr>';\n  }\n  \n  // Highlights HTML\n  const highlightsHtml = d.highlights.length > 0 \n    ? d.highlights.map(h => `<li style=\"color: #4caf50; margin: 5px 0;\">${h}</li>`).join('')\n    : '<li style=\"color: #999;\">Keep up the good work!</li>';\n  \n  // Concerns HTML\n  const concernsHtml = d.concerns.length > 0\n    ? `<div style=\"background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;\"><h4 style=\"margin: 0 0 10px 0; color: #e65100;\">Areas for Improvement</h4><ul style=\"margin: 0; padding-left: 20px;\">${d.concerns.map(c => `<li style=\"color: #e65100;\">${c}</li>`).join('')}</ul></div>`\n    : '';\n  \n  // Full email HTML\n  const emailHtml = `\n<!DOCTYPE html>\n<html>\n<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head>\n<body style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; background: #f5f5f5;\">\n  <div style=\"background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); padding: 30px; text-align: center;\">\n    <h1 style=\"color: white; margin: 0; font-size: 24px;\">Weekly Progress Report</h1>\n    <p style=\"color: rgba(255,255,255,0.9); margin: 10px 0 0 0;\">${d.week_label}</p>\n  </div>\n  \n  <div style=\"background: white; padding: 30px;\">\n    <p style=\"color: #333; font-size: 16px;\">Dear ${d.parent_name},</p>\n    <p style=\"color: #666;\">Here's ${d.student_name}'s weekly progress summary for <strong>${d.class_enrolled}</strong>.</p>\n    \n    <!-- Overall Grade Card -->\n    <div style=\"background: linear-gradient(135deg, ${gradeColor}22 0%, ${gradeColor}11 100%); padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; border: 2px solid ${gradeColor};\">\n      <div style=\"font-size: 48px; font-weight: bold; color: ${gradeColor};\">${m.grade}</div>\n      <div style=\"color: #666; margin-top: 5px;\">Overall Grade</div>\n      <div style=\"font-size: 14px; color: #999; margin-top: 5px;\">Engagement Score: ${m.engagement_score}%</div>\n    </div>\n    \n    <!-- Metrics Grid -->\n    <div style=\"display: flex; flex-wrap: wrap; gap: 15px; margin: 25px 0;\">\n      <div style=\"flex: 1; min-width: 120px; background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;\">\n        <div style=\"font-size: 28px; font-weight: bold; color: ${attendanceColor};\">${m.attendance.percentage}%</div>\n        <div style=\"color: #666; font-size: 12px;\">Attendance</div>\n        <div style=\"color: #999; font-size: 11px;\">${m.attendance.present}/${m.attendance.total} classes</div>\n      </div>\n      <div style=\"flex: 1; min-width: 120px; background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;\">\n        <div style=\"font-size: 28px; font-weight: bold; color: ${testColor};\">${m.tests.average}%</div>\n        <div style=\"color: #666; font-size: 12px;\">Avg Test Score</div>\n        <div style=\"color: #999; font-size: 11px;\">${m.tests.count} tests taken</div>\n      </div>\n      <div style=\"flex: 1; min-width: 120px; background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;\">\n        <div style=\"font-size: 28px; font-weight: bold; color: #1976d2;\">${m.assignments.percentage}%</div>\n        <div style=\"color: #666; font-size: 12px;\">Assignments</div>\n        <div style=\"color: #999; font-size: 11px;\">${m.assignments.completed}/${m.assignments.total} done</div>\n      </div>\n      <div style=\"flex: 1; min-width: 120px; background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;\">\n        <div style=\"font-size: 28px; font-weight: bold; color: #ff9800;\">${m.streak}</div>\n        <div style=\"color: #666; font-size: 12px;\">Day Streak</div>\n        <div style=\"color: #999; font-size: 11px;\">Learning days</div>\n      </div>\n    </div>\n    \n    <!-- Highlights -->\n    <div style=\"background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4caf50;\">\n      <h4 style=\"margin: 0 0 10px 0; color: #2e7d32;\">This Week's Highlights</h4>\n      <ul style=\"margin: 0; padding-left: 20px;\">${highlightsHtml}</ul>\n    </div>\n    \n    ${concernsHtml}\n    \n    <!-- Test Details -->\n    <h3 style=\"color: #333; margin-top: 25px;\">Test Performance</h3>\n    <table style=\"width: 100%; border-collapse: collapse; background: #fafafa; border-radius: 8px; overflow: hidden;\">\n      <thead><tr style=\"background: #e3f2fd;\"><th style=\"padding: 12px; text-align: left;\">Subject</th><th style=\"padding: 12px; text-align: left;\">Test</th><th style=\"padding: 12px; text-align: right;\">Score</th></tr></thead>\n      <tbody>${testDetailsHtml}</tbody>\n    </table>\n    \n    <!-- CTA -->\n    <div style=\"text-align: center; margin: 30px 0;\">\n      <a href=\"#\" style=\"background: #1976d2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;\">View Full Report</a>\n    </div>\n    \n    <p style=\"color: #666; font-size: 14px;\">For any questions, please contact the class teacher or reply to this email.</p>\n    <p style=\"color: #666;\">Best regards,<br><strong>Manushi Coaching</strong></p>\n  </div>\n  \n  <div style=\"background: #f5f5f5; padding: 20px; text-align: center;\">\n    <p style=\"color: #999; font-size: 12px; margin: 0;\">Digest ID: ${d.digest_id}</p>\n    <p style=\"color: #999; font-size: 11px; margin: 5px 0 0 0;\">Period: ${d.period}</p>\n  </div>\n</body>\n</html>\n`;\n\n  // SMS content (brief)\n  const smsContent = `Dear ${d.parent_name}, ${d.student_name}'s weekly report: Attendance ${m.attendance.percentage}%, Avg Score ${m.tests.average}%, Streak ${m.streak} days. Grade: ${m.grade}. View details in email. -Manushi`;\n  \n  return {\n    ...d,\n    email: {\n      to: d.parent_email,\n      subject: `${d.student_name}'s Weekly Report - ${d.week_label} - Grade ${m.grade}`,\n      html: emailHtml\n    },\n    sms: smsContent\n  };\n});\n\nreturn {\n  ...data,\n  digests: digestsWithContent,\n  _content_generated: true\n};"
+      },
+      "id": "generate-content",
+      "name": "Generate Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1260, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split digests into individual items for processing\nconst data = $json;\nreturn data.digests.map(d => ({\n  ...d,\n  _supabase_url: data._supabase_url,\n  _supabase_key: data._supabase_key,\n  _msg91_key: data._msg91_key,\n  _from_email: data._from_email\n}));"
+      },
+      "id": "split-digests",
+      "name": "Split Digests",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1460, 320]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json._from_email || 'reports@manushi.com' }}",
+        "toEmail": "={{ $json.email.to }}",
+        "subject": "={{ $json.email.subject }}",
+        "emailType": "html",
+        "html": "={{ $json.email.html }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1680, 260],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._msg91_url || 'https://api.msg91.com/api/v5/flow/' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"flow_id\": \"{{ $json._msg91_flow_id || 'weekly_digest_flow' }}\",\n  \"mobiles\": \"91{{ $json.parent_phone }}\",\n  \"student_name\": \"{{ $json.student_name }}\",\n  \"attendance\": \"{{ $json.metrics.attendance.percentage }}%\",\n  \"avg_score\": \"{{ $json.metrics.tests.average }}%\",\n  \"grade\": \"{{ $json.metrics.grade }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-sms",
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1680, 380],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/digest_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"digest_id\": \"{{ $json.digest_id }}\",\n  \"student_id\": \"{{ $json.student_id }}\",\n  \"parent_email\": \"{{ $json.parent_email }}\",\n  \"week_number\": {{ $json.week_number }},\n  \"week_label\": \"{{ $json.week_label }}\",\n  \"metrics\": {{ JSON.stringify($json.metrics) }},\n  \"grade\": \"{{ $json.metrics.grade }}\",\n  \"email_sent\": true,\n  \"sms_sent\": true,\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-digest",
+      "name": "Log Digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1900, 320],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Aggregate Results\n// ============================================\nconst items = $input.all();\nconst firstItem = items[0]?.json || {};\n\nconst results = items.map(item => ({\n  digest_id: item.json.digest_id,\n  student_id: item.json.student_id,\n  student_name: item.json.student_name,\n  grade: item.json.metrics?.grade,\n  status: 'sent'\n}));\n\nconst gradeDistribution = {\n  A: results.filter(r => r.grade === 'A').length,\n  B: results.filter(r => r.grade === 'B').length,\n  C: results.filter(r => r.grade === 'C').length,\n  D: results.filter(r => r.grade === 'D').length,\n  F: results.filter(r => r.grade === 'F').length\n};\n\nconst startTime = new Date(firstItem._trace?.started_at || new Date()).getTime();\nconst duration_ms = Date.now() - startTime;\n\nreturn {\n  success: true,\n  message: 'Weekly parent digests sent successfully',\n  summary: {\n    total_sent: results.length,\n    week: firstItem.week_label,\n    grade_distribution: gradeDistribution\n  },\n  digests: results,\n  _log: {\n    timestamp: new Date().toISOString(),\n    level: 'info',\n    message: 'Weekly digest batch completed',\n    event_type: 'weekly_digest',\n    count: results.length,\n    duration_ms: duration_ms\n  },\n  _trace: { ...firstItem._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "aggregate",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2120, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"weekly_digest\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2340, 320],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":email: *Weekly Digest Summary*\",\n  \"attachments\": [{\n    \"color\": \"good\",\n    \"blocks\": [\n      {\n        \"type\": \"section\",\n        \"text\": { \"type\": \"mrkdwn\", \"text\": \"*${$json.summary.week}*\\n${$json.summary.total_sent} parent digests sent\" }\n      },\n      {\n        \"type\": \"section\",\n        \"fields\": [\n          { \"type\": \"mrkdwn\", \"text\": \"*Grade A:* ${$json.summary.grade_distribution.A}\" },\n          { \"type\": \"mrkdwn\", \"text\": \"*Grade B:* ${$json.summary.grade_distribution.B}\" },\n          { \"type\": \"mrkdwn\", \"text\": \"*Grade C:* ${$json.summary.grade_distribution.C}\" },\n          { \"type\": \"mrkdwn\", \"text\": \"*Grade D/F:* ${$json.summary.grade_distribution.D + $json.summary.grade_distribution.F}\" }\n        ]\n      },\n      {\n        \"type\": \"context\",\n        \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"Duration: ${$json._trace.duration_ms}ms | Correlation: ${$json._trace.correlation_id}\" }]\n      }\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-summary",
+      "name": "Slack Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2340, 460],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, summary: $json.summary, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2560, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// No students found\nconst ctx = $json;\nconst duration_ms = Date.now() - new Date(ctx._trace.started_at).getTime();\n\nreturn {\n  success: true,\n  message: 'No active students found for digest',\n  summary: { total_sent: 0, week: ctx.week_label },\n  _trace: { ...ctx._trace, completed_at: new Date().toISOString(), duration_ms, path: 'no_students' }\n};"
+      },
+      "id": "no-students",
+      "name": "No Students",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1260, 480]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-no-students",
+      "name": "Respond Empty",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1460, 480]
+    }
+  ],
+  "connections": {
+    "Saturday 9 AM": { "main": [[{ "node": "Initialize", "type": "main", "index": 0 }]] },
+    "Manual Trigger": { "main": [[{ "node": "Initialize", "type": "main", "index": 0 }]] },
+    "Initialize": { "main": [[{ "node": "Fetch Students", "type": "main", "index": 0 }, { "node": "Fetch Attendance", "type": "main", "index": 0 }, { "node": "Fetch Tests", "type": "main", "index": 0 }, { "node": "Fetch Assignments", "type": "main", "index": 0 }]] },
+    "Fetch Students": { "main": [[{ "node": "Compile Digests", "type": "main", "index": 0 }]] },
+    "Fetch Attendance": { "main": [[{ "node": "Compile Digests", "type": "main", "index": 0 }]] },
+    "Fetch Tests": { "main": [[{ "node": "Compile Digests", "type": "main", "index": 0 }]] },
+    "Fetch Assignments": { "main": [[{ "node": "Compile Digests", "type": "main", "index": 0 }]] },
+    "Compile Digests": { "main": [[{ "node": "Any Students?", "type": "main", "index": 0 }]] },
+    "Any Students?": {
+      "main": [
+        [{ "node": "No Students", "type": "main", "index": 0 }],
+        [{ "node": "Generate Content", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Content": { "main": [[{ "node": "Split Digests", "type": "main", "index": 0 }]] },
+    "Split Digests": { "main": [[{ "node": "Send Email", "type": "main", "index": 0 }, { "node": "Send SMS", "type": "main", "index": 0 }]] },
+    "Send Email": { "main": [[{ "node": "Log Digest", "type": "main", "index": 0 }]] },
+    "Send SMS": { "main": [[{ "node": "Log Digest", "type": "main", "index": 0 }]] },
+    "Log Digest": { "main": [[{ "node": "Aggregate Results", "type": "main", "index": 0 }]] },
+    "Aggregate Results": { "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }, { "node": "Slack Summary", "type": "main", "index": 0 }]] },
+    "Log to Supabase": { "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]] },
+    "Slack Summary": { "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]] },
+    "No Students": { "main": [[{ "node": "Respond Empty", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

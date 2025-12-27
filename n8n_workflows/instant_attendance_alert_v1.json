@@ -1,0 +1,444 @@
+{
+  "name": "Instant Attendance Alert - v1 Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Instant Attendance Alert\n\n**Webhook:** POST /webhook/attendance-alert\n\n**Purpose:** Notify parents immediately when their child is marked absent\n\n**Trigger:** Student marked absent in class\n\n**Channels:**\n- Push notification (instant)\n- SMS (backup)\n\n**Required Headers:**\n- `X-API-KEY`: sk_test_manushi_2025",
+        "height": 320,
+        "width": 320,
+        "color": 4
+      },
+      "id": "sticky-intro",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Authentication\n\nValidates API key from headers.\n\n**Valid Keys:**\n- sk_test_manushi_2025 (test)\n- sk_prod_manushi_2025 (prod)\n\n**Returns 401** if invalid",
+        "height": 200,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-auth",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 80]
+    },
+    {
+      "parameters": {
+        "content": "## Input Validation\n\n**Required Fields:**\n- student_id, student_name\n- class_id, class_name\n- date, time_slot\n- parent_phone, parent_name\n- parent_fcm_token\n\n**Returns 400** if invalid",
+        "height": 240,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-validation",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [900, 20]
+    },
+    {
+      "parameters": {
+        "content": "## Duplicate Detection\n\nPrevents sending multiple alerts for same absence.\n\n**Dedupe Key:**\nstudent_id + date + class_id\n\n**Window:** 24 hours\n\nUses workflow static data.",
+        "height": 200,
+        "width": 260,
+        "color": 5
+      },
+      "id": "sticky-dedupe",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1280, -40]
+    },
+    {
+      "parameters": {
+        "content": "## Parent Push Notification\n\n**Channel:** Firebase FCM\n**Priority:** High\n**Sound:** Alert tone\n\n**Message:**\n\"Attendance Alert: {student} was marked absent in {class} today at {time}\"",
+        "height": 200,
+        "width": 300,
+        "color": 1
+      },
+      "id": "sticky-push",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1780, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Parent SMS Alert\n\n**Channel:** MSG91 SMS Gateway\n**Sender:** MANUSH\n**Template:** Attendance Alert\n\n**Message:**\n\"Dear {parent}, {student} was absent in {class} on {date}. Contact school if unexpected.\"",
+        "height": 200,
+        "width": 300,
+        "color": 2
+      },
+      "id": "sticky-sms",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2100, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Success Logging\n\n**Logs to:** Supabase automation_logs\n\n**Tracked:**\n- Correlation ID\n- Student/Parent IDs\n- Channels used\n- Response time",
+        "height": 180,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-success",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2500, -40]
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\n\n**Fallback:** Logs failed alerts\n\n**Dead Letter Queue:**\nFailed messages saved for retry\n\n**Slack Alert:**\nImmediate ops notification\n\n**Returns 500** on error",
+        "height": 220,
+        "width": 280,
+        "color": 6
+      },
+      "id": "sticky-error",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2500, 480]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "attendance-alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Webhook Authentication\n// ============================================\nconst headers = $json.headers || {};\nconst body = $json.body || $json;\n\nconst apiKey = headers['x-api-key'] || headers['X-API-KEY'] || headers['authorization'] || '';\n\nconst VALID_KEYS = ['sk_test_manushi_2025', 'sk_prod_manushi_2025'];\nconst isAuthenticated = VALID_KEYS.some(key => apiKey.includes(key));\n\nif (!isAuthenticated) {\n  return {\n    _auth_failed: true,\n    success: false,\n    error: {\n      code: 'UNAUTHORIZED',\n      message: 'Invalid or missing API key',\n      hint: 'Include X-API-KEY header with valid key'\n    }\n  };\n}\n\nconst correlationId = body.correlation_id || \n  'att_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString(),\n  authenticated: true\n};\n\nreturn {\n  student_id: body.student_id,\n  student_name: body.student_name,\n  class_id: body.class_id,\n  class_name: body.class_name,\n  subject: body.subject,\n  teacher_name: body.teacher_name,\n  date: body.date || new Date().toISOString().split('T')[0],\n  time_slot: body.time_slot,\n  absence_type: body.absence_type || 'absent',\n  parent_id: body.parent_id,\n  parent_name: body.parent_name,\n  parent_phone: body.parent_phone,\n  parent_fcm_token: body.parent_fcm_token,\n  school_name: body.school_name || 'Manushi Coaching',\n  school_phone: body.school_phone,\n  _trace: trace,\n  _raw: body,\n  _auth_passed: true\n};"
+      },
+      "id": "auth",
+      "name": "Auth Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "auth-check", "leftValue": "={{ $json._auth_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-auth",
+      "name": "Is Authenticated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Input Validation for Attendance Alert\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['student_id', 'student_name', 'class_id', 'class_name', 'parent_phone', 'parent_name'],\n  properties: {\n    student_id: { type: 'string', minLength: 1, maxLength: 50 },\n    student_name: { type: 'string', minLength: 1, maxLength: 100 },\n    class_id: { type: 'string', minLength: 1, maxLength: 50 },\n    class_name: { type: 'string', minLength: 1, maxLength: 100 },\n    parent_phone: { type: 'string', minLength: 10, maxLength: 15 },\n    parent_name: { type: 'string', minLength: 1, maxLength: 100 }\n  }\n};\n\n// Check required fields\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\n// Validate phone number format\nif (data.parent_phone && !/^[+]?[0-9]{10,15}$/.test(data.parent_phone.replace(/\\s/g, ''))) {\n  errors.push('Invalid parent_phone format');\n}\n\n// Validate date format if provided\nif (data.date && !/^\\d{4}-\\d{2}-\\d{2}$/.test(data.date)) {\n  errors.push('Invalid date format. Use YYYY-MM-DD');\n}\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\nreturn {\n  student_id: String(data.student_id).trim(),\n  student_name: String(data.student_name).trim(),\n  class_id: String(data.class_id).trim(),\n  class_name: String(data.class_name).trim(),\n  subject: String(data.subject || '').trim(),\n  teacher_name: String(data.teacher_name || 'Teacher').trim(),\n  date: data.date || new Date().toISOString().split('T')[0],\n  time_slot: String(data.time_slot || '').trim(),\n  absence_type: data.absence_type || 'absent',\n  parent_id: String(data.parent_id || '').trim(),\n  parent_name: String(data.parent_name).trim(),\n  parent_phone: String(data.parent_phone).replace(/\\s/g, ''),\n  parent_fcm_token: data.parent_fcm_token || '',\n  school_name: data.school_name || 'Manushi Coaching',\n  school_phone: data.school_phone || '',\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Duplicate Detection for Attendance Alert\n// Prevents multiple alerts for same absence on same day\n// ============================================\nconst data = $json;\nconst dedupeKey = data.student_id + '_' + data.date + '_' + data.class_id;\n\nconst processed = $getWorkflowStaticData('global');\nconst recentAlerts = processed.recentAlerts || {};\n\nconst now = Date.now();\nconst DEDUP_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours\n\n// Clean up old entries\nfor (const key in recentAlerts) {\n  if (now - recentAlerts[key] > DEDUP_WINDOW_MS) {\n    delete recentAlerts[key];\n  }\n}\n\nif (recentAlerts[dedupeKey]) {\n  return {\n    _duplicate: true,\n    success: true,\n    message: 'Attendance alert already sent for this student/class/date',\n    dedupe_key: dedupeKey,\n    _trace: { ...data._trace, path: 'duplicate_skipped' }\n  };\n}\n\nrecentAlerts[dedupeKey] = now;\nprocessed.recentAlerts = recentAlerts;\n\nreturn {\n  ...data,\n  _dedupe_key: dedupeKey,\n  _duplicate_checked: true\n};"
+      },
+      "id": "dedupe",
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dup-check", "leftValue": "={{ $json._duplicate }}", "rightValue": true, "operator": { "type": "boolean", "operation": "notEquals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-dup",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare Push Notification for Parent\n// ============================================\nconst data = $json;\nconst dateFormatted = new Date(data.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });\n\nconst notification = {\n  title: 'Attendance Alert',\n  body: data.student_name + ' was marked ' + data.absence_type + ' in ' + data.class_name + ' on ' + dateFormatted + (data.time_slot ? ' (' + data.time_slot + ')' : ''),\n  data: {\n    type: 'attendance_alert',\n    student_id: data.student_id,\n    class_id: data.class_id,\n    date: data.date,\n    absence_type: data.absence_type\n  }\n};\n\nconst fcmPayload = {\n  message: {\n    token: data.parent_fcm_token,\n    notification: {\n      title: notification.title,\n      body: notification.body\n    },\n    data: notification.data,\n    android: {\n      priority: 'high',\n      notification: {\n        sound: 'alert',\n        channel_id: 'attendance_alerts',\n        icon: 'ic_attendance'\n      }\n    },\n    apns: {\n      payload: {\n        aps: {\n          sound: 'default',\n          badge: 1\n        }\n      }\n    }\n  }\n};\n\nreturn {\n  ...data,\n  _notification: notification,\n  _fcm_payload: fcmPayload,\n  _date_formatted: dateFormatted,\n  _push_prepared: true\n};"
+      },
+      "id": "prep-push",
+      "name": "Prepare Push Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1600, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._fcm_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-push",
+      "name": "Send Push to Parent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1800, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Prepare SMS for Parent\n// ============================================\nconst data = $json;\nconst dateFormatted = data._date_formatted;\n\nconst smsMessage = 'Dear ' + data.parent_name + ', ' + data.student_name + ' was marked ' + data.absence_type + ' in ' + data.class_name + ' on ' + dateFormatted + '. If unexpected, please contact ' + data.school_name + '.';\n\n// MSG91 SMS Payload\nconst smsPayload = {\n  flow_id: 'YOUR_ATTENDANCE_FLOW_ID',\n  sender: 'MANUSH',\n  mobiles: data.parent_phone.replace(/\\+/g, ''),\n  VAR1: data.parent_name,\n  VAR2: data.student_name,\n  VAR3: data.absence_type,\n  VAR4: data.class_name,\n  VAR5: dateFormatted,\n  VAR6: data.school_name\n};\n\nreturn {\n  ...data,\n  _sms_message: smsMessage,\n  _sms_payload: smsPayload,\n  _sms_prepared: true\n};"
+      },
+      "id": "prep-sms",
+      "name": "Prepare SMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://control.msg91.com/api/v5/flow/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authkey", "value": "={{ $json._msg91_key || 'YOUR_MSG91_KEY' }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json._sms_payload) }}",
+        "options": {
+          "timeout": 10000,
+          "retry": { "maxTries": 3, "retryInterval": 1000, "retryIntervalMultiplier": 2 }
+        }
+      },
+      "id": "send-sms",
+      "name": "Send SMS to Parent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2200, 180],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Success Handler\n// ============================================\nconst data = $json;\nconst startTime = new Date(data._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Success',\n  message: 'Attendance alert sent to parent',\n  event_type: 'attendance_alert',\n  student_id: data.student_id,\n  parent_id: data.parent_id,\n  class_id: data.class_id,\n  date: data.date,\n  channels: ['push', 'sms'],\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: true,\n  message: 'Attendance alert sent successfully',\n  alert: {\n    type: 'attendance',\n    absence_type: data.absence_type,\n    channels: ['push', 'sms']\n  },\n  student: {\n    id: data.student_id,\n    name: data.student_name\n  },\n  parent: {\n    id: data.parent_id,\n    name: data.parent_name\n  },\n  class: {\n    id: data.class_id,\n    name: data.class_name,\n    date: data.date\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'success' }\n};"
+      },
+      "id": "success-handler",
+      "name": "Success Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2400, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// Fallback Handler for Failed Notifications\n// ============================================\nconst data = $('Duplicate Check').first().json;\nconst errorInfo = $json.error || {};\nconst duration_ms = Date.now() - new Date(data._trace.started_at).getTime();\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'error',\n  correlation_id: data._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Fallback',\n  message: 'Attendance alert delivery failed',\n  error_code: 'NOTIFICATION_FAILED',\n  error_message: errorInfo.message || 'Unknown error',\n  student_id: data.student_id,\n  parent_id: data.parent_id,\n  duration_ms: duration_ms\n};\n\nreturn {\n  success: false,\n  message: 'Failed to send attendance alert, logged for retry',\n  alert: {\n    type: 'attendance',\n    student_name: data.student_name\n  },\n  _log: log,\n  _trace: { ...data._trace, completed_at: new Date().toISOString(), duration_ms, path: 'notification_failed' },\n  _needs_dlq: true,\n  _error_info: errorInfo\n};"
+      },
+      "id": "fallback",
+      "name": "Notification Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2400, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/automation_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"{{ $json._trace.workflow_name }}\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"level\": \"{{ $json._log.level }}\",\n  \"message\": \"{{ $json._log.message }}\",\n  \"event_type\": \"attendance_alert\",\n  \"recipient_id\": \"{{ $json.parent.id }}\",\n  \"student_id\": \"{{ $json.student.id }}\",\n  \"duration_ms\": {{ $json._trace.duration_ms || 0 }},\n  \"path\": \"{{ $json._trace.path }}\",\n  \"payload\": {{ JSON.stringify($json) }}\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2600, 180],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "dlq-check", "leftValue": "={{ $json._needs_dlq }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-needs-dlq",
+      "name": "Needs DLQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2600, 380]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._supabase_url || 'https://YOUR_PROJECT.supabase.co' }}/rest/v1/dead_letter_queue",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json._supabase_key || 'YOUR_ANON_KEY' }}" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"workflow_name\": \"Instant Attendance Alert\",\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"error_code\": \"NOTIFICATION_FAILED\",\n  \"error_message\": \"{{ $json._error_info.message || 'Attendance alert delivery failed' }}\",\n  \"original_payload\": {{ JSON.stringify($json) }},\n  \"retry_count\": 0,\n  \"status\": \"pending\"\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "dlq",
+      "name": "Dead Letter Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2800, 440],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._slack_webhook || 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \":warning: *Attendance Alert Failed*\",\n  \"attachments\": [{\n    \"color\": \"warning\",\n    \"fields\": [\n      {\"title\": \"Student\", \"value\": \"{{ $json.alert.student_name }}\", \"short\": true},\n      {\"title\": \"Parent\", \"value\": \"{{ $json.parent.name || 'Unknown' }}\", \"short\": true},\n      {\"title\": \"Class\", \"value\": \"{{ $json.class.name || 'Unknown' }}\", \"short\": true},\n      {\"title\": \"Error\", \"value\": \"{{ $json._error_info.message || 'Unknown' }}\", \"short\": true}\n    ]\n  }]\n}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3000, 440],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, alert: $json.alert, student: $json.student, parent: $json.parent, class: $json.class, _trace: { correlation_id: $json._trace.correlation_id, duration_ms: $json._trace.duration_ms, path: $json._trace.path } }) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2800, 180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: $json.success, message: $json.message, alert: $json.alert, _trace: { correlation_id: $json._trace.correlation_id, path: $json._trace.path } }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3200, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-unauth",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-invalid",
+      "name": "Respond Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-dup",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1600, 360]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Auth Check", "type": "main", "index": 0}]] },
+    "Auth Check": { "main": [[{"node": "Is Authenticated?", "type": "main", "index": 0}]] },
+    "Is Authenticated?": { "main": [ [{"node": "Validate Input", "type": "main", "index": 0}], [{"node": "Respond Unauthorized", "type": "main", "index": 0}] ] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Duplicate Check", "type": "main", "index": 0}], [{"node": "Respond Invalid", "type": "main", "index": 0}] ] },
+    "Duplicate Check": { "main": [[{"node": "Not Duplicate?", "type": "main", "index": 0}]] },
+    "Not Duplicate?": { "main": [ [{"node": "Prepare Push Notification", "type": "main", "index": 0}], [{"node": "Respond Duplicate", "type": "main", "index": 0}] ] },
+    "Prepare Push Notification": { "main": [[{"node": "Send Push to Parent", "type": "main", "index": 0}]] },
+    "Send Push to Parent": { "main": [[{"node": "Prepare SMS", "type": "main", "index": 0}]] },
+    "Prepare SMS": { "main": [[{"node": "Send SMS to Parent", "type": "main", "index": 0}]] },
+    "Send SMS to Parent": { "main": [[{"node": "Success Handler", "type": "main", "index": 0}]], "error": [[{"node": "Notification Fallback", "type": "main", "index": 0}]] },
+    "Success Handler": { "main": [[{"node": "Log to Supabase", "type": "main", "index": 0}]] },
+    "Log to Supabase": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "Notification Fallback": { "main": [[{"node": "Needs DLQ?", "type": "main", "index": 0}]] },
+    "Needs DLQ?": { "main": [ [{"node": "Respond Fallback", "type": "main", "index": 0}], [{"node": "Dead Letter Queue", "type": "main", "index": 0}] ] },
+    "Dead Letter Queue": { "main": [[{"node": "Slack Alert", "type": "main", "index": 0}]] },
+    "Slack Alert": { "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

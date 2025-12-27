@@ -1,0 +1,131 @@
+{
+  "name": "360 Performance Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-completed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Test Completed Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "tableId": "test_results",
+        "filterType": "string",
+        "filterString": "={{ 'id=eq.' + $json.test_result_id }}"
+      },
+      "id": "get-test-result",
+      "name": "Get Test Result",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT/messages:send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: { token: $json.student_fcm_token, notification: { title: 'Test Result', body: 'You scored ' + $json.score + '% in ' + $json.test_name } } } }}"
+      },
+      "id": "notify-student",
+      "name": "Notify Student (FCM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT/messages:send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: { token: $json.parent_fcm_token, notification: { title: $json.student_name + ' Test Result', body: 'Scored ' + $json.score + '% in ' + $json.test_name + '. Batch avg: ' + $json.batch_avg + '%' } } } }}"
+      },
+      "id": "notify-parent",
+      "name": "Notify Parent (FCM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT/messages:send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: { token: $json.teacher_fcm_token, notification: { title: 'Test Analytics', body: $json.student_name + ' completed ' + $json.test_name + ': ' + $json.score + '%' } } } }}"
+      },
+      "id": "notify-teacher",
+      "name": "Notify Teacher (FCM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 440]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "admin_notifications",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "type", "fieldValue": "test_completed" },
+            { "fieldName": "data", "fieldValue": "={{ JSON.stringify($json) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "log-admin",
+      "name": "Log for Admin Dashboard",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, message: 'All roles notified' } }}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Test Completed Webhook": {
+      "main": [[{ "node": "Get Test Result", "type": "main", "index": 0 }]]
+    },
+    "Get Test Result": {
+      "main": [[
+        { "node": "Notify Student (FCM)", "type": "main", "index": 0 },
+        { "node": "Notify Parent (FCM)", "type": "main", "index": 0 },
+        { "node": "Notify Teacher (FCM)", "type": "main", "index": 0 }
+      ]]
+    },
+    "Notify Student (FCM)": {
+      "main": [[{ "node": "Log for Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Notify Parent (FCM)": {
+      "main": [[{ "node": "Log for Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Notify Teacher (FCM)": {
+      "main": [[{ "node": "Log for Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Log for Admin Dashboard": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null
+}

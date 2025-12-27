@@ -1,0 +1,112 @@
+{
+  "name": "AI Study Streak - Simple",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-simple",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\n\nreturn {\n  student_id: body.student_id,\n  student_name: body.student_name,\n  current_streak: body.current_streak,\n  preferred_subject: body.preferred_subject || 'studies',\n  correlation_id: 'corr_' + Date.now()\n};"
+      },
+      "id": "config",
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\"role\": \"user\", \"parts\": [{\"text\": \"Generate a SHORT motivational push notification (max 2 sentences, under 150 chars) for student {{ $json.student_name }} with {{ $json.current_streak }} day streak. Subject: {{ $json.preferred_subject }}. Be friendly and encouraging.\"}]}],\n  \"generationConfig\": {\"temperature\": 0.8, \"maxOutputTokens\": 500}\n}",
+        "options": {"timeout": 15000}
+      },
+      "id": "gemini",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const student = $('Config').first().json;\nconst response = $json;\n\nlet message = '';\ntry {\n  message = response.candidates[0].content.parts[0].text || '';\n  message = message.trim().substring(0, 200);\n} catch(e) {\n  message = 'Hey ' + student.student_name + '! Keep your ' + student.current_streak + '-day streak alive!';\n}\n\nreturn {\n  success: true,\n  notification: {\n    title: 'Streak Alert',\n    body: message\n  },\n  student: {\n    id: student.student_id,\n    name: student.student_name,\n    streak: student.current_streak\n  },\n  ai_used: true,\n  correlation_id: student.correlation_id\n};"
+      },
+      "id": "parse",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "const student = $('Config').first().json;\nconst fallback = 'Hey ' + student.student_name + '! Your ' + student.current_streak + '-day streak is amazing. Keep it going!';\n\nreturn {\n  success: true,\n  notification: {\n    title: 'Streak Alert',\n    body: fallback\n  },\n  student: {\n    id: student.student_id,\n    name: student.student_name,\n    streak: student.current_streak\n  },\n  ai_used: false,\n  correlation_id: student.correlation_id\n};"
+      },
+      "id": "fallback",
+      "name": "Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond1",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond2",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1000, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Config", "type": "main", "index": 0}]]
+    },
+    "Config": {
+      "main": [[{"node": "Call Gemini", "type": "main", "index": 0}]]
+    },
+    "Call Gemini": {
+      "main": [[{"node": "Parse Response", "type": "main", "index": 0}]],
+      "error": [[{"node": "Fallback", "type": "main", "index": 0}]]
+    },
+    "Parse Response": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    },
+    "Fallback": {
+      "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null
+}

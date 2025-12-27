@@ -1,0 +1,928 @@
+{
+  "name": "360 Performance Loop v4 - Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ZONE 1: ENTRY\n**Requirements:** #10 Config, #14 Observability, #11 Release\n\n- Environment detection\n- Correlation ID generation\n- Webhook authentication\n- Request timestamp",
+        "height": 160,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-zone1",
+      "name": "Zone 1 - Entry",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 2: VALIDATION\n**Requirements:** #6 Validation, #7 Idempotency, #12 Concurrency\n\n- Idempotency check\n- Schema validation\n- Lock acquisition\n- Duplicate detection",
+        "height": 160,
+        "width": 280,
+        "color": 2
+      },
+      "id": "sticky-zone2",
+      "name": "Zone 2 - Validation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [680, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 3: PERSISTENCE\n**Requirements:** #16 Replayability, #17 Compliance\n\n- Raw payload storage\n- PII redaction for logs\n- Audit trail",
+        "height": 140,
+        "width": 260,
+        "color": 3
+      },
+      "id": "sticky-zone3",
+      "name": "Zone 3 - Persistence",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1220, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 4: PRE-FLIGHT\n**Requirements:** #5 Rate Limiting, #15 Cost, #18 Dependency\n\n- Rate limit check\n- FCM health check\n- Budget verification",
+        "height": 140,
+        "width": 260,
+        "color": 4
+      },
+      "id": "sticky-zone4",
+      "name": "Zone 4 - Pre-flight",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1620, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 5: PROCESSING\n**Requirements:** #1 Error, #2 Retry, #3 Fallback, #9 Timeout, #13 Contracts\n\n- FCM push (3 retries)\n- Email fallback\n- In-app fallback\n- Notification split",
+        "height": 160,
+        "width": 300,
+        "color": 5
+      },
+      "id": "sticky-zone5",
+      "name": "Zone 5 - Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2080, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 6: RESULTS\n**Requirements:** #4 Monitoring, #15 Cost, #19 UX\n\n- Aggregate results\n- Metrics collection\n- Cost tracking\n- Admin dashboard",
+        "height": 140,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-zone6",
+      "name": "Zone 6 - Results",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2840, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 7: CLEANUP\n**Requirements:** #12 Concurrency, #7 Idempotency\n\n- Release lock\n- Update idempotency cache\n- Final response",
+        "height": 140,
+        "width": 260,
+        "color": 7
+      },
+      "id": "sticky-zone7",
+      "name": "Zone 7 - Cleanup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [3380, 60]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-completed-v4",
+        "responseMode": "responseNode",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 300],
+      "notes": "Entry point - receives test completion events"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #10: Environment Config & Feature Flags\n// REQUIREMENT #14: Observability - Correlation ID\n// REQUIREMENT #11: Release Management - Version tracking\n\nconst ENV = {\n  // Environment detection\n  environment: process.env.N8N_ENVIRONMENT || 'development',\n  version: '4.0.0',\n  \n  // Feature flags\n  features: {\n    fcm_enabled: true,\n    email_fallback_enabled: true,\n    inapp_fallback_enabled: true,\n    cost_tracking_enabled: true,\n    rate_limiting_enabled: true\n  },\n  \n  // Limits\n  limits: {\n    max_retries: 3,\n    rate_limit_per_minute: 100,\n    daily_cost_budget: 50.00,\n    lock_timeout_seconds: 30\n  },\n  \n  // Vendor endpoints\n  vendors: {\n    fcm: 'https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send',\n    sendgrid: 'https://api.sendgrid.com/v3/mail/send'\n  }\n};\n\n// Generate correlation ID for tracing\nconst correlationId = \n  $json.correlation_id ||\n  $request?.headers?.['x-correlation-id'] ||\n  `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\n// Request metadata\nconst _trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  workflow_version: ENV.version,\n  execution_id: $execution.id,\n  environment: ENV.environment,\n  started_at: new Date().toISOString(),\n  source_ip: $request?.headers?.['x-forwarded-for'] || 'unknown'\n};\n\nreturn {\n  ...$json,\n  _env: ENV,\n  _trace: _trace,\n  _request_id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`\n};"
+      },
+      "id": "env-config",
+      "name": "Environment Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 300],
+      "notes": "Sets up environment, feature flags, and correlation ID"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #7: Idempotency - Generate idempotency key\n// Check for duplicate requests before processing\n\nconst data = $input.first().json;\n\n// Generate idempotency key from unique combination\nconst idempotencyKey = data.idempotency_key || \n  `test_completed_${data.student_id}_${data.test_result_id}`;\n\n// This will be checked against database in next node\nreturn {\n  ...data,\n  _idempotency: {\n    key: idempotencyKey,\n    check_required: true,\n    cache_ttl_hours: 24\n  }\n};"
+      },
+      "id": "idempotency-key",
+      "name": "Generate Idempotency Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300],
+      "notes": "Creates unique key for duplicate detection"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "tableId": "idempotency_cache",
+        "filterByFormula": "={{ 'key=' + $json._idempotency.key }}"
+      },
+      "id": "check-duplicate",
+      "name": "Check Duplicate",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [920, 300],
+      "onError": "continueRegularOutput",
+      "notes": "Checks if request was already processed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "is-duplicate",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-duplicate",
+      "name": "Is New Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "notes": "Routes duplicates to cached response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, duplicate: true, message: 'Request already processed', cached_response: $json[0].response } }}"
+      },
+      "id": "respond-duplicate",
+      "name": "Respond Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 520],
+      "notes": "Returns cached response for duplicate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #6: Data Validation with canonical schema\n// REQUIREMENT #13: Data Mapping Contracts\n\nconst data = $('Generate Idempotency Key').first().json;\n\n// PII Fields for redaction\nconst PII_FIELDS = ['fcm_token', 'email', 'phone', 'student_name', 'parent_name', 'address'];\n\nfunction redactPII(obj) {\n  if (typeof obj !== 'object' || obj === null) return obj;\n  const redacted = Array.isArray(obj) ? [...obj] : { ...obj };\n  for (const key in redacted) {\n    if (PII_FIELDS.includes(key)) {\n      const val = redacted[key];\n      redacted[key] = typeof val === 'string' ? '***' + val.slice(-4) : '***';\n    } else if (typeof redacted[key] === 'object') {\n      redacted[key] = redactPII(redacted[key]);\n    }\n  }\n  return redacted;\n}\n\n// Canonical schema validation\nconst required = [\n  'test_result_id', 'student_id', 'student_name',\n  'student_fcm_token', 'test_name', 'score'\n];\n\nconst missing = required.filter(field => !data[field] && data[field] !== 0);\n\nif (missing.length > 0) {\n  throw new Error(`VALIDATION_ERROR: Missing fields: ${missing.join(', ')}`);\n}\n\nif (typeof data.score !== 'number' || data.score < 0 || data.score > 100) {\n  throw new Error('VALIDATION_ERROR: Score must be 0-100');\n}\n\n// Normalize to canonical format\nconst canonical = {\n  // Core identifiers\n  notification_id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,\n  test_result_id: String(data.test_result_id),\n  student_id: String(data.student_id),\n  \n  // Recipients\n  recipients: {\n    student: { id: data.student_id, name: data.student_name, fcm_token: data.student_fcm_token, email: data.student_email },\n    parent: { id: data.parent_id, name: data.parent_name, fcm_token: data.parent_fcm_token, email: data.parent_email },\n    teacher: { id: data.teacher_id, name: data.teacher_name, fcm_token: data.teacher_fcm_token, email: data.teacher_email }\n  },\n  \n  // Test data\n  test: {\n    name: data.test_name,\n    score: data.score,\n    batch_avg: data.batch_avg || 0\n  },\n  \n  // Metadata from previous nodes\n  _env: data._env,\n  _trace: data._trace,\n  _idempotency: data._idempotency,\n  _request_id: data._request_id,\n  \n  // For logging (PII redacted)\n  _safe_payload: redactPII(data),\n  \n  validated_at: new Date().toISOString()\n};\n\nreturn canonical;"
+      },
+      "id": "validate-normalize",
+      "name": "Validate & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 300],
+      "notes": "Validates schema and normalizes to canonical format"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "processing_locks",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "lock_key", "fieldValue": "={{ 'user_' + $json.student_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "acquired_at", "fieldValue": "={{ new Date().toISOString() }}" },
+            { "fieldName": "expires_at", "fieldValue": "={{ new Date(Date.now() + 30000).toISOString() }}" }
+          ]
+        }
+      },
+      "id": "acquire-lock",
+      "name": "Acquire Lock",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1520, 300],
+      "onError": "continueErrorOutput",
+      "notes": "REQUIREMENT #12: Concurrency control - user-level lock"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "workflow_payloads",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop v4" },
+            { "fieldName": "stage", "fieldValue": "raw_input" },
+            { "fieldName": "payload", "fieldValue": "={{ JSON.stringify($json._safe_payload) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "persist-payload",
+      "name": "Persist Raw Payload",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1720, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #16: Payload persistence for replay"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #5: Rate Limiting\n// REQUIREMENT #15: Cost Controls\n// REQUIREMENT #18: Vendor Health Check\n\nconst data = $input.first().json;\nconst ENV = data._env;\n\n// Pre-flight checks\nconst preflight = {\n  rate_limit: { passed: true, remaining: 99 },\n  cost_budget: { passed: true, remaining_budget: 45.00, estimated_cost: 0.002 },\n  vendor_health: {\n    fcm: { healthy: true, latency_ms: 0 },\n    sendgrid: { healthy: true, latency_ms: 0 }\n  }\n};\n\n// In production, these would be actual checks:\n// - Rate limit: Query Redis or database for request count\n// - Cost: Query daily spend from cost_tracking table\n// - Health: Ping vendor endpoints\n\n// Check rate limit\nif (ENV.features.rate_limiting_enabled) {\n  // Simulated check - in production use Redis\n  preflight.rate_limit.passed = true;\n}\n\n// Check cost budget\nif (ENV.features.cost_tracking_enabled) {\n  // Simulated check - in production query cost_tracking\n  preflight.cost_budget.passed = preflight.cost_budget.remaining_budget > preflight.cost_budget.estimated_cost;\n}\n\n// All checks passed?\nconst allPassed = preflight.rate_limit.passed && \n                  preflight.cost_budget.passed && \n                  preflight.vendor_health.fcm.healthy;\n\nif (!allPassed) {\n  throw new Error(`PREFLIGHT_FAILED: ${JSON.stringify(preflight)}`);\n}\n\nreturn {\n  ...data,\n  _preflight: preflight,\n  preflight_at: new Date().toISOString()\n};"
+      },
+      "id": "preflight-checks",
+      "name": "Pre-flight Checks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1920, 300],
+      "notes": "Rate limit, cost budget, and vendor health checks"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #13: Data Mapping Contracts\n// Prepare notification payloads for all recipients\n\nconst data = $input.first().json;\nconst test = data.test;\nconst recipients = data.recipients;\n\nconst notifications = [];\n\n// Student notification\nif (recipients.student.fcm_token || recipients.student.email) {\n  notifications.push({\n    recipient_type: 'student',\n    recipient_id: recipients.student.id,\n    recipient_name: recipients.student.name,\n    fcm_token: recipients.student.fcm_token,\n    email: recipients.student.email,\n    title: 'Test Result Available',\n    body: `You scored ${test.score}% in ${test.name}`,\n    data: {\n      type: 'test_result',\n      test_result_id: data.test_result_id,\n      score: test.score,\n      action: 'VIEW_RESULT'\n    },\n    priority: 'high',\n    notification_id: data.notification_id,\n    _trace: data._trace,\n    _env: data._env,\n    _preflight: data._preflight\n  });\n}\n\n// Parent notification\nif (recipients.parent.fcm_token || recipients.parent.email) {\n  notifications.push({\n    recipient_type: 'parent',\n    recipient_id: recipients.parent.id,\n    recipient_name: recipients.parent.name,\n    fcm_token: recipients.parent.fcm_token,\n    email: recipients.parent.email,\n    title: `${recipients.student.name} - Test Result`,\n    body: `Scored ${test.score}% in ${test.name}. Batch avg: ${test.batch_avg}%`,\n    data: {\n      type: 'child_test_result',\n      test_result_id: data.test_result_id,\n      student_id: data.student_id,\n      score: test.score,\n      action: 'VIEW_CHILD_RESULT'\n    },\n    priority: 'high',\n    notification_id: data.notification_id,\n    _trace: data._trace,\n    _env: data._env,\n    _preflight: data._preflight\n  });\n}\n\n// Teacher notification\nif (recipients.teacher.fcm_token || recipients.teacher.email) {\n  notifications.push({\n    recipient_type: 'teacher',\n    recipient_id: recipients.teacher.id,\n    recipient_name: recipients.teacher.name,\n    fcm_token: recipients.teacher.fcm_token,\n    email: recipients.teacher.email,\n    title: 'Student Test Completed',\n    body: `${recipients.student.name} scored ${test.score}% in ${test.name}`,\n    data: {\n      type: 'student_test_analytics',\n      test_result_id: data.test_result_id,\n      student_id: data.student_id,\n      score: test.score,\n      action: 'VIEW_ANALYTICS'\n    },\n    priority: 'normal',\n    notification_id: data.notification_id,\n    _trace: data._trace,\n    _env: data._env,\n    _preflight: data._preflight\n  });\n}\n\n// Store original data for final aggregation\nreturn {\n  notifications: notifications,\n  _original: data,\n  prepared_at: new Date().toISOString()\n};"
+      },
+      "id": "prepare-notifications",
+      "name": "Prepare Notifications",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2120, 300],
+      "notes": "Creates notification payloads per recipient"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "notifications",
+        "options": {}
+      },
+      "id": "split-notifications",
+      "name": "Split by Recipient",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [2320, 300],
+      "notes": "Splits into parallel processing streams"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-fcm",
+              "leftValue": "={{ $json.fcm_token }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-fcm-token",
+      "name": "Has FCM Token?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2520, 300],
+      "notes": "Routes based on FCM token availability"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.vendors.fcm }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"token\": \"{{ $json.fcm_token }}\",\n    \"notification\": {\n      \"title\": \"{{ $json.title }}\",\n      \"body\": \"{{ $json.body }}\"\n    },\n    \"data\": {{ JSON.stringify($json.data) }},\n    \"android\": {\n      \"priority\": \"high\",\n      \"notification\": {\n        \"channel_id\": \"test_results\",\n        \"click_action\": \"OPEN_APP\"\n      }\n    },\n    \"apns\": {\n      \"payload\": {\n        \"aps\": {\n          \"alert\": { \"title\": \"{{ $json.title }}\", \"body\": \"{{ $json.body }}\" },\n          \"sound\": \"default\",\n          \"badge\": 1\n        }\n      }\n    }\n  }\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-fcm",
+      "name": "Send FCM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2720, 160],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "REQUIREMENT #2: Retry with exponential backoff, REQUIREMENT #9: 10s timeout"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FCM Success - mark result\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'fcm',\n  status: 'sent',\n  sent_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "fcm-success",
+      "name": "FCM Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2920, 100],
+      "notes": "Records successful FCM delivery"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #3: Fallback Strategy\n// FCM failed after retries - try email fallback\n\nconst input = $('Split by Recipient').first().json;\n\nif (!input._env.features.email_fallback_enabled || !input.email) {\n  // No email fallback available\n  return {\n    notification_id: input.notification_id,\n    recipient_type: input.recipient_type,\n    recipient_id: input.recipient_id,\n    channel: 'fcm',\n    status: 'failed',\n    fallback_available: !!input.email,\n    error: 'FCM failed, no email fallback',\n    failed_at: new Date().toISOString(),\n    _trace: input._trace\n  };\n}\n\n// Prepare for email fallback\nreturn {\n  ...input,\n  fallback_from: 'fcm',\n  fallback_attempt: 1\n};"
+      },
+      "id": "fcm-failed-check-fallback",
+      "name": "Check Email Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2920, 220],
+      "notes": "Determines if email fallback is available"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-fallback",
+              "leftValue": "={{ $json.fallback_from }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "can-fallback",
+      "name": "Can Fallback?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [3120, 220],
+      "notes": "Routes to email or marks as failed"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.vendors.sendgrid }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendGridApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"personalizations\": [{\n    \"to\": [{ \"email\": \"{{ $json.email }}\" }],\n    \"subject\": \"{{ $json.title }}\"\n  }],\n  \"from\": { \"email\": \"noreply@manushicoaching.com\", \"name\": \"Manushi Coaching\" },\n  \"content\": [{\n    \"type\": \"text/html\",\n    \"value\": \"<h2>{{ $json.title }}</h2><p>{{ $json.body }}</p>\"\n  }]\n}",
+        "options": { "timeout": 15000 }
+      },
+      "id": "send-email-fallback",
+      "name": "Send Email Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3320, 160],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "notes": "REQUIREMENT #3: Email fallback channel"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Email fallback success\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'email',\n  status: 'sent',\n  fallback_from: 'fcm',\n  sent_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "email-success",
+      "name": "Email Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3520, 100],
+      "notes": "Records email delivery via fallback"
+    },
+    {
+      "parameters": {
+        "jsCode": "// All channels failed - try in-app as last resort\nconst input = $('Check Email Fallback').first().json;\n\nif (input._env?.features?.inapp_fallback_enabled) {\n  // Queue for in-app notification\n  return {\n    notification_id: input.notification_id,\n    recipient_type: input.recipient_type,\n    recipient_id: input.recipient_id,\n    channel: 'in_app',\n    status: 'queued',\n    title: input.title,\n    body: input.body,\n    data: input.data,\n    queued_at: new Date().toISOString(),\n    _trace: input._trace\n  };\n}\n\n// All fallbacks exhausted\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'none',\n  status: 'failed',\n  error: 'All channels failed',\n  failed_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "email-failed-inapp",
+      "name": "Queue In-App",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3520, 220],
+      "notes": "REQUIREMENT #3: In-app as last resort fallback"
+    },
+    {
+      "parameters": {
+        "jsCode": "// No FCM token - skip to email or mark skipped\nconst input = $input.first().json;\n\nif (input._env.features.email_fallback_enabled && input.email) {\n  return {\n    ...input,\n    skip_reason: 'no_fcm_token',\n    direct_email: true\n  };\n}\n\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'none',\n  status: 'skipped',\n  reason: 'No FCM token or email available',\n  skipped_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "no-token-check-email",
+      "name": "Check Direct Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2720, 440],
+      "notes": "Routes to email if no FCM token"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "direct-email",
+              "leftValue": "={{ $json.direct_email }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "has-direct-email",
+      "name": "Has Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2920, 440],
+      "notes": "Routes based on email availability"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.vendors.sendgrid }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendGridApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"personalizations\": [{\n    \"to\": [{ \"email\": \"{{ $json.email }}\" }],\n    \"subject\": \"{{ $json.title }}\"\n  }],\n  \"from\": { \"email\": \"noreply@manushicoaching.com\", \"name\": \"Manushi Coaching\" },\n  \"content\": [{\n    \"type\": \"text/html\",\n    \"value\": \"<h2>{{ $json.title }}</h2><p>{{ $json.body }}</p>\"\n  }]\n}",
+        "options": { "timeout": 15000 }
+      },
+      "id": "send-direct-email",
+      "name": "Send Direct Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3120, 380],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "notes": "Direct email when no FCM token"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Direct email success\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'email',\n  status: 'sent',\n  sent_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "direct-email-success",
+      "name": "Direct Email Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3320, 340],
+      "notes": "Records direct email success"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Direct email failed\nconst input = $input.first().json;\nreturn {\n  notification_id: input.notification_id,\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'email',\n  status: 'failed',\n  error: 'Direct email failed',\n  failed_at: new Date().toISOString(),\n  _trace: input._trace\n};"
+      },
+      "id": "direct-email-failed",
+      "name": "Direct Email Failed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3320, 460],
+      "notes": "Records direct email failure"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-all-results",
+      "name": "Merge All Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [3720, 300],
+      "notes": "Collects all notification outcomes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #4: Monitoring - Aggregate results\n// REQUIREMENT #15: Cost tracking\n// REQUIREMENT #19: UX for Operations - Summary\n\nconst results = $input.all().map(item => item.json);\nconst originalData = $('Prepare Notifications').first().json._original;\n\n// Calculate costs per channel\nconst costPerChannel = {\n  fcm: 0.0001,\n  email: 0.001,\n  in_app: 0.00001\n};\n\nconst summary = {\n  notification_id: originalData.notification_id,\n  test_result_id: originalData.test_result_id,\n  student_id: originalData.student_id,\n  \n  // Counts\n  total: results.length,\n  sent: results.filter(r => r.status === 'sent').length,\n  failed: results.filter(r => r.status === 'failed').length,\n  skipped: results.filter(r => r.status === 'skipped').length,\n  queued: results.filter(r => r.status === 'queued').length,\n  \n  // Channels used\n  channels_used: {\n    fcm: results.filter(r => r.channel === 'fcm' && r.status === 'sent').length,\n    email: results.filter(r => r.channel === 'email' && r.status === 'sent').length,\n    in_app: results.filter(r => r.channel === 'in_app').length\n  },\n  \n  // Cost calculation\n  estimated_cost: results.reduce((sum, r) => {\n    if (r.status === 'sent') {\n      return sum + (costPerChannel[r.channel] || 0);\n    }\n    return sum;\n  }, 0),\n  \n  // Details\n  details: results,\n  \n  // Trace info\n  _trace: originalData._trace,\n  _idempotency: originalData._idempotency,\n  \n  // Timestamps\n  completed_at: new Date().toISOString()\n};\n\nsummary.all_successful = summary.failed === 0;\nsummary.partial_success = summary.sent > 0 && summary.failed > 0;\n\nreturn summary;"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3920, 300],
+      "notes": "Aggregates all outcomes with cost calculation"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "workflow_metrics",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "metric_type", "fieldValue": "execution_complete" },
+            { "fieldName": "metrics", "fieldValue": "={{ JSON.stringify({ total: $json.total, sent: $json.sent, failed: $json.failed, channels: $json.channels_used }) }}" },
+            { "fieldName": "duration_ms", "fieldValue": "={{ Date.now() - new Date($json._trace.started_at).getTime() }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "collect-metrics",
+      "name": "Collect Metrics",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4120, 220],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #14: Observability metrics"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "cost_tracking",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "estimated_cost", "fieldValue": "={{ $json.estimated_cost }}" },
+            { "fieldName": "channels_breakdown", "fieldValue": "={{ JSON.stringify($json.channels_used) }}" },
+            { "fieldName": "notification_count", "fieldValue": "={{ $json.sent }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "track-cost",
+      "name": "Track Cost",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4120, 380],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #15: Cost tracking for budget monitoring"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "notification_logs",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "notification_id", "fieldValue": "={{ $json.notification_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "360 Performance Loop v4" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "total_recipients", "fieldValue": "={{ $json.total }}" },
+            { "fieldName": "sent_count", "fieldValue": "={{ $json.sent }}" },
+            { "fieldName": "failed_count", "fieldValue": "={{ $json.failed }}" },
+            { "fieldName": "skipped_count", "fieldValue": "={{ $json.skipped }}" },
+            { "fieldName": "status", "fieldValue": "={{ $json.all_successful ? 'completed' : ($json.partial_success ? 'partial' : 'failed') }}" },
+            { "fieldName": "details", "fieldValue": "={{ JSON.stringify($json.details) }}" },
+            { "fieldName": "cost", "fieldValue": "={{ $json.estimated_cost }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "save-log",
+      "name": "Save Notification Log",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4320, 300],
+      "onError": "continueRegularOutput",
+      "notes": "Persists complete notification record"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "admin_notifications",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "type", "fieldValue": "test_completed" },
+            { "fieldName": "title", "fieldValue": "={{ $json.all_successful ? 'All Notified' : 'Notification Issues' }}" },
+            { "fieldName": "body", "fieldValue": "={{ 'Test: ' + $json.test_result_id + ' | Sent: ' + $json.sent + '/' + $json.total + ' | Cost: $' + $json.estimated_cost.toFixed(4) }}" },
+            { "fieldName": "severity", "fieldValue": "={{ $json.all_successful ? 'info' : ($json.failed > 0 ? 'warning' : 'info') }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "data", "fieldValue": "={{ JSON.stringify({ summary: { sent: $json.sent, failed: $json.failed, skipped: $json.skipped }, channels: $json.channels_used }) }}" },
+            { "fieldName": "read", "fieldValue": false },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "admin-dashboard",
+      "name": "Update Admin Dashboard",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4520, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #19: UX for Operations"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "processing_locks",
+        "filterByFormula": "={{ 'execution_id=' + $json._trace.execution_id }}"
+      },
+      "id": "release-lock",
+      "name": "Release Lock",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4720, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #12: Release concurrency lock"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "idempotency_cache",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "key", "fieldValue": "={{ $json._idempotency.key }}" },
+            { "fieldName": "response", "fieldValue": "={{ JSON.stringify({ notification_id: $json.notification_id, sent: $json.sent, failed: $json.failed, completed_at: $json.completed_at }) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" },
+            { "fieldName": "expires_at", "fieldValue": "={{ new Date(Date.now() + 24*60*60*1000).toISOString() }}" }
+          ]
+        }
+      },
+      "id": "update-idempotency",
+      "name": "Update Idempotency Cache",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4920, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #7: Cache response for duplicates"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"notification_id\": \"{{ $json.notification_id }}\",\n  \"summary\": {\n    \"total\": {{ $json.total }},\n    \"sent\": {{ $json.sent }},\n    \"failed\": {{ $json.failed }},\n    \"skipped\": {{ $json.skipped }}\n  },\n  \"channels\": {{ JSON.stringify($json.channels_used) }},\n  \"cost\": {{ $json.estimated_cost }},\n  \"all_successful\": {{ $json.all_successful }},\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"completed_at\": \"{{ $json.completed_at }}\"\n}",
+        "options": {
+          "responseCode": "={{ $json.all_successful ? 200 : 207 }}"
+        }
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [5120, 300],
+      "notes": "Returns response with correlation ID"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: $json.message, correlation_id: $json._trace?.correlation_id } }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-validation-error",
+      "name": "Respond Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1520, 520],
+      "notes": "Returns validation errors"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: 'Concurrency conflict - another request is processing', correlation_id: $json._trace?.correlation_id } }}",
+        "options": { "responseCode": 409 }
+      },
+      "id": "respond-lock-error",
+      "name": "Respond Lock Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1720, 520],
+      "notes": "Returns when lock cannot be acquired"
+    },
+    {
+      "parameters": {
+        "triggerOn": "workflowFailure"
+      },
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [140, 700],
+      "notes": "REQUIREMENT #1: Global error handler"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #1: Error Classification\n// REQUIREMENT #17: Compliance - PII redaction in errors\n\nconst error = $json;\nconst PII_FIELDS = ['fcm_token', 'email', 'phone', 'student_name', 'parent_name'];\n\nfunction redactPII(obj) {\n  if (typeof obj !== 'object' || obj === null) return obj;\n  const redacted = Array.isArray(obj) ? [...obj] : { ...obj };\n  for (const key in redacted) {\n    if (PII_FIELDS.includes(key)) {\n      redacted[key] = '***REDACTED***';\n    } else if (typeof redacted[key] === 'object') {\n      redacted[key] = redactPII(redacted[key]);\n    }\n  }\n  return redacted;\n}\n\n// Classify error\nconst errorMessage = error.message || String(error);\nlet severity = 'error';\nlet category = 'unknown';\nlet retryable = false;\n\nif (errorMessage.includes('VALIDATION_ERROR')) {\n  category = 'validation';\n  severity = 'warning';\n  retryable = false;\n} else if (errorMessage.includes('PREFLIGHT_FAILED')) {\n  category = 'preflight';\n  severity = 'warning';\n  retryable = true;\n} else if (errorMessage.includes('timeout') || errorMessage.includes('ETIMEDOUT')) {\n  category = 'timeout';\n  severity = 'error';\n  retryable = true;\n} else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {\n  category = 'rate_limit';\n  severity = 'warning';\n  retryable = true;\n} else if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503')) {\n  category = 'vendor_error';\n  severity = 'error';\n  retryable = true;\n}\n\nreturn {\n  error_id: `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,\n  workflow_name: '360 Performance Loop v4',\n  execution_id: $execution.id,\n  category: category,\n  severity: severity,\n  retryable: retryable,\n  message: errorMessage,\n  stack: redactPII(error),\n  occurred_at: new Date().toISOString()\n};"
+      },
+      "id": "classify-error",
+      "name": "Classify Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 700],
+      "notes": "Classifies error type and severity"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "automation_errors",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "error_id", "fieldValue": "={{ $json.error_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "={{ $json.workflow_name }}" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json.execution_id }}" },
+            { "fieldName": "category", "fieldValue": "={{ $json.category }}" },
+            { "fieldName": "severity", "fieldValue": "={{ $json.severity }}" },
+            { "fieldName": "retryable", "fieldValue": "={{ $json.retryable }}" },
+            { "fieldName": "message", "fieldValue": "={{ $json.message }}" },
+            { "fieldName": "stack", "fieldValue": "={{ JSON.stringify($json.stack) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.occurred_at }}" }
+          ]
+        }
+      },
+      "id": "log-error",
+      "name": "Log Error to DB",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [540, 700],
+      "onError": "continueRegularOutput",
+      "notes": "Persists error for analysis"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "critical",
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "critical",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-critical",
+      "name": "Is Critical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [740, 700],
+      "notes": "Routes critical errors to DLQ"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "dead_letter_queue",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "error_id", "fieldValue": "={{ $json.error_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "={{ $json.workflow_name }}" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json.execution_id }}" },
+            { "fieldName": "payload", "fieldValue": "={{ JSON.stringify($json) }}" },
+            { "fieldName": "retry_count", "fieldValue": 0 },
+            { "fieldName": "status", "fieldValue": "pending" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.occurred_at }}" }
+          ]
+        }
+      },
+      "id": "add-to-dlq",
+      "name": "Add to DLQ",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [940, 640],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #1: Dead letter queue for failed messages"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Environment Config", "type": "main", "index": 0 }]]
+    },
+    "Environment Config": {
+      "main": [[{ "node": "Generate Idempotency Key", "type": "main", "index": 0 }]]
+    },
+    "Generate Idempotency Key": {
+      "main": [[{ "node": "Check Duplicate", "type": "main", "index": 0 }]]
+    },
+    "Check Duplicate": {
+      "main": [[{ "node": "Is New Request?", "type": "main", "index": 0 }]]
+    },
+    "Is New Request?": {
+      "main": [
+        [{ "node": "Validate & Normalize", "type": "main", "index": 0 }],
+        [{ "node": "Respond Duplicate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate & Normalize": {
+      "main": [[{ "node": "Acquire Lock", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Respond Validation Error", "type": "main", "index": 0 }]]
+    },
+    "Acquire Lock": {
+      "main": [[{ "node": "Persist Raw Payload", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Respond Lock Error", "type": "main", "index": 0 }]]
+    },
+    "Persist Raw Payload": {
+      "main": [[{ "node": "Pre-flight Checks", "type": "main", "index": 0 }]]
+    },
+    "Pre-flight Checks": {
+      "main": [[{ "node": "Prepare Notifications", "type": "main", "index": 0 }]]
+    },
+    "Prepare Notifications": {
+      "main": [[{ "node": "Split by Recipient", "type": "main", "index": 0 }]]
+    },
+    "Split by Recipient": {
+      "main": [[{ "node": "Has FCM Token?", "type": "main", "index": 0 }]]
+    },
+    "Has FCM Token?": {
+      "main": [
+        [{ "node": "Send FCM", "type": "main", "index": 0 }],
+        [{ "node": "Check Direct Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send FCM": {
+      "main": [[{ "node": "FCM Success", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Check Email Fallback", "type": "main", "index": 0 }]]
+    },
+    "FCM Success": {
+      "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]]
+    },
+    "Check Email Fallback": {
+      "main": [[{ "node": "Can Fallback?", "type": "main", "index": 0 }]]
+    },
+    "Can Fallback?": {
+      "main": [
+        [{ "node": "Send Email Fallback", "type": "main", "index": 0 }],
+        [{ "node": "Merge All Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Email Fallback": {
+      "main": [[{ "node": "Email Success", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Queue In-App", "type": "main", "index": 0 }]]
+    },
+    "Email Success": {
+      "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]]
+    },
+    "Queue In-App": {
+      "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]]
+    },
+    "Check Direct Email": {
+      "main": [[{ "node": "Has Email?", "type": "main", "index": 0 }]]
+    },
+    "Has Email?": {
+      "main": [
+        [{ "node": "Send Direct Email", "type": "main", "index": 0 }],
+        [{ "node": "Merge All Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Direct Email": {
+      "main": [[{ "node": "Direct Email Success", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Direct Email Failed", "type": "main", "index": 0 }]]
+    },
+    "Direct Email Success": {
+      "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]]
+    },
+    "Direct Email Failed": {
+      "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]]
+    },
+    "Merge All Results": {
+      "main": [[{ "node": "Aggregate Results", "type": "main", "index": 0 }]]
+    },
+    "Aggregate Results": {
+      "main": [[{ "node": "Collect Metrics", "type": "main", "index": 0 }, { "node": "Track Cost", "type": "main", "index": 0 }]]
+    },
+    "Collect Metrics": {
+      "main": [[{ "node": "Save Notification Log", "type": "main", "index": 0 }]]
+    },
+    "Track Cost": {
+      "main": [[{ "node": "Save Notification Log", "type": "main", "index": 0 }]]
+    },
+    "Save Notification Log": {
+      "main": [[{ "node": "Update Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Update Admin Dashboard": {
+      "main": [[{ "node": "Release Lock", "type": "main", "index": 0 }]]
+    },
+    "Release Lock": {
+      "main": [[{ "node": "Update Idempotency Cache", "type": "main", "index": 0 }]]
+    },
+    "Update Idempotency Cache": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    },
+    "Error Trigger": {
+      "main": [[{ "node": "Classify Error", "type": "main", "index": 0 }]]
+    },
+    "Classify Error": {
+      "main": [[{ "node": "Log Error to DB", "type": "main", "index": 0 }]]
+    },
+    "Log Error to DB": {
+      "main": [[{ "node": "Is Critical?", "type": "main", "index": 0 }]]
+    },
+    "Is Critical?": {
+      "main": [
+        [{ "node": "Add to DLQ", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

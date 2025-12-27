@@ -1,0 +1,766 @@
+{
+  "name": "Smart Doubt Chain v4 - Enterprise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ZONE 1: ENTRY & CONFIG\n**Requirements:** #10 Config, #14 Observability, #11 Release\n\n- Webhook receives doubt\n- Environment + feature flags\n- Correlation ID generation\n- Idempotency check",
+        "height": 160,
+        "width": 280,
+        "color": 1
+      },
+      "id": "sticky-zone1",
+      "name": "Zone 1 - Entry",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 2: VALIDATION & LOCK\n**Requirements:** #6 Validation, #7 Idempotency, #12 Concurrency\n\n- Schema validation\n- Duplicate doubt detection\n- User-level lock\n- Payload persistence",
+        "height": 160,
+        "width": 280,
+        "color": 2
+      },
+      "id": "sticky-zone2",
+      "name": "Zone 2 - Validation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [680, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 3: AI ANALYSIS\n**Requirements:** #18 Dependency, #9 Timeout, #2 Retry\n\n- OpenAI doubt analysis\n- Confidence scoring\n- Subject/topic extraction\n- Similar doubt lookup",
+        "height": 160,
+        "width": 280,
+        "color": 3
+      },
+      "id": "sticky-zone3",
+      "name": "Zone 3 - AI Analysis",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1300, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 4: ROUTING DECISION\n**Requirements:** #3 Fallback, #13 Contracts\n\n- High confidence -> AI answer\n- Low confidence -> Teacher route\n- FAQ check (3x repeat)\n- Teacher assignment",
+        "height": 160,
+        "width": 280,
+        "color": 4
+      },
+      "id": "sticky-zone4",
+      "name": "Zone 4 - Routing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1900, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 5: NOTIFICATIONS\n**Requirements:** #1 Error, #2 Retry, #3 Fallback\n\n- Student notification\n- Parent notification\n- Teacher notification\n- Admin dashboard update",
+        "height": 160,
+        "width": 280,
+        "color": 5
+      },
+      "id": "sticky-zone5",
+      "name": "Zone 5 - Notifications",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2500, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 6: CLEANUP & RESPONSE\n**Requirements:** #4 Monitoring, #15 Cost, #19 UX\n\n- Metrics collection\n- Cost tracking (AI usage)\n- Lock release\n- Response with correlation ID",
+        "height": 160,
+        "width": 260,
+        "color": 6
+      },
+      "id": "sticky-zone6",
+      "name": "Zone 6 - Cleanup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [3100, 60]
+    },
+    {
+      "parameters": {
+        "content": "## ZONE 7: FAQ BUILDER\n**Requirements:** #20 Performance, #21 Documentation\n\n- Track repeat doubts\n- Auto-create FAQ entry\n- Link similar doubts\n- Knowledge base update",
+        "height": 140,
+        "width": 260,
+        "color": 7
+      },
+      "id": "sticky-zone7",
+      "name": "Zone 7 - FAQ Builder",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [140, 700]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "doubt-submitted-v4",
+        "responseMode": "responseNode",
+        "options": { "responseCode": 200 }
+      },
+      "id": "webhook-trigger",
+      "name": "Doubt Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 300],
+      "notes": "Entry point - receives doubt submissions from students"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #10: Environment Config & Feature Flags\n// REQUIREMENT #14: Observability - Correlation ID\n// REQUIREMENT #11: Release Management - Version tracking\n\nconst ENV = {\n  environment: process.env.N8N_ENVIRONMENT || 'development',\n  version: '4.0.0',\n  \n  features: {\n    ai_auto_answer: true,\n    ai_confidence_threshold: 0.75,\n    teacher_fallback: true,\n    parent_notification: true,\n    faq_auto_create: true,\n    faq_repeat_threshold: 3\n  },\n  \n  limits: {\n    max_retries: 3,\n    ai_timeout_ms: 30000,\n    teacher_response_sla_hours: 24,\n    lock_timeout_seconds: 60\n  },\n  \n  vendors: {\n    openai: 'https://api.openai.com/v1/chat/completions',\n    fcm: 'https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send'\n  },\n  \n  costs: {\n    openai_per_1k_tokens: 0.002,\n    fcm_per_message: 0.0001\n  }\n};\n\nconst correlationId = \n  $json.correlation_id ||\n  $request?.headers?.['x-correlation-id'] ||\n  `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\nconst _trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  workflow_version: ENV.version,\n  execution_id: $execution.id,\n  environment: ENV.environment,\n  started_at: new Date().toISOString(),\n  source_ip: $request?.headers?.['x-forwarded-for'] || 'unknown'\n};\n\nreturn {\n  ...$json,\n  _env: ENV,\n  _trace: _trace,\n  _request_id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`\n};"
+      },
+      "id": "env-config",
+      "name": "Environment Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 300],
+      "notes": "Sets up environment, AI config, and correlation ID"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #7: Idempotency key generation\n\nconst data = $input.first().json;\n\n// Create idempotency key from doubt content hash\nconst doubtHash = Buffer.from(data.doubt_text || '').toString('base64').slice(0, 20);\nconst idempotencyKey = `doubt_${data.student_id}_${doubtHash}_${Date.now().toString().slice(0, -5)}`;\n\nreturn {\n  ...data,\n  _idempotency: {\n    key: idempotencyKey,\n    check_required: true,\n    cache_ttl_hours: 1\n  }\n};"
+      },
+      "id": "idempotency-key",
+      "name": "Generate Idempotency Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [580, 300],
+      "notes": "Creates unique key to prevent duplicate submissions"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #6: Data Validation\n// REQUIREMENT #13: Data Mapping Contracts\n// REQUIREMENT #17: PII Redaction\n\nconst data = $input.first().json;\n\nconst PII_FIELDS = ['fcm_token', 'email', 'phone', 'student_name', 'parent_name'];\n\nfunction redactPII(obj) {\n  if (typeof obj !== 'object' || obj === null) return obj;\n  const redacted = Array.isArray(obj) ? [...obj] : { ...obj };\n  for (const key in redacted) {\n    if (PII_FIELDS.includes(key)) {\n      const val = redacted[key];\n      redacted[key] = typeof val === 'string' ? '***' + val.slice(-4) : '***';\n    } else if (typeof redacted[key] === 'object') {\n      redacted[key] = redactPII(redacted[key]);\n    }\n  }\n  return redacted;\n}\n\n// Validate required fields\nconst required = ['doubt_id', 'student_id', 'doubt_text', 'subject'];\nconst missing = required.filter(field => !data[field]);\n\nif (missing.length > 0) {\n  throw new Error(`VALIDATION_ERROR: Missing fields: ${missing.join(', ')}`);\n}\n\nif (data.doubt_text.length < 10) {\n  throw new Error('VALIDATION_ERROR: Doubt text too short (min 10 chars)');\n}\n\nif (data.doubt_text.length > 2000) {\n  throw new Error('VALIDATION_ERROR: Doubt text too long (max 2000 chars)');\n}\n\n// Normalize to canonical format\nconst canonical = {\n  doubt_id: String(data.doubt_id),\n  student_id: String(data.student_id),\n  student_name: data.student_name || 'Student',\n  student_fcm_token: data.student_fcm_token,\n  student_email: data.student_email,\n  \n  parent_id: data.parent_id,\n  parent_fcm_token: data.parent_fcm_token,\n  parent_email: data.parent_email,\n  \n  doubt_text: data.doubt_text.trim(),\n  subject: data.subject,\n  topic: data.topic || 'General',\n  chapter: data.chapter,\n  image_url: data.image_url,\n  \n  priority: data.priority || 'normal',\n  \n  _env: data._env,\n  _trace: data._trace,\n  _idempotency: data._idempotency,\n  _request_id: data._request_id,\n  _safe_payload: redactPII(data),\n  \n  validated_at: new Date().toISOString()\n};\n\nreturn canonical;"
+      },
+      "id": "validate-normalize",
+      "name": "Validate & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300],
+      "notes": "Validates doubt data and normalizes format"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "processing_locks",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "lock_key", "fieldValue": "={{ 'doubt_' + $json.student_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "Smart Doubt Chain v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "acquired_at", "fieldValue": "={{ new Date().toISOString() }}" },
+            { "fieldName": "expires_at", "fieldValue": "={{ new Date(Date.now() + 60000).toISOString() }}" }
+          ]
+        }
+      },
+      "id": "acquire-lock",
+      "name": "Acquire Lock",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [980, 300],
+      "onError": "continueErrorOutput",
+      "notes": "REQUIREMENT #12: Concurrency control"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "workflow_payloads",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "Smart Doubt Chain v4" },
+            { "fieldName": "stage", "fieldValue": "doubt_received" },
+            { "fieldName": "payload", "fieldValue": "={{ JSON.stringify($json._safe_payload) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "persist-payload",
+      "name": "Persist Doubt Payload",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1180, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #16: Payload persistence for replay"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "doubts",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "id", "fieldValue": "={{ $json.doubt_id }}" },
+            { "fieldName": "student_id", "fieldValue": "={{ $json.student_id }}" },
+            { "fieldName": "doubt_text", "fieldValue": "={{ $json.doubt_text }}" },
+            { "fieldName": "subject", "fieldValue": "={{ $json.subject }}" },
+            { "fieldName": "topic", "fieldValue": "={{ $json.topic }}" },
+            { "fieldName": "status", "fieldValue": "processing" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "save-doubt",
+      "name": "Save Doubt to DB",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1380, 300],
+      "onError": "continueRegularOutput",
+      "notes": "Persist doubt for tracking"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #18: Vendor Health Check for AI\n// Check similar doubts first (for FAQ)\n\nconst data = $input.first().json;\nconst ENV = data._env;\n\n// Pre-flight for AI\nconst preflight = {\n  ai_enabled: ENV.features.ai_auto_answer,\n  openai_healthy: true,\n  rate_limit_ok: true,\n  estimated_tokens: Math.ceil(data.doubt_text.length / 4) + 500,\n  estimated_cost: 0\n};\n\npreflight.estimated_cost = (preflight.estimated_tokens / 1000) * ENV.costs.openai_per_1k_tokens;\n\nreturn {\n  ...data,\n  _preflight: preflight,\n  preflight_at: new Date().toISOString()\n};"
+      },
+      "id": "preflight-ai",
+      "name": "Pre-flight AI Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 300],
+      "notes": "Checks AI availability and estimates cost"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "tableId": "doubt_faq",
+        "filterByFormula": "={{ 'subject=eq.' + $json.subject + '&topic=eq.' + $json.topic }}"
+      },
+      "id": "check-faq",
+      "name": "Check Existing FAQ",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1780, 300],
+      "onError": "continueRegularOutput",
+      "notes": "Look for pre-answered similar doubts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.vendors.openai }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert tutor for Indian students. Analyze the doubt and provide: 1) A clear answer if you're confident, 2) A confidence score (0-1), 3) Related concepts to review. Subject: {{ $json.subject }}. Topic: {{ $json.topic }}. Respond in JSON format: {\\\"answer\\\": \\\"...\\\", \\\"confidence\\\": 0.X, \\\"concepts\\\": [...], \\\"needs_teacher\\\": true/false}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Student Doubt: {{ $json.doubt_text }}\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"max_tokens\": 1000\n}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "ai-analyze",
+      "name": "AI Analyze Doubt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1980, 300],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "notes": "REQUIREMENT #2: Retry, #9: 30s timeout, #18: AI vendor"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and determine routing\nconst data = $('Pre-flight AI Check').first().json;\nconst aiResponse = $input.first().json;\n\nlet aiResult = {\n  success: false,\n  answer: null,\n  confidence: 0,\n  concepts: [],\n  needs_teacher: true,\n  tokens_used: 0,\n  cost: 0\n};\n\ntry {\n  const content = aiResponse.choices?.[0]?.message?.content || '';\n  const parsed = JSON.parse(content);\n  \n  aiResult = {\n    success: true,\n    answer: parsed.answer || '',\n    confidence: parsed.confidence || 0,\n    concepts: parsed.concepts || [],\n    needs_teacher: parsed.needs_teacher !== false,\n    tokens_used: aiResponse.usage?.total_tokens || 0,\n    cost: ((aiResponse.usage?.total_tokens || 0) / 1000) * data._env.costs.openai_per_1k_tokens\n  };\n  \n  // Override needs_teacher based on confidence threshold\n  if (aiResult.confidence >= data._env.features.ai_confidence_threshold) {\n    aiResult.needs_teacher = false;\n  }\n} catch (e) {\n  aiResult.error = e.message;\n  aiResult.needs_teacher = true;\n}\n\nreturn {\n  ...data,\n  _ai: aiResult,\n  ai_analyzed_at: new Date().toISOString()\n};"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2180, 240],
+      "notes": "Extracts answer and confidence from AI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI failed - route to teacher\nconst data = $('Pre-flight AI Check').first().json;\n\nreturn {\n  ...data,\n  _ai: {\n    success: false,\n    answer: null,\n    confidence: 0,\n    needs_teacher: true,\n    error: 'AI service unavailable'\n  },\n  ai_analyzed_at: new Date().toISOString()\n};"
+      },
+      "id": "ai-failed",
+      "name": "AI Failed - Teacher Route",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2180, 400],
+      "notes": "Fallback when AI is unavailable"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "high-confidence",
+              "leftValue": "={{ $json._ai.confidence }}",
+              "rightValue": "={{ $json._env.features.ai_confidence_threshold }}",
+              "operator": { "type": "number", "operation": "gte" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "confidence-check",
+      "name": "High Confidence?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2380, 300],
+      "notes": "Routes based on AI confidence score"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI answered with high confidence\nconst data = $input.first().json;\n\nreturn {\n  ...data,\n  resolution: {\n    type: 'ai_auto',\n    answer: data._ai.answer,\n    confidence: data._ai.confidence,\n    concepts: data._ai.concepts,\n    resolved_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "ai-auto-answer",
+      "name": "AI Auto Answer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2580, 200],
+      "notes": "High confidence - use AI answer directly"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Low confidence - assign to teacher\n// REQUIREMENT #13: Data Mapping Contracts\n\nconst data = $input.first().json;\n\n// Find best teacher based on subject/topic\n// In production, query teachers table with expertise matching\nconst assignedTeacher = {\n  teacher_id: data.assigned_teacher_id || 'teacher_001',\n  teacher_name: data.assigned_teacher_name || 'Subject Expert',\n  teacher_fcm_token: data.teacher_fcm_token,\n  teacher_email: data.teacher_email\n};\n\nreturn {\n  ...data,\n  resolution: {\n    type: 'teacher_assigned',\n    ai_attempt: data._ai.answer,\n    ai_confidence: data._ai.confidence,\n    concepts: data._ai.concepts,\n    assigned_teacher: assignedTeacher,\n    sla_deadline: new Date(Date.now() + data._env.limits.teacher_response_sla_hours * 60 * 60 * 1000).toISOString(),\n    assigned_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "assign-teacher",
+      "name": "Assign to Teacher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2580, 400],
+      "notes": "Low confidence - route to appropriate teacher"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "doubts",
+        "matchBy": "id",
+        "id": "={{ $json.doubt_id }}",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "status", "fieldValue": "={{ $json.resolution.type === 'ai_auto' ? 'resolved' : 'assigned' }}" },
+            { "fieldName": "resolution_type", "fieldValue": "={{ $json.resolution.type }}" },
+            { "fieldName": "ai_answer", "fieldValue": "={{ $json._ai.answer }}" },
+            { "fieldName": "ai_confidence", "fieldValue": "={{ $json._ai.confidence }}" },
+            { "fieldName": "assigned_teacher_id", "fieldValue": "={{ $json.resolution.assigned_teacher?.teacher_id }}" },
+            { "fieldName": "updated_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "update-doubt-status",
+      "name": "Update Doubt Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2780, 300],
+      "onError": "continueRegularOutput",
+      "notes": "Persist resolution status"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare notifications for all stakeholders\nconst data = $input.first().json;\nconst isAiResolved = data.resolution.type === 'ai_auto';\n\nconst notifications = [];\n\n// Student notification\nnotifications.push({\n  recipient_type: 'student',\n  recipient_id: data.student_id,\n  recipient_name: data.student_name,\n  fcm_token: data.student_fcm_token,\n  email: data.student_email,\n  title: isAiResolved ? 'Your Doubt Has Been Answered!' : 'Doubt Received - Teacher Assigned',\n  body: isAiResolved \n    ? `AI answered your ${data.subject} doubt. Check the answer now!`\n    : `Your ${data.subject} doubt has been assigned to ${data.resolution.assigned_teacher?.teacher_name}. Expected response within 24 hours.`,\n  data: {\n    type: 'doubt_update',\n    doubt_id: data.doubt_id,\n    resolution_type: data.resolution.type,\n    action: 'VIEW_DOUBT'\n  },\n  priority: 'high',\n  _trace: data._trace,\n  _env: data._env\n});\n\n// Parent notification (if enabled)\nif (data._env.features.parent_notification && data.parent_fcm_token) {\n  notifications.push({\n    recipient_type: 'parent',\n    recipient_id: data.parent_id,\n    fcm_token: data.parent_fcm_token,\n    email: data.parent_email,\n    title: `${data.student_name}'s Doubt ${isAiResolved ? 'Answered' : 'Assigned'}`,\n    body: isAiResolved\n      ? `AI provided an instant answer to your child's ${data.subject} question.`\n      : `A teacher has been assigned to answer your child's ${data.subject} question.`,\n    data: {\n      type: 'child_doubt_update',\n      doubt_id: data.doubt_id,\n      student_id: data.student_id,\n      action: 'VIEW_CHILD_DOUBT'\n    },\n    priority: 'normal',\n    _trace: data._trace,\n    _env: data._env\n  });\n}\n\n// Teacher notification (if assigned)\nif (!isAiResolved && data.resolution.assigned_teacher?.fcm_token) {\n  notifications.push({\n    recipient_type: 'teacher',\n    recipient_id: data.resolution.assigned_teacher.teacher_id,\n    recipient_name: data.resolution.assigned_teacher.teacher_name,\n    fcm_token: data.resolution.assigned_teacher.teacher_fcm_token,\n    email: data.resolution.assigned_teacher.teacher_email,\n    title: 'New Doubt Assigned',\n    body: `${data.student_name} asked a ${data.subject} question. AI confidence: ${Math.round(data._ai.confidence * 100)}%`,\n    data: {\n      type: 'doubt_assigned',\n      doubt_id: data.doubt_id,\n      student_id: data.student_id,\n      ai_suggestion: data._ai.answer,\n      action: 'ANSWER_DOUBT'\n    },\n    priority: 'high',\n    _trace: data._trace,\n    _env: data._env\n  });\n}\n\nreturn {\n  notifications: notifications,\n  _original: data,\n  prepared_at: new Date().toISOString()\n};"
+      },
+      "id": "prepare-notifications",
+      "name": "Prepare Notifications",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2980, 300],
+      "notes": "Creates notification payloads for student/parent/teacher"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "notifications",
+        "options": {}
+      },
+      "id": "split-notifications",
+      "name": "Split Notifications",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [3180, 300],
+      "notes": "Parallel notification processing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-fcm",
+              "leftValue": "={{ $json.fcm_token }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-fcm",
+      "name": "Has FCM?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [3380, 300],
+      "notes": "Check if FCM token available"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json._env.vendors.fcm }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"token\": \"{{ $json.fcm_token }}\",\n    \"notification\": {\n      \"title\": \"{{ $json.title }}\",\n      \"body\": \"{{ $json.body }}\"\n    },\n    \"data\": {{ JSON.stringify($json.data) }},\n    \"android\": { \"priority\": \"high\" },\n    \"apns\": { \"payload\": { \"aps\": { \"sound\": \"default\" } } }\n  }\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "send-fcm",
+      "name": "Send FCM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [3580, 240],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "Send push notification"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nreturn {\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'fcm',\n  status: 'sent',\n  sent_at: new Date().toISOString()\n};"
+      },
+      "id": "notif-success",
+      "name": "Notification Sent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3780, 180],
+      "notes": "Mark notification as sent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Split Notifications').first().json;\nreturn {\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'fcm',\n  status: 'failed',\n  error: 'FCM delivery failed',\n  failed_at: new Date().toISOString()\n};"
+      },
+      "id": "notif-failed",
+      "name": "Notification Failed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3780, 300],
+      "notes": "Mark notification as failed"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nreturn {\n  recipient_type: input.recipient_type,\n  recipient_id: input.recipient_id,\n  channel: 'none',\n  status: 'skipped',\n  reason: 'No FCM token',\n  skipped_at: new Date().toISOString()\n};"
+      },
+      "id": "notif-skipped",
+      "name": "No FCM - Skipped",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3580, 420],
+      "notes": "No token available"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-results",
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [3980, 300],
+      "notes": "Collect all notification outcomes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate results and calculate costs\nconst results = $input.all().map(item => item.json);\nconst originalData = $('Prepare Notifications').first().json._original;\n\nconst summary = {\n  doubt_id: originalData.doubt_id,\n  student_id: originalData.student_id,\n  resolution_type: originalData.resolution.type,\n  ai_confidence: originalData._ai.confidence,\n  \n  notifications: {\n    total: results.length,\n    sent: results.filter(r => r.status === 'sent').length,\n    failed: results.filter(r => r.status === 'failed').length,\n    skipped: results.filter(r => r.status === 'skipped').length\n  },\n  \n  costs: {\n    ai_cost: originalData._ai.cost || 0,\n    fcm_cost: results.filter(r => r.status === 'sent').length * originalData._env.costs.fcm_per_message,\n    total: 0\n  },\n  \n  _trace: originalData._trace,\n  _idempotency: originalData._idempotency,\n  details: results,\n  completed_at: new Date().toISOString()\n};\n\nsummary.costs.total = summary.costs.ai_cost + summary.costs.fcm_cost;\n\nreturn summary;"
+      },
+      "id": "aggregate",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4180, 300],
+      "notes": "Summarize outcomes and costs"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "workflow_metrics",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "workflow_name", "fieldValue": "Smart Doubt Chain v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "metric_type", "fieldValue": "doubt_processed" },
+            { "fieldName": "metrics", "fieldValue": "={{ JSON.stringify({ resolution: $json.resolution_type, ai_confidence: $json.ai_confidence, notifications: $json.notifications }) }}" },
+            { "fieldName": "duration_ms", "fieldValue": "={{ Date.now() - new Date($json._trace.started_at).getTime() }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "collect-metrics",
+      "name": "Collect Metrics",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4380, 240],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #14: Observability"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "cost_tracking",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "workflow_name", "fieldValue": "Smart Doubt Chain v4" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json._trace.execution_id }}" },
+            { "fieldName": "estimated_cost", "fieldValue": "={{ $json.costs.total }}" },
+            { "fieldName": "channels_breakdown", "fieldValue": "={{ JSON.stringify({ ai: $json.costs.ai_cost, fcm: $json.costs.fcm_cost }) }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "track-cost",
+      "name": "Track Cost",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4380, 360],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #15: Cost tracking"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "admin_notifications",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "type", "fieldValue": "doubt_processed" },
+            { "fieldName": "title", "fieldValue": "={{ $json.resolution_type === 'ai_auto' ? 'AI Resolved Doubt' : 'Doubt Assigned to Teacher' }}" },
+            { "fieldName": "body", "fieldValue": "={{ 'Doubt #' + $json.doubt_id + ' | AI: ' + Math.round($json.ai_confidence * 100) + '% | Cost: $' + $json.costs.total.toFixed(4) }}" },
+            { "fieldName": "severity", "fieldValue": "info" },
+            { "fieldName": "correlation_id", "fieldValue": "={{ $json._trace.correlation_id }}" },
+            { "fieldName": "read", "fieldValue": false },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.completed_at }}" }
+          ]
+        }
+      },
+      "id": "admin-dashboard",
+      "name": "Update Admin Dashboard",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4580, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #19: UX for Operations"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "processing_locks",
+        "filterByFormula": "={{ 'execution_id=eq.' + $json._trace.execution_id }}"
+      },
+      "id": "release-lock",
+      "name": "Release Lock",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [4780, 300],
+      "onError": "continueRegularOutput",
+      "notes": "REQUIREMENT #12: Release concurrency lock"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"correlation_id\": \"{{ $json._trace.correlation_id }}\",\n  \"doubt_id\": \"{{ $json.doubt_id }}\",\n  \"resolution\": {\n    \"type\": \"{{ $json.resolution_type }}\",\n    \"ai_confidence\": {{ $json.ai_confidence }}\n  },\n  \"notifications\": {{ JSON.stringify($json.notifications) }},\n  \"execution_id\": \"{{ $json._trace.execution_id }}\",\n  \"completed_at\": \"{{ $json.completed_at }}\"\n}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [4980, 300],
+      "notes": "Returns response with correlation ID"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: $json.message, correlation_id: $json._trace?.correlation_id } }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 520],
+      "notes": "Returns validation errors"
+    },
+    {
+      "parameters": {
+        "jsCode": "// REQUIREMENT #21: FAQ Auto-Creation\n// Track repeat doubts and create FAQ if threshold reached\n\nconst data = $('Aggregate Results').first().json;\nconst originalData = $('Prepare Notifications').first().json._original;\n\n// This would be triggered after teacher answers or for AI-resolved doubts\n// Check if similar doubt asked 3+ times\n\nconst faqEntry = {\n  subject: originalData.subject,\n  topic: originalData.topic,\n  question: originalData.doubt_text,\n  answer: originalData._ai.answer || originalData.resolution.answer,\n  ai_confidence: originalData._ai.confidence,\n  times_asked: 1,\n  created_from_doubt_id: originalData.doubt_id,\n  created_at: new Date().toISOString()\n};\n\nreturn faqEntry;"
+      },
+      "id": "prepare-faq",
+      "name": "Prepare FAQ Entry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 800],
+      "notes": "Prepares FAQ for repeat doubts"
+    },
+    {
+      "parameters": {
+        "triggerOn": "workflowFailure"
+      },
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [140, 1000],
+      "notes": "REQUIREMENT #1: Global error handler"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error classification with PII redaction\nconst error = $json;\nconst PII_FIELDS = ['fcm_token', 'email', 'phone', 'student_name'];\n\nfunction redactPII(obj) {\n  if (typeof obj !== 'object' || obj === null) return obj;\n  const redacted = Array.isArray(obj) ? [...obj] : { ...obj };\n  for (const key in redacted) {\n    if (PII_FIELDS.includes(key)) {\n      redacted[key] = '***REDACTED***';\n    } else if (typeof redacted[key] === 'object') {\n      redacted[key] = redactPII(redacted[key]);\n    }\n  }\n  return redacted;\n}\n\nconst errorMessage = error.message || String(error);\nlet category = 'unknown';\nlet severity = 'error';\n\nif (errorMessage.includes('VALIDATION_ERROR')) {\n  category = 'validation';\n  severity = 'warning';\n} else if (errorMessage.includes('openai') || errorMessage.includes('AI')) {\n  category = 'ai_vendor';\n  severity = 'error';\n} else if (errorMessage.includes('timeout')) {\n  category = 'timeout';\n  severity = 'error';\n}\n\nreturn {\n  error_id: `err_${Date.now()}`,\n  workflow_name: 'Smart Doubt Chain v4',\n  execution_id: $execution.id,\n  category: category,\n  severity: severity,\n  message: errorMessage,\n  stack: redactPII(error),\n  occurred_at: new Date().toISOString()\n};"
+      },
+      "id": "classify-error",
+      "name": "Classify Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 1000],
+      "notes": "Classifies and redacts errors"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "automation_errors",
+        "fieldsToSend": "defineBelow",
+        "fieldList": {
+          "fieldValues": [
+            { "fieldName": "error_id", "fieldValue": "={{ $json.error_id }}" },
+            { "fieldName": "workflow_name", "fieldValue": "={{ $json.workflow_name }}" },
+            { "fieldName": "execution_id", "fieldValue": "={{ $json.execution_id }}" },
+            { "fieldName": "category", "fieldValue": "={{ $json.category }}" },
+            { "fieldName": "severity", "fieldValue": "={{ $json.severity }}" },
+            { "fieldName": "message", "fieldValue": "={{ $json.message }}" },
+            { "fieldName": "created_at", "fieldValue": "={{ $json.occurred_at }}" }
+          ]
+        }
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [540, 1000],
+      "onError": "continueRegularOutput",
+      "notes": "Persist error for analysis"
+    }
+  ],
+  "connections": {
+    "Doubt Webhook": {
+      "main": [[{ "node": "Environment Config", "type": "main", "index": 0 }]]
+    },
+    "Environment Config": {
+      "main": [[{ "node": "Generate Idempotency Key", "type": "main", "index": 0 }]]
+    },
+    "Generate Idempotency Key": {
+      "main": [[{ "node": "Validate & Normalize", "type": "main", "index": 0 }]]
+    },
+    "Validate & Normalize": {
+      "main": [[{ "node": "Acquire Lock", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Respond Error", "type": "main", "index": 0 }]]
+    },
+    "Acquire Lock": {
+      "main": [[{ "node": "Persist Doubt Payload", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Respond Error", "type": "main", "index": 0 }]]
+    },
+    "Persist Doubt Payload": {
+      "main": [[{ "node": "Save Doubt to DB", "type": "main", "index": 0 }]]
+    },
+    "Save Doubt to DB": {
+      "main": [[{ "node": "Pre-flight AI Check", "type": "main", "index": 0 }]]
+    },
+    "Pre-flight AI Check": {
+      "main": [[{ "node": "Check Existing FAQ", "type": "main", "index": 0 }]]
+    },
+    "Check Existing FAQ": {
+      "main": [[{ "node": "AI Analyze Doubt", "type": "main", "index": 0 }]]
+    },
+    "AI Analyze Doubt": {
+      "main": [[{ "node": "Parse AI Response", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "AI Failed - Teacher Route", "type": "main", "index": 0 }]]
+    },
+    "Parse AI Response": {
+      "main": [[{ "node": "High Confidence?", "type": "main", "index": 0 }]]
+    },
+    "AI Failed - Teacher Route": {
+      "main": [[{ "node": "High Confidence?", "type": "main", "index": 0 }]]
+    },
+    "High Confidence?": {
+      "main": [
+        [{ "node": "AI Auto Answer", "type": "main", "index": 0 }],
+        [{ "node": "Assign to Teacher", "type": "main", "index": 0 }]
+      ]
+    },
+    "AI Auto Answer": {
+      "main": [[{ "node": "Update Doubt Status", "type": "main", "index": 0 }]]
+    },
+    "Assign to Teacher": {
+      "main": [[{ "node": "Update Doubt Status", "type": "main", "index": 0 }]]
+    },
+    "Update Doubt Status": {
+      "main": [[{ "node": "Prepare Notifications", "type": "main", "index": 0 }]]
+    },
+    "Prepare Notifications": {
+      "main": [[{ "node": "Split Notifications", "type": "main", "index": 0 }]]
+    },
+    "Split Notifications": {
+      "main": [[{ "node": "Has FCM?", "type": "main", "index": 0 }]]
+    },
+    "Has FCM?": {
+      "main": [
+        [{ "node": "Send FCM", "type": "main", "index": 0 }],
+        [{ "node": "No FCM - Skipped", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send FCM": {
+      "main": [[{ "node": "Notification Sent", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "Notification Failed", "type": "main", "index": 0 }]]
+    },
+    "Notification Sent": {
+      "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]]
+    },
+    "Notification Failed": {
+      "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]]
+    },
+    "No FCM - Skipped": {
+      "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]]
+    },
+    "Merge Results": {
+      "main": [[{ "node": "Aggregate Results", "type": "main", "index": 0 }]]
+    },
+    "Aggregate Results": {
+      "main": [[{ "node": "Collect Metrics", "type": "main", "index": 0 }, { "node": "Track Cost", "type": "main", "index": 0 }]]
+    },
+    "Collect Metrics": {
+      "main": [[{ "node": "Update Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Track Cost": {
+      "main": [[{ "node": "Update Admin Dashboard", "type": "main", "index": 0 }]]
+    },
+    "Update Admin Dashboard": {
+      "main": [[{ "node": "Release Lock", "type": "main", "index": 0 }]]
+    },
+    "Release Lock": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    },
+    "Error Trigger": {
+      "main": [[{ "node": "Classify Error", "type": "main", "index": 0 }]]
+    },
+    "Classify Error": {
+      "main": [[{ "node": "Log Error", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

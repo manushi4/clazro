@@ -1,0 +1,149 @@
+{
+  "name": "AI Study Streak - v4 Production",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "streak-v4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Entry Point with Correlation ID\n// ============================================\n// NOTE: $request is NOT available in n8n Code nodes\n// NOTE: process.env is NOT available in n8n sandbox\n// Webhook POST data comes in $json.body, not $json directly\n\nconst body = $json.body || $json;\n\nconst correlationId = body.correlation_id || \n  'corr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nconst trace = {\n  correlation_id: correlationId,\n  workflow_id: $workflow.id,\n  workflow_name: $workflow.name,\n  execution_id: $execution.id,\n  started_at: new Date().toISOString()\n};\n\nreturn {\n  student_id: body.student_id,\n  student_name: body.student_name,\n  current_streak: body.current_streak,\n  preferred_subject: body.preferred_subject,\n  _trace: trace,\n  _raw: body\n};"
+      },
+      "id": "config",
+      "name": "Entry Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Input Validation\n// ============================================\nconst data = $json;\nconst errors = [];\n\nconst schema = {\n  required: ['student_id', 'student_name', 'current_streak'],\n  properties: {\n    student_id: { type: 'string', minLength: 1, maxLength: 50 },\n    student_name: { type: 'string', minLength: 1, maxLength: 100 },\n    current_streak: { type: 'number', minimum: 0, maximum: 9999 },\n    preferred_subject: { type: 'string', maxLength: 50 }\n  }\n};\n\nfor (const field of schema.required) {\n  if (data[field] === undefined || data[field] === null || data[field] === '') {\n    errors.push('Missing required field: ' + field);\n  }\n}\n\nconst props = schema.properties;\nif (data.student_id && typeof data.student_id !== 'string') errors.push('student_id must be string');\nif (data.student_name && typeof data.student_name !== 'string') errors.push('student_name must be string');\nif (data.current_streak !== undefined && isNaN(Number(data.current_streak))) errors.push('current_streak must be number');\n\nif (errors.length > 0) {\n  return {\n    _validation_failed: true,\n    success: false,\n    error: { code: 'VALIDATION_ERROR', message: 'Input validation failed', details: errors },\n    _trace: { ...data._trace, completed_at: new Date().toISOString(), path: 'validation_error' }\n  };\n}\n\nreturn {\n  student_id: String(data.student_id).trim().substring(0, 50),\n  student_name: String(data.student_name).trim().substring(0, 100),\n  current_streak: Math.max(0, Math.min(9999, Number(data.current_streak))),\n  preferred_subject: String(data.preferred_subject || 'studies').trim().substring(0, 50),\n  _trace: data._trace,\n  _validation_passed: true\n};"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{ "id": "validation-check", "leftValue": "={{ $json._validation_passed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\"role\": \"user\", \"parts\": [{\"text\": \"Generate a SHORT motivational push notification (max 2 sentences, under 150 chars) for student {{ $json.student_name }} with {{ $json.current_streak }} day streak. Subject: {{ $json.preferred_subject }}. Be friendly and encouraging.\"}]}],\n  \"generationConfig\": {\"temperature\": 0.8, \"maxOutputTokens\": 500}\n}",
+        "options": {"timeout": 15000}
+      },
+      "id": "gemini",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1000, 240],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Success + Cost + Structured Log\n// ============================================\nconst PRICING = {\n  model: 'gemini-2.5-flash',\n  input_per_million: 0.15,\n  output_per_million: 0.60,\n  thinking_per_million: 1.25,\n  currency: 'USD'\n};\n\nconst config = $('Validate Input').first().json;\nconst response = $json;\nconst startTime = new Date(config._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\n// Extract usage\nlet usageMetadata = response.usageMetadata || {};\nconst inputTokens = usageMetadata.promptTokenCount || 0;\nconst outputTokens = usageMetadata.candidatesTokenCount || 0;\nconst thinkingTokens = usageMetadata.thoughtsTokenCount || 0;\nconst totalTokens = inputTokens + outputTokens + thinkingTokens;\n\n// Calculate costs\nconst inputCost = (inputTokens / 1000000) * PRICING.input_per_million;\nconst outputCost = (outputTokens / 1000000) * PRICING.output_per_million;\nconst thinkingCost = (thinkingTokens / 1000000) * PRICING.thinking_per_million;\nconst totalCost = inputCost + outputCost + thinkingCost;\n\n// Parse message\nlet message = '';\ntry {\n  message = response.candidates[0].content.parts[0].text || '';\n  message = message.trim().substring(0, 200);\n} catch(e) {\n  message = 'Hey ' + config.student_name + '! Keep your ' + config.current_streak + '-day streak alive!';\n}\n\n// Build structured log\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'info',\n  correlation_id: config._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Parse + Log',\n  message: 'AI notification generated successfully',\n  event_type: 'streak_notification',\n  recipient_id: config.student_id,\n  duration_ms: duration_ms,\n  ai_model: PRICING.model,\n  tokens_used: totalTokens,\n  cost_usd: Number(totalCost.toFixed(8))\n};\n\nconst cost = {\n  model: PRICING.model,\n  tokens: { input: inputTokens, output: outputTokens, thinking: thinkingTokens, total: totalTokens },\n  cost_usd: { input: Number(inputCost.toFixed(8)), output: Number(outputCost.toFixed(8)), thinking: Number(thinkingCost.toFixed(8)), total: Number(totalCost.toFixed(8)) }\n};\n\nconst trace = {\n  ...config._trace,\n  completed_at: new Date().toISOString(),\n  duration_ms: duration_ms,\n  path: 'success',\n  ai_model: PRICING.model\n};\n\nreturn {\n  success: true,\n  notification: { title: 'Streak Alert', body: message },\n  student: { id: config.student_id, name: config.student_name, streak: config.current_streak },\n  ai_used: true,\n  _cost: cost,\n  _log: log,\n  _trace: trace\n};"
+      },
+      "id": "parse",
+      "name": "Parse + Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Fallback with Structured Log\n// ============================================\nconst config = $('Validate Input').first().json;\nconst errorInfo = $json.error || {};\nconst startTime = new Date(config._trace.started_at).getTime();\nconst duration_ms = Date.now() - startTime;\n\nconst fallback = 'Hey ' + config.student_name + '! Your ' + config.current_streak + '-day streak is amazing. Keep it going!';\n\n// Build structured log for error\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'warn',\n  correlation_id: config._trace.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'AI Fallback',\n  message: 'AI call failed, using fallback message',\n  event_type: 'streak_notification',\n  recipient_id: config.student_id,\n  duration_ms: duration_ms,\n  error_code: 'AI_FALLBACK',\n  error_message: errorInfo.message || 'Unknown AI error'\n};\n\nconst cost = {\n  model: 'none',\n  tokens: { input: 0, output: 0, thinking: 0, total: 0 },\n  cost_usd: { input: 0, output: 0, thinking: 0, total: 0 },\n  fallback_reason: errorInfo.message || 'ai_call_failed'\n};\n\nconst trace = {\n  ...config._trace,\n  completed_at: new Date().toISOString(),\n  duration_ms: duration_ms,\n  path: 'ai_fallback',\n  error_reason: errorInfo.message || 'ai_call_failed'\n};\n\nreturn {\n  success: true,\n  notification: { title: 'Streak Alert', body: fallback },\n  student: { id: config.student_id, name: config.student_name, streak: config.current_streak },\n  ai_used: false,\n  _cost: cost,\n  _log: log,\n  _trace: trace\n};"
+      },
+      "id": "fallback",
+      "name": "AI Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1400, 180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond-fallback",
+      "name": "Respond Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1400, 340]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// PATTERN: Validation Error Log\n// ============================================\nconst data = $json;\n\nconst log = {\n  timestamp: new Date().toISOString(),\n  level: 'warn',\n  correlation_id: data._trace?.correlation_id,\n  workflow: $workflow.name,\n  execution_id: $execution.id,\n  node: 'Validation Error',\n  message: 'Input validation failed',\n  event_type: 'validation_error',\n  error_code: 'VALIDATION_ERROR',\n  error_details: data.error?.details || []\n};\n\nreturn {\n  ...data,\n  _log: log\n};"
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "respond-error",
+      "name": "Respond Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 440]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Entry Config", "type": "main", "index": 0}]] },
+    "Entry Config": { "main": [[{"node": "Validate Input", "type": "main", "index": 0}]] },
+    "Validate Input": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [ [{"node": "Call Gemini", "type": "main", "index": 0}], [{"node": "Log Error", "type": "main", "index": 0}] ] },
+    "Call Gemini": { "main": [[{"node": "Parse + Log", "type": "main", "index": 0}]], "error": [[{"node": "AI Fallback", "type": "main", "index": 0}]] },
+    "Parse + Log": { "main": [[{"node": "Respond Success", "type": "main", "index": 0}]] },
+    "AI Fallback": { "main": [[{"node": "Respond Fallback", "type": "main", "index": 0}]] },
+    "Log Error": { "main": [[{"node": "Respond Validation Error", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "staticData": null
+}

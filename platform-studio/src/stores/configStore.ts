@@ -12,6 +12,14 @@ import {
   DEFAULT_NOTIFICATION_SETTINGS,
 } from "@/types";
 
+// Customer type for multi-tenant support
+export type Customer = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+};
+
 // Layout settings for controlling widget appearance
 export type LayoutSettings = {
   gap: number; // Space between widgets (px)
@@ -42,6 +50,9 @@ export type ConfigState = {
   customerId: string | null;
   selectedRole: Role;
 
+  // Available customers for multi-tenant support
+  customers: Customer[];
+
   // Navigation (per role)
   tabs: Record<Role, TabConfig[]>;
 
@@ -64,6 +75,8 @@ export type ConfigState = {
   // Actions
   setCustomerId: (id: string) => void;
   setSelectedRole: (role: Role) => void;
+  setCustomers: (customers: Customer[]) => void;
+  addCustomer: (customer: Customer) => void;
 
   // Tab actions
   setTabs: (role: Role, tabs: TabConfig[]) => void;
@@ -224,6 +237,7 @@ export const useConfigStore = create<ConfigState>()(
       // Initial state
       customerId: null,
       selectedRole: "student",
+      customers: [],
 
       tabs: {
         student: DEFAULT_STUDENT_TABS,
@@ -447,6 +461,11 @@ export const useConfigStore = create<ConfigState>()(
       // Actions
       setCustomerId: (id) => set({ customerId: id }),
       setSelectedRole: (role) => set({ selectedRole: role }),
+      setCustomers: (customers) => set({ customers }),
+      addCustomer: (customer) =>
+        set((state) => ({
+          customers: [...state.customers, customer],
+        })),
 
       // Tab actions
       setTabs: (role, tabs) =>
@@ -654,6 +673,7 @@ export const useConfigStore = create<ConfigState>()(
       name: "platform-studio-config",
       partialize: (state) => ({
         customerId: state.customerId,
+        customers: state.customers,
         tabs: state.tabs,
         screenLayouts: state.screenLayouts,
         theme: state.theme,

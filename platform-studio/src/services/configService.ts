@@ -345,6 +345,182 @@ export async function loadFullConfig(customerId: string) {
   return { tabs, screenLayouts, theme, branding };
 }
 
+// ============ CUSTOMER MANAGEMENT ============
+
+export async function validateSlugAvailability(slug: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error && error.code !== "PGRST116") throw error;
+  return data === null;
+}
+
+export async function createCustomer(customerData: {
+  name: string;
+  slug: string;
+  subscription_tier?: string;
+  status?: string;
+}): Promise<string> {
+  const { data, error } = await supabase
+    .from("customers")
+    .insert({
+      name: customerData.name,
+      slug: customerData.slug,
+      subscription_tier: customerData.subscription_tier || "free",
+      status: customerData.status || "active",
+      created_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  return data.id;
+}
+
+export async function cloneCustomerConfig(
+  sourceCustomerId: string,
+  targetCustomerId: string,
+  overrides?: {
+    branding?: Partial<Omit<CustomerBranding, "customer_id">>;
+    theme?: Partial<Omit<ThemeConfig, "customer_id">>;
+  }
+): Promise<void> {
+  const sourceConfig = await loadFullConfig(sourceCustomerId);
+
+  await Promise.all([
+    ...(["student", "teacher", "parent", "admin"] as Role[]).map((role) =>
+      saveNavigationTabs(targetCustomerId, role, sourceConfig.tabs[role] || [])
+    ),
+    saveTheme(targetCustomerId, {
+      ...sourceConfig.theme!,
+      ...overrides?.theme,
+    }),
+    saveBranding(targetCustomerId, {
+      ...sourceConfig.branding!,
+      ...overrides?.branding,
+    }),
+  ]);
+
+  const screenLayoutPromises: Promise<void>[] = [];
+  (["student", "teacher", "parent", "admin"] as Role[]).forEach((role) => {
+    Object.entries(sourceConfig.screenLayouts[role] || {}).forEach(
+      ([screenId, layout]) => {
+        screenLayoutPromises.push(
+          saveScreenLayout(
+            targetCustomerId,
+            role,
+            screenId,
+            layout.widgets,
+            layout.layoutSettings
+          )
+        );
+      }
+    );
+  });
+
+  await Promise.all(screenLayoutPromises);
+}
+
+export async function initializeDefaultConfig(
+  customerId: string,
+  branding?: Partial<Omit<CustomerBranding, "customer_id">>
+): Promise<void> {
+  const DEFAULT_BRANDING: Omit<CustomerBranding, "customer_id"> = {
+    app_name: "Learning App",
+    app_tagline: "Learn Smarter",
+    ai_tutor_name: "AI Tutor",
+    doubt_section_name: "Ask Doubts",
+    assignment_name: "Assignment",
+    test_name: "Test",
+    live_class_name: "Live Class",
+    text_overrides: {},
+  };
+
+  const DEFAULT_THEME: Omit<ThemeConfig, "customer_id"> = {
+    primary_color: "#6750A4",
+    secondary_color: "#958DA5",
+    accent_color: "#7C4DFF",
+    background_color: "#FFFBFE",
+    surface_color: "#FFFFFF",
+    text_color: "#1C1B1F",
+    text_secondary_color: "#49454F",
+    error_color: "#B3261E",
+    success_color: "#2E7D32",
+    warning_color: "#ED6C02",
+    primary_color_dark: "#D0BCFF",
+    secondary_color_dark: "#CCC2DC",
+    accent_color_dark: "#9575FF",
+    background_color_dark: "#1C1B1F",
+    surface_color_dark: "#2B2930",
+    text_color_dark: "#E6E1E5",
+    text_secondary_color_dark: "#CAC4D0",
+    error_color_dark: "#F2B8B5",
+    success_color_dark: "#81C784",
+    warning_color_dark: "#FFB74D",
+    dark_mode_enabled: true,
+    font_family: "Inter",
+    font_scale: 1.0,
+    border_radius_small: 8,
+    border_radius_medium: 12,
+    border_radius_large: 16,
+    roundness: 12,
+    card_elevation: 2,
+    button_elevation: 1,
+    button_style: "filled",
+    card_style: "elevated",
+    input_style: "outlined",
+    chip_style: "filled",
+    theme_preset: "default",
+    status: "active",
+  };
+
+  await Promise.all([
+    saveTheme(customerId, DEFAULT_THEME),
+    saveBranding(customerId, { ...DEFAULT_BRANDING, ...branding }),
+  ]);
+}
+
+export async function createCustomerWithConfig(params: {
+  name: string;
+  slug: string;
+  subscription_tier?: string;
+  cloneFrom?: string;
+  branding?: Partial<Omit<CustomerBranding, "customer_id">>;
+  theme?: Partial<Omit<ThemeConfig, "customer_id">>;
+}): Promise<string> {
+  const isAvailable = await validateSlugAvailability(params.slug);
+  if (!isAvailable) {
+    throw new Error(`Slug "${params.slug}" is already taken`);
+  }
+
+  const customerId = await createCustomer({
+    name: params.name,
+    slug: params.slug,
+    subscription_tier: params.subscription_tier,
+  });
+
+  try {
+    if (params.cloneFrom) {
+      await cloneCustomerConfig(params.cloneFrom, customerId, {
+        branding: params.branding,
+        theme: params.theme,
+      });
+    } else {
+      await initializeDefaultConfig(customerId, params.branding);
+    }
+
+    await triggerConfigChangeEvent(customerId, "customer_created");
+
+    return customerId;
+  } catch (error) {
+    await supabase.from("customers").delete().eq("id", customerId);
+    throw error;
+  }
+}
+
 // ============ PUBLISH ============
 
 export async function triggerConfigChangeEvent(customerId: string, eventType: string, version?: number) {

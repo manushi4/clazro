@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useConfigStore } from "@/stores/configStore";
+import { CustomerSelector } from "@/components/CustomerSelector";
 import { ROLE_LABELS } from "@/types";
 import {
   LayoutDashboard,
@@ -20,10 +21,12 @@ import {
   Bell,
   Bot,
   Menu,
+  Building2,
 } from "lucide-react";
 
 const sidebarItems = [
   { href: "/studio", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/studio/schools", label: "Schools", icon: Building2 },
   { href: "/studio/navigation", label: "Navigation", icon: Navigation },
   { href: "/studio/drawer", label: "Drawer", icon: Menu },
   { href: "/studio/screens", label: "Screens", icon: Layers },
@@ -80,6 +83,14 @@ export default function StudioLayout({
             {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
+
+        {/* Customer Selector */}
+        {!collapsed && (
+          <div className="px-4 py-3 border-b">
+            <div className="text-xs text-gray-500 mb-2">School</div>
+            <CustomerSelector />
+          </div>
+        )}
 
         {/* Current Role Indicator */}
         {!collapsed && (
